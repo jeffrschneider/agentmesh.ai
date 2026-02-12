@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Getting Started — AgentMesh</title>
+  <link rel="icon" type="image/svg+xml" href="favicon.svg">
+  <link rel="stylesheet" href="styles.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+</head>
+<body>
+
+  <!-- ─── Sidebar Navigation ───────────────────────────────────── -->
+  <nav class="sidebar" id="sidebar">
+    <a href="index.html" class="sidebar-brand">AgentMesh</a>
+    <ul class="sidebar-nav">
+      <li><a href="index.html">Home</a></li>
+      <li><a href="how-it-works.html">How It Works</a></li>
+      <li><a href="concepts.html">The Network</a></li>
+      <li><a href="getting-started.html">Getting Started</a></li>
+      <li><a href="reference.html">Reference</a></li>
+      <li><a href="examples.html">Examples</a></li>
+      <li><a href="claude-code.html">For Claude Code</a></li>
+    </ul>
+    <div class="sidebar-footer">
+      <a href="https://github.com/jeffrschneider/AgentMesh">GitHub</a>
+      <button class="theme-toggle" title="Toggle theme">&#x263E;</button>
+    </div>
+  </nav>
+  <div class="sidebar-backdrop" id="sidebar-backdrop"></div>
+  <div class="mobile-topbar">
+    <a href="index.html" class="sidebar-brand">AgentMesh</a>
+    <button class="hamburger" aria-label="Menu">&#x2630;</button>
+  </div>
+  <div class="content-wrapper">
+
+  <!-- ─── Page Content ──────────────────────────────────────────── -->
+  <div class="page">
+
+    <h1>Build Your First Agent</h1>
+    <p>
+      Let's build an agent that connects to the mesh, registers itself, finds other agents,
+      and handles incoming requests. The whole thing is about 30 lines of code.
+    </p>
+
+    <!-- ─── Steps ─────────────────────────────────────────────────── -->
+    <div class="steps">
+
+      <!-- Step 1 -->
+      <div class="step">
+        <h3>Install the SDK</h3>
+        <p>
+          <strong>Prerequisites:</strong> Node.js 18+
+        </p>
+        <div class="code-block">
+          <span class="code-lang">bash</span>
+          <pre><code>npm install agentmesh</code></pre>
+        </div>
+        <p>
+          This gives you everything you need &mdash; connection handling, envelope building, the works.
+        </p>
+      </div>
+
+      <!-- Step 2 -->
+      <div class="step">
+        <h3>Connect to the mesh</h3>
+        <div class="code-block">
+          <span class="code-lang">typescript</span>
+          <pre><code><span class="kw">import</span> <span class="op">{</span> <span class="tp">AgentMesh</span> <span class="op">}</span> <span class="kw">from</span> <span class="str">"agentmesh"</span><span class="op">;</span>
+
+<span class="kw">const</span> mesh <span class="op">=</span> <span class="kw">await</span> <span class="tp">AgentMesh</span><span class="op">.</span><span class="fn">connect</span><span class="op">(</span><span class="str">"ws://your-nats-server:4443"</span><span class="op">);</span></code></pre>
+        </div>
+        <p>
+          This creates a WebSocket connection to the mesh. Once connected, your agent has a
+          unique ID and can start communicating.
+        </p>
+      </div>
+
+      <!-- Step 3 -->
+      <div class="step">
+        <h3>Register your agent</h3>
+        <div class="code-block">
+          <span class="code-lang">typescript</span>
+          <pre><code><span class="kw">await</span> mesh<span class="op">.</span><span class="fn">register</span><span class="op">({</span>
+  name<span class="op">:</span> <span class="str">"My First Agent"</span><span class="op">,</span>
+  description<span class="op">:</span> <span class="str">"A friendly agent that echoes messages back"</span><span class="op">,</span>
+  capabilities<span class="op">:</span> <span class="op">[</span><span class="str">"echo"</span><span class="op">],</span>
+  skills<span class="op">:</span> <span class="op">[</span>
+    <span class="op">{</span>
+      id<span class="op">:</span> <span class="str">"echo"</span><span class="op">,</span>
+      name<span class="op">:</span> <span class="str">"Echo"</span><span class="op">,</span>
+      description<span class="op">:</span> <span class="str">"Returns whatever you send it"</span><span class="op">,</span>
+    <span class="op">},</span>
+  <span class="op">],</span>
+<span class="op">});</span></code></pre>
+        </div>
+        <p>
+          Now every other agent on the mesh can find you. Your manifest is stored in the
+          registry, and you'll show up in discovery queries.
+        </p>
+      </div>
+
+      <!-- Step 4 -->
+      <div class="step">
+        <h3>Handle incoming requests</h3>
+        <div class="code-block">
+          <span class="code-lang">typescript</span>
+          <pre><code>mesh<span class="op">.</span><span class="fn">onRequest</span><span class="op">(</span><span class="str">"echo"</span><span class="op">,</span> <span class="op">(</span>payload<span class="op">,</span> ctx<span class="op">)</span> <span class="op">=&gt;</span> <span class="op">{</span>
+  <span class="kw">const</span> input <span class="op">=</span> payload<span class="op">.</span>input <span class="kw">as</span> <span class="op">{</span> text<span class="op">:</span> <span class="tp">string</span> <span class="op">};</span>
+  <span class="kw">return</span> <span class="op">{</span> text<span class="op">:</span> <span class="str">`Echo: <span class="op">${</span>input<span class="op">.</span>text<span class="op">}</span>`</span> <span class="op">};</span>
+<span class="op">});</span></code></pre>
+        </div>
+        <p>
+          When another agent asks you to use your 'echo' skill, this function runs.
+          Whatever you return becomes the response.
+        </p>
+      </div>
+
+      <!-- Step 5 -->
+      <div class="step">
+        <h3>Discover other agents</h3>
+        <div class="code-block">
+          <span class="code-lang">typescript</span>
+          <pre><code><span class="kw">const</span> result <span class="op">=</span> <span class="kw">await</span> mesh<span class="op">.</span><span class="fn">discover</span><span class="op">();</span>
+
+<span class="kw">for</span> <span class="op">(</span><span class="kw">const</span> agent <span class="kw">of</span> result<span class="op">.</span>agents<span class="op">)</span> <span class="op">{</span>
+  console<span class="op">.</span><span class="fn">log</span><span class="op">(</span><span class="str">`<span class="op">${</span>agent<span class="op">.</span>name<span class="op">}</span> — <span class="op">${</span>agent<span class="op">.</span>availability<span class="op">}</span>`</span><span class="op">);</span>
+<span class="op">}</span></code></pre>
+        </div>
+        <p>
+          This queries the registry and returns every online agent. You can filter by
+          capability or skill too.
+        </p>
+      </div>
+
+      <!-- Step 6 -->
+      <div class="step">
+        <h3>Send a request</h3>
+        <div class="code-block">
+          <span class="code-lang">typescript</span>
+          <pre><code><span class="kw">const</span> agent <span class="op">=</span> result<span class="op">.</span>agents<span class="op">[</span><span class="num">0</span><span class="op">];</span>
+
+<span class="kw">const</span> response <span class="op">=</span> <span class="kw">await</span> mesh<span class="op">.</span><span class="fn">request</span><span class="op">(</span>agent<span class="op">.</span>id<span class="op">,</span> <span class="str">"echo"</span><span class="op">,</span> <span class="op">{</span>
+  text<span class="op">:</span> <span class="str">"Hello from my first agent!"</span><span class="op">,</span>
+<span class="op">});</span>
+
+console<span class="op">.</span><span class="fn">log</span><span class="op">(</span>response<span class="op">.</span>payload<span class="op">.</span>output<span class="op">);</span>
+<span class="cm">// { text: "Echo: Hello from my first agent!" }</span></code></pre>
+        </div>
+        <p>
+          You pick an agent, choose a skill, send input, and get output back. The mesh handles
+          routing, tracing, and error handling.
+        </p>
+      </div>
+
+      <!-- Step 7 -->
+      <div class="step">
+        <h3>Clean up</h3>
+        <div class="code-block">
+          <span class="code-lang">typescript</span>
+          <pre><code><span class="kw">await</span> mesh<span class="op">.</span><span class="fn">close</span><span class="op">();</span></code></pre>
+        </div>
+        <p>
+          Always close your connection when you're done.
+        </p>
+      </div>
+
+    </div>
+
+    <hr>
+
+    <!-- ─── Putting It All Together ───────────────────────────────── -->
+    <h2>Putting it all together</h2>
+    <p>
+      Here's the complete agent in a single file. Copy this, swap in your server address,
+      and run it.
+    </p>
+
+    <div class="code-block">
+      <span class="code-lang">typescript</span>
+      <pre><code><span class="kw">import</span> <span class="op">{</span> <span class="tp">AgentMesh</span> <span class="op">}</span> <span class="kw">from</span> <span class="str">"agentmesh"</span><span class="op">;</span>
+
+<span class="cm">// Connect to the mesh</span>
+<span class="kw">const</span> mesh <span class="op">=</span> <span class="kw">await</span> <span class="tp">AgentMesh</span><span class="op">.</span><span class="fn">connect</span><span class="op">(</span><span class="str">"ws://your-nats-server:4443"</span><span class="op">);</span>
+
+<span class="cm">// Register this agent</span>
+<span class="kw">await</span> mesh<span class="op">.</span><span class="fn">register</span><span class="op">({</span>
+  name<span class="op">:</span> <span class="str">"My First Agent"</span><span class="op">,</span>
+  description<span class="op">:</span> <span class="str">"A friendly agent that echoes messages back"</span><span class="op">,</span>
+  capabilities<span class="op">:</span> <span class="op">[</span><span class="str">"echo"</span><span class="op">],</span>
+  skills<span class="op">:</span> <span class="op">[</span>
+    <span class="op">{</span>
+      id<span class="op">:</span> <span class="str">"echo"</span><span class="op">,</span>
+      name<span class="op">:</span> <span class="str">"Echo"</span><span class="op">,</span>
+      description<span class="op">:</span> <span class="str">"Returns whatever you send it"</span><span class="op">,</span>
+    <span class="op">},</span>
+  <span class="op">],</span>
+<span class="op">});</span>
+
+<span class="cm">// Handle incoming echo requests</span>
+mesh<span class="op">.</span><span class="fn">onRequest</span><span class="op">(</span><span class="str">"echo"</span><span class="op">,</span> <span class="op">(</span>payload<span class="op">,</span> ctx<span class="op">)</span> <span class="op">=&gt;</span> <span class="op">{</span>
+  <span class="kw">const</span> input <span class="op">=</span> payload<span class="op">.</span>input <span class="kw">as</span> <span class="op">{</span> text<span class="op">:</span> <span class="tp">string</span> <span class="op">};</span>
+  <span class="kw">return</span> <span class="op">{</span> text<span class="op">:</span> <span class="str">`Echo: <span class="op">${</span>input<span class="op">.</span>text<span class="op">}</span>`</span> <span class="op">};</span>
+<span class="op">});</span>
+
+<span class="cm">// Discover other agents on the mesh</span>
+<span class="kw">const</span> result <span class="op">=</span> <span class="kw">await</span> mesh<span class="op">.</span><span class="fn">discover</span><span class="op">();</span>
+
+<span class="kw">for</span> <span class="op">(</span><span class="kw">const</span> agent <span class="kw">of</span> result<span class="op">.</span>agents<span class="op">)</span> <span class="op">{</span>
+  console<span class="op">.</span><span class="fn">log</span><span class="op">(</span><span class="str">`<span class="op">${</span>agent<span class="op">.</span>name<span class="op">}</span> — <span class="op">${</span>agent<span class="op">.</span>availability<span class="op">}</span>`</span><span class="op">);</span>
+<span class="op">}</span>
+
+<span class="cm">// Send a request to the first agent found</span>
+<span class="kw">const</span> target <span class="op">=</span> result<span class="op">.</span>agents<span class="op">[</span><span class="num">0</span><span class="op">];</span>
+
+<span class="kw">const</span> response <span class="op">=</span> <span class="kw">await</span> mesh<span class="op">.</span><span class="fn">request</span><span class="op">(</span>target<span class="op">.</span>id<span class="op">,</span> <span class="str">"echo"</span><span class="op">,</span> <span class="op">{</span>
+  text<span class="op">:</span> <span class="str">"Hello from my first agent!"</span><span class="op">,</span>
+<span class="op">});</span>
+
+console<span class="op">.</span><span class="fn">log</span><span class="op">(</span>response<span class="op">.</span>payload<span class="op">.</span>output<span class="op">);</span>
+<span class="cm">// { text: "Echo: Hello from my first agent!" }</span>
+
+<span class="cm">// Disconnect</span>
+<span class="kw">await</span> mesh<span class="op">.</span><span class="fn">close</span><span class="op">();</span></code></pre>
+    </div>
+
+    <hr>
+
+    <!-- ─── What Just Happened? ───────────────────────────────────── -->
+    <h2>What just happened?</h2>
+    <p>
+      In those ~30 lines, your agent did everything a mesh participant needs to do:
+    </p>
+    <ol>
+      <li><strong>Connected</strong> to the mesh over WebSocket.</li>
+      <li><strong>Registered</strong> itself with a name, description, and list of skills so other agents can find it.</li>
+      <li><strong>Declared a request handler</strong> for its "echo" skill, ready to respond when asked.</li>
+      <li><strong>Discovered</strong> every other online agent by querying the registry.</li>
+      <li><strong>Sent a request</strong> to another agent and received a structured response.</li>
+      <li><strong>Closed</strong> the connection cleanly.</li>
+    </ol>
+    <p>
+      The mesh handled all the hard parts behind the scenes &mdash; message routing,
+      envelope construction, distributed tracing, and error propagation. Your code
+      just focused on the logic.
+    </p>
+
+    <hr>
+
+    <!-- ─── Where to Go Next ──────────────────────────────────────── -->
+    <h2>Where to go next</h2>
+
+    <div class="card-grid">
+      <a href="concepts.html" class="card">
+        <h3>The Network</h3>
+        <p>How agents connect &mdash; within an organization, between companies, or from a browser at home.</p>
+      </a>
+      <a href="reference.html" class="card">
+        <h3>Reference</h3>
+        <p>Full API surface, envelope fields, error codes, subject namespaces, and task states.</p>
+      </a>
+      <a href="examples.html" class="card">
+        <h3>Examples</h3>
+        <p>Real-world patterns: multi-agent workflows, event-driven pipelines, and more.</p>
+      </a>
+    </div>
+
+  </div>
+
+  <!-- ─── Footer ──────────────────────────────────────────────── -->
+  <footer class="footer">
+    <p>AgentMesh &mdash; Open protocol for agent-to-agent communication.
+      <a href="https://github.com/jeffrschneider/AgentMesh">GitHub</a>
+    </p>
+  </footer>
+
+  </div><!-- /.content-wrapper -->
+
+  <script src="script.js"></script>
+</body>
+</html>

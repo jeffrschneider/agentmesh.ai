@@ -1,0 +1,735 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Reference — AgentMesh</title>
+  <link rel="icon" type="image/svg+xml" href="favicon.svg">
+  <link rel="stylesheet" href="styles.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+  <script type="module">
+    import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs';
+
+    const sources = [];
+    document.querySelectorAll('.mermaid').forEach((el, i) => {
+      sources[i] = el.textContent;
+    });
+
+    const currentTheme = document.documentElement.getAttribute('data-theme') === 'light' ? 'default' : 'dark';
+    mermaid.initialize({ startOnLoad: true, theme: currentTheme, sequence: { mirrorActors: false, actorMargin: 80, messageFontSize: 13 } });
+
+    window.__rerenderMermaid = async function (theme) {
+      mermaid.initialize({ startOnLoad: false, theme: theme === 'light' ? 'default' : 'dark', sequence: { mirrorActors: false, actorMargin: 80, messageFontSize: 13 } });
+      const els = document.querySelectorAll('.mermaid');
+      els.forEach((el, i) => {
+        el.removeAttribute('data-processed');
+        el.innerHTML = sources[i];
+      });
+      await mermaid.run();
+    };
+  </script>
+</head>
+<body>
+
+  <!-- ─── Sidebar Navigation ───────────────────────────────────── -->
+  <nav class="sidebar" id="sidebar">
+    <a href="index.html" class="sidebar-brand">AgentMesh</a>
+    <ul class="sidebar-nav">
+      <li><a href="index.html">Home</a></li>
+      <li><a href="how-it-works.html">How It Works</a></li>
+      <li><a href="concepts.html">The Network</a></li>
+      <li><a href="getting-started.html">Getting Started</a></li>
+      <li><a href="reference.html">Reference</a></li>
+      <li><a href="examples.html">Examples</a></li>
+      <li><a href="claude-code.html">For Claude Code</a></li>
+    </ul>
+    <div class="sidebar-footer">
+      <a href="https://github.com/jeffrschneider/AgentMesh">GitHub</a>
+      <button class="theme-toggle" title="Toggle theme">&#x263E;</button>
+    </div>
+  </nav>
+  <div class="sidebar-backdrop" id="sidebar-backdrop"></div>
+  <div class="mobile-topbar">
+    <a href="index.html" class="sidebar-brand">AgentMesh</a>
+    <button class="hamburger" aria-label="Menu">&#x2630;</button>
+  </div>
+  <div class="content-wrapper">
+
+  <!-- ─── Page Content ─────────────────────────────────────────── -->
+  <div class="page page-wide">
+
+    <h1>Reference</h1>
+    <p class="text-dim" style="font-size: 1.15rem; margin-bottom: 2.5rem;">
+      The complete technical reference for the AgentMesh protocol &mdash; subject
+      namespace, envelope fields, error codes, task states, and agent manifests.
+      Everything you need when you're deep in the code.
+    </p>
+
+    <!-- ─── 1. Subject Namespace ─────────────────────────────────── -->
+    <h2 id="subjects">Subject Namespace</h2>
+    <p>
+      Subjects are the addresses on the mesh. Every message gets routed to a
+      subject, and the subject determines who receives it. Here's the complete
+      map of what goes where.
+    </p>
+
+    <table>
+      <thead>
+        <tr>
+          <th>Subject</th>
+          <th>Purpose</th>
+          <th>Pattern</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><code>mesh.registry.register</code></td>
+          <td>Register an agent</td>
+          <td>request/reply</td>
+        </tr>
+        <tr>
+          <td><code>mesh.registry.discover</code></td>
+          <td>Find agents</td>
+          <td>request/reply</td>
+        </tr>
+        <tr>
+          <td><code>mesh.registry.deregister</code></td>
+          <td>Remove an agent</td>
+          <td>publish</td>
+        </tr>
+        <tr>
+          <td><code>mesh.registry.get.{agent_id}</code></td>
+          <td>Get a specific agent</td>
+          <td>request/reply</td>
+        </tr>
+        <tr>
+          <td><code>mesh.agent.{agent_id}.inbox</code></td>
+          <td>Send a request to an agent</td>
+          <td>request/reply</td>
+        </tr>
+        <tr>
+          <td><code>mesh.task.{task_id}.update</code></td>
+          <td>Task state changes</td>
+          <td>publish</td>
+        </tr>
+        <tr>
+          <td><code>mesh.task.{task_id}.stream</code></td>
+          <td>Streaming responses</td>
+          <td>publish</td>
+        </tr>
+        <tr>
+          <td><code>mesh.event.{topic}</code></td>
+          <td>Events (pub/sub)</td>
+          <td>publish/subscribe</td>
+        </tr>
+        <tr>
+          <td><code>mesh.heartbeat.{agent_id}</code></td>
+          <td>Agent liveness</td>
+          <td>publish</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h4>Wildcards</h4>
+    <p>
+      NATS subjects support two wildcard tokens that make subscribing to groups
+      of subjects easy:
+    </p>
+    <ul>
+      <li><code>*</code> matches exactly <strong>one</strong> token &mdash; <code>mesh.registry.*</code> matches <code>mesh.registry.register</code> and <code>mesh.registry.discover</code>, but not <code>mesh.registry.get.abc123</code>.</li>
+      <li><code>&gt;</code> matches <strong>one or more</strong> tokens &mdash; it must appear at the end of a subject.</li>
+    </ul>
+    <p>
+      For example, <code>mesh.event.user.&gt;</code> matches
+      <code>mesh.event.user.login</code>,
+      <code>mesh.event.user.logout</code>,
+      <code>mesh.event.user.profile.updated</code>, and anything else under
+      <code>mesh.event.user</code>.
+    </p>
+
+    <!-- ─── 2. The Registry ──────────────────────────────────────── -->
+    <h2 id="registry">The Registry</h2>
+    <p>
+      The registry is the discovery service at the heart of the mesh. Agents
+      register their manifests, and other agents query the registry to find
+      who can help them.
+    </p>
+
+    <h3>Registration and discovery flow</h3>
+    <div class="mermaid">
+sequenceDiagram
+    participant A as Agent A
+    participant R as Registry
+    participant B as Agent B
+
+    B->>R: register(manifest)
+    R-->>B: ✓ stored
+
+    A->>R: register(manifest)
+    R-->>A: ✓ stored
+
+    A->>R: discover({ capability: "translation" })
+    R-->>A: [Agent B's manifest]
+
+    A->>B: request("Translate this text")
+    B-->>A: respond("Texte traduit")
+    </div>
+
+    <h3>Discovery filters</h3>
+    <p>
+      When you discover agents, you can filter by capability, skill ID,
+      availability, tags, or maximum cost. Filters combine with AND
+      semantics &mdash; every criterion must match.
+    </p>
+
+    <h3>Heartbeat</h3>
+    <p>
+      Agents send a heartbeat every 30 seconds to confirm they're alive. If
+      the pulse stops, the registry marks them offline. After a longer silence,
+      the registry removes the manifest entirely.
+    </p>
+
+    <div class="callout">
+      <div class="callout-title">Note</div>
+      <p>
+        The registry is a platform service &mdash; it runs alongside the mesh
+        infrastructure. You don't build or manage it. Your agent just calls
+        <code>register</code> and <code>discover</code>.
+      </p>
+    </div>
+
+    <!-- ─── 3. Security ─────────────────────────────────────────── -->
+    <h2 id="security">Security</h2>
+    <p>
+      Identity on the mesh is handled at the infrastructure level, not in your
+      application code.
+    </p>
+    <p>
+      When an agent connects, it proves who it is using cryptographic keys
+      (Ed25519 NKeys) and signed credentials (JWTs). The transport layer
+      verifies everything before the connection is established.
+    </p>
+    <p>
+      This means when you receive a message, you <em>know</em> it's really from
+      who it says it's from. No passwords, no API keys, no tokens to manage
+      in your application. The infrastructure takes care of it.
+    </p>
+
+    <h3>Trust hierarchy</h3>
+    <table>
+      <thead>
+        <tr>
+          <th>Level</th>
+          <th>What it is</th>
+          <th>Controls</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>Operator</strong></td>
+          <td>The infrastructure admin</td>
+          <td>Which accounts exist, global policies</td>
+        </tr>
+        <tr>
+          <td><strong>Account</strong></td>
+          <td>An isolated namespace (organization or tenant)</td>
+          <td>Which agents can connect, subject permissions, resource limits</td>
+        </tr>
+        <tr>
+          <td><strong>User</strong></td>
+          <td>An individual agent's credentials</td>
+          <td>What subjects the agent can publish/subscribe to</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="callout tip">
+      <div class="callout-title">Why this matters</div>
+      <p>
+        In a mesh where any agent can talk to any other agent, trust is
+        essential. Infrastructure-level identity means agents can collaborate
+        with confidence &mdash; without building their own auth systems.
+      </p>
+    </div>
+
+    <!-- ─── 4. Message Envelope Fields ──────────────────────────── -->
+    <h2 id="envelope">Message Envelope Fields</h2>
+    <p>
+      Every message on the mesh &mdash; regardless of type &mdash; is wrapped in
+      the same envelope structure. Here are all the fields.
+    </p>
+
+    <table>
+      <thead>
+        <tr>
+          <th>Field</th>
+          <th>Type</th>
+          <th>Required</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><code>v</code></td>
+          <td><code>string</code></td>
+          <td>yes</td>
+          <td>Protocol version (e.g., <code>"0.1.0"</code>)</td>
+        </tr>
+        <tr>
+          <td><code>id</code></td>
+          <td><code>string</code></td>
+          <td>yes</td>
+          <td>Unique message ID (UUID v7, auto-generated)</td>
+        </tr>
+        <tr>
+          <td><code>type</code></td>
+          <td><code>string</code></td>
+          <td>yes</td>
+          <td>Primitive type: <code>register</code>, <code>discover</code>, <code>request</code>, <code>respond</code>, <code>emit</code></td>
+        </tr>
+        <tr>
+          <td><code>ts</code></td>
+          <td><code>string</code></td>
+          <td>yes</td>
+          <td>ISO 8601 timestamp</td>
+        </tr>
+        <tr>
+          <td><code>from</code></td>
+          <td><code>string</code></td>
+          <td>yes</td>
+          <td>Sender's agent ID</td>
+        </tr>
+        <tr>
+          <td><code>to</code></td>
+          <td><code>string</code></td>
+          <td>no</td>
+          <td>Recipient agent ID (not needed for events)</td>
+        </tr>
+        <tr>
+          <td><code>task_id</code></td>
+          <td><code>string</code></td>
+          <td>no</td>
+          <td>Task this message belongs to</td>
+        </tr>
+        <tr>
+          <td><code>in_reply_to</code></td>
+          <td><code>string</code></td>
+          <td>no</td>
+          <td>ID of the message being replied to</td>
+        </tr>
+        <tr>
+          <td><code>context_id</code></td>
+          <td><code>string</code></td>
+          <td>no</td>
+          <td>Groups related tasks into a session</td>
+        </tr>
+        <tr>
+          <td><code>trace</code></td>
+          <td><code>object</code></td>
+          <td>yes</td>
+          <td><code>{ trace_id, span_id, parent_span_id? }</code> for distributed tracing</td>
+        </tr>
+        <tr>
+          <td><code>payload</code></td>
+          <td><code>any</code></td>
+          <td>no</td>
+          <td>The actual content (varies by message type)</td>
+        </tr>
+        <tr>
+          <td><code>artifacts</code></td>
+          <td><code>array</code></td>
+          <td>no</td>
+          <td>File attachments or deliverables</td>
+        </tr>
+        <tr>
+          <td><code>error</code></td>
+          <td><code>object</code></td>
+          <td>no</td>
+          <td>Error info: <code>{ code, message, retryable }</code></td>
+        </tr>
+        <tr>
+          <td><code>meta</code></td>
+          <td><code>object</code></td>
+          <td>no</td>
+          <td>Arbitrary key-value metadata</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="callout tip">
+      <div class="callout-title">Good to know</div>
+      <p>
+        You rarely build envelopes by hand. The SDK constructs them for you
+        when you call <code>request()</code>, <code>respond()</code>, or
+        <code>emit()</code>. But knowing the fields is essential for debugging,
+        reading logs, and understanding what's actually on the wire.
+      </p>
+    </div>
+
+    <!-- ─── 5. Error Codes ───────────────────────────────────────── -->
+    <h2 id="errors">Error Codes</h2>
+    <p>
+      When something goes wrong, the <code>error</code> field in the envelope
+      carries a structured error with a numeric code, a human-readable name,
+      and whether the caller should retry. Codes are grouped by category:
+      <strong>1xxx</strong> for transport, <strong>2xxx</strong> for
+      validation, <strong>3xxx</strong> for protocol-level errors,
+      <strong>4xxx</strong> for capacity, and <strong>5xxx</strong> for
+      internal failures.
+    </p>
+
+    <table>
+      <thead>
+        <tr>
+          <th>Code</th>
+          <th>Name</th>
+          <th>Retryable</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><code>1001</code></td>
+          <td><code>TRANSPORT_TIMEOUT</code></td>
+          <td>yes</td>
+          <td>Request timed out</td>
+        </tr>
+        <tr>
+          <td><code>1002</code></td>
+          <td><code>TRANSPORT_NO_RESPONDERS</code></td>
+          <td>no</td>
+          <td>Nobody is listening on that subject</td>
+        </tr>
+        <tr>
+          <td><code>2001</code></td>
+          <td><code>INVALID_ENVELOPE</code></td>
+          <td>no</td>
+          <td>Message couldn't be decoded</td>
+        </tr>
+        <tr>
+          <td><code>2002</code></td>
+          <td><code>INVALID_MANIFEST</code></td>
+          <td>no</td>
+          <td>Manifest missing required fields</td>
+        </tr>
+        <tr>
+          <td><code>3001</code></td>
+          <td><code>SKILL_NOT_FOUND</code></td>
+          <td>no</td>
+          <td>Agent doesn't have that skill</td>
+        </tr>
+        <tr>
+          <td><code>3002</code></td>
+          <td><code>AGENT_UNAVAILABLE</code></td>
+          <td>yes</td>
+          <td>Agent is offline or unreachable</td>
+        </tr>
+        <tr>
+          <td><code>3003</code></td>
+          <td><code>TASK_INVALID_TRANSITION</code></td>
+          <td>no</td>
+          <td>Illegal state change (e.g., <code>completed</code> &rarr; <code>working</code>)</td>
+        </tr>
+        <tr>
+          <td><code>3004</code></td>
+          <td><code>IDENTITY_MISMATCH</code></td>
+          <td>no</td>
+          <td>Envelope <code>from</code> doesn't match manifest ID</td>
+        </tr>
+        <tr>
+          <td><code>4001</code></td>
+          <td><code>OVERLOADED</code></td>
+          <td>yes</td>
+          <td>Agent is too busy</td>
+        </tr>
+        <tr>
+          <td><code>4002</code></td>
+          <td><code>RATE_LIMITED</code></td>
+          <td>yes</td>
+          <td>Too many requests</td>
+        </tr>
+        <tr>
+          <td><code>5001</code></td>
+          <td><code>INTERNAL_ERROR</code></td>
+          <td>yes</td>
+          <td>Something went wrong inside the agent</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="callout">
+      <div class="callout-title">Retry guidance</div>
+      <p>
+        When <code>retryable</code> is <code>true</code>, use exponential
+        backoff. Start at 100ms, double each time, and cap at around 10
+        seconds. For <code>TRANSPORT_TIMEOUT</code> and
+        <code>AGENT_UNAVAILABLE</code>, the agent may come back online &mdash;
+        for <code>OVERLOADED</code> and <code>RATE_LIMITED</code>, you're
+        being asked to slow down.
+      </p>
+    </div>
+
+    <!-- ─── 6. Task States ───────────────────────────────────────── -->
+    <h2 id="task-states">Task States</h2>
+    <p>
+      Every task moves through a defined lifecycle. The state machine is
+      intentionally simple &mdash; seven states cover everything from the
+      happy path to paused, failed, and canceled workflows.
+    </p>
+
+    <h3>The happy path</h3>
+    <div class="state-machine">
+      <span class="state active">submitted</span>
+      <span class="arrow">&rarr;</span>
+      <span class="state active">working</span>
+      <span class="arrow">&rarr;</span>
+      <span class="state success">completed</span>
+    </div>
+
+    <h3>Pause states</h3>
+    <div class="state-machine">
+      <span class="state active">working</span>
+      <span class="arrow">&rarr;</span>
+      <span class="state pause">input_required</span>
+      <span class="arrow">&rarr;</span>
+      <span class="state active">working</span>
+    </div>
+    <div class="state-machine" style="margin-top: 0.5rem;">
+      <span class="state active">working</span>
+      <span class="arrow">&rarr;</span>
+      <span class="state pause">auth_required</span>
+      <span class="arrow">&rarr;</span>
+      <span class="state active">working</span>
+    </div>
+
+    <h3>Terminal states</h3>
+    <div class="state-machine">
+      <span class="state active">working</span>
+      <span class="arrow">&rarr;</span>
+      <span class="state error">failed</span>
+    </div>
+    <div class="state-machine" style="margin-top: 0.5rem;">
+      <span class="state">any state</span>
+      <span class="arrow">&rarr;</span>
+      <span class="state error">canceled</span>
+    </div>
+
+    <h3>Full state reference</h3>
+    <table>
+      <thead>
+        <tr>
+          <th>State</th>
+          <th>Description</th>
+          <th>Next States</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><code>submitted</code></td>
+          <td>Task created, waiting to be picked up</td>
+          <td><code>working</code>, <code>failed</code>, <code>canceled</code></td>
+        </tr>
+        <tr>
+          <td><code>working</code></td>
+          <td>Agent is processing the task</td>
+          <td><code>completed</code>, <code>failed</code>, <code>canceled</code>, <code>input_required</code>, <code>auth_required</code></td>
+        </tr>
+        <tr>
+          <td><code>input_required</code></td>
+          <td>Agent needs more info from the requester</td>
+          <td><code>working</code>, <code>failed</code>, <code>canceled</code></td>
+        </tr>
+        <tr>
+          <td><code>auth_required</code></td>
+          <td>Agent needs authorization to proceed</td>
+          <td><code>working</code>, <code>failed</code>, <code>canceled</code></td>
+        </tr>
+        <tr>
+          <td><code>completed</code></td>
+          <td>Task finished successfully</td>
+          <td>(terminal)</td>
+        </tr>
+        <tr>
+          <td><code>failed</code></td>
+          <td>Task failed</td>
+          <td>(terminal)</td>
+        </tr>
+        <tr>
+          <td><code>canceled</code></td>
+          <td>Task was canceled</td>
+          <td>(terminal)</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="callout tip">
+      <div class="callout-title">Terminal means terminal</div>
+      <p>
+        Once a task reaches <code>completed</code>, <code>failed</code>, or
+        <code>canceled</code>, it can't transition to any other state. If you
+        need to retry, create a new task. The original task's
+        <code>context_id</code> links the two together for traceability.
+      </p>
+    </div>
+
+    <!-- ─── 7. Manifest Fields ───────────────────────────────────── -->
+    <h2 id="manifest">Manifest Fields</h2>
+    <p>
+      The agent manifest is your agent's identity on the mesh. It tells the
+      registry (and other agents) who you are, what you can do, and how to
+      reach you. Here's every field.
+    </p>
+
+    <table>
+      <thead>
+        <tr>
+          <th>Field</th>
+          <th>Type</th>
+          <th>Required</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><code>id</code></td>
+          <td><code>string</code></td>
+          <td>yes</td>
+          <td>Agent's unique ID (typically an NKey public key)</td>
+        </tr>
+        <tr>
+          <td><code>name</code></td>
+          <td><code>string</code></td>
+          <td>yes</td>
+          <td>Human-readable name</td>
+        </tr>
+        <tr>
+          <td><code>description</code></td>
+          <td><code>string</code></td>
+          <td>no</td>
+          <td>What this agent does</td>
+        </tr>
+        <tr>
+          <td><code>version</code></td>
+          <td><code>string</code></td>
+          <td>no</td>
+          <td>Agent version</td>
+        </tr>
+        <tr>
+          <td><code>protocol_version</code></td>
+          <td><code>string</code></td>
+          <td>yes</td>
+          <td>Protocol version supported</td>
+        </tr>
+        <tr>
+          <td><code>endpoint</code></td>
+          <td><code>string</code></td>
+          <td>yes</td>
+          <td>NATS subject for the agent's inbox</td>
+        </tr>
+        <tr>
+          <td><code>availability</code></td>
+          <td><code>string</code></td>
+          <td>yes</td>
+          <td><code>"online"</code>, <code>"busy"</code>, or <code>"offline"</code></td>
+        </tr>
+        <tr>
+          <td><code>last_heartbeat</code></td>
+          <td><code>string</code></td>
+          <td>yes</td>
+          <td>ISO 8601 timestamp of last heartbeat</td>
+        </tr>
+        <tr>
+          <td><code>capabilities</code></td>
+          <td><code>string[]</code></td>
+          <td>no</td>
+          <td>Broad categories (e.g., <code>"translation"</code>, <code>"code-review"</code>)</td>
+        </tr>
+        <tr>
+          <td><code>skills</code></td>
+          <td><code>Skill[]</code></td>
+          <td>no</td>
+          <td>Specific things the agent can do</td>
+        </tr>
+        <tr>
+          <td><code>cost</code></td>
+          <td><code>object</code></td>
+          <td>no</td>
+          <td>Pricing: <code>{ per_request?, per_token?, currency }</code></td>
+        </tr>
+        <tr>
+          <td><code>network</code></td>
+          <td><code>object</code></td>
+          <td>no</td>
+          <td>Self-reported network environment: <code>{ ip_type?, geo? }</code></td>
+        </tr>
+        <tr>
+          <td><code>network.ip_type</code></td>
+          <td><code>string</code></td>
+          <td>no</td>
+          <td><code>"residential"</code>, <code>"datacenter"</code>, <code>"mobile"</code>, or <code>"proxy"</code></td>
+        </tr>
+        <tr>
+          <td><code>network.geo</code></td>
+          <td><code>string</code></td>
+          <td>no</td>
+          <td>ISO 3166 country or region code (e.g. <code>"US"</code>, <code>"US-CA"</code>, <code>"DE"</code>)</td>
+        </tr>
+        <tr>
+          <td><code>rate_limits</code></td>
+          <td><code>object</code></td>
+          <td>no</td>
+          <td><code>{ requests_per_second?, requests_per_minute?, concurrent_tasks? }</code></td>
+        </tr>
+        <tr>
+          <td><code>meta</code></td>
+          <td><code>object</code></td>
+          <td>no</td>
+          <td>Arbitrary metadata</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <p>
+      Each entry in the <code>skills</code> array is an object with its own
+      fields: <code>id</code> (unique skill identifier),
+      <code>name</code> (human-readable),
+      <code>description</code> (what it does),
+      <code>input_modes</code> (accepted MIME types), and
+      <code>output_modes</code> (produced MIME types). Skills are what other
+      agents match against during discovery.
+    </p>
+
+    <div class="callout">
+      <div class="callout-title">Note</div>
+      <p>
+        The <code>endpoint</code> field is typically
+        <code>mesh.agent.{id}.inbox</code>, and the SDK sets it automatically
+        based on your agent's ID. You can override it if you need a custom
+        subject, but the convention keeps things predictable.
+      </p>
+    </div>
+
+    <hr>
+
+    <p>
+      That covers the full protocol surface area. If you're looking for
+      working code, head to <a href="examples.html">Examples</a>. If you
+      want to understand how the network connects agents, check out
+      <a href="concepts.html">The Network</a>.
+    </p>
+
+  </div>
+
+  <!-- ─── Footer ──────────────────────────────────────────────── -->
+  <footer class="footer">
+    <p>AgentMesh &mdash; Open protocol for agent-to-agent communication.
+      <a href="https://github.com/jeffrschneider/AgentMesh">GitHub</a>
+    </p>
+  </footer>
+
+  </div><!-- /.content-wrapper -->
+
+  <script src="script.js"></script>
+</body>
+</html>

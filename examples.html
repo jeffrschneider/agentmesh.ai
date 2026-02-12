@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Examples — AgentMesh</title>
+  <link rel="icon" type="image/svg+xml" href="favicon.svg">
+  <link rel="stylesheet" href="styles.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+</head>
+<body>
+
+  <!-- ─── Sidebar Navigation ───────────────────────────────────── -->
+  <nav class="sidebar" id="sidebar">
+    <a href="index.html" class="sidebar-brand">AgentMesh</a>
+    <ul class="sidebar-nav">
+      <li><a href="index.html">Home</a></li>
+      <li><a href="how-it-works.html">How It Works</a></li>
+      <li><a href="concepts.html">The Network</a></li>
+      <li><a href="getting-started.html">Getting Started</a></li>
+      <li><a href="reference.html">Reference</a></li>
+      <li><a href="examples.html">Examples</a></li>
+      <li><a href="claude-code.html">For Claude Code</a></li>
+    </ul>
+    <div class="sidebar-footer">
+      <a href="https://github.com/jeffrschneider/AgentMesh">GitHub</a>
+      <button class="theme-toggle" title="Toggle theme">&#x263E;</button>
+    </div>
+  </nav>
+  <div class="sidebar-backdrop" id="sidebar-backdrop"></div>
+  <div class="mobile-topbar">
+    <a href="index.html" class="sidebar-brand">AgentMesh</a>
+    <button class="hamburger" aria-label="Menu">&#x2630;</button>
+  </div>
+  <div class="content-wrapper">
+
+  <!-- ─── Page Content ────────────────────────────────────────── -->
+  <div class="page">
+
+    <h1>Examples</h1>
+    <p>
+      Real working examples of agents communicating on the mesh. Each one shows
+      complete, runnable code &mdash; not just snippets &mdash; so you can see
+      exactly how the pieces fit together.
+    </p>
+
+    <!-- ─── Example 1: Two-Agent Chat ──────────────────────────── -->
+    <h2 id="two-agent-chat">Example 1: Two-Agent Chat</h2>
+    <p>
+      The simplest possible multi-agent interaction: Jeff's agent and Bob's agent
+      have a conversation through the mesh. Jeff's agent discovers Bob, sends a
+      chat message, and Bob's agent replies.
+    </p>
+
+    <h3>Bob's side &mdash; handle chat requests</h3>
+    <p>
+      Bob's agent connects to the mesh, registers with a "chat" skill, and
+      listens for incoming requests. When one arrives, it reads the message
+      and sends back a reply.
+    </p>
+
+    <div class="code-block">
+      <span class="code-lang">typescript</span>
+      <pre><code><span class="cm">// Bob's agent — handles chat requests</span>
+<span class="kw">const</span> mesh <span class="op">=</span> <span class="kw">await</span> <span class="tp">AgentMesh</span><span class="op">.</span><span class="fn">connect</span><span class="op">(</span><span class="str">"ws://nats-server:4443"</span><span class="op">);</span>
+
+<span class="kw">await</span> mesh<span class="op">.</span><span class="fn">register</span><span class="op">({</span>
+  name<span class="op">:</span> <span class="str">"Bob's Agent"</span><span class="op">,</span>
+  skills<span class="op">:</span> <span class="op">[{</span> id<span class="op">:</span> <span class="str">"chat"</span><span class="op">,</span> name<span class="op">:</span> <span class="str">"Chat"</span><span class="op">,</span> description<span class="op">:</span> <span class="str">"Chat with Bob"</span> <span class="op">}],</span>
+<span class="op">});</span>
+
+mesh<span class="op">.</span><span class="fn">onRequest</span><span class="op">(</span><span class="str">"chat"</span><span class="op">,</span> <span class="op">(</span>payload<span class="op">)</span> <span class="op">=&gt;</span> <span class="op">{</span>
+  <span class="kw">const</span> input <span class="op">=</span> payload<span class="op">.</span>input <span class="kw">as</span> <span class="op">{</span> text<span class="op">:</span> <span class="tp">string</span> <span class="op">};</span>
+  console<span class="op">.</span><span class="fn">log</span><span class="op">(</span><span class="str">`Received: <span class="op">${</span>input<span class="op">.</span>text<span class="op">}</span>`</span><span class="op">);</span>
+  <span class="kw">return</span> <span class="op">{</span> text<span class="op">:</span> <span class="str">`Bob says: Got your message!`</span> <span class="op">};</span>
+<span class="op">});</span></code></pre>
+    </div>
+
+    <h3>Jeff's side &mdash; discover and send</h3>
+    <p>
+      Jeff's agent connects, registers itself (with no skills &mdash; it's a
+      consumer, not a provider), discovers agents that can chat, finds Bob,
+      and sends a message.
+    </p>
+
+    <div class="code-block">
+      <span class="code-lang">typescript</span>
+      <pre><code><span class="cm">// Jeff's agent — finds Bob and sends a message</span>
+<span class="kw">const</span> mesh <span class="op">=</span> <span class="kw">await</span> <span class="tp">AgentMesh</span><span class="op">.</span><span class="fn">connect</span><span class="op">(</span><span class="str">"ws://nats-server:4443"</span><span class="op">);</span>
+
+<span class="kw">await</span> mesh<span class="op">.</span><span class="fn">register</span><span class="op">({</span>
+  name<span class="op">:</span> <span class="str">"Jeff's Agent"</span><span class="op">,</span>
+  skills<span class="op">:</span> <span class="op">[],</span>
+<span class="op">});</span>
+
+<span class="kw">const</span> <span class="op">{</span> agents <span class="op">}</span> <span class="op">=</span> <span class="kw">await</span> mesh<span class="op">.</span><span class="fn">discover</span><span class="op">({</span> capabilities<span class="op">:</span> <span class="op">[</span><span class="str">"chat"</span><span class="op">]</span> <span class="op">});</span>
+<span class="kw">const</span> bob <span class="op">=</span> agents<span class="op">.</span><span class="fn">find</span><span class="op">(</span>a <span class="op">=&gt;</span> a<span class="op">.</span>name <span class="op">===</span> <span class="str">"Bob's Agent"</span><span class="op">);</span>
+
+<span class="kw">const</span> result <span class="op">=</span> <span class="kw">await</span> mesh<span class="op">.</span><span class="fn">request</span><span class="op">(</span>bob<span class="op">.</span>id<span class="op">,</span> <span class="str">"chat"</span><span class="op">,</span> <span class="op">{</span>
+  text<span class="op">:</span> <span class="str">"Hey Bob, how's it going?"</span><span class="op">,</span>
+<span class="op">});</span>
+
+console<span class="op">.</span><span class="fn">log</span><span class="op">(</span>result<span class="op">.</span>payload<span class="op">.</span>output<span class="op">);</span>
+<span class="cm">// { text: "Bob says: Got your message!" }</span></code></pre>
+    </div>
+
+    <h3>What's happening</h3>
+    <p>
+      This example uses three of the six primitives: <code>register</code>,
+      <code>discover</code>, and <code>request</code>/<code>respond</code>. Bob's
+      agent registers with a "chat" skill, making itself discoverable. Jeff's agent
+      queries the registry for agents with the "chat" capability, picks Bob from the
+      results, and sends a request. Under the hood, the mesh creates a task, routes
+      the message to Bob's inbox, Bob's <code>onRequest</code> handler runs and
+      returns a result, and the mesh delivers that result back to Jeff as a response
+      envelope. All of this &mdash; routing, tracing, envelope construction &mdash;
+      is handled automatically.
+    </p>
+
+    <hr>
+
+    <!-- ─── Example 2: Event-Driven Collaboration ──────────────── -->
+    <h2 id="event-driven">Example 2: Event-Driven Collaboration</h2>
+    <p>
+      Not everything is a request/response. Sometimes agents need to react to
+      things happening on the mesh without being asked directly. This example
+      shows a document watcher that emits events and a summarizer that reacts
+      to them &mdash; completely decoupled.
+    </p>
+
+    <h3>Document watcher &mdash; emit events</h3>
+    <p>
+      When a new document is uploaded, this agent publishes an event to the
+      mesh. It doesn't know or care who's listening.
+    </p>
+
+    <div class="code-block">
+      <span class="code-lang">typescript</span>
+      <pre><code><span class="cm">// Document watcher — emits events when files arrive</span>
+<span class="kw">const</span> mesh <span class="op">=</span> <span class="kw">await</span> <span class="tp">AgentMesh</span><span class="op">.</span><span class="fn">connect</span><span class="op">(</span><span class="str">"ws://nats-server:4443"</span><span class="op">);</span>
+
+<span class="kw">await</span> mesh<span class="op">.</span><span class="fn">register</span><span class="op">({</span>
+  name<span class="op">:</span> <span class="str">"Document Watcher"</span><span class="op">,</span>
+  skills<span class="op">:</span> <span class="op">[],</span>
+<span class="op">});</span>
+
+<span class="cm">// When a document is uploaded, publish an event</span>
+mesh<span class="op">.</span><span class="fn">emit</span><span class="op">(</span><span class="str">"document.uploaded"</span><span class="op">,</span> <span class="op">{</span>
+  filename<span class="op">:</span> <span class="str">"quarterly-report.pdf"</span><span class="op">,</span>
+  size<span class="op">:</span> <span class="num">245000</span><span class="op">,</span>
+  uploaded_by<span class="op">:</span> <span class="str">"jeff"</span><span class="op">,</span>
+<span class="op">});</span></code></pre>
+    </div>
+
+    <h3>Summarizer &mdash; react to document events</h3>
+    <p>
+      This agent subscribes to all document events using a wildcard pattern.
+      When a new document arrives, it kicks off a summarization workflow.
+    </p>
+
+    <div class="code-block">
+      <span class="code-lang">typescript</span>
+      <pre><code><span class="cm">// Summarizer — reacts to document events</span>
+<span class="kw">const</span> mesh <span class="op">=</span> <span class="kw">await</span> <span class="tp">AgentMesh</span><span class="op">.</span><span class="fn">connect</span><span class="op">(</span><span class="str">"ws://nats-server:4443"</span><span class="op">);</span>
+
+<span class="kw">await</span> mesh<span class="op">.</span><span class="fn">register</span><span class="op">({</span>
+  name<span class="op">:</span> <span class="str">"Summarizer"</span><span class="op">,</span>
+  skills<span class="op">:</span> <span class="op">[{</span> id<span class="op">:</span> <span class="str">"summarize"</span><span class="op">,</span> name<span class="op">:</span> <span class="str">"Summarize"</span><span class="op">,</span> description<span class="op">:</span> <span class="str">"Summarize documents"</span> <span class="op">}],</span>
+<span class="op">});</span>
+
+<span class="cm">// Listen for all document events (wildcard)</span>
+mesh<span class="op">.</span><span class="fn">subscribe</span><span class="op">(</span><span class="str">"document.&gt;"</span><span class="op">,</span> <span class="op">(</span>event<span class="op">)</span> <span class="op">=&gt;</span> <span class="op">{</span>
+  <span class="kw">if</span> <span class="op">(</span>event<span class="op">.</span>event_type <span class="op">===</span> <span class="str">"uploaded"</span><span class="op">)</span> <span class="op">{</span>
+    <span class="kw">const</span> doc <span class="op">=</span> event<span class="op">.</span>data <span class="kw">as</span> <span class="op">{</span> filename<span class="op">:</span> <span class="tp">string</span> <span class="op">};</span>
+    console<span class="op">.</span><span class="fn">log</span><span class="op">(</span><span class="str">`New document: <span class="op">${</span>doc<span class="op">.</span>filename<span class="op">}</span> — queuing for summary`</span><span class="op">);</span>
+    <span class="cm">// Could trigger a request to an LLM agent here</span>
+  <span class="op">}</span>
+<span class="op">});</span></code></pre>
+    </div>
+
+    <h3>What's happening</h3>
+    <p>
+      This example uses the <code>emit</code> and <code>subscribe</code> primitives
+      to create a reactive system. The document watcher doesn't need to know which
+      agents care about new uploads &mdash; it just fires the event. The summarizer
+      doesn't need to know where documents come from &mdash; it just reacts when one
+      appears. The wildcard pattern <code>document.&gt;</code> catches all events
+      under the <code>document</code> namespace: <code>document.uploaded</code>,
+      <code>document.deleted</code>, <code>document.updated</code>, and anything
+      else. You could add ten more agents that react to document events without
+      changing a single line in the watcher.
+    </p>
+
+    <hr>
+
+    <!-- ─── Example 3: Help Desk ───────────────────────────────── -->
+    <h2 id="help-desk">Example 3: Help Desk (Discover + Request)</h2>
+    <p>
+      A more sophisticated pattern: an agent that acts as a help desk router. It
+      takes a user's question, figures out what topic it falls under, discovers
+      all agents with skills in that topic, and routes the question to the right
+      specialist. This is capability-based routing &mdash; the help desk doesn't
+      hard-code which agent handles what.
+    </p>
+
+    <div class="code-block">
+      <span class="code-lang">typescript</span>
+      <pre><code><span class="cm">// Help desk agent — finds the right specialist</span>
+<span class="kw">const</span> mesh <span class="op">=</span> <span class="kw">await</span> <span class="tp">AgentMesh</span><span class="op">.</span><span class="fn">connect</span><span class="op">(</span><span class="str">"ws://nats-server:4443"</span><span class="op">);</span>
+
+<span class="kw">await</span> mesh<span class="op">.</span><span class="fn">register</span><span class="op">({</span>
+  name<span class="op">:</span> <span class="str">"Help Desk"</span><span class="op">,</span>
+  skills<span class="op">:</span> <span class="op">[{</span> id<span class="op">:</span> <span class="str">"help"</span><span class="op">,</span> name<span class="op">:</span> <span class="str">"Help"</span><span class="op">,</span> description<span class="op">:</span> <span class="str">"Route questions to specialists"</span> <span class="op">}],</span>
+<span class="op">});</span>
+
+<span class="kw">async</span> <span class="kw">function</span> <span class="fn">routeQuestion</span><span class="op">(</span>question<span class="op">:</span> <span class="tp">string</span><span class="op">,</span> topic<span class="op">:</span> <span class="tp">string</span><span class="op">)</span> <span class="op">{</span>
+  <span class="kw">const</span> <span class="op">{</span> agents <span class="op">}</span> <span class="op">=</span> <span class="kw">await</span> mesh<span class="op">.</span><span class="fn">discover</span><span class="op">({</span>
+    capabilities<span class="op">:</span> <span class="op">[</span>topic<span class="op">],</span>
+  <span class="op">});</span>
+
+  <span class="kw">if</span> <span class="op">(</span>agents<span class="op">.</span>length <span class="op">===</span> <span class="num">0</span><span class="op">)</span> <span class="op">{</span>
+    <span class="kw">return</span> <span class="op">{</span> text<span class="op">:</span> <span class="str">`Sorry, no agents available for "<span class="op">${</span>topic<span class="op">}</span>"`</span> <span class="op">};</span>
+  <span class="op">}</span>
+
+  <span class="cm">// Pick the first available agent with the right skill</span>
+  <span class="kw">const</span> specialist <span class="op">=</span> agents<span class="op">[</span><span class="num">0</span><span class="op">];</span>
+  <span class="kw">const</span> result <span class="op">=</span> <span class="kw">await</span> mesh<span class="op">.</span><span class="fn">request</span><span class="op">(</span>specialist<span class="op">.</span>id<span class="op">,</span> topic<span class="op">,</span> <span class="op">{</span>
+    text<span class="op">:</span> question<span class="op">,</span>
+  <span class="op">});</span>
+
+  <span class="kw">return</span> result<span class="op">.</span>payload<span class="op">.</span>output<span class="op">;</span>
+<span class="op">}</span>
+
+<span class="cm">// Usage</span>
+<span class="kw">const</span> answer <span class="op">=</span> <span class="kw">await</span> <span class="fn">routeQuestion</span><span class="op">(</span>
+  <span class="str">"What's the weather in Tokyo?"</span><span class="op">,</span>
+  <span class="str">"weather"</span>
+<span class="op">);</span></code></pre>
+    </div>
+
+    <h3>What's happening</h3>
+    <p>
+      The help desk agent doesn't know in advance which agents exist or what
+      they can do. It uses <code>discover</code> at runtime to search the
+      registry for agents whose capabilities match the question's topic. If a
+      weather agent is online and registered with the <code>"weather"</code>
+      capability, it shows up in the results. The help desk picks one and
+      forwards the question via <code>request</code>. If no agents match, it
+      returns a graceful fallback message. This pattern is powerful because it's
+      completely dynamic &mdash; new specialist agents can join or leave the mesh
+      at any time, and the help desk automatically adapts without code changes.
+    </p>
+
+    <hr>
+
+    <!-- ─── Next Steps ─────────────────────────────────────────── -->
+    <div class="callout tip">
+      <div class="callout-title">Build on these patterns</div>
+      <p>
+        These examples cover the core patterns &mdash; direct request/response,
+        event-driven collaboration, and capability-based routing. They combine
+        to handle almost any agent workflow. To learn more, check out the
+        <a href="getting-started.html">Getting Started guide</a> to build your
+        first agent, or browse the <a href="reference.html">Reference</a> for
+        the full API surface.
+      </p>
+    </div>
+
+  </div>
+
+  <!-- ─── Footer ──────────────────────────────────────────────── -->
+  <footer class="footer">
+    <p>AgentMesh &mdash; Open protocol for agent-to-agent communication.
+      <a href="https://github.com/jeffrschneider/AgentMesh">GitHub</a>
+    </p>
+  </footer>
+
+  </div><!-- /.content-wrapper -->
+
+  <script src="script.js"></script>
+</body>
+</html>

@@ -1,544 +1,178 @@
 <!DOCTYPE html>
-<html lang="en" class="scroll-smooth">
+<html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AgentMesh - The Architecture of Autonomous AI</title>
-    <link rel="icon" type="image/svg+xml" href="favicon.svg">
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://unpkg.com/lucide@latest"></script>
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap');
-        body { font-family: 'Inter', sans-serif; }
-        ::selection { background-color: #06b6d4; color: white; }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AgentMesh — Agent-to-Agent Communication</title>
+  <link rel="icon" type="image/svg+xml" href="favicon.svg">
+  <link rel="stylesheet" href="styles.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
 </head>
-<body class="bg-[#050b14] text-gray-100 font-sans overflow-x-hidden">
+<body>
 
-    <!-- Navigation -->
-    <nav id="navbar" class="fixed w-full z-50 transition-all duration-300 border-b border-transparent py-6">
-        <div class="max-w-7xl mx-auto px-6 flex justify-between items-center">
-            <div class="flex items-center gap-2">
-                <div class="w-8 h-8 bg-gradient-to-br from-cyan-500 to-purple-600 rounded-lg flex items-center justify-center p-1">
-                    <svg viewBox="0 0 24 24" class="w-6 h-6">
-                        <line x1="4" y1="4" x2="12" y2="12" stroke="white" stroke-width="1.5" stroke-linecap="round"/>
-                        <line x1="20" y1="4" x2="12" y2="12" stroke="white" stroke-width="1.5" stroke-linecap="round"/>
-                        <line x1="4" y1="20" x2="12" y2="12" stroke="white" stroke-width="1.5" stroke-linecap="round"/>
-                        <line x1="20" y1="20" x2="12" y2="12" stroke="white" stroke-width="1.5" stroke-linecap="round"/>
-                        <line x1="4" y1="4" x2="20" y2="4" stroke="white" stroke-width="1.5" stroke-linecap="round"/>
-                        <line x1="4" y1="20" x2="20" y2="20" stroke="white" stroke-width="1.5" stroke-linecap="round"/>
-                        <line x1="4" y1="4" x2="4" y2="20" stroke="white" stroke-width="1.5" stroke-linecap="round"/>
-                        <line x1="20" y1="4" x2="20" y2="20" stroke="white" stroke-width="1.5" stroke-linecap="round"/>
-                        <circle cx="4" cy="4" r="2" fill="white"/>
-                        <circle cx="20" cy="4" r="2" fill="white"/>
-                        <circle cx="4" cy="20" r="2" fill="white"/>
-                        <circle cx="20" cy="20" r="2" fill="white"/>
-                        <circle cx="12" cy="12" r="2.5" fill="white"/>
-                    </svg>
-                </div>
-                <span class="text-2xl font-bold tracking-tight text-white">
-                    AgentMesh
-                </span>
-            </div>
-            <div class="hidden md:flex gap-8">
-                <a href="#distinction" class="text-gray-300 hover:text-cyan-400 transition-colors text-sm uppercase tracking-wider font-semibold">The Concept</a>
-                <a href="#lifecycle" class="text-gray-300 hover:text-cyan-400 transition-colors text-sm uppercase tracking-wider font-semibold">Lifecycle</a>
-                <a href="#architecture" class="text-gray-300 hover:text-cyan-400 transition-colors text-sm uppercase tracking-wider font-semibold">Anatomy</a>
-                <a href="#platform" class="text-gray-300 hover:text-cyan-400 transition-colors text-sm uppercase tracking-wider font-semibold">Dev vs Mesh</a>
-            </div>
-            <button class="bg-cyan-500 hover:bg-cyan-400 text-[#050b14] px-5 py-2 rounded-full font-bold transition-all text-sm">
-                Enterprise Guide
-            </button>
-        </div>
-    </nav>
+  <!-- ─── Sidebar Navigation ───────────────────────────────────── -->
+  <nav class="sidebar" id="sidebar">
+    <a href="index.html" class="sidebar-brand">AgentMesh</a>
+    <ul class="sidebar-nav">
+      <li><a href="index.html">Home</a></li>
+      <li><a href="how-it-works.html">How It Works</a></li>
+      <li><a href="concepts.html">The Network</a></li>
+      <li><a href="getting-started.html">Getting Started</a></li>
+      <li><a href="reference.html">Reference</a></li>
+      <li><a href="examples.html">Examples</a></li>
+      <li><a href="claude-code.html">For Claude Code</a></li>
+    </ul>
+    <div class="sidebar-footer">
+      <a href="https://github.com/jeffrschneider/AgentMesh">GitHub</a>
+      <button class="theme-toggle" title="Toggle theme">&#x263E;</button>
+    </div>
+  </nav>
+  <div class="sidebar-backdrop" id="sidebar-backdrop"></div>
+  <div class="mobile-topbar">
+    <a href="index.html" class="sidebar-brand">AgentMesh</a>
+    <button class="hamburger" aria-label="Menu">&#x2630;</button>
+  </div>
+  <div class="content-wrapper">
 
-    <!-- Hero Section -->
-    <header class="relative pt-32 pb-20 lg:pt-48 lg:pb-32 px-6">
-        <div class="absolute top-0 left-0 w-full h-full overflow-hidden z-0 pointer-events-none">
-            <div class="absolute top-[-10%] right-[-5%] w-[500px] h-[500px] bg-purple-600/20 rounded-full blur-[120px]"></div>
-            <div class="absolute bottom-[10%] left-[-10%] w-[600px] h-[600px] bg-cyan-600/10 rounded-full blur-[100px]"></div>
-            <div class="absolute inset-0 opacity-5" style="background-image: url('https://www.transparenttextures.com/patterns/cubes.png');"></div>
-        </div>
+  <!-- ─── Hero ────────────────────────────────────────────────── -->
+  <section class="hero">
+    <h1>Let your agents <span class="text-gradient">talk to each other</span></h1>
+    <p class="subtitle">
+      AgentMesh is a platform for connecting AI agents. Agents find each other,
+      send requests, share results, and collaborate &mdash; without you writing
+      the networking code.
+    </p>
+    <div class="hero-actions">
+      <a href="getting-started.html" class="btn btn-primary">Get Started</a>
+      <a href="how-it-works.html" class="btn btn-outline">How It Works</a>
+    </div>
+  </section>
 
-        <div class="relative z-10 max-w-5xl mx-auto text-center">
-            <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-cyan-900/30 border border-cyan-500/30 text-cyan-400 text-xs font-bold tracking-widest uppercase mb-6">
-                <i data-lucide="zap" class="w-3 h-3"></i> The Architecture of Autonomous AI
-            </div>
-            <h1 class="text-5xl md:text-7xl font-extrabold tracking-tight mb-8 leading-tight">
-                The Agent is the <span class="text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-400">Worker</span>.<br />
-                The Mesh is the <span class="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-blue-400">Office</span>.
-            </h1>
-            <p class="text-xl md:text-2xl text-gray-400 max-w-3xl mx-auto mb-12 leading-relaxed">
-                Stop building monolithic bots. The Agent Mesh provides the governance, orchestration, and connectivity layer that turns scattered AI experiments into a secure enterprise workforce.
-            </p>
-        </div>
-    </header>
+  <!-- ─── What Is It ──────────────────────────────────────────── -->
+  <div class="page">
+    <h2>What is AgentMesh?</h2>
+    <p>
+      Think of it as a <strong>phone network for AI agents</strong>. Each agent connects
+      to the mesh, registers what it can do, and becomes available to every other agent.
+      Need a translator? A code reviewer? A data analyst? If it's on the mesh, your
+      agent can find it and ask it for help.
+    </p>
+    <p>
+      You don't manage connections, figure out addresses, or build APIs between agents.
+      The mesh handles all of that. Your agent just says <em>"I need someone who can
+      summarize text"</em> and the mesh finds a match.
+    </p>
 
-    <!-- Section 1: The Distinction (Analogy) -->
-    <section id="distinction" class="py-24 bg-[#080f1e] relative border-t border-gray-800">
-        <div class="max-w-7xl mx-auto px-6">
-            <div class="mb-16">
-                <h2 class="text-3xl md:text-4xl font-bold mb-4">The Distinction</h2>
-                <p class="text-gray-400 text-lg max-w-2xl">Why separate the brain from the body? Focus and Safety.</p>
-            </div>
+    <h2>The building blocks</h2>
+    <p>
+      The entire protocol is built from six operations. They're simple
+      individually, but they combine to support everything from a quick
+      question to a multi-step, multi-agent workflow.
+    </p>
 
-            <div class="grid md:grid-cols-2 gap-8 lg:gap-16">
-                <!-- The Agent Card -->
-                <div class="group relative bg-gradient-to-b from-purple-900/20 to-[#0a0f1c] border border-purple-500/30 rounded-2xl p-8 hover:border-purple-500/60 transition-all">
-                    <div class="absolute top-6 right-6 p-3 bg-purple-500/20 rounded-lg">
-                        <i data-lucide="brain" class="text-purple-400 w-8 h-8"></i>
-                    </div>
-                    <h3 class="text-2xl font-bold text-white mb-2">The Agent</h3>
-                    <p class="text-purple-300 font-mono text-sm mb-6">"The Specialized Worker"</p>
-                    
-                    <ul class="space-y-4">
-                        <li class="flex gap-3">
-                            <div class="w-6 h-6 rounded-full bg-purple-500/20 flex items-center justify-center shrink-0 text-sm">1</div>
-                            <p class="text-gray-300">Holds the <strong>Cognitive Logic</strong>.</p>
-                        </li>
-                        <li class="flex gap-3">
-                            <div class="w-6 h-6 rounded-full bg-purple-500/20 flex items-center justify-center shrink-0 text-sm">2</div>
-                            <p class="text-gray-300">Possesses <strong>Domain Expertise</strong>.</p>
-                        </li>
-                        <li class="flex gap-3">
-                            <div class="w-6 h-6 rounded-full bg-purple-500/20 flex items-center justify-center shrink-0 text-sm">3</div>
-                            <p class="text-gray-300">Focuses purely on <strong>Reasoning & Solving</strong>.</p>
-                        </li>
-                    </ul>
-                </div>
+    <div class="card-grid">
+      <div class="card">
+        <h3>Register</h3>
+        <p>Join the mesh and share what your agent can do. Other agents can then find and work with you.</p>
+      </div>
+      <div class="card">
+        <h3>Discover</h3>
+        <p>Search for agents that fit what you need &mdash; by capability, by skill, or just who's currently available.</p>
+      </div>
+      <div class="card">
+        <h3>Request</h3>
+        <p>Ask another agent to do something. The mesh tracks the work from start to finish.</p>
+      </div>
+      <div class="card">
+        <h3>Respond</h3>
+        <p>Deliver the result back to the agent that asked. The work is marked complete.</p>
+      </div>
+      <div class="card">
+        <h3>Emit</h3>
+        <p>Publish an event to the mesh &mdash; only agents that are listening for it will receive it.</p>
+      </div>
+      <div class="card">
+        <h3>Subscribe</h3>
+        <p>Get notified when something relevant happens, without polling or checking manually.</p>
+      </div>
+    </div>
 
-                <!-- The Mesh Card -->
-                <div class="group relative bg-gradient-to-b from-cyan-900/20 to-[#0a0f1c] border border-cyan-500/30 rounded-2xl p-8 hover:border-cyan-500/60 transition-all">
-                    <div class="absolute top-6 right-6 p-3 bg-cyan-500/20 rounded-lg">
-                        <i data-lucide="layers" class="text-cyan-400 w-8 h-8"></i>
-                    </div>
-                    <h3 class="text-2xl font-bold text-white mb-2">The Mesh</h3>
-                    <p class="text-cyan-300 font-mono text-sm mb-6">"The Support Staff"</p>
-                    
-                    <ul class="space-y-4">
-                        <li class="flex gap-3">
-                            <div class="w-6 h-6 rounded-full bg-cyan-500/20 flex items-center justify-center shrink-0 text-sm">1</div>
-                            <p class="text-gray-300"><strong>The Secretary:</strong> Connects calls and manages files.</p>
-                        </li>
-                        <li class="flex gap-3">
-                            <div class="w-6 h-6 rounded-full bg-cyan-500/20 flex items-center justify-center shrink-0 text-sm">2</div>
-                            <p class="text-gray-300"><strong>The Guard:</strong> Ensures the agent doesn't delete evidence.</p>
-                        </li>
-                        <li class="flex gap-3">
-                            <div class="w-6 h-6 rounded-full bg-cyan-500/20 flex items-center justify-center shrink-0 text-sm">3</div>
-                            <p class="text-gray-300"><strong>The Platform:</strong> Scalable infrastructure for 1000s of agents.</p>
-                        </li>
-                    </ul>
-                </div>
-            </div>
+    <p>
+      These six operations compose into higher-level patterns like persistent
+      sessions, delegation chains, and streaming.
+      <a href="how-it-works.html">Learn how they work together &rarr;</a>
+    </p>
 
-            <!-- Technical Description Box -->
-            <div class="mt-16 bg-gradient-to-r from-cyan-900/30 to-purple-900/30 border border-cyan-500/20 rounded-2xl p-8">
-                <h3 class="text-xl font-bold text-white mb-4 flex items-center gap-2">
-                    <svg viewBox="0 0 24 24" class="w-5 h-5 text-cyan-400">
-                        <line x1="4" y1="4" x2="12" y2="12" stroke="currentColor" stroke-width="1.5"/>
-                        <line x1="20" y1="4" x2="12" y2="12" stroke="currentColor" stroke-width="1.5"/>
-                        <line x1="4" y1="20" x2="12" y2="12" stroke="currentColor" stroke-width="1.5"/>
-                        <line x1="20" y1="20" x2="12" y2="12" stroke="currentColor" stroke-width="1.5"/>
-                        <circle cx="4" cy="4" r="2" fill="currentColor"/>
-                        <circle cx="20" cy="4" r="2" fill="currentColor"/>
-                        <circle cx="4" cy="20" r="2" fill="currentColor"/>
-                        <circle cx="20" cy="20" r="2" fill="currentColor"/>
-                        <circle cx="12" cy="12" r="2.5" fill="currentColor"/>
-                    </svg>
-                    Technical Architecture
-                </h3>
-                <div class="space-y-3 text-gray-300">
-                    <p><strong class="text-cyan-400">Service Mesh for AI:</strong> The Agent Mesh applies proven service mesh patterns—sidecar proxies, control planes, and observability—to autonomous AI workloads, enabling fine-grained traffic control and policy enforcement at the agent level.</p>
-                    <p><strong class="text-purple-400">Decoupled Governance:</strong> By separating cognitive logic from infrastructure concerns, organizations can independently scale, secure, and audit agent operations without modifying agent code or retraining models.</p>
-                    <p><strong class="text-pink-400">Enterprise Value:</strong> This architecture reduces integration complexity, provides unified audit trails for compliance, and enables heterogeneous agent deployments across cloud providers and on-premise infrastructure.</p>
-                </div>
-            </div>
-        </div>
-    </section>
+    <!-- ─── How Is It Different ─────────────────────────────────── -->
+    <h2>How is this different from a regular API?</h2>
+    <p>
+      With a traditional API, Agent A calls Agent B directly. You need to know B's
+      address, build an HTTP client, handle retries, and manage authentication &mdash;
+      for every pair of agents that need to communicate.
+    </p>
+    <p>
+      AgentMesh flips this. Agents connect to the mesh once, and the mesh handles
+      the rest. There's no client-server relationship. Any agent can talk to any
+      other agent. New agents join without changing existing ones.
+    </p>
 
-    <!-- Section 2: Lifecycle -->
-    <section id="lifecycle" class="py-24 bg-[#050b14] relative overflow-hidden">
-        <!-- Background Accent -->
-        <div class="absolute left-0 top-0 w-2 h-full bg-gradient-to-b from-purple-600 via-cyan-500 to-blue-600"></div>
-        
-        <div class="max-w-6xl mx-auto px-6 relative z-10">
-            <div class="mb-16">
-                <h2 class="text-3xl md:text-5xl font-bold mb-6">Governance Across Time</h2>
-                <p class="text-gray-400 text-lg">Governance isn't one step. It is a lifecycle that dictates how the Mesh is built.</p>
-            </div>
+    <div class="diagram">
+      <pre><code>  Traditional API              AgentMesh
 
-            <div class="space-y-12">
-                
-                <!-- Phase 1 -->
-                <div class="flex flex-col md:flex-row gap-8 items-start">
-                    <div class="md:w-1/4">
-                        <div class="inline-block px-4 py-2 bg-purple-900/30 text-purple-400 border border-purple-500/30 rounded font-bold text-sm mb-2">PHASE 1</div>
-                        <h3 class="text-2xl font-bold text-white">Plan-Time</h3>
-                        <p class="text-gray-500 italic">"City Planning"</p>
-                    </div>
-                    <div class="md:w-3/4 bg-[#0f1623] p-8 rounded-xl border border-purple-900/50 relative">
-                        <div class="absolute -left-3 top-8 w-6 h-6 bg-[#050b14] border border-purple-500 rounded-full hidden md:block"></div>
-                        <p class="text-gray-300 mb-4">
-                            The strategic architectural roadmap before agents are built or bought. You map out the "Society of Agents," defining domains (e.g., "Finance Agent owns the General Ledger") and dependencies.
-                        </p>
-                        <div class="bg-black/30 p-4 rounded text-sm text-purple-200 border-l-4 border-purple-500">
-                            <strong>Goal:</strong> Prevent functional overlap through agent refactoring, domain planning, and versioning strategies.
-                        </div>
-                    </div>
-                </div>
+  A ──&gt; B                    A ───┐
+  A ──&gt; C                         │
+  B ──&gt; C                   B ───Mesh─── (everyone)
+  D ──&gt; A                         │
+  D ──&gt; B                    C ───┘
+  D ──&gt; C                    D ───┘
 
-                <!-- Phase 2 -->
-                <div class="flex flex-col md:flex-row gap-8 items-start">
-                    <div class="md:w-1/4">
-                        <div class="inline-block px-4 py-2 bg-cyan-900/30 text-cyan-400 border border-cyan-500/30 rounded font-bold text-sm mb-2">PHASE 2</div>
-                        <h3 class="text-2xl font-bold text-white">Design-Time</h3>
-                        <p class="text-gray-500 italic">"Building Inspection"</p>
-                    </div>
-                    <div class="md:w-3/4 bg-[#0f1623] p-8 rounded-xl border border-cyan-900/50 relative">
-                        <div class="absolute -left-3 top-8 w-6 h-6 bg-[#050b14] border border-cyan-500 rounded-full hidden md:block"></div>
-                        <p class="text-gray-300 mb-4">
-                            Dependency mapping and refinement. This phase focuses on refactoring monolithic logic into sub-agents, defining clear skill boundaries, and verifying catalog registration.
-                        </p>
-                        <div class="bg-black/30 p-4 rounded text-sm text-cyan-200 border-l-4 border-cyan-500">
-                            <strong>Example:</strong> "This agent claims to be for 'Refunds' but is asking for 'Delete User' permissions? Rejected."
-                        </div>
-                    </div>
-                </div>
+  6 connections              4 connections
+  Each pair is custom        All use the same protocol</code></pre>
+    </div>
 
-                <!-- Phase 3 -->
-                <div class="flex flex-col md:flex-row gap-8 items-start">
-                    <div class="md:w-1/4">
-                        <div class="inline-block px-4 py-2 bg-pink-900/30 text-pink-400 border border-pink-500/30 rounded font-bold text-sm mb-2">PHASE 3</div>
-                        <h3 class="text-2xl font-bold text-white">Run-Time</h3>
-                        <p class="text-gray-500 italic">"Security Guard"</p>
-                    </div>
-                    <div class="md:w-3/4 bg-[#0f1623] p-8 rounded-xl border border-pink-900/50 relative">
-                        <div class="absolute -left-3 top-8 w-6 h-6 bg-[#050b14] border border-pink-500 rounded-full hidden md:block"></div>
-                        <p class="text-gray-300 mb-4">
-                            Dynamic interception. As the agent runs, the Mesh monitors inputs and outputs in real-time.
-                        </p>
-                        <div class="bg-black/30 p-4 rounded text-sm text-pink-200 border-l-4 border-pink-500">
-                            <strong>Action:</strong> If an agent generates a malicious SQL query or tries to output PII, the Mesh blocks it instantly.
-                        </div>
-                    </div>
-                </div>
+    <!-- ─── Documentation ─────────────────────────────────────────── -->
+    <hr>
 
-            </div>
-        </div>
-    </section>
+    <h2>Documentation</h2>
 
-    <!-- Section 3: Anatomy (Architecture) -->
-    <section id="architecture" class="py-24 px-6 relative border-t border-gray-800">
-        <div class="max-w-7xl mx-auto">
-            <div class="text-center mb-20">
-                <h2 class="text-3xl md:text-5xl font-bold mb-6">The Anatomy of the Mesh</h2>
-                <p class="text-gray-400 max-w-2xl mx-auto">
-                    How do we enforce the governance lifecycle? We need five critical pillars that handle discovery, workflow, connectivity, authorization, and observability.
-                </p>
-            </div>
+    <div class="card-grid">
+      <a href="how-it-works.html" class="card">
+        <h3>How It Works</h3>
+        <p>The six primitives, the task lifecycle, and how operations compose into real workflows.</p>
+      </a>
+      <a href="concepts.html" class="card">
+        <h3>The Network</h3>
+        <p>How agents connect &mdash; within an organization, between companies, or from a browser at home.</p>
+      </a>
+      <a href="getting-started.html" class="card">
+        <h3>Getting Started</h3>
+        <p>Connect to the mesh, register an agent, and send your first request &mdash; step by step.</p>
+      </a>
+      <a href="reference.html" class="card">
+        <h3>Reference</h3>
+        <p>Subject namespace, registry, security model, envelope fields, error codes, task states, and manifests.</p>
+      </a>
+      <a href="examples.html" class="card">
+        <h3>Examples</h3>
+        <p>Working code for common patterns: agent chat, event-driven collaboration, and request routing.</p>
+      </a>
+      <a href="claude-code.html" class="card">
+        <h3>For Claude Code</h3>
+        <p>How agentic coding tools like Claude Code build, connect, and orchestrate agents on the mesh.</p>
+      </a>
+    </div>
+  </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                
-                <!-- Component 1 -->
-                <div class="bg-[#0f1623] border border-gray-800 p-8 rounded-xl hover:bg-[#131b2b] transition-colors group">
-                    <div class="w-12 h-12 bg-blue-500/20 rounded-lg flex items-center justify-center mb-6">
-                        <i data-lucide="layout-grid" class="text-blue-400 w-6 h-6"></i>
-                    </div>
-                    <h3 class="text-xl font-bold text-white mb-3">A. The Catalogs (Directories)</h3>
-                    <p class="text-gray-400 mb-4 leading-relaxed">
-                        This supports <strong>Plan-Time Governance</strong>. By registering agents here, we ensure discovery and prevent overlap.
-                    </p>
-                    <div class="space-y-3">
-                        <div class="p-3 bg-black/40 rounded border-l-2 border-blue-500">
-                            <strong class="text-blue-200 block text-sm">Agent Catalog</strong>
-                            <span class="text-gray-500 text-sm">Lists active identities (e.g., Tier 2 Refund Agent) so orchestrators can "hire" valid workers.</span>
-                        </div>
-                        <div class="p-3 bg-black/40 rounded border-l-2 border-blue-500">
-                            <strong class="text-blue-200 block text-sm">MCP Catalog</strong>
-                            <span class="text-gray-500 text-sm">Lists approved Tools. This is the "Building Inspection" record of what tools are safe to use.</span>
-                        </div>
-                    </div>
-                </div>
+  <!-- ─── Footer ──────────────────────────────────────────────── -->
+  <footer class="footer">
+    <p>AgentMesh &mdash; Open protocol for agent-to-agent communication.
+      <a href="https://github.com/jeffrschneider/AgentMesh">GitHub</a>
+    </p>
+  </footer>
 
-                <!-- Component 2 -->
-                <div class="bg-[#0f1623] border border-gray-800 p-8 rounded-xl hover:bg-[#131b2b] transition-colors group">
-                    <div class="w-12 h-12 bg-pink-500/20 rounded-lg flex items-center justify-center mb-6">
-                        <i data-lucide="workflow" class="text-pink-400 w-6 h-6"></i>
-                    </div>
-                    <h3 class="text-xl font-bold text-white mb-3">B. Orchestration & Events</h3>
-                    <p class="text-gray-400 mb-4 leading-relaxed">
-                        The execution engine. It ensures the strategic plan (Phase 1) is actually followed during runtime.
-                    </p>
-                    <div class="space-y-3">
-                        <div class="p-3 bg-black/40 rounded border-l-2 border-pink-500">
-                            <strong class="text-pink-200 block text-sm">Event Bus</strong>
-                            <span class="text-gray-500 text-sm">The "Nervous System" that listens for authorized business moments to wake up the mesh.</span>
-                        </div>
-                        <div class="p-3 bg-black/40 rounded border-l-2 border-pink-500">
-                            <strong class="text-pink-200 block text-sm">Orchestrator</strong>
-                            <span class="text-gray-500 text-sm">Manages logic & state. It enforces dependencies defined in the roadmap.</span>
-                        </div>
-                    </div>
-                </div>
+  </div><!-- /.content-wrapper -->
 
-                <!-- Component 3 -->
-                <div class="bg-[#0f1623] border border-gray-800 p-8 rounded-xl hover:bg-[#131b2b] transition-colors group">
-                    <div class="w-12 h-12 bg-green-500/20 rounded-lg flex items-center justify-center mb-6">
-                        <i data-lucide="server" class="text-green-400 w-6 h-6"></i>
-                    </div>
-                    <h3 class="text-xl font-bold text-white mb-3">C. MCP + API Gateway</h3>
-                    <p class="text-gray-400 mb-4 leading-relaxed">
-                        The control point for traffic. This is where the rubber meets the road for security policies.
-                    </p>
-                    <div class="space-y-3">
-                        <div class="p-3 bg-black/40 rounded border-l-2 border-green-500">
-                            <strong class="text-green-200 block text-sm">API Gateway</strong>
-                            <span class="text-gray-500 text-sm">Standard network security: Rate limiting, AuthN/AuthZ, and logging.</span>
-                        </div>
-                        <div class="p-3 bg-black/40 rounded border-l-2 border-green-500">
-                            <strong class="text-green-200 block text-sm">The MCP Layer</strong>
-                            <span class="text-gray-500 text-sm">Semantic translation. It converts messy intent into clean, safe API calls.</span>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Component 4 -->
-                <div class="bg-[#0f1623] border border-gray-800 p-8 rounded-xl hover:bg-[#131b2b] transition-colors group">
-                    <div class="w-12 h-12 bg-orange-500/20 rounded-lg flex items-center justify-center mb-6">
-                        <i data-lucide="shield" class="text-orange-400 w-6 h-6"></i>
-                    </div>
-                    <h3 class="text-xl font-bold text-white mb-3">D. Authorization Fabric</h3>
-                    <p class="text-gray-400 mb-4 leading-relaxed">
-                        <strong>Policy-Based Access Control (PBAC)</strong> for dynamic, context-aware authorization decisions.
-                    </p>
-                    <div class="space-y-3">
-                        <div class="p-3 bg-black/40 rounded border-l-2 border-orange-500">
-                            <strong class="text-orange-200 block text-sm">Policy Decision Point</strong>
-                            <span class="text-gray-500 text-sm">Evaluates access requests against policies considering identity, context, resource sensitivity, and real-time risk signals.</span>
-                        </div>
-                        <div class="p-3 bg-black/40 rounded border-l-2 border-orange-500">
-                            <strong class="text-orange-200 block text-sm">Policy Enforcement</strong>
-                            <span class="text-gray-500 text-sm">Intercepts and gates every agent action—blocking PII exposure, unauthorized data access, or scope violations in real-time.</span>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Component 5 -->
-                <div class="bg-[#0f1623] border border-gray-800 p-8 rounded-xl hover:bg-[#131b2b] transition-colors group">
-                    <div class="w-12 h-12 bg-yellow-500/20 rounded-lg flex items-center justify-center mb-6">
-                        <i data-lucide="activity" class="text-yellow-400 w-6 h-6"></i>
-                    </div>
-                    <h3 class="text-xl font-bold text-white mb-3">E. Observability & Feedback Loops</h3>
-                    <p class="text-gray-400 mb-4 leading-relaxed">
-                        Continuous monitoring, tracing, and learning from agent behavior across the mesh.
-                    </p>
-                    <div class="space-y-3">
-                        <div class="p-3 bg-black/40 rounded border-l-2 border-yellow-500">
-                            <strong class="text-yellow-200 block text-sm">Distributed Tracing</strong>
-                            <span class="text-gray-500 text-sm">End-to-end visibility into multi-agent workflows—trace every decision, handoff, and tool invocation across the mesh.</span>
-                        </div>
-                        <div class="p-3 bg-black/40 rounded border-l-2 border-yellow-500">
-                            <strong class="text-yellow-200 block text-sm">Feedback & Evaluation</strong>
-                            <span class="text-gray-500 text-sm">Captures outcomes, user feedback, and performance metrics to continuously improve agent behavior and policy tuning.</span>
-                        </div>
-                    </div>
-                </div>
-
-            </div>
-        </div>
-    </section>
-
-    <!-- Section 4: Standards -->
-    <section id="standards" class="py-24 bg-gradient-to-b from-[#0a0f1c] to-[#0d1221] border-y border-gray-800">
-        <div class="max-w-7xl mx-auto px-6">
-            <div class="flex flex-col md:flex-row items-start md:items-end justify-between mb-12">
-                <div>
-                    <h2 class="text-3xl font-bold mb-2">Decoupling via Standards</h2>
-                    <p class="text-gray-400">Prevent vendor lock-in by separating the Worker from the Office.</p>
-                </div>
-            </div>
-
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                
-                <!-- MCP -->
-                <div class="bg-[#1a202e] p-6 rounded-lg border border-gray-700 hover:border-cyan-500 transition-all group">
-                    <div class="flex justify-between items-start mb-4">
-                        <h3 class="text-2xl font-black text-white group-hover:text-cyan-400 transition-colors">MCP</h3>
-                        <i data-lucide="database" class="text-gray-500 group-hover:text-white w-5 h-5"></i>
-                    </div>
-                    <span class="inline-block px-2 py-1 bg-gray-800 text-xs font-bold text-gray-300 rounded mb-3">For Tools</span>
-                    <p class="text-gray-400 text-sm leading-relaxed">Universal protocol for connecting data sources (Google Drive, Slack) so you swap backends without rewriting agents.</p>
-                </div>
-
-                <!-- Agent Protocol -->
-                <div class="bg-[#1a202e] p-6 rounded-lg border border-gray-700 hover:border-cyan-500 transition-all group">
-                    <div class="flex justify-between items-start mb-4">
-                        <h3 class="text-2xl font-black text-white group-hover:text-cyan-400 transition-colors">Agent Protocol</h3>
-                        <i data-lucide="code" class="text-gray-500 group-hover:text-white w-5 h-5"></i>
-                    </div>
-                    <span class="inline-block px-2 py-1 bg-gray-800 text-xs font-bold text-gray-300 rounded mb-3">For Endpoints</span>
-                    <p class="text-gray-400 text-sm leading-relaxed">Defines a universal API spec for communicating with an agent (tasking, listing steps, getting artifacts).</p>
-                </div>
-
-                <!-- Agent2Agent -->
-                <div class="bg-[#1a202e] p-6 rounded-lg border border-gray-700 hover:border-cyan-500 transition-all group">
-                    <div class="flex justify-between items-start mb-4">
-                        <h3 class="text-2xl font-black text-white group-hover:text-cyan-400 transition-colors">Agent2Agent</h3>
-                        <i data-lucide="users" class="text-gray-500 group-hover:text-white w-5 h-5"></i>
-                    </div>
-                    <span class="inline-block px-2 py-1 bg-gray-800 text-xs font-bold text-gray-300 rounded mb-3">For Comms</span>
-                    <p class="text-gray-400 text-sm leading-relaxed">Allows two autonomous agents to perform a 'handshake' and negotiate tasks without a central orchestrator.</p>
-                </div>
-
-                <!-- AGENTS.md -->
-                <div class="bg-[#1a202e] p-6 rounded-lg border border-gray-700 hover:border-cyan-500 transition-all group">
-                    <div class="flex justify-between items-start mb-4">
-                        <h3 class="text-2xl font-black text-white group-hover:text-cyan-400 transition-colors">AGENTS.md</h3>
-                        <i data-lucide="file-json" class="text-gray-500 group-hover:text-white w-5 h-5"></i>
-                    </div>
-                    <span class="inline-block px-2 py-1 bg-gray-800 text-xs font-bold text-gray-300 rounded mb-3">For Context</span>
-                    <p class="text-gray-400 text-sm leading-relaxed">A manifest file (like robots.txt) where agents document their own capabilities for other robots to read.</p>
-                </div>
-
-            </div>
-        </div>
-    </section>
-
-    <!-- NEW SECTION: Platform vs Mesh -->
-    <section id="platform" class="py-24 bg-[#050b14] border-t border-gray-800">
-        <div class="max-w-7xl mx-auto px-6">
-            <div class="text-center mb-16">
-                <h2 class="text-3xl md:text-5xl font-bold mb-6">Dev Platform vs. The Mesh</h2>
-                <p class="text-gray-400 max-w-2xl mx-auto">
-                    Don't confuse the tool you use to <em>build</em> the agent with the infrastructure that <em>runs</em> it.
-                </p>
-            </div>
-
-            <div class="grid md:grid-cols-2 gap-8">
-                <!-- Dev Platform -->
-                <div class="bg-[#0f1623] p-8 rounded-xl border border-gray-800 hover:border-indigo-500 transition-all">
-                    <div class="w-12 h-12 bg-indigo-500/20 rounded-lg flex items-center justify-center mb-6">
-                        <i data-lucide="wrench" class="text-indigo-400 w-6 h-6"></i>
-                    </div>
-                    <h3 class="text-2xl font-bold text-white mb-2">Agent Dev Platforms</h3>
-                    <p class="text-indigo-300 font-mono text-sm mb-6">"The Car Factory"</p>
-                    <p class="text-gray-400 mb-6">
-                        This is where you write code, optimize prompts, and run evaluations. It's about creation and iteration.
-                    </p>
-                    <ul class="space-y-3 text-sm text-gray-300">
-                        <li class="flex items-center gap-2"><div class="w-1 h-1 bg-indigo-400 rounded-full"></div> <strong>Focus:</strong> Developer Productivity</li>
-                        <li class="flex items-center gap-2"><div class="w-1 h-1 bg-indigo-400 rounded-full"></div> <strong>Artifacts:</strong> Code, Prompts, Weights</li>
-                        <li class="flex items-center gap-2"><div class="w-1 h-1 bg-indigo-400 rounded-full"></div> <strong>Examples:</strong> LangChain, Letta, IDEs</li>
-                    </ul>
-                </div>
-
-                <!-- The Mesh -->
-                <div class="bg-[#0f1623] p-8 rounded-xl border border-gray-800 hover:border-cyan-500 transition-all">
-                    <div class="w-12 h-12 bg-cyan-500/20 rounded-lg flex items-center justify-center mb-6">
-                        <i data-lucide="network" class="text-cyan-400 w-6 h-6"></i>
-                    </div>
-                    <h3 class="text-2xl font-bold text-white mb-2">The Agent Mesh</h3>
-                    <p class="text-cyan-300 font-mono text-sm mb-6">"The Highway System"</p>
-                    <p class="text-gray-400 mb-6">
-                        This is the production environment where the agent lives. It handles traffic, security, and connectivity to the enterprise.
-                    </p>
-                    <ul class="space-y-3 text-sm text-gray-300">
-                        <li class="flex items-center gap-2"><div class="w-1 h-1 bg-cyan-400 rounded-full"></div> <strong>Focus:</strong> Operational Control & Safety</li>
-                        <li class="flex items-center gap-2"><div class="w-1 h-1 bg-cyan-400 rounded-full"></div> <strong>Artifacts:</strong> Logs, Policies, Access Tokens</li>
-                        <li class="flex items-center gap-2"><div class="w-1 h-1 bg-cyan-400 rounded-full"></div> <strong>Examples:</strong> API Gateways, Governance Layers</li>
-                    </ul>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Section 5: Business Value -->
-    <section class="py-24 bg-gradient-to-r from-blue-900 to-indigo-900 text-white relative overflow-hidden">
-        <div class="absolute inset-0 opacity-10" style="background-image: url('https://www.transparenttextures.com/patterns/carbon-fibre.png');"></div>
-        <div class="max-w-7xl mx-auto px-6 relative z-10">
-            <h2 class="text-3xl md:text-5xl font-bold mb-16 text-center">The Business Value of the Mesh</h2>
-            
-            <div class="grid md:grid-cols-3 gap-8">
-                
-                <!-- Value Card 1 -->
-                <div class="bg-white/5 backdrop-blur-md border border-white/10 p-8 rounded-2xl hover:bg-white/10 transition-all duration-300">
-                    <div class="w-14 h-14 bg-cyan-500 rounded-xl flex items-center justify-center mb-6 shadow-lg shadow-cyan-500/30">
-                        <i data-lucide="box" class="text-white w-7 h-7"></i>
-                    </div>
-                    <h3 class="text-2xl font-bold mb-4">Control & Governance</h3>
-                    <p class="text-cyan-100/80 leading-relaxed mb-4">
-                        Prevent <strong>Agent Sprawl</strong>. Centralize policy enforcement so you don't have thousands of rogue agents hitting APIs without oversight.
-                    </p>
-                    <div class="h-1 w-12 bg-cyan-400 rounded-full"></div>
-                </div>
-
-                <!-- Value Card 2 -->
-                <div class="bg-white/5 backdrop-blur-md border border-white/10 p-8 rounded-2xl hover:bg-white/10 transition-all duration-300">
-                    <div class="w-14 h-14 bg-purple-500 rounded-xl flex items-center justify-center mb-6 shadow-lg shadow-purple-500/30">
-                        <i data-lucide="trending-up" class="text-white w-7 h-7"></i>
-                    </div>
-                    <h3 class="text-2xl font-bold mb-4">Efficiency & ROI</h3>
-                    <p class="text-purple-100/80 leading-relaxed mb-4">
-                        <strong>Write Once, Run Everywhere.</strong> Build a "Salesforce Tool" once and let 50 different agents across Finance, Sales, and Support reuse it.
-                    </p>
-                    <div class="h-1 w-12 bg-purple-400 rounded-full"></div>
-                </div>
-
-                <!-- Value Card 3 -->
-                <div class="bg-white/5 backdrop-blur-md border border-white/10 p-8 rounded-2xl hover:bg-white/10 transition-all duration-300">
-                    <div class="w-14 h-14 bg-pink-500 rounded-xl flex items-center justify-center mb-6 shadow-lg shadow-pink-500/30">
-                        <i data-lucide="eye" class="text-white w-7 h-7"></i>
-                    </div>
-                    <h3 class="text-2xl font-bold mb-4">Observability</h3>
-                    <p class="text-pink-100/80 leading-relaxed mb-4">
-                        <strong>Forensic Traceability.</strong> When a chain of autonomous agents fails, the Mesh provides the "black box" recording to pinpoint exactly which agent made the bad decision.
-                    </p>
-                    <div class="h-1 w-12 bg-pink-400 rounded-full"></div>
-                </div>
-
-            </div>
-        </div>
-    </section>
-
-    <!-- Footer -->
-    <footer class="bg-[#02050a] py-12 px-6 border-t border-gray-900 text-center md:text-left">
-        <div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center text-gray-500 text-sm">
-            <div class="flex items-center gap-2 mb-4 md:mb-0">
-                <svg viewBox="0 0 24 24" class="w-4 h-4 text-gray-400">
-                    <line x1="4" y1="4" x2="12" y2="12" stroke="currentColor" stroke-width="1.5"/>
-                    <line x1="20" y1="4" x2="12" y2="12" stroke="currentColor" stroke-width="1.5"/>
-                    <line x1="4" y1="20" x2="12" y2="12" stroke="currentColor" stroke-width="1.5"/>
-                    <line x1="20" y1="20" x2="12" y2="12" stroke="currentColor" stroke-width="1.5"/>
-                    <circle cx="4" cy="4" r="1.5" fill="currentColor"/>
-                    <circle cx="20" cy="4" r="1.5" fill="currentColor"/>
-                    <circle cx="4" cy="20" r="1.5" fill="currentColor"/>
-                    <circle cx="20" cy="20" r="1.5" fill="currentColor"/>
-                    <circle cx="12" cy="12" r="2" fill="currentColor"/>
-                </svg>
-                <span class="font-bold text-gray-300">AgentMesh.ai</span>
-            </div>
-            <div>
-                &copy; 2026 <a href="https://Legendary.AI" class="text-cyan-400 hover:text-cyan-300 transition-colors">Legendary AI</a>
-            </div>
-        </div>
-    </footer>
-
-    <script>
-        // Initialize Icons
-        lucide.createIcons();
-
-        // Navbar Scroll Effect
-        const navbar = document.getElementById('navbar');
-        window.addEventListener('scroll', () => {
-            if (window.scrollY > 50) {
-                navbar.classList.add('bg-[#050b14]/90', 'backdrop-blur-md', 'border-cyan-900/30', 'py-4');
-                navbar.classList.remove('bg-transparent', 'py-6');
-            } else {
-                navbar.classList.remove('bg-[#050b14]/90', 'backdrop-blur-md', 'border-cyan-900/30', 'py-4');
-                navbar.classList.add('bg-transparent', 'py-6');
-            }
-        });
-    </script>
+  <script src="script.js"></script>
 </body>
 </html>

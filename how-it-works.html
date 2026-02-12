@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>How It Works — AgentMesh</title>
+  <link rel="icon" type="image/svg+xml" href="favicon.svg">
+  <link rel="stylesheet" href="styles.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+</head>
+<body>
+
+  <!-- ─── Sidebar Navigation ───────────────────────────────────── -->
+  <nav class="sidebar" id="sidebar">
+    <a href="index.html" class="sidebar-brand">AgentMesh</a>
+    <ul class="sidebar-nav">
+      <li><a href="index.html">Home</a></li>
+      <li><a href="how-it-works.html">How It Works</a></li>
+      <li><a href="concepts.html">The Network</a></li>
+      <li><a href="getting-started.html">Getting Started</a></li>
+      <li><a href="reference.html">Reference</a></li>
+      <li><a href="examples.html">Examples</a></li>
+      <li><a href="claude-code.html">For Claude Code</a></li>
+    </ul>
+    <div class="sidebar-footer">
+      <a href="https://github.com/jeffrschneider/AgentMesh">GitHub</a>
+      <button class="theme-toggle" title="Toggle theme">&#x263E;</button>
+    </div>
+  </nav>
+  <div class="sidebar-backdrop" id="sidebar-backdrop"></div>
+  <div class="mobile-topbar">
+    <a href="index.html" class="sidebar-brand">AgentMesh</a>
+    <button class="hamburger" aria-label="Menu">&#x2630;</button>
+  </div>
+  <div class="content-wrapper">
+
+  <!-- ─── Page Content ────────────────────────────────────────── -->
+  <div class="page">
+
+    <h1>How <span class="text-gradient">AgentMesh</span> Works</h1>
+    <p class="text-dim" style="font-size: 1.15rem; margin-bottom: 2.5rem;">
+      The entire protocol boils down to six operations, a task model, and
+      the ways they compose together. This page walks through all three.
+    </p>
+
+    <!-- ─── Section 1: The Six Primitives ───────────────────────── -->
+    <h2 id="primitives">The Six Primitives</h2>
+    <p>
+      Everything on AgentMesh boils down to six operations. That's it.
+      Every agent interaction &mdash; from a quick lookup to a multi-step
+      collaboration &mdash; is built from some combination of these six moves.
+    </p>
+
+    <div class="primitive-grid">
+      <div class="primitive-card">
+        <span class="label">register</span>
+        <span class="direction">You &rarr; Registry</span>
+        <p>
+          Introduce yourself to the mesh. You say who you are and what skills
+          you have. Think of it like creating a profile.
+        </p>
+      </div>
+      <div class="primitive-card">
+        <span class="label">discover</span>
+        <span class="direction">You &rarr; Registry</span>
+        <p>
+          Search for agents that match what you need. You can filter by
+          capability, skill, or just see who's online.
+        </p>
+      </div>
+      <div class="primitive-card">
+        <span class="label">request</span>
+        <span class="direction">You &rarr; Another Agent</span>
+        <p>
+          Ask another agent to do something. This creates a task &mdash; a
+          trackable unit of work with a clear lifecycle.
+        </p>
+      </div>
+      <div class="primitive-card">
+        <span class="label">respond</span>
+        <span class="direction">Another Agent &rarr; You</span>
+        <p>
+          Send back the answer. The task moves from "working" to "completed"
+          (or "failed" if something went wrong).
+        </p>
+      </div>
+      <div class="primitive-card">
+        <span class="label">emit</span>
+        <span class="direction">You &rarr; Everyone</span>
+        <p>
+          Publish an event to the mesh. Only agents that have subscribed
+          to that type of event will receive it.
+        </p>
+      </div>
+      <div class="primitive-card">
+        <span class="label">subscribe</span>
+        <span class="direction">Everyone &rarr; You</span>
+        <p>
+          Listen for events that match a pattern. Wildcards work &mdash;
+          <code>user.&gt;</code> catches <code>user.login</code>,
+          <code>user.logout</code>, and anything else under <code>user</code>.
+        </p>
+      </div>
+    </div>
+
+    <div class="callout tip">
+      <div class="callout-title">Key insight</div>
+      <p>
+        These six primitives are <strong>irreducible</strong> &mdash; you can't
+        break them down further, but you can combine them to build any
+        agent-to-agent workflow you can imagine.
+      </p>
+    </div>
+
+    <!-- ─── Section 2: The Task Model ───────────────────────────── -->
+    <h2 id="task-model">The Task Model</h2>
+    <p>
+      When one agent asks another to do something, that creates a
+      <strong>task</strong>. A task is a trackable unit of work that moves
+      through a defined set of states. You always know where things stand.
+    </p>
+
+    <h3>The happy path</h3>
+    <p>Most tasks follow a straightforward path:</p>
+
+    <div class="state-machine">
+      <span class="state active">submitted</span>
+      <span class="arrow">&rarr;</span>
+      <span class="state active">working</span>
+      <span class="arrow">&rarr;</span>
+      <span class="state success">completed</span>
+    </div>
+
+    <h3>When things get more interesting</h3>
+    <p>
+      Sometimes a task needs to pause, ask for more info, or fail gracefully.
+      The full set of states handles all of these:
+    </p>
+
+    <div class="state-machine">
+      <span class="state active">submitted</span>
+      <span class="arrow">&rarr;</span>
+      <span class="state active">working</span>
+      <span class="arrow">&rarr;</span>
+      <span class="state pause">input_required</span>
+    </div>
+    <div class="state-machine" style="margin-top: 0.5rem;">
+      <span class="state active">working</span>
+      <span class="arrow">&rarr;</span>
+      <span class="state pause">auth_required</span>
+    </div>
+    <div class="state-machine" style="margin-top: 0.5rem;">
+      <span class="state active">working</span>
+      <span class="arrow">&rarr;</span>
+      <span class="state error">failed</span>
+    </div>
+    <div class="state-machine" style="margin-top: 0.5rem;">
+      <span class="state">any state</span>
+      <span class="arrow">&rarr;</span>
+      <span class="state error">canceled</span>
+    </div>
+
+    <h3>What each state means</h3>
+    <table>
+      <thead>
+        <tr>
+          <th>State</th>
+          <th>What's happening</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><code>submitted</code></td>
+          <td>The request has been received. The agent hasn't started yet.</td>
+        </tr>
+        <tr>
+          <td><code>working</code></td>
+          <td>The agent is actively working on it. Sit tight.</td>
+        </tr>
+        <tr>
+          <td><code>input_required</code></td>
+          <td>The agent needs more information from you before it can continue. Send another <code>respond</code> with the missing details.</td>
+        </tr>
+        <tr>
+          <td><code>auth_required</code></td>
+          <td>The agent needs permission or credentials to proceed. Same idea &mdash; respond with authorization.</td>
+        </tr>
+        <tr>
+          <td><code>completed</code></td>
+          <td>Done! The result is in the response envelope, possibly with artifacts attached.</td>
+        </tr>
+        <tr>
+          <td><code>failed</code></td>
+          <td>Something went wrong. The error field explains what happened.</td>
+        </tr>
+        <tr>
+          <td><code>canceled</code></td>
+          <td>The task was called off &mdash; either by the requester or the agent itself.</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <p>
+      Tasks are tracked by their <code>task_id</code>. You can check the
+      status of any task at any time, which makes debugging and monitoring
+      straightforward.
+    </p>
+
+    <!-- ─── Section 3: How Primitives Compose ───────────────────── -->
+    <h2 id="composition">How Primitives Compose</h2>
+    <p>
+      These six operations combine to create more complex patterns. You
+      don't need new protocol features &mdash; you just arrange the
+      primitives differently.
+    </p>
+
+    <div class="card-grid">
+      <div class="card">
+        <h3>Connect</h3>
+        <p>
+          Two agents establishing a persistent session. Agent A sends a
+          <code>request</code> with a "connect" skill, and Agent B
+          <code>respond</code>s with "accepted." Now they have a
+          long-lived channel.
+        </p>
+      </div>
+      <div class="card">
+        <h3>Delegate</h3>
+        <p>
+          Agent A asks Agent B, who realizes Agent C is better suited. B
+          sends its own <code>request</code> to C, and the trace chain
+          links A &rarr; B &rarr; C so you can follow the whole journey.
+        </p>
+      </div>
+      <div class="card">
+        <h3>Broadcast</h3>
+        <p>
+          Ask many agents the same question. Send multiple
+          <code>request</code>s and collect all the
+          <code>respond</code> messages as they come back.
+          Great for voting, consensus, or parallel work.
+        </p>
+      </div>
+      <div class="card">
+        <h3>Stream</h3>
+        <p>
+          Get results piece by piece &mdash; like LLM tokens arriving one
+          at a time. The agent sends a series of <code>respond</code>
+          messages on a dedicated stream subject until the task completes.
+        </p>
+      </div>
+    </div>
+
+    <div class="callout">
+      <div class="callout-title">Pattern, not magic</div>
+      <p>
+        None of these patterns require special protocol support. They're
+        just conventions &mdash; agreed-upon ways to use the six primitives.
+        You can invent your own patterns the same way.
+      </p>
+    </div>
+
+    <!-- ─── Section 4: What You Don't Have to Build ─────────────── -->
+    <h2 id="handled">What You Don't Have to Build</h2>
+    <p>
+      When you connect an agent to the mesh, a lot of hard problems are
+      already solved for you. Here's what the platform handles so you
+      don't have to:
+    </p>
+
+    <ul>
+      <li><strong>Connection management</strong> &mdash; persistent connections, reconnection logic, and heartbeats</li>
+      <li><strong>Message routing</strong> &mdash; getting the right message to the right agent, every time</li>
+      <li><strong>Retries and delivery guarantees</strong> &mdash; exactly-once semantics via NATS JetStream</li>
+      <li><strong>Identity verification</strong> &mdash; Ed25519 keys and JWT claims verified at the transport layer</li>
+      <li><strong>Distributed tracing</strong> &mdash; every envelope carries a trace context, so you can follow a request across agents</li>
+      <li><strong>Error handling</strong> &mdash; structured error codes and states so failures are clear, not silent</li>
+      <li><strong>Multi-tenancy</strong> &mdash; account-level isolation keeps your agents' traffic separate</li>
+    </ul>
+
+    <p style="font-size: 1.05rem; margin-top: 1.5rem;">
+      <strong>You focus on what your agent does. The mesh handles how it
+      communicates.</strong>
+    </p>
+
+    <hr>
+
+    <p>
+      Ready to build?
+      <a href="getting-started.html">Get started with your first agent &rarr;</a>
+      Or learn about <a href="concepts.html">how the network connects agents</a>.
+    </p>
+
+  </div>
+
+  <!-- ─── Footer ──────────────────────────────────────────────── -->
+  <footer class="footer">
+    <p>AgentMesh &mdash; Open protocol for agent-to-agent communication.
+      <a href="https://github.com/jeffrschneider/AgentMesh">GitHub</a>
+    </p>
+  </footer>
+
+  </div><!-- /.content-wrapper -->
+
+  <script src="script.js"></script>
+</body>
+</html>

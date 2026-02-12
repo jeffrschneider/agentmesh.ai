@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>The Network — AgentMesh</title>
+  <link rel="icon" type="image/svg+xml" href="favicon.svg">
+  <link rel="stylesheet" href="styles.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+  <script type="module">
+    import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs';
+
+    // Save original diagram sources before Mermaid processes them
+    const sources = [];
+    document.querySelectorAll('.mermaid').forEach((el, i) => {
+      sources[i] = el.textContent;
+    });
+
+    const currentTheme = document.documentElement.getAttribute('data-theme') === 'light' ? 'default' : 'dark';
+    mermaid.initialize({ startOnLoad: true, theme: currentTheme, flowchart: { curve: 'basis', padding: 20 } });
+
+    // Expose re-render function for theme toggle
+    window.__rerenderMermaid = async function (theme) {
+      mermaid.initialize({ startOnLoad: false, theme: theme === 'light' ? 'default' : 'dark', flowchart: { curve: 'basis', padding: 20 } });
+      const els = document.querySelectorAll('.mermaid');
+      els.forEach((el, i) => {
+        el.removeAttribute('data-processed');
+        el.innerHTML = sources[i];
+      });
+      await mermaid.run();
+    };
+  </script>
+</head>
+<body>
+
+  <!-- ─── Sidebar Navigation ───────────────────────────────────── -->
+  <nav class="sidebar" id="sidebar">
+    <a href="index.html" class="sidebar-brand">AgentMesh</a>
+    <ul class="sidebar-nav">
+      <li><a href="index.html">Home</a></li>
+      <li><a href="how-it-works.html">How It Works</a></li>
+      <li><a href="concepts.html">The Network</a></li>
+      <li><a href="getting-started.html">Getting Started</a></li>
+      <li><a href="reference.html">Reference</a></li>
+      <li><a href="examples.html">Examples</a></li>
+      <li><a href="claude-code.html">For Claude Code</a></li>
+    </ul>
+    <div class="sidebar-footer">
+      <a href="https://github.com/jeffrschneider/AgentMesh">GitHub</a>
+      <button class="theme-toggle" title="Toggle theme">&#x263E;</button>
+    </div>
+  </nav>
+  <div class="sidebar-backdrop" id="sidebar-backdrop"></div>
+  <div class="mobile-topbar">
+    <a href="index.html" class="sidebar-brand">AgentMesh</a>
+    <button class="hamburger" aria-label="Menu">&#x2630;</button>
+  </div>
+  <div class="content-wrapper">
+
+  <!-- ─── Page Content ─────────────────────────────────────────── -->
+  <div class="page">
+
+    <h1>The Network</h1>
+    <p class="text-dim" style="font-size: 1.15rem; margin-bottom: 2.5rem;">
+      AgentMesh runs on <a href="https://nats.io">NATS</a>, a lightweight
+      messaging system designed for exactly this kind of thing &mdash;
+      connecting distributed software that needs to talk to each other in
+      real time. This page explains how the network works at different
+      scales, from a single office to agents spread across the world.
+    </p>
+
+    <!-- ─── 1. The Big Idea ──────────────────────────────────────── -->
+    <h2 id="big-idea">The Big Idea</h2>
+    <p>
+      Every agent connects to a NATS server. Once connected, the agent can
+      send messages to any other agent on the same server &mdash; without
+      knowing the other agent's IP address, without opening ports, and
+      without building an API.
+    </p>
+    <p>
+      NATS handles all the routing. You just say <em>"send this message to
+      the agent named Translator"</em> and NATS delivers it. If the
+      Translator is on the same machine as you, across the building, or on
+      the other side of the planet, the code is identical.
+    </p>
+    <p>
+      This is fundamentally different from traditional APIs, where you need
+      to know every service's URL, manage connections to each one, and
+      handle failures individually. On the mesh, you connect once and talk
+      to everyone.
+    </p>
+
+    <div class="mermaid">
+graph LR
+    A[Agent A] --- S((NATS<br/>Server))
+    B[Agent B] --- S
+    C[Agent C] --- S
+    D[Agent D] --- S
+    style S fill:#06b6d4,color:#fff,stroke:#06b6d4
+    </div>
+
+    <!-- ─── 2. Within an Organization ────────────────────────────── -->
+    <h2 id="within-org">Within an Organization</h2>
+    <p>
+      The simplest deployment is a single NATS server running on your
+      company's network &mdash; behind the firewall, on a VM, in a
+      container, wherever you run internal services.
+    </p>
+    <p>
+      Every agent in the organization connects to this server. Because
+      everything stays on the internal network, there's no exposure to the
+      public internet. Agents can discover each other, send requests, and
+      share events &mdash; all within the safety of your own
+      infrastructure.
+    </p>
+
+    <div class="topology-card">
+      <h3>Single office or data center</h3>
+      <p class="scenario">
+        Acme Corp runs three agents on their internal network: a document
+        processor, a code reviewer, and a reporting agent. All three connect
+        to a single NATS server running on an internal VM.
+      </p>
+      <div class="mermaid">
+graph TB
+    subgraph firewall ["Acme Corp Network"]
+        direction TB
+        NS((NATS Server))
+        A1["Document Processor"] --- NS
+        A2["Code Reviewer"] --- NS
+        A3["Reporting Agent"] --- NS
+    end
+    style firewall fill:transparent,stroke:#06b6d4,stroke-width:2px,stroke-dasharray:5
+    style NS fill:#06b6d4,color:#fff,stroke:#06b6d4
+      </div>
+      <p>
+        All traffic stays inside the firewall. The agents register with the
+        mesh, discover each other through the registry, and collaborate &mdash;
+        all without any external network access.
+      </p>
+    </div>
+
+    <div class="callout tip">
+      <div class="callout-title">Scaling up</div>
+      <p>
+        For high availability, you can run a cluster of NATS servers within
+        your network. They replicate automatically &mdash; if one goes down,
+        the others keep the mesh running. Agents reconnect seamlessly.
+      </p>
+    </div>
+
+    <!-- ─── 3. Between Organizations ─────────────────────────────── -->
+    <h2 id="between-orgs">Between Organizations</h2>
+    <p>
+      What if agents at two different companies need to collaborate? This
+      is where NATS really shines.
+    </p>
+    <p>
+      Each organization keeps its own NATS server behind its own firewall.
+      To connect the two, one of them extends a <strong>leaf node</strong>
+      connection to a shared hub &mdash; a NATS server running in the cloud.
+      A leaf node is just an outbound connection (like opening a web page),
+      so it doesn't require opening any inbound ports or poking holes in
+      the firewall.
+    </p>
+
+    <div class="topology-card">
+      <h3>Two companies collaborating</h3>
+      <p class="scenario">
+        Acme Corp and Globex Inc each run their own agents internally. They
+        connect to a shared cloud hub so their agents can find each other
+        and exchange work.
+      </p>
+      <div class="mermaid">
+graph TB
+    subgraph acme ["Acme Corp"]
+        direction TB
+        NS1((NATS))
+        A1["Doc Processor"] --- NS1
+        A2["Code Reviewer"] --- NS1
+    end
+    subgraph cloud ["Cloud Hub"]
+        direction TB
+        HUB((NATS Hub))
+    end
+    subgraph globex ["Globex Inc"]
+        direction TB
+        NS2((NATS))
+        B1["Data Analyst"] --- NS2
+        B2["Translator"] --- NS2
+    end
+    NS1 -. "leaf node<br/>(outbound)" .-> HUB
+    NS2 -. "leaf node<br/>(outbound)" .-> HUB
+    style acme fill:transparent,stroke:#06b6d4,stroke-width:2px,stroke-dasharray:5
+    style globex fill:transparent,stroke:#4ade80,stroke-width:2px,stroke-dasharray:5
+    style cloud fill:transparent,stroke:#fbbf24,stroke-width:2px
+    style NS1 fill:#06b6d4,color:#fff,stroke:#06b6d4
+    style NS2 fill:#4ade80,color:#fff,stroke:#4ade80
+    style HUB fill:#fbbf24,color:#000,stroke:#fbbf24
+      </div>
+      <p>
+        The key insight: each company's internal traffic stays internal. Only
+        the subjects they explicitly share are routed through the hub. Acme's
+        Code Reviewer can talk to Globex's Translator, but neither company
+        exposes its full internal mesh to the other.
+      </p>
+    </div>
+
+    <p>
+      NATS accounts provide the isolation. Each organization has its own
+      account with its own permissions. The hub controls which subjects
+      cross between accounts, so you have fine-grained control over
+      what's shared.
+    </p>
+
+    <div class="callout">
+      <div class="callout-title">Note</div>
+      <p>
+        The cloud hub can be a self-hosted NATS server, or you can use a
+        managed service like <a href="https://www.synadia.com">Synadia Cloud</a>
+        which provides a global supercluster with built-in account management,
+        credential rotation, and observability.
+      </p>
+    </div>
+
+    <!-- ─── 4. Between Individuals ────────────────────────────────── -->
+    <h2 id="individuals">Between Individuals</h2>
+    <p>
+      AgentMesh isn't just for companies with IT departments. Individual
+      users &mdash; each at home, on a laptop, behind a residential router
+      &mdash; can connect their agents too.
+    </p>
+    <p>
+      The trick is <strong>WebSockets</strong>. Home networks typically
+      block inbound connections, but every browser and Node.js app can
+      open outbound WebSocket connections. NATS supports WebSocket
+      listeners alongside its native protocol, so agents running in a
+      browser or on a home machine can connect to a cloud NATS server just
+      like opening any other website.
+    </p>
+
+    <div class="topology-card">
+      <h3>People at home</h3>
+      <p class="scenario">
+        Jeff and Bob each have personal agents running on their laptops.
+        Neither has a static IP or open ports. Both connect to a NATS
+        server in the cloud over WebSockets.
+      </p>
+      <div class="mermaid">
+graph TB
+    subgraph jeff ["Jeff's Home"]
+        direction TB
+        JA["Jeff's Agent<br/>(browser)"]
+    end
+    subgraph cloud ["Cloud"]
+        direction TB
+        NS((NATS Server<br/>port 4443 WS))
+        REG["Registry"]
+        REG --- NS
+    end
+    subgraph bob ["Bob's Home"]
+        direction TB
+        BA["Bob's Agent<br/>(browser)"]
+    end
+    JA -. "WebSocket<br/>(outbound)" .-> NS
+    BA -. "WebSocket<br/>(outbound)" .-> NS
+    style jeff fill:transparent,stroke:#06b6d4,stroke-width:2px,stroke-dasharray:5
+    style bob fill:transparent,stroke:#4ade80,stroke-width:2px,stroke-dasharray:5
+    style cloud fill:transparent,stroke:#fbbf24,stroke-width:2px
+    style NS fill:#fbbf24,color:#000,stroke:#fbbf24
+      </div>
+      <p>
+        From Jeff's perspective, his agent connects to a URL
+        (<code>wss://mesh.example.com:4443</code>), registers, and
+        immediately sees Bob's agent in the registry. He can send requests,
+        receive responses, and subscribe to events &mdash; all through that
+        single outbound WebSocket.
+      </p>
+    </div>
+
+    <p>
+      This is exactly how the
+      <a href="examples.html">WeBrowse demo</a> works. Each user opens a
+      browser tab, types their name, and their personal agent connects to
+      the cloud NATS server over WebSockets. Agents discover each other
+      and can chat in real time &mdash; even though both users are behind
+      NAT on residential internet.
+    </p>
+
+    <!-- ─── 5. All Three Together ────────────────────────────────── -->
+    <h2 id="all-together">All Three Together</h2>
+    <p>
+      The real power is that these aren't three separate systems. They're
+      the same protocol at different scales. An agent in Acme Corp's data
+      center can collaborate with Bob's personal agent at home, through
+      the same hub, using the same six primitives.
+    </p>
+
+    <div class="mermaid">
+graph TB
+    subgraph acme ["Acme Corp"]
+        direction TB
+        NS1((NATS))
+        A1["Doc Processor"] --- NS1
+    end
+    subgraph cloud ["Cloud Hub"]
+        direction TB
+        HUB((NATS Hub))
+        SVC["Platform Services<br/>(Registry, Task Manager)"]
+        SVC --- HUB
+    end
+    subgraph home ["Bob's Home"]
+        direction TB
+        BA["Bob's Agent<br/>(browser)"]
+    end
+    NS1 -. "leaf node" .-> HUB
+    BA -. "WebSocket" .-> HUB
+    style acme fill:transparent,stroke:#06b6d4,stroke-width:2px,stroke-dasharray:5
+    style home fill:transparent,stroke:#4ade80,stroke-width:2px,stroke-dasharray:5
+    style cloud fill:transparent,stroke:#fbbf24,stroke-width:2px
+    style NS1 fill:#06b6d4,color:#fff,stroke:#06b6d4
+    style HUB fill:#fbbf24,color:#000,stroke:#fbbf24
+    </div>
+
+    <p>
+      NATS makes this possible because it was designed from the start for
+      exactly this kind of multi-topology connectivity. AgentMesh inherits
+      that capability and adds the agent-level protocol on top: discovery,
+      requests, tasks, and events.
+    </p>
+
+    <!-- ─── 6. Connection Types Summary ──────────────────────────── -->
+    <h2 id="connections">Connection Types at a Glance</h2>
+
+    <table>
+      <thead>
+        <tr>
+          <th>Scenario</th>
+          <th>Connection</th>
+          <th>Who initiates</th>
+          <th>Firewall impact</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Agents on the same network</td>
+          <td>Native TCP (port 4222)</td>
+          <td>Each agent connects outbound to the NATS server</td>
+          <td>None &mdash; internal only</td>
+        </tr>
+        <tr>
+          <td>Org to cloud hub</td>
+          <td>Leaf node (outbound TCP or TLS)</td>
+          <td>The org's NATS server connects outbound to the hub</td>
+          <td>None &mdash; outbound only</td>
+        </tr>
+        <tr>
+          <td>Browser or home agent to cloud</td>
+          <td>WebSocket (port 4443, TLS)</td>
+          <td>The agent connects outbound to the hub</td>
+          <td>None &mdash; outbound only</td>
+        </tr>
+        <tr>
+          <td>Server agents to cloud</td>
+          <td>Native TCP or TLS (port 4222)</td>
+          <td>The agent connects outbound to the hub</td>
+          <td>None &mdash; outbound only</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="callout tip">
+      <div class="callout-title">The pattern</div>
+      <p>
+        Notice that every connection is <strong>outbound</strong>. Nobody
+        needs to open inbound ports, configure port forwarding, or set up
+        a VPN. This is what makes it possible for agents to connect from
+        anywhere &mdash; a corporate data center, a home laptop, or a
+        browser tab.
+      </p>
+    </div>
+
+    <hr>
+
+    <p>
+      The network is the foundation that makes everything else possible.
+      Once your agents can reach each other, the
+      <a href="how-it-works.html">six primitives</a> give them a common
+      language, and the <a href="reference.html">platform services</a>
+      (registry, task management, security) handle the rest.
+    </p>
+    <p>
+      <a href="getting-started.html">Ready to connect your first agent? Head to Getting Started &rarr;</a>
+    </p>
+
+  </div>
+
+  <!-- ─── Footer ──────────────────────────────────────────────── -->
+  <footer class="footer">
+    <p>AgentMesh &mdash; Open protocol for agent-to-agent communication.
+      <a href="https://github.com/jeffrschneider/AgentMesh">GitHub</a>
+    </p>
+  </footer>
+
+  </div><!-- /.content-wrapper -->
+
+  <script src="script.js"></script>
+</body>
+</html>

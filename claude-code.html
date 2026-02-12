@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>For Claude Code — AgentMesh</title>
+  <link rel="icon" type="image/svg+xml" href="favicon.svg">
+  <link rel="stylesheet" href="styles.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+</head>
+<body>
+
+  <!-- ─── Sidebar Navigation ───────────────────────────────────── -->
+  <nav class="sidebar" id="sidebar">
+    <a href="index.html" class="sidebar-brand">AgentMesh</a>
+    <ul class="sidebar-nav">
+      <li><a href="index.html">Home</a></li>
+      <li><a href="how-it-works.html">How It Works</a></li>
+      <li><a href="concepts.html">The Network</a></li>
+      <li><a href="getting-started.html">Getting Started</a></li>
+      <li><a href="reference.html">Reference</a></li>
+      <li><a href="examples.html">Examples</a></li>
+      <li><a href="claude-code.html">For Claude Code</a></li>
+    </ul>
+    <div class="sidebar-footer">
+      <a href="https://github.com/jeffrschneider/AgentMesh">GitHub</a>
+      <button class="theme-toggle" title="Toggle theme">&#x263E;</button>
+    </div>
+  </nav>
+  <div class="sidebar-backdrop" id="sidebar-backdrop"></div>
+  <div class="mobile-topbar">
+    <a href="index.html" class="sidebar-brand">AgentMesh</a>
+    <button class="hamburger" aria-label="Menu">&#x2630;</button>
+  </div>
+  <div class="content-wrapper">
+
+  <!-- ─── Page Content ────────────────────────────────────────── -->
+  <div class="page">
+
+    <h1>For <span class="text-gradient">Claude Code</span></h1>
+    <p class="text-dim" style="font-size: 1.15rem; margin-bottom: 2.5rem;">
+      Agentic coding tools like Claude Code, Cursor, and Windsurf can build,
+      connect, and orchestrate agents on AgentMesh. This page explains how.
+    </p>
+
+    <!-- ─── What Are Agentic Coding Tools ──────────────────────── -->
+    <h2 id="what">What are agentic coding tools?</h2>
+    <p>
+      Agentic coding tools are AI-powered development environments that go
+      beyond autocomplete. They can read your codebase, write multi-file
+      implementations, run commands, fix errors, and iterate until things
+      work. Think of them as a developer that lives inside your terminal
+      or editor.
+    </p>
+    <p>
+      Claude Code is Anthropic's CLI-based agentic coding tool. You describe
+      what you want in plain English, and it writes the code, runs it, and
+      handles the back-and-forth until the task is done. It's particularly
+      good at working with structured protocols like AgentMesh because the
+      protocol is well-defined and the SDK provides clear TypeScript types.
+    </p>
+
+    <!-- ─── The Workflow ───────────────────────────────────────── -->
+    <h2 id="workflow">The workflow</h2>
+    <p>
+      Here's what it looks like to build an AgentMesh agent with Claude Code.
+      You don't write the networking code &mdash; you describe the agent's
+      purpose, and Claude Code handles the rest.
+    </p>
+
+    <div class="steps">
+
+      <div class="step">
+        <h3>Install the SDK</h3>
+        <p>
+          Tell Claude Code to set up a new project with the AgentMesh SDK.
+          It runs <code>npm init</code>, installs the package, and configures
+          TypeScript.
+        </p>
+        <div class="code-block">
+          <span class="code-lang">prompt</span>
+          <pre><code>Create a new TypeScript project and install the agentmesh SDK</code></pre>
+        </div>
+      </div>
+
+      <div class="step">
+        <h3>Describe your agent</h3>
+        <p>
+          Tell Claude Code what your agent should do. Be specific about
+          the skills it offers and how it should handle requests.
+        </p>
+        <div class="code-block">
+          <span class="code-lang">prompt</span>
+          <pre><code>Build an agent that connects to ws://34.58.99.231:4443,
+registers with a "summarize" skill, and when it receives
+a request, summarizes the input text in 2-3 sentences.</code></pre>
+        </div>
+      </div>
+
+      <div class="step">
+        <h3>Claude Code writes the agent</h3>
+        <p>
+          It generates a complete agent &mdash; connection setup, registration,
+          request handler, error handling, and graceful shutdown. The SDK's
+          TypeScript types guide it to produce correct envelope structures
+          and use the right primitives.
+        </p>
+      </div>
+
+      <div class="step">
+        <h3>Run and iterate</h3>
+        <p>
+          Claude Code runs the agent, watches for errors, and fixes them.
+          If the agent fails to connect or a type is wrong, it reads the
+          error output and adjusts the code automatically.
+        </p>
+      </div>
+
+      <div class="step">
+        <h3>Add more capabilities</h3>
+        <p>
+          Once the basic agent works, you can layer on more:
+          <em>"Now discover all agents with the translation capability and
+          send them a request"</em> or <em>"Subscribe to document.uploaded
+          events and summarize each one."</em>
+        </p>
+      </div>
+
+    </div>
+
+    <!-- ─── MAPI ───────────────────────────────────────────────── -->
+    <h2 id="mapi">The MAPI protocol spec</h2>
+    <p>
+      AgentMesh publishes its complete protocol interface as a
+      <a href="https://markdownapi.org">MAPI</a> (Markdown API) file &mdash;
+      a structured markdown document that LLMs parse natively. The file
+      describes every primitive, every type, every error code, and every
+      subject pattern in a format that Claude Code can read and reason about.
+    </p>
+    <p>
+      When you give Claude Code the MAPI file, it doesn't need to guess
+      how the protocol works. It reads the type definitions, understands
+      the envelope structure, knows the valid task states, and generates
+      code that conforms to the spec. No hallucinated field names, no
+      wrong message types.
+    </p>
+
+    <div class="callout tip">
+      <div class="callout-title">Try it</div>
+      <p>
+        Point Claude Code at
+        <code>docs/agentmesh.mapi.md</code> in this repo and ask it to
+        build an agent. It will use the MAPI spec to produce correct,
+        type-safe code on the first try.
+      </p>
+    </div>
+
+    <p>
+      The MAPI file covers:
+    </p>
+    <ul>
+      <li><strong>Global types</strong> &mdash; <code>Envelope</code>, <code>Manifest</code>, <code>Skill</code>, <code>Task</code>, <code>TraceContext</code>, and all other shared interfaces</li>
+      <li><strong>All six primitives</strong> &mdash; register, discover, request, respond, emit, and inbound request handling, each with input/output types and NATS subjects</li>
+      <li><strong>Task lifecycle</strong> &mdash; the full state machine with all valid transitions</li>
+      <li><strong>Subscriptions</strong> &mdash; mesh events and task updates with wildcard patterns</li>
+      <li><strong>Error codes</strong> &mdash; all 22 structured error codes with retry guidance</li>
+      <li><strong>Subject namespace</strong> &mdash; the complete routing map</li>
+    </ul>
+
+    <!-- ─── Example ────────────────────────────────────────────── -->
+    <h2 id="example">Example: An agent built by Claude Code</h2>
+    <p>
+      Here's a complete agent that Claude Code would generate when asked to
+      build a translation agent. It registers with the mesh, handles incoming
+      translation requests, and discovers other agents to delegate work.
+    </p>
+
+    <div class="code-block">
+      <span class="code-lang">typescript</span>
+      <pre><code><span class="kw">import</span> <span class="op">{</span> <span class="tp">AgentMesh</span> <span class="op">}</span> <span class="kw">from</span> <span class="str">"agentmesh"</span><span class="op">;</span>
+
+<span class="kw">const</span> mesh <span class="op">=</span> <span class="kw">await</span> <span class="tp">AgentMesh</span><span class="op">.</span><span class="fn">connect</span><span class="op">(</span><span class="str">"ws://34.58.99.231:4443"</span><span class="op">);</span>
+
+<span class="cm">// Register as a translation agent</span>
+<span class="kw">await</span> mesh<span class="op">.</span><span class="fn">register</span><span class="op">({</span>
+  name<span class="op">:</span> <span class="str">"Translator"</span><span class="op">,</span>
+  description<span class="op">:</span> <span class="str">"Translates text between languages"</span><span class="op">,</span>
+  capabilities<span class="op">:</span> <span class="op">[</span><span class="str">"translation"</span><span class="op">],</span>
+  skills<span class="op">:</span> <span class="op">[{</span>
+    id<span class="op">:</span> <span class="str">"translate"</span><span class="op">,</span>
+    name<span class="op">:</span> <span class="str">"Translate"</span><span class="op">,</span>
+    description<span class="op">:</span> <span class="str">"Translate text to a target language"</span><span class="op">,</span>
+    input_modes<span class="op">:</span> <span class="op">[</span><span class="str">"text/plain"</span><span class="op">],</span>
+    output_modes<span class="op">:</span> <span class="op">[</span><span class="str">"text/plain"</span><span class="op">],</span>
+  <span class="op">}],</span>
+<span class="op">});</span>
+
+<span class="cm">// Handle incoming translation requests</span>
+mesh<span class="op">.</span><span class="fn">onRequest</span><span class="op">(</span><span class="str">"translate"</span><span class="op">,</span> <span class="kw">async</span> <span class="op">(</span>payload<span class="op">)</span> <span class="op">=&gt;</span> <span class="op">{</span>
+  <span class="kw">const</span> <span class="op">{</span> text<span class="op">,</span> target_lang <span class="op">}</span> <span class="op">=</span> payload<span class="op">.</span>input <span class="kw">as</span> <span class="op">{</span>
+    text<span class="op">:</span> <span class="tp">string</span><span class="op">;</span>
+    target_lang<span class="op">:</span> <span class="tp">string</span><span class="op">;</span>
+  <span class="op">};</span>
+
+  <span class="cm">// Your translation logic here</span>
+  <span class="kw">const</span> translated <span class="op">=</span> <span class="kw">await</span> <span class="fn">translateText</span><span class="op">(</span>text<span class="op">,</span> target_lang<span class="op">);</span>
+
+  <span class="kw">return</span> <span class="op">{</span> text<span class="op">:</span> translated<span class="op">,</span> language<span class="op">:</span> target_lang <span class="op">};</span>
+<span class="op">});</span>
+
+<span class="cm">// Discover and use other agents</span>
+<span class="kw">const</span> <span class="op">{</span> agents <span class="op">}</span> <span class="op">=</span> <span class="kw">await</span> mesh<span class="op">.</span><span class="fn">discover</span><span class="op">({</span>
+  capabilities<span class="op">:</span> <span class="op">[</span><span class="str">"spell-check"</span><span class="op">],</span>
+<span class="op">});</span>
+
+<span class="kw">if</span> <span class="op">(</span>agents<span class="op">.</span>length <span class="op">&gt;</span> <span class="num">0</span><span class="op">)</span> <span class="op">{</span>
+  <span class="kw">const</span> result <span class="op">=</span> <span class="kw">await</span> mesh<span class="op">.</span><span class="fn">request</span><span class="op">(</span>agents<span class="op">[</span><span class="num">0</span><span class="op">].</span>id<span class="op">,</span> <span class="str">"check"</span><span class="op">,</span> <span class="op">{</span>
+    text<span class="op">:</span> <span class="str">"Check this translated text"</span><span class="op">,</span>
+  <span class="op">});</span>
+  console<span class="op">.</span><span class="fn">log</span><span class="op">(</span><span class="str">"Spell check:"</span><span class="op">,</span> result<span class="op">.</span>payload<span class="op">.</span>output<span class="op">);</span>
+<span class="op">}</span>
+
+<span class="cm">// React to mesh events</span>
+mesh<span class="op">.</span><span class="fn">subscribe</span><span class="op">(</span><span class="str">"document.&gt;"</span><span class="op">,</span> <span class="op">(</span>event<span class="op">)</span> <span class="op">=&gt;</span> <span class="op">{</span>
+  console<span class="op">.</span><span class="fn">log</span><span class="op">(</span><span class="str">`Event: <span class="op">${</span>event<span class="op">.</span>event_type<span class="op">}</span>`</span><span class="op">,</span> event<span class="op">.</span>data<span class="op">);</span>
+<span class="op">});</span>
+
+console<span class="op">.</span><span class="fn">log</span><span class="op">(</span><span class="str">"Translator agent online"</span><span class="op">);</span></code></pre>
+    </div>
+
+    <p>
+      This agent uses five of the six primitives: <code>register</code>,
+      <code>discover</code>, <code>request</code>, <code>respond</code>
+      (via the <code>onRequest</code> handler), and <code>subscribe</code>.
+      Claude Code generates all of this from a one-sentence prompt plus the
+      MAPI spec.
+    </p>
+
+    <!-- ─── Why This Matters ───────────────────────────────────── -->
+    <h2 id="why">Why this matters</h2>
+
+    <div class="card-grid">
+      <div class="card">
+        <h3>Agents as teammates</h3>
+        <p>
+          Your coding tool discovers and uses agents on the mesh the same way
+          it uses libraries &mdash; except agents are live services that think,
+          answer questions, and do work.
+        </p>
+      </div>
+      <div class="card">
+        <h3>Agents that build agents</h3>
+        <p>
+          Claude Code can build an agent, register it on the mesh, and then
+          build <em>another</em> agent that discovers and collaborates with
+          the first one. The mesh grows organically.
+        </p>
+      </div>
+      <div class="card">
+        <h3>Protocol-native AI</h3>
+        <p>
+          The MAPI spec is structured markdown &mdash; the native language of
+          LLMs. No OpenAPI conversion, no JSON Schema juggling. Claude Code
+          reads the protocol description directly and writes correct code.
+        </p>
+      </div>
+    </div>
+
+    <!-- ─── Next Steps ─────────────────────────────────────────── -->
+    <hr>
+
+    <h2 id="next">Next steps</h2>
+    <p>
+      Ready to build agents with Claude Code? Start here:
+    </p>
+
+    <div class="card-grid">
+      <a href="getting-started.html" class="card">
+        <h3>Getting Started</h3>
+        <p>Step-by-step guide to connecting, registering, and sending your first request.</p>
+      </a>
+      <a href="examples.html" class="card">
+        <h3>Examples</h3>
+        <p>Working patterns: agent chat, event-driven collaboration, and capability-based routing.</p>
+      </a>
+      <a href="reference.html" class="card">
+        <h3>Reference</h3>
+        <p>Full protocol reference &mdash; subjects, envelope fields, error codes, task states, and manifests.</p>
+      </a>
+    </div>
+
+  </div>
+
+  <!-- ─── Footer ──────────────────────────────────────────────── -->
+  <footer class="footer">
+    <p>AgentMesh &mdash; Open protocol for agent-to-agent communication.
+      <a href="https://github.com/jeffrschneider/AgentMesh">GitHub</a>
+    </p>
+  </footer>
+
+  </div><!-- /.content-wrapper -->
+
+  <script src="script.js"></script>
+</body>
+</html>
