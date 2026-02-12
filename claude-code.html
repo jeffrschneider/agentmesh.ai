@@ -138,6 +138,24 @@ a request, summarizes the input text in 2-3 sentences.</code></pre>
       describes every primitive, every type, every error code, and every
       subject pattern in a format that Claude Code can read and reason about.
     </p>
+
+    <div class="mapi-cta">
+      <div class="mapi-cta-inner">
+        <div class="mapi-cta-text">
+          <h3>agentmesh.mapi.md</h3>
+          <p>
+            The complete AgentMesh protocol &mdash; all six primitives, the envelope
+            schema, task lifecycle, 22 error codes, and every TypeScript type &mdash;
+            in a single file that LLMs understand natively.
+          </p>
+        </div>
+        <div class="mapi-cta-actions">
+          <a href="agentmesh.mapi.md" class="btn btn-primary">View the spec</a>
+          <a href="https://github.com/jeffrschneider/AgentMesh/blob/main/docs/agentmesh.mapi.md" class="btn btn-outline">GitHub</a>
+        </div>
+      </div>
+    </div>
+
     <p>
       When you give Claude Code the MAPI file, it doesn't need to guess
       how the protocol works. It reads the type definitions, understands
@@ -149,10 +167,10 @@ a request, summarizes the input text in 2-3 sentences.</code></pre>
     <div class="callout tip">
       <div class="callout-title">Try it</div>
       <p>
-        Point Claude Code at
-        <code>docs/agentmesh.mapi.md</code> in this repo and ask it to
-        build an agent. It will use the MAPI spec to produce correct,
-        type-safe code on the first try.
+        Paste this into Claude Code:
+        <code>Read docs/agentmesh.mapi.md and build me an agent that...</code>
+        &mdash; it will use the spec to produce correct, type-safe code on
+        the first try.
       </p>
     </div>
 
