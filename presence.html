@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Presence &amp; Liveness — AgentMesh</title>
+  <link rel="stylesheet" href="styles.css">
+  <link rel="icon" type="image/svg+xml" href="favicon.svg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+</head>
+<body>
+
+  <!-- ─── Sidebar Navigation ───────────────────────────────────── -->
+  <nav class="sidebar" id="sidebar">
+    <a href="index.html" class="sidebar-brand">AgentMesh</a>
+    <ul class="sidebar-nav">
+      <li><a href="index.html">Home</a></li>
+      <li><a href="how-it-works.html">How It Works</a></li>
+      <li><a href="concepts.html">The Network</a></li>
+      <li><a href="getting-started.html">Getting Started</a></li>
+      <li><a href="sdks.html">SDKs</a></li>
+      <li><a href="reference.html">Reference</a></li>
+      <li><a href="examples.html">Examples</a></li>
+      <li><a href="presence.html">Presence</a></li>
+      <li><a href="claude-code.html">For Claude Code</a></li>
+    </ul>
+    <div class="sidebar-footer">
+      <a href="https://github.com/jeffrschneider/AgentMesh">GitHub</a>
+      <button class="theme-toggle" title="Toggle theme">&#x263E;</button>
+    </div>
+  </nav>
+  <div class="sidebar-backdrop" id="sidebar-backdrop"></div>
+  <div class="mobile-topbar">
+    <a href="index.html" class="sidebar-brand">AgentMesh</a>
+    <button class="hamburger" aria-label="Menu">&#x2630;</button>
+  </div>
+  <div class="content-wrapper">
+
+  <!-- ─── Page Content ────────────────────────────────────────── -->
+  <div class="page">
+
+    <h1><span class="text-gradient">Presence</span> &amp; liveness</h1>
+    <p class="text-dim" style="font-size: 1.15rem; margin-bottom: 2.5rem;">
+      Presence answers one question: <em>is this agent reachable right now?</em>
+      In 0.2 it's a separate, node-keyed liveness layer &mdash; deliberately split
+      from the registry, so a quiet or sleeping host is shown offline without ever
+      losing its registration.
+    </p>
+
+    <!-- ─── The split ───────────────────────────────────────────── -->
+    <h2 id="split">Registry vs. presence</h2>
+    <p>
+      Earlier drafts stored liveness <em>inside</em> the registry and deleted an
+      agent's manifest after a few missed heartbeats. That's actively wrong for
+      real deployments: a laptop that goes to sleep would silently unregister its
+      agents. 0.2 splits the two concerns:
+    </p>
+
+    <div class="feature-split">
+      <div class="card card-accent-purple">
+        <h3>Registry &mdash; durable</h3>
+        <p>Stores an agent's <strong>manifest</strong> (identity, skills, node vouch).
+        It is never deleted on a missed heartbeat. Registration is a fact about
+        <em>what</em> an agent is, not whether it happens to be awake.</p>
+      </div>
+      <div class="card card-accent-green">
+        <h3>Presence &mdash; ephemeral</h3>
+        <p>Tracks <strong>liveness</strong> on a TTL, keyed by <strong>node</strong>.
+        It expires on silence and refreshes on the next heartbeat. It says nothing
+        about identity &mdash; only reachability.</p>
+      </div>
+    </div>
+
+    <!-- ─── Heartbeats ──────────────────────────────────────────── -->
+    <h2 id="heartbeats">Node heartbeats</h2>
+    <p>
+      Presence is keyed by <strong>node</strong>, not by agent. Because a node holds
+      the connection and vouches for the agents it runs, one heartbeat covers every
+      agent on that node. The SDK sends it for you after you register; you rarely
+      touch this directly.
+    </p>
+
+    <div class="diagram">
+      <pre><code>  node heartbeat            →  mesh.heartbeat.{nodeId}
+  liveness lookup           →  mesh.presence.get
+
+  A node emits a heartbeat on an interval. The presence layer stamps
+  a TTL. If no heartbeat arrives before it expires, every agent on
+  that node reads as offline — but their manifests remain in the
+  registry, untouched.</code></pre>
+    </div>
+
+    <!-- ─── Availability ────────────────────────────────────────── -->
+    <h2 id="availability">Availability in discovery</h2>
+    <p>
+      <a href="how-it-works.html">Discover</a> joins the registry and the presence
+      layer at query time. Each returned manifest carries an <code>availability</code>
+      value derived from presence &mdash; it is not stored on the manifest itself:
+    </p>
+
+    <ul>
+      <li><code>online</code> &mdash; a fresh heartbeat within the TTL.</li>
+      <li><code>busy</code> &mdash; reachable but at capacity (advertised by the agent).</li>
+      <li><code>degraded</code> &mdash; reachable but impaired.</li>
+      <li><code>offline</code> &mdash; no heartbeat within the TTL (still registered).</li>
+    </ul>
+
+    <p>
+      So you can ask discovery for <em>agents that can summarize text <strong>and</strong>
+      are online right now</em>, and get an honest answer &mdash; without the registry
+      ever forgetting an agent that merely went quiet.
+    </p>
+
+    <div class="callout">
+      <p>
+        <strong>Note.</strong> The 0.1 "Presence service" &mdash; human accounts,
+        contacts, connection requests, and store-and-forward direct messaging &mdash;
+        was demo scaffolding for the playground and has been retired. Those are an
+        application built <em>on</em> the mesh, not part of the protocol. This page
+        describes protocol-level liveness only.
+      </p>
+    </div>
+
+    <!-- ─── Next Steps ─────────────────────────────────────────── -->
+    <h2 id="next">Next steps</h2>
+
+    <div class="card-grid">
+      <a href="concepts.html" class="card">
+        <h3>The Network</h3>
+        <p>Nodes, identity, and how agents connect across trust boundaries.</p>
+      </a>
+      <a href="reference.html" class="card">
+        <h3>Reference</h3>
+        <p>Full protocol reference &mdash; envelope fields, error codes, task states.</p>
+      </a>
+      <a href="how-it-works.html" class="card">
+        <h3>How It Works</h3>
+        <p>The six primitives, bare-vs-task requests, and how they compose.</p>
+      </a>
+    </div>
+
+  </div>
+
+  <!-- ─── Footer ──────────────────────────────────────────────── -->
+  <footer class="footer">
+    <p>AgentMesh &mdash; Open protocol for agent-to-agent communication.
+      <a href="https://github.com/jeffrschneider/AgentMesh">GitHub</a>
+    </p>
+  </footer>
+
+  </div><!-- /.content-wrapper -->
+
+  <script src="script.js"></script>
+</body>
+</html>

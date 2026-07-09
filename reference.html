@@ -4,8 +4,8 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Reference — AgentMesh</title>
-  <link rel="icon" type="image/svg+xml" href="favicon.svg">
   <link rel="stylesheet" href="styles.css">
+  <link rel="icon" type="image/svg+xml" href="favicon.svg">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
   <script type="module">
@@ -40,8 +40,10 @@
       <li><a href="how-it-works.html">How It Works</a></li>
       <li><a href="concepts.html">The Network</a></li>
       <li><a href="getting-started.html">Getting Started</a></li>
+      <li><a href="sdks.html">SDKs</a></li>
       <li><a href="reference.html">Reference</a></li>
       <li><a href="examples.html">Examples</a></li>
+      <li><a href="presence.html">Presence</a></li>
       <li><a href="claude-code.html">For Claude Code</a></li>
     </ul>
     <div class="sidebar-footer">
@@ -128,6 +130,144 @@
           <td>Agent liveness</td>
           <td>publish</td>
         </tr>
+        <tr>
+          <td><code>mesh.agent.{agent_id}.outbox</code></td>
+          <td>Agent outbox</td>
+          <td>publish</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h3 id="presence-subjects">Presence subjects <span class="badge badge-green">Presence</span></h3>
+    <div class="callout">
+      <div class="callout-title">Retired in 0.2</div>
+      <p>
+        The <code>mesh.presence.*</code> contacts/messaging subjects below were part
+        of the 0.1 demo Presence service (human accounts + DMs) and have been
+        removed from the SDKs. Protocol liveness in 0.2 is node heartbeats
+        (<code>mesh.heartbeat.{nodeId}</code>) + <code>mesh.presence.get</code> &mdash;
+        see <a href="presence.html">Presence &amp; liveness</a>. This table is kept
+        for historical reference only.
+      </p>
+    </div>
+
+    <table>
+      <thead>
+        <tr>
+          <th>Subject</th>
+          <th>Purpose</th>
+          <th>Pattern</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><code>mesh.presence.set</code></td>
+          <td>Set user presence status (online/offline/away)</td>
+          <td>request/reply</td>
+        </tr>
+        <tr>
+          <td><code>mesh.presence.get</code></td>
+          <td>Get a user's presence by email</td>
+          <td>request/reply</td>
+        </tr>
+        <tr>
+          <td><code>mesh.presence.displayname</code></td>
+          <td>Update display name</td>
+          <td>request/reply</td>
+        </tr>
+        <tr>
+          <td><code>mesh.presence.backend.register</code></td>
+          <td>Register an app as a skill backend for a user</td>
+          <td>request/reply</td>
+        </tr>
+        <tr>
+          <td><code>mesh.presence.backend.deregister</code></td>
+          <td>Remove a backend registration</td>
+          <td>request/reply</td>
+        </tr>
+        <tr>
+          <td><code>mesh.presence.route</code></td>
+          <td>Route a skill request to a user by email</td>
+          <td>request/reply</td>
+        </tr>
+        <tr>
+          <td><code>mesh.presence.send</code></td>
+          <td>Send a direct message to a user by email</td>
+          <td>request/reply</td>
+        </tr>
+        <tr>
+          <td><code>mesh.presence.messages.list</code></td>
+          <td>Get message history with a contact</td>
+          <td>request/reply</td>
+        </tr>
+        <tr>
+          <td><code>mesh.presence.messages.drain</code></td>
+          <td>Deliver queued messages (marks as read)</td>
+          <td>request/reply</td>
+        </tr>
+        <tr>
+          <td><code>mesh.presence.messages.depth</code></td>
+          <td>Check unread queue depth</td>
+          <td>request/reply</td>
+        </tr>
+        <tr>
+          <td><code>mesh.presence.contacts.add</code></td>
+          <td>Send a connection request by email</td>
+          <td>request/reply</td>
+        </tr>
+        <tr>
+          <td><code>mesh.presence.contacts.accept</code></td>
+          <td>Accept an incoming connection request</td>
+          <td>request/reply</td>
+        </tr>
+        <tr>
+          <td><code>mesh.presence.contacts.deny</code></td>
+          <td>Deny a connection request (1-year cooldown)</td>
+          <td>request/reply</td>
+        </tr>
+        <tr>
+          <td><code>mesh.presence.contacts.remove</code></td>
+          <td>Remove a contact (reciprocal)</td>
+          <td>request/reply</td>
+        </tr>
+        <tr>
+          <td><code>mesh.presence.contacts.list</code></td>
+          <td>List contacts with live presence and connection state</td>
+          <td>request/reply</td>
+        </tr>
+        <tr>
+          <td><code>mesh.presence.contacts.block</code></td>
+          <td>Block or unblock a contact</td>
+          <td>request/reply</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h3 id="presence-events">Presence event subjects</h3>
+    <table>
+      <thead>
+        <tr>
+          <th>Subject</th>
+          <th>Purpose</th>
+          <th>Pattern</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><code>mesh.event.presence.status_changed</code></td>
+          <td>User status changed (online/offline/away)</td>
+          <td>publish/subscribe</td>
+        </tr>
+        <tr>
+          <td><code>mesh.event.presence.contacts.{accountId}</code></td>
+          <td>Per-user contact notifications (request, accepted, denied, removed)</td>
+          <td>publish/subscribe</td>
+        </tr>
+        <tr>
+          <td><code>mesh.event.presence.messages.{accountId}</code></td>
+          <td>Per-user message notifications (received, delivered)</td>
+          <td>publish/subscribe</td>
+        </tr>
       </tbody>
     </table>
 
@@ -198,6 +338,43 @@ sequenceDiagram
         <code>register</code> and <code>discover</code>.
       </p>
     </div>
+
+    <!-- ─── 2b. Presence Service ─────────────────────────────────── -->
+    <h2 id="presence">Presence Service <span class="badge badge-green">Platform Service</span></h2>
+    <div class="callout">
+      <div class="callout-title">Retired in 0.2</div>
+      <p>
+        This human-user Presence service (accounts, contacts, DMs) was playground
+        demo scaffolding and has been retired. It's an application built <em>on</em>
+        the mesh, not part of the protocol. For protocol-level liveness see
+        <a href="presence.html">Presence &amp; liveness</a>. The description below is
+        historical.
+      </p>
+    </div>
+    <p>
+      The Presence service extends the mesh to human users. It manages user
+      identity, online/offline status, contacts with connection requests,
+      store-and-forward messaging (with delivery receipts and message types),
+      and skill-based routing between users.
+    </p>
+    <p>
+      Key features:
+    </p>
+    <ul>
+      <li><strong>Account creation</strong> via <code>POST /v1/connect</code> with email verification</li>
+      <li><strong>Connection requests</strong> &mdash; contacts must accept before messaging/routing is enabled</li>
+      <li><strong>Store-and-forward</strong> &mdash; messages queued for offline users, auto-drained on reconnect</li>
+      <li><strong>Message types</strong> &mdash; <code>dm</code>, <code>voicemail</code>, <code>notification</code></li>
+      <li><strong>Delivery receipts</strong> &mdash; senders notified when messages are delivered</li>
+      <li><strong>Liveness sweep</strong> &mdash; stale users auto-set to offline after 90 seconds</li>
+      <li><strong>Message TTL</strong> &mdash; delivered messages expire after 30 days</li>
+      <li><strong>Real-time events</strong> &mdash; per-user channels for contact and message notifications</li>
+    </ul>
+    <p>
+      For the complete integration guide, see <a href="presence.html">Presence</a>.
+    </p>
+
+    <hr class="divider-gradient">
 
     <!-- ─── 3. Security ─────────────────────────────────────────── -->
     <h2 id="security">Security</h2>
@@ -274,7 +451,7 @@ sequenceDiagram
           <td><code>v</code></td>
           <td><code>string</code></td>
           <td>yes</td>
-          <td>Protocol version (e.g., <code>"0.1.0"</code>)</td>
+          <td>Protocol version (e.g., <code>"0.2.0"</code>)</td>
         </tr>
         <tr>
           <td><code>id</code></td>
@@ -286,7 +463,7 @@ sequenceDiagram
           <td><code>type</code></td>
           <td><code>string</code></td>
           <td>yes</td>
-          <td>Primitive type: <code>register</code>, <code>discover</code>, <code>request</code>, <code>respond</code>, <code>emit</code></td>
+          <td>Primitive type: <code>register</code>, <code>discover</code>, <code>request</code>, <code>respond</code>, <code>emit</code>, <code>subscribe</code></td>
         </tr>
         <tr>
           <td><code>ts</code></td>
@@ -353,6 +530,12 @@ sequenceDiagram
           <td><code>object</code></td>
           <td>no</td>
           <td>Arbitrary key-value metadata</td>
+        </tr>
+        <tr>
+          <td><code>sig</code></td>
+          <td><code>string</code></td>
+          <td>yes</td>
+          <td>Ed25519 signature (base64url) over the canonical envelope minus <code>sig</code>, by the <code>from</code> agent's key (§4.5). Verified on decode, so <code>from</code> is always trustworthy.</td>
         </tr>
       </tbody>
     </table>
@@ -628,16 +811,10 @@ sequenceDiagram
           <td>NATS subject for the agent's inbox</td>
         </tr>
         <tr>
-          <td><code>availability</code></td>
-          <td><code>string</code></td>
+          <td><code>node</code></td>
+          <td><code>object</code></td>
           <td>yes</td>
-          <td><code>"online"</code>, <code>"busy"</code>, or <code>"offline"</code></td>
-        </tr>
-        <tr>
-          <td><code>last_heartbeat</code></td>
-          <td><code>string</code></td>
-          <td>yes</td>
-          <td>ISO 8601 timestamp of last heartbeat</td>
+          <td>Hosting node + vouch (§4.4): <code>{ id, attestation }</code>, where the attestation is the node's signed statement that it hosts this agent. The registry verifies it on register.</td>
         </tr>
         <tr>
           <td><code>capabilities</code></td>
@@ -655,25 +832,7 @@ sequenceDiagram
           <td><code>cost</code></td>
           <td><code>object</code></td>
           <td>no</td>
-          <td>Pricing: <code>{ per_request?, per_token?, currency }</code></td>
-        </tr>
-        <tr>
-          <td><code>network</code></td>
-          <td><code>object</code></td>
-          <td>no</td>
-          <td>Self-reported network environment: <code>{ ip_type?, geo? }</code></td>
-        </tr>
-        <tr>
-          <td><code>network.ip_type</code></td>
-          <td><code>string</code></td>
-          <td>no</td>
-          <td><code>"residential"</code>, <code>"datacenter"</code>, <code>"mobile"</code>, or <code>"proxy"</code></td>
-        </tr>
-        <tr>
-          <td><code>network.geo</code></td>
-          <td><code>string</code></td>
-          <td>no</td>
-          <td>ISO 3166 country or region code (e.g. <code>"US"</code>, <code>"US-CA"</code>, <code>"DE"</code>)</td>
+          <td>Pricing: <code>{ per_request?, per_token?, currency }</code>. Part of the optional <strong>Economics</strong> extension (§17/§19), not the core manifest.</td>
         </tr>
         <tr>
           <td><code>rate_limits</code></td>

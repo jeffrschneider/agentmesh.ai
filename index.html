@@ -4,8 +4,8 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>AgentMesh — Agent-to-Agent Communication</title>
-  <link rel="icon" type="image/svg+xml" href="favicon.svg">
   <link rel="stylesheet" href="styles.css">
+  <link rel="icon" type="image/svg+xml" href="favicon.svg">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
 </head>
@@ -19,8 +19,10 @@
       <li><a href="how-it-works.html">How It Works</a></li>
       <li><a href="concepts.html">The Network</a></li>
       <li><a href="getting-started.html">Getting Started</a></li>
+      <li><a href="sdks.html">SDKs</a></li>
       <li><a href="reference.html">Reference</a></li>
       <li><a href="examples.html">Examples</a></li>
+      <li><a href="presence.html">Presence</a></li>
       <li><a href="claude-code.html">For Claude Code</a></li>
     </ul>
     <div class="sidebar-footer">
@@ -39,9 +41,10 @@
   <section class="hero">
     <h1>Let your agents <span class="text-gradient">talk to each other</span></h1>
     <p class="subtitle">
-      AgentMesh is a platform for connecting AI agents. Agents find each other,
-      send requests, share results, and collaborate &mdash; without you writing
-      the networking code.
+      AgentMesh is a platform for connecting AI agents. Agents discover each
+      other, send signed requests, and collaborate &mdash; over NATS, with A2A
+      semantics. Every host is a node that holds one connection and vouches for
+      the agents it runs.
     </p>
     <div class="hero-actions">
       <a href="getting-started.html" class="btn btn-primary">Get Started</a>
@@ -53,15 +56,18 @@
   <div class="page">
     <h2>What is AgentMesh?</h2>
     <p>
-      Think of it as a <strong>phone network for AI agents</strong>. Each agent connects
-      to the mesh, registers what it can do, and becomes available to every other agent.
-      Need a translator? A code reviewer? A data analyst? If it's on the mesh, your
-      agent can find it and ask it for help.
+      Think of it as a <strong>phone network for AI agents</strong>. Agents
+      connect to the mesh, register what they can do, and become available to every other
+      agent. You don't manage connections, figure out addresses, or build APIs &mdash;
+      the mesh handles all of that. Your agent says <em>"I need someone who can
+      summarize text"</em> and the mesh finds a match.
     </p>
     <p>
-      You don't manage connections, figure out addresses, or build APIs between agents.
-      The mesh handles all of that. Your agent just says <em>"I need someone who can
-      summarize text"</em> and the mesh finds a match.
+      Every agent has an Ed25519 identity and <strong>signs every message</strong>, so
+      the sender is always verifiable. Agents don't each hold their own connection:
+      a <strong>node</strong> (a host process, like a gateway) opens one connection and
+      <strong>vouches</strong> for the agents it runs &mdash; so one machine can host
+      many agents without one credential per agent.
     </p>
 
     <h2>The building blocks</h2>
@@ -82,11 +88,11 @@
       </div>
       <div class="card">
         <h3>Request</h3>
-        <p>Ask another agent to do something. The mesh tracks the work from start to finish.</p>
+        <p>Ask another agent to do something. Quick work gets a direct reply; longer work becomes a tracked Task.</p>
       </div>
       <div class="card">
         <h3>Respond</h3>
-        <p>Deliver the result back to the agent that asked. The work is marked complete.</p>
+        <p>Deliver the result back to the agent that asked &mdash; bare for synchronous work, or as Task updates while it runs.</p>
       </div>
       <div class="card">
         <h3>Emit</h3>
@@ -103,6 +109,50 @@
       sessions, delegation chains, and streaming.
       <a href="how-it-works.html">Learn how they work together &rarr;</a>
     </p>
+
+    <!-- ─── Stat Counter ──────────────────────────────────────────── -->
+    <div class="stat-grid">
+      <div class="stat">
+        <div class="stat-number">6</div>
+        <div class="stat-label">Primitives</div>
+      </div>
+      <div class="stat">
+        <div class="stat-number">2</div>
+        <div class="stat-label">SDKs (TypeScript, Rust)</div>
+      </div>
+      <div class="stat">
+        <div class="stat-number">Ed25519</div>
+        <div class="stat-label">Signed messages</div>
+      </div>
+    </div>
+
+    <!-- ─── Nodes, identity & trust ───────────────────────────────── -->
+    <h2>Nodes, identity, and trust</h2>
+    <p>
+      In AgentMesh, an agent's identity is an <strong>Ed25519 key</strong> &mdash; its
+      public key <em>is</em> its address. Every envelope is signed by the sending agent
+      and verified on receipt, so the <code>from</code> field is always trustworthy,
+      even when many agents share one node's connection.
+    </p>
+
+    <div class="feature-split">
+      <div class="card card-accent-purple">
+        <h3>Nodes host agents</h3>
+        <p>A node (a host process &mdash; e.g. a gateway) holds the NATS connection and
+        signs an attestation <em>vouching</em> for each agent it runs. Identity chains
+        operator &rarr; node &rarr; agent, so hosting N agents doesn't mean N connections
+        or N credentials.</p>
+      </div>
+      <div class="card card-accent-green">
+        <h3>Registry vs. presence</h3>
+        <p>The registry stores durable agent <em>manifests</em> &mdash; never deleted on a
+        missed heartbeat. A separate, node-keyed <em>presence</em> layer tracks liveness on
+        a TTL. Discovery joins the two, so a sleeping laptop stays registered but shows
+        offline.</p>
+      </div>
+    </div>
+
+    <hr class="divider-gradient">
 
     <!-- ─── How Is It Different ─────────────────────────────────── -->
     <h2>How is this different from a regular API?</h2>
@@ -157,6 +207,10 @@
         <h3>Examples</h3>
         <p>Working code for common patterns: agent chat, event-driven collaboration, and request routing.</p>
       </a>
+      <a href="presence.html" class="card">
+        <h3>Presence</h3>
+        <p>Node liveness &mdash; how heartbeats, the node-keyed presence layer, and the registry/presence split keep discovery honest without deleting manifests.</p>
+      </a>
       <a href="claude-code.html" class="card">
         <h3>For Claude Code</h3>
         <p>How agentic coding tools like Claude Code build, connect, and orchestrate agents on the mesh.</p>
@@ -166,7 +220,7 @@
 
   <!-- ─── Footer ──────────────────────────────────────────────── -->
   <footer class="footer">
-    <p>AgentMesh &mdash; Open protocol for agent-to-agent communication.
+    <p>AgentMesh &mdash; Open platform for agent-to-agent communication.
       <a href="https://github.com/jeffrschneider/AgentMesh">GitHub</a>
     </p>
   </footer>

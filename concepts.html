@@ -4,8 +4,8 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>The Network — AgentMesh</title>
-  <link rel="icon" type="image/svg+xml" href="favicon.svg">
   <link rel="stylesheet" href="styles.css">
+  <link rel="icon" type="image/svg+xml" href="favicon.svg">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
   <script type="module">
@@ -42,8 +42,10 @@
       <li><a href="how-it-works.html">How It Works</a></li>
       <li><a href="concepts.html">The Network</a></li>
       <li><a href="getting-started.html">Getting Started</a></li>
+      <li><a href="sdks.html">SDKs</a></li>
       <li><a href="reference.html">Reference</a></li>
       <li><a href="examples.html">Examples</a></li>
+      <li><a href="presence.html">Presence</a></li>
       <li><a href="claude-code.html">For Claude Code</a></li>
     </ul>
     <div class="sidebar-footer">
@@ -98,6 +100,17 @@ graph LR
     C[Agent C] --- S
     D[Agent D] --- S
     style S fill:#06b6d4,color:#fff,stroke:#06b6d4
+    </div>
+
+    <div class="callout">
+      <div class="callout-title">Two meanings of "node"</div>
+      <p>
+        On this page, <strong>node</strong> means a NATS <em>network</em> node (a
+        server or leaf connection) &mdash; it's about topology. Elsewhere in AgentMesh,
+        a <strong>node</strong> is an <em>identity</em> concept: a host process that
+        holds one connection and vouches for the agents it runs
+        (see <a href="how-it-works.html#nodes">How It Works</a>). Same word, two layers.
+      </p>
     </div>
 
     <!-- ─── 2. Within an Organization ────────────────────────────── -->
@@ -307,7 +320,7 @@ graph TB
     subgraph cloud ["Cloud Hub"]
         direction TB
         HUB((NATS Hub))
-        SVC["Platform Services<br/>(Registry, Task Manager)"]
+        SVC["Platform Services<br/>(Registry, Task Manager, Presence)"]
         SVC --- HUB
     end
     subgraph home ["Bob's Home"]

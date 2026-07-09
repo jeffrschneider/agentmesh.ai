@@ -513,10 +513,11 @@ th, td {
 th {
   font-weight: 600;
   color: var(--text-bright);
-  background: var(--bg-surface);
+  background: linear-gradient(to bottom, var(--bg-surface), var(--bg-code));
   font-size: 0.82rem;
   text-transform: uppercase;
   letter-spacing: 0.3px;
+  border-bottom: 2px solid var(--accent);
 }
 
 tr:hover td {
@@ -782,6 +783,19 @@ h3[id]::before {
     grid-template-columns: 1fr;
   }
 
+  .feature-split {
+    grid-template-columns: 1fr;
+  }
+
+  .stat-grid {
+    gap: 24px;
+    flex-wrap: wrap;
+  }
+
+  .stat-number {
+    font-size: 1.8rem;
+  }
+
   table {
     display: block;
     overflow-x: auto;
@@ -844,6 +858,122 @@ h3[id]::before {
 ::-webkit-scrollbar-track { background: transparent; }
 ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
 ::-webkit-scrollbar-thumb:hover { background: var(--text-dim); }
+
+/* ─── Stat Counter Row ─────────────────────────────────────────── */
+
+.stat-grid {
+  display: flex;
+  justify-content: center;
+  gap: 48px;
+  margin: 2.5rem 0;
+  padding: 2rem 0;
+}
+
+.stat {
+  text-align: center;
+}
+
+.stat-number {
+  font-size: 2.4rem;
+  font-weight: 700;
+  font-family: var(--font-mono);
+  background: linear-gradient(135deg, var(--accent), #a78bfa);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  line-height: 1.2;
+}
+
+.stat-label {
+  font-size: 0.82rem;
+  color: var(--text-dim);
+  margin-top: 4px;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+
+/* ─── Gradient Divider ─────────────────────────────────────────── */
+
+.divider-gradient {
+  border: none;
+  height: 1px;
+  margin: 3rem 0;
+  background: linear-gradient(to right, transparent, var(--accent), transparent);
+}
+
+/* ─── Badge ────────────────────────────────────────────────────── */
+
+.badge {
+  display: inline-block;
+  font-size: 0.65rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  padding: 3px 8px;
+  border-radius: 4px;
+  background: var(--accent-soft);
+  color: var(--accent);
+  vertical-align: middle;
+  margin-left: 8px;
+}
+
+.badge-green {
+  background: rgba(74, 222, 128, 0.15);
+  color: var(--green);
+}
+
+.badge-purple {
+  background: rgba(167, 139, 250, 0.15);
+  color: var(--purple);
+}
+
+/* ─── Feature Split (two-column) ──────────────────────────────── */
+
+.feature-split {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+  margin: 2rem 0;
+}
+
+.feature-split .card {
+  position: relative;
+  padding-left: 28px;
+}
+
+.feature-split .card::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 28px;
+  bottom: 28px;
+  width: 3px;
+  border-radius: 2px;
+  background: var(--accent);
+}
+
+.feature-split .card.card-accent-green::before {
+  background: var(--green);
+}
+
+.feature-split .card.card-accent-purple::before {
+  background: var(--purple);
+}
+
+/* ─── Card Accent Variants ─────────────────────────────────────── */
+
+.card-accent-green:hover {
+  border-color: var(--green);
+  background: linear-gradient(to bottom, rgba(74, 222, 128, 0.06), var(--bg-surface));
+  box-shadow: 0 4px 24px rgba(74, 222, 128, 0.08);
+}
+
+.card-accent-purple:hover {
+  border-color: var(--purple);
+  background: linear-gradient(to bottom, rgba(167, 139, 250, 0.06), var(--bg-surface));
+  box-shadow: 0 4px 24px rgba(167, 139, 250, 0.08);
+}
 
 /* ─── Utility ───────────────────────────────────────────────────── */
 

@@ -4,8 +4,8 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>How It Works — AgentMesh</title>
-  <link rel="icon" type="image/svg+xml" href="favicon.svg">
   <link rel="stylesheet" href="styles.css">
+  <link rel="icon" type="image/svg+xml" href="favicon.svg">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
 </head>
@@ -19,8 +19,10 @@
       <li><a href="how-it-works.html">How It Works</a></li>
       <li><a href="concepts.html">The Network</a></li>
       <li><a href="getting-started.html">Getting Started</a></li>
+      <li><a href="sdks.html">SDKs</a></li>
       <li><a href="reference.html">Reference</a></li>
       <li><a href="examples.html">Examples</a></li>
+      <li><a href="presence.html">Presence</a></li>
       <li><a href="claude-code.html">For Claude Code</a></li>
     </ul>
     <div class="sidebar-footer">
@@ -261,7 +263,49 @@
       </p>
     </div>
 
-    <!-- ─── Section 4: What You Don't Have to Build ─────────────── -->
+    <!-- ─── Section 4: Nodes, identity & trust ───────────────────── -->
+    <h2 id="nodes">Nodes, identity &amp; trust</h2>
+    <p>
+      An agent's identity is an <strong>Ed25519 key</strong> &mdash; its public key
+      <em>is</em> its address. Agents don't each hold their own connection: a
+      <strong>node</strong> (a host process) holds the connection and vouches for the
+      agents it runs. This is what lets one gateway host many agents cleanly.
+    </p>
+
+    <div class="card-grid">
+      <div class="card card-accent-purple">
+        <h3>Every message is signed</h3>
+        <p>
+          Each envelope carries an Ed25519 signature over its canonical form, made by
+          the sending agent's key and verified on receipt. So <code>from</code> is
+          always trustworthy &mdash; even when many agents share one node's connection.
+        </p>
+      </div>
+      <div class="card card-accent-purple">
+        <h3>Nodes vouch for agents</h3>
+        <p>
+          A node signs an attestation stating it hosts an agent; the registry verifies
+          it at register time. Identity chains operator &rarr; node &rarr; agent, so
+          hosting N agents doesn't mean N connections or N credentials.
+        </p>
+      </div>
+      <div class="card card-accent-green">
+        <h3>Registry vs. presence</h3>
+        <p>
+          The registry keeps durable manifests (never deleted on a missed heartbeat);
+          a separate node-keyed presence layer tracks liveness on a TTL. Discovery
+          joins them, so a sleeping host stays registered but reads offline.
+        </p>
+      </div>
+    </div>
+
+    <p>
+      <a href="presence.html">Learn how presence &amp; liveness work &rarr;</a>
+    </p>
+
+    <hr class="divider-gradient">
+
+    <!-- ─── Section 5: What You Don't Have to Build ─────────────── -->
     <h2 id="handled">What You Don't Have to Build</h2>
     <p>
       When you connect an agent to the mesh, a lot of hard problems are
@@ -273,10 +317,12 @@
       <li><strong>Connection management</strong> &mdash; persistent connections, reconnection logic, and heartbeats</li>
       <li><strong>Message routing</strong> &mdash; getting the right message to the right agent, every time</li>
       <li><strong>Retries and delivery guarantees</strong> &mdash; exactly-once semantics via NATS JetStream</li>
-      <li><strong>Identity verification</strong> &mdash; Ed25519 keys and JWT claims verified at the transport layer</li>
+      <li><strong>Message authenticity</strong> &mdash; every envelope is Ed25519-signed by the sending agent and verified on decode</li>
+      <li><strong>Identity &amp; vouching</strong> &mdash; node attestations bind agents to their host; verified at register time</li>
       <li><strong>Distributed tracing</strong> &mdash; every envelope carries a trace context, so you can follow a request across agents</li>
       <li><strong>Error handling</strong> &mdash; structured error codes and states so failures are clear, not silent</li>
       <li><strong>Multi-tenancy</strong> &mdash; account-level isolation keeps your agents' traffic separate</li>
+      <li><strong>Liveness</strong> &mdash; node heartbeats + a TTL presence layer, joined into discovery, without deleting manifests</li>
     </ul>
 
     <p style="font-size: 1.05rem; margin-top: 1.5rem;">

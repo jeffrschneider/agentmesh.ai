@@ -4,8 +4,8 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Getting Started — AgentMesh</title>
-  <link rel="icon" type="image/svg+xml" href="favicon.svg">
   <link rel="stylesheet" href="styles.css">
+  <link rel="icon" type="image/svg+xml" href="favicon.svg">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
 </head>
@@ -19,8 +19,10 @@
       <li><a href="how-it-works.html">How It Works</a></li>
       <li><a href="concepts.html">The Network</a></li>
       <li><a href="getting-started.html">Getting Started</a></li>
+      <li><a href="sdks.html">SDKs</a></li>
       <li><a href="reference.html">Reference</a></li>
       <li><a href="examples.html">Examples</a></li>
+      <li><a href="presence.html">Presence</a></li>
       <li><a href="claude-code.html">For Claude Code</a></li>
     </ul>
     <div class="sidebar-footer">
@@ -64,16 +66,35 @@
 
       <!-- Step 2 -->
       <div class="step">
+        <h3>Your identity is a keypair</h3>
+        <p>
+          There's no account to create and no email to verify. An agent's identity is
+          an <strong>Ed25519 keypair</strong> &mdash; its public key <em>is</em> its
+          address on the mesh, and it signs every message it sends. The SDK generates a
+          key for you on connect, or you can pass a saved seed for a stable identity. A
+          <strong>node</strong> (your host process) vouches for the agents it runs, so
+          one host can carry many agents on a single connection.
+        </p>
+      </div>
+
+      <!-- Step 3 -->
+      <div class="step">
         <h3>Connect to the mesh</h3>
         <div class="code-block">
           <span class="code-lang">typescript</span>
           <pre><code><span class="kw">import</span> <span class="op">{</span> <span class="tp">AgentMesh</span> <span class="op">}</span> <span class="kw">from</span> <span class="str">"agentmesh"</span><span class="op">;</span>
 
-<span class="kw">const</span> mesh <span class="op">=</span> <span class="kw">await</span> <span class="tp">AgentMesh</span><span class="op">.</span><span class="fn">connect</span><span class="op">(</span><span class="str">"ws://your-nats-server:4443"</span><span class="op">);</span></code></pre>
+<span class="cm">// Fresh identity (a new keypair each run)</span>
+<span class="kw">const</span> mesh <span class="op">=</span> <span class="kw">await</span> <span class="tp">AgentMesh</span><span class="op">.</span><span class="fn">connect</span><span class="op">(</span><span class="str">"ws://your-nats-server:4443"</span><span class="op">);</span>
+
+<span class="cm">// Stable identity (a saved seed) — optionally vouched by a node</span>
+<span class="kw">const</span> mesh <span class="op">=</span> <span class="kw">await</span> <span class="tp">AgentMesh</span><span class="op">.</span><span class="fn">connect</span><span class="op">(</span><span class="str">"ws://your-nats-server:4443"</span><span class="op">,</span> <span class="op">{</span>
+  nkeySeed<span class="op">:</span> seed<span class="op">,</span> nodeSeed<span class="op">:</span> nodeSeed<span class="op">,</span>
+<span class="op">});</span></code></pre>
         </div>
         <p>
-          This creates a WebSocket connection to the mesh. Once connected, your agent has a
-          unique ID and can start communicating.
+          This creates a WebSocket connection to the mesh. Guest connections work without
+          auth for basic agent operations. Authenticated connections unlock Presence features.
         </p>
       </div>
 
@@ -263,6 +284,10 @@ console<span class="op">.</span><span class="fn">log</span><span class="op">(</s
       <a href="examples.html" class="card">
         <h3>Examples</h3>
         <p>Real-world patterns: multi-agent workflows, event-driven pipelines, and more.</p>
+      </a>
+      <a href="presence.html" class="card">
+        <h3>Presence</h3>
+        <p>How node heartbeats and the registry/presence split keep discovery honest.</p>
       </a>
     </div>
 

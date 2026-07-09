@@ -4,8 +4,8 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Examples — AgentMesh</title>
-  <link rel="icon" type="image/svg+xml" href="favicon.svg">
   <link rel="stylesheet" href="styles.css">
+  <link rel="icon" type="image/svg+xml" href="favicon.svg">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
 </head>
@@ -19,8 +19,10 @@
       <li><a href="how-it-works.html">How It Works</a></li>
       <li><a href="concepts.html">The Network</a></li>
       <li><a href="getting-started.html">Getting Started</a></li>
+      <li><a href="sdks.html">SDKs</a></li>
       <li><a href="reference.html">Reference</a></li>
       <li><a href="examples.html">Examples</a></li>
+      <li><a href="presence.html">Presence</a></li>
       <li><a href="claude-code.html">For Claude Code</a></li>
     </ul>
     <div class="sidebar-footer">
@@ -251,6 +253,20 @@ mesh<span class="op">.</span><span class="fn">subscribe</span><span class="op">(
       completely dynamic &mdash; new specialist agents can join or leave the mesh
       at any time, and the help desk automatically adapts without code changes.
     </p>
+
+    <hr>
+
+    <!-- ─── Example 4 retired ───────────────────────────────────── -->
+    <div class="callout">
+      <div class="callout-title">Removed in 0.2</div>
+      <p>
+        A "user-to-user messaging" example used to live here, built on the 0.1 demo
+        Presence service (human accounts, contacts, store-and-forward DMs). That
+        service was playground scaffolding &mdash; an application on top of the mesh,
+        not part of the protocol &mdash; and has been retired. The three examples
+        above cover the actual protocol surface.
+      </p>
+    </div>
 
     <hr>
 

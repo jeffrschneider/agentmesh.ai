@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SDKs — AgentMesh</title>
+  <link rel="stylesheet" href="styles.css">
+  <link rel="icon" type="image/svg+xml" href="favicon.svg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+</head>
+<body>
+
+  <!-- ─── Sidebar Navigation ───────────────────────────────────── -->
+  <nav class="sidebar" id="sidebar">
+    <a href="index.html" class="sidebar-brand">AgentMesh</a>
+    <ul class="sidebar-nav">
+      <li><a href="index.html">Home</a></li>
+      <li><a href="how-it-works.html">How It Works</a></li>
+      <li><a href="concepts.html">The Network</a></li>
+      <li><a href="getting-started.html">Getting Started</a></li>
+      <li><a href="sdks.html">SDKs</a></li>
+      <li><a href="reference.html">Reference</a></li>
+      <li><a href="examples.html">Examples</a></li>
+      <li><a href="presence.html">Presence</a></li>
+      <li><a href="claude-code.html">For Claude Code</a></li>
+    </ul>
+    <div class="sidebar-footer">
+      <a href="https://github.com/jeffrschneider/AgentMesh">GitHub</a>
+      <button class="theme-toggle" title="Toggle theme">&#x263E;</button>
+    </div>
+  </nav>
+  <div class="sidebar-backdrop" id="sidebar-backdrop"></div>
+  <div class="mobile-topbar">
+    <a href="index.html" class="sidebar-brand">AgentMesh</a>
+    <button class="hamburger" aria-label="Menu">&#x2630;</button>
+  </div>
+  <div class="content-wrapper">
+
+  <!-- ─── Header ────────────────────────────────────────────────── -->
+  <section class="hero" style="padding-bottom: 2rem;">
+    <h1>SDKs</h1>
+    <p class="subtitle">
+      Official AgentMesh SDKs for connecting your agents to the mesh.
+      Every SDK implements the full protocol &mdash; all 6 primitives, envelope codec,
+      skill routing, task tracking, distributed tracing, heartbeats, and error handling.
+    </p>
+  </section>
+
+  <div class="page">
+
+    <!-- ─── Status Overview ─────────────────────────────────────── -->
+    <h2>Status</h2>
+    <p>Both SDKs implement <strong>AgentMesh Protocol v0.2.0</strong> and produce wire-compatible
+       messages. A Rust agent and a TypeScript agent speak the same signed envelope format over
+       NATS &mdash; cross-language signature verification is part of the test suite.</p>
+
+    <div class="callout tip">
+      <div class="callout-title">TypeScript &amp; Rust</div>
+      <p>
+        AgentMesh ships two reference SDKs &mdash; <strong>TypeScript</strong> and
+        <strong>Rust</strong>. They share one wire format: canonical-JSON envelopes,
+        Ed25519 signing (§4.5), and node vouching (§4.4), verified byte-for-byte
+        across languages.
+      </p>
+    </div>
+
+    <table style="width:100%; border-collapse:collapse; margin: 1.5rem 0;">
+      <thead>
+        <tr style="text-align:left; border-bottom: 2px solid var(--border);">
+          <th style="padding: 0.75rem 1rem;">Language</th>
+          <th style="padding: 0.75rem 1rem;">Package</th>
+          <th style="padding: 0.75rem 1rem;">Transport</th>
+          <th style="padding: 0.75rem 1rem;">Tests</th>
+          <th style="padding: 0.75rem 1rem;">Status</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr style="border-bottom: 1px solid var(--border);">
+          <td style="padding: 0.75rem 1rem;"><strong>TypeScript</strong></td>
+          <td style="padding: 0.75rem 1rem;"><code>agentmesh</code> (sdk-typescript)</td>
+          <td style="padding: 0.75rem 1rem;">WebSocket</td>
+          <td style="padding: 0.75rem 1rem;">81 pass</td>
+          <td style="padding: 0.75rem 1rem;"><span style="color: var(--green);">&#x25CF;</span> Reference</td>
+        </tr>
+        <tr style="border-bottom: 1px solid var(--border);">
+          <td style="padding: 0.75rem 1rem;"><strong>Rust</strong></td>
+          <td style="padding: 0.75rem 1rem;"><code>agentmesh</code> (sdk-rust)</td>
+          <td style="padding: 0.75rem 1rem;">TCP</td>
+          <td style="padding: 0.75rem 1rem;">11 pass</td>
+          <td style="padding: 0.75rem 1rem;"><span style="color: var(--green);">&#x25CF;</span> Stable</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <!-- ─── What Every SDK Provides ─────────────────────────────── -->
+    <h2>What Every SDK Provides</h2>
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1rem; margin: 1.5rem 0;">
+      <div class="card" style="background: var(--bg-surface); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 1.25rem;">
+        <h3 style="margin-bottom: 0.5rem; font-size: 1rem;">6 Primitives</h3>
+        <p style="color: var(--text-dim); font-size: 0.9rem;">register, discover, request, respond, emit, subscribe &mdash; the complete protocol surface.</p>
+      </div>
+      <div class="card" style="background: var(--bg-surface); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 1.25rem;">
+        <h3 style="margin-bottom: 0.5rem; font-size: 1rem;">Envelope Codec</h3>
+        <p style="color: var(--text-dim); font-size: 0.9rem;">Wire-compatible JSON serialization with validation. Every SDK produces identical bytes on the wire.</p>
+      </div>
+      <div class="card" style="background: var(--bg-surface); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 1.25rem;">
+        <h3 style="margin-bottom: 0.5rem; font-size: 1rem;">Skill Routing</h3>
+        <p style="color: var(--text-dim); font-size: 0.9rem;">Register handlers for skills. Incoming requests are dispatched to the right handler automatically.</p>
+      </div>
+      <div class="card" style="background: var(--bg-surface); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 1.25rem;">
+        <h3 style="margin-bottom: 0.5rem; font-size: 1rem;">Task Tracking</h3>
+        <p style="color: var(--text-dim); font-size: 0.9rem;">Stateful task lifecycle with validated state machine transitions and history.</p>
+      </div>
+      <div class="card" style="background: var(--bg-surface); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 1.25rem;">
+        <h3 style="margin-bottom: 0.5rem; font-size: 1rem;">Distributed Tracing</h3>
+        <p style="color: var(--text-dim); font-size: 0.9rem;">Trace context propagation with trace_id, span_id, and parent linking across agent hops.</p>
+      </div>
+      <div class="card" style="background: var(--bg-surface); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 1.25rem;">
+        <h3 style="margin-bottom: 0.5rem; font-size: 1rem;">Error Classification</h3>
+        <p style="color: var(--text-dim); font-size: 0.9rem;">16 error codes with automatic retryability detection. Transport, protocol, task, and agent error categories.</p>
+      </div>
+    </div>
+
+    <!-- ─── Quick Start per Language ────────────────────────────── -->
+    <h2>Quick Start</h2>
+
+    <h3>TypeScript</h3>
+    <pre><code>npm install agentmesh</code></pre>
+    <pre><code>import { AgentMesh } from "agentmesh";
+
+const mesh = await AgentMesh.connect("ws://nats-server:4443");
+
+await mesh.register({ name: "my-agent", skills: [{ id: "chat", name: "Chat", description: "General conversation" }] });
+
+mesh.onRequest("chat", async (input) =&gt; {
+  return { reply: `You said: ${input}` };
+});
+
+const result = await mesh.request(agentId, "chat", { text: "Hello!" });</code></pre>
+
+    <h3>Rust</h3>
+    <pre><code># Cargo.toml
+[dependencies]
+agentmesh = "0.2.0"</code></pre>
+    <pre><code>use agentmesh::{AgentMesh, ConnectOptions, RegisterOptions};
+use serde_json::json;
+
+let mesh = AgentMesh::connect("nats://server:4222", ConnectOptions::default()).await?;
+
+// The inner input is passed directly to Rust handlers.
+mesh.on_request("chat", |input| async move {
+    Ok(json!({ "reply": format!("You said: {input}") }))
+});
+
+mesh.register(RegisterOptions { name: "my-agent".into(), ..Default::default() }).await?;</code></pre>
+
+    <!-- ─── Source ──────────────────────────────────────────────── -->
+    <h2>Source Code</h2>
+    <ul style="line-height: 2;">
+      <li><a href="https://github.com/jeffrschneider/AgentMesh/tree/main/sdk-typescript">sdk-typescript/</a> &mdash; TypeScript (reference)</li>
+      <li><a href="https://github.com/jeffrschneider/AgentMesh/tree/main/sdk-rust">sdk-rust/</a> &mdash; Rust</li>
+    </ul>
+
+  </div>
+
+  </div><!-- /content-wrapper -->
+  <script src="script.js"></script>
+</body>
+</html>
