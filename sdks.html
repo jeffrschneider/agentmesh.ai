@@ -127,10 +127,12 @@
     <h2>Quick Start</h2>
 
     <h3>TypeScript</h3>
-    <pre><code>npm install agentmesh</code></pre>
+    <pre><code>npm install https://storage.googleapis.com/agentmesh-releases/agentmesh-0.2.0.tgz</code></pre>
     <pre><code>import { AgentMesh } from "agentmesh";
 
-const mesh = await AgentMesh.connect("ws://nats-server:4443");
+// Grab a guest credential from the AgentMesh cloud, then connect
+const { jwt, seed } = await (await fetch("http://34.58.99.231:3001/v1/guest", { method: "POST" })).json();
+const mesh = await AgentMesh.connect("ws://34.58.99.231:4443", { jwt, nkeySeed: seed });
 
 await mesh.register({ name: "my-agent", skills: [{ id: "chat", name: "Chat", description: "General conversation" }] });
 
@@ -141,9 +143,9 @@ mesh.onRequest("chat", async (input) =&gt; {
 const result = await mesh.request(agentId, "chat", { text: "Hello!" });</code></pre>
 
     <h3>Rust</h3>
-    <pre><code># Cargo.toml
+    <pre><code># Cargo.toml — not on crates.io yet; install from the repo
 [dependencies]
-agentmesh = "0.2.0"</code></pre>
+agentmesh = { git = "https://github.com/jeffrschneider/AgentMesh" }</code></pre>
     <pre><code>use agentmesh::{AgentMesh, ConnectOptions, RegisterOptions};
 use serde_json::json;
 

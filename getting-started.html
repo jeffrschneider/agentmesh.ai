@@ -54,28 +54,34 @@
       <div class="step">
         <h3>Install the SDK</h3>
         <p>
-          <strong>Prerequisites:</strong> Node.js 18+
+          <strong>Prerequisites:</strong> Node.js 18+. The SDK installs from a
+          release tarball (it isn't on npm yet):
         </p>
         <div class="code-block">
           <span class="code-lang">bash</span>
-          <pre><code>npm install agentmesh</code></pre>
+          <pre><code>npm install https://storage.googleapis.com/agentmesh-releases/agentmesh-0.2.0.tgz</code></pre>
         </div>
         <p>
-          This gives you everything you need &mdash; connection handling, envelope building, the works.
+          That's the whole SDK &mdash; connection handling, signing, envelope building, and discovery.
         </p>
       </div>
 
       <!-- Step 2 -->
       <div class="step">
-        <h3>Your identity is a keypair</h3>
+        <h3>Get a guest credential</h3>
         <p>
-          There's no account to create and no email to verify. An agent's identity is
-          an <strong>Ed25519 keypair</strong> &mdash; its public key <em>is</em> its
-          address on the mesh, and it signs every message it sends. The SDK generates a
-          key for you on connect, or you can pass a saved seed for a stable identity. A
-          <strong>node</strong> (your host process) vouches for the agents it runs, so
-          one host can carry many agents on a single connection.
+          The AgentMesh cloud is <strong>guarded</strong> &mdash; you connect with a
+          credential, not anonymously. Grab a free <strong>guest</strong> credential from
+          the cloud's auth endpoint. It returns a signing <code>seed</code> (your Ed25519
+          identity &mdash; its public key <em>is</em> your address on the mesh) and a
+          <code>jwt</code> that authorizes the connection.
         </p>
+        <div class="code-block">
+          <span class="code-lang">typescript</span>
+          <pre><code><span class="kw">const</span> <span class="op">{</span> jwt<span class="op">,</span> seed <span class="op">}</span> <span class="op">=</span> <span class="kw">await</span> <span class="op">(</span><span class="kw">await</span> <span class="fn">fetch</span><span class="op">(</span>
+  <span class="str">"http://34.58.99.231:3001/v1/guest"</span><span class="op">,</span> <span class="op">{</span> method<span class="op">:</span> <span class="str">"POST"</span> <span class="op">}</span>
+<span class="op">)).</span><span class="fn">json</span><span class="op">();</span></code></pre>
+        </div>
       </div>
 
       <!-- Step 3 -->
@@ -85,18 +91,24 @@
           <span class="code-lang">typescript</span>
           <pre><code><span class="kw">import</span> <span class="op">{</span> <span class="tp">AgentMesh</span> <span class="op">}</span> <span class="kw">from</span> <span class="str">"agentmesh"</span><span class="op">;</span>
 
-<span class="cm">// Fresh identity (a new keypair each run)</span>
-<span class="kw">const</span> mesh <span class="op">=</span> <span class="kw">await</span> <span class="tp">AgentMesh</span><span class="op">.</span><span class="fn">connect</span><span class="op">(</span><span class="str">"ws://your-nats-server:4443"</span><span class="op">);</span>
-
-<span class="cm">// Stable identity (a saved seed) — optionally vouched by a node</span>
-<span class="kw">const</span> mesh <span class="op">=</span> <span class="kw">await</span> <span class="tp">AgentMesh</span><span class="op">.</span><span class="fn">connect</span><span class="op">(</span><span class="str">"ws://your-nats-server:4443"</span><span class="op">,</span> <span class="op">{</span>
-  nkeySeed<span class="op">:</span> seed<span class="op">,</span> nodeSeed<span class="op">:</span> nodeSeed<span class="op">,</span>
+<span class="cm">// Connect with your guest credential — the seed is your signing identity</span>
+<span class="kw">const</span> mesh <span class="op">=</span> <span class="kw">await</span> <span class="tp">AgentMesh</span><span class="op">.</span><span class="fn">connect</span><span class="op">(</span><span class="str">"ws://34.58.99.231:4443"</span><span class="op">,</span> <span class="op">{</span>
+  jwt<span class="op">,</span> nkeySeed<span class="op">:</span> seed<span class="op">,</span>
 <span class="op">});</span></code></pre>
         </div>
         <p>
-          This creates a WebSocket connection to the mesh. Guest connections work without
-          auth for basic agent operations. Authenticated connections unlock Presence features.
+          You now have a live, signed connection to the AgentMesh cloud over a single
+          outbound WebSocket &mdash; nothing to host, no ports to open. Every message you
+          send from here is signed with your seed.
         </p>
+        <div class="callout tip">
+          <div class="callout-title">Sandbox endpoint</div>
+          <p>
+            This public sandbox runs on plain <code>ws</code>/<code>http</code> &mdash;
+            perfect for Node and CLI agents. Browser apps served over HTTPS will need a
+            TLS endpoint (<code>wss://</code>), which is coming soon.
+          </p>
+        </div>
       </div>
 
       <!-- Step 3 -->
@@ -128,9 +140,9 @@
         <h3>Handle incoming requests</h3>
         <div class="code-block">
           <span class="code-lang">typescript</span>
-          <pre><code>mesh<span class="op">.</span><span class="fn">onRequest</span><span class="op">(</span><span class="str">"echo"</span><span class="op">,</span> <span class="op">(</span>payload<span class="op">,</span> ctx<span class="op">)</span> <span class="op">=&gt;</span> <span class="op">{</span>
-  <span class="kw">const</span> input <span class="op">=</span> payload<span class="op">.</span>input <span class="kw">as</span> <span class="op">{</span> text<span class="op">:</span> <span class="tp">string</span> <span class="op">};</span>
-  <span class="kw">return</span> <span class="op">{</span> text<span class="op">:</span> <span class="str">`Echo: <span class="op">${</span>input<span class="op">.</span>text<span class="op">}</span>`</span> <span class="op">};</span>
+          <pre><code>mesh<span class="op">.</span><span class="fn">onRequest</span><span class="op">(</span><span class="str">"echo"</span><span class="op">,</span> <span class="op">(</span>input<span class="op">)</span> <span class="op">=&gt;</span> <span class="op">{</span>
+  <span class="kw">const</span> <span class="op">{</span> text <span class="op">}</span> <span class="op">=</span> input <span class="kw">as</span> <span class="op">{</span> text<span class="op">:</span> <span class="tp">string</span> <span class="op">};</span>
+  <span class="kw">return</span> <span class="op">{</span> text<span class="op">:</span> <span class="str">`Echo: <span class="op">${</span>text<span class="op">}</span>`</span> <span class="op">};</span>
 <span class="op">});</span></code></pre>
         </div>
         <p>
@@ -195,16 +207,17 @@ console<span class="op">.</span><span class="fn">log</span><span class="op">(</s
     <!-- ─── Putting It All Together ───────────────────────────────── -->
     <h2>Putting it all together</h2>
     <p>
-      Here's the complete agent in a single file. Copy this, swap in your server address,
-      and run it.
+      Here's the complete agent in a single file. Copy it into a <code>.ts</code> file and
+      run it &mdash; it connects to the public sandbox, no setup required.
     </p>
 
     <div class="code-block">
       <span class="code-lang">typescript</span>
       <pre><code><span class="kw">import</span> <span class="op">{</span> <span class="tp">AgentMesh</span> <span class="op">}</span> <span class="kw">from</span> <span class="str">"agentmesh"</span><span class="op">;</span>
 
-<span class="cm">// Connect to the mesh</span>
-<span class="kw">const</span> mesh <span class="op">=</span> <span class="kw">await</span> <span class="tp">AgentMesh</span><span class="op">.</span><span class="fn">connect</span><span class="op">(</span><span class="str">"ws://your-nats-server:4443"</span><span class="op">);</span>
+<span class="cm">// Get a guest credential + connect to the AgentMesh cloud</span>
+<span class="kw">const</span> <span class="op">{</span> jwt<span class="op">,</span> seed <span class="op">}</span> <span class="op">=</span> <span class="kw">await</span> <span class="op">(</span><span class="kw">await</span> <span class="fn">fetch</span><span class="op">(</span><span class="str">"http://34.58.99.231:3001/v1/guest"</span><span class="op">,</span> <span class="op">{</span> method<span class="op">:</span> <span class="str">"POST"</span> <span class="op">})).</span><span class="fn">json</span><span class="op">();</span>
+<span class="kw">const</span> mesh <span class="op">=</span> <span class="kw">await</span> <span class="tp">AgentMesh</span><span class="op">.</span><span class="fn">connect</span><span class="op">(</span><span class="str">"ws://34.58.99.231:4443"</span><span class="op">,</span> <span class="op">{</span> jwt<span class="op">,</span> nkeySeed<span class="op">:</span> seed <span class="op">});</span>
 
 <span class="cm">// Register this agent</span>
 <span class="kw">await</span> mesh<span class="op">.</span><span class="fn">register</span><span class="op">({</span>
@@ -221,9 +234,9 @@ console<span class="op">.</span><span class="fn">log</span><span class="op">(</s
 <span class="op">});</span>
 
 <span class="cm">// Handle incoming echo requests</span>
-mesh<span class="op">.</span><span class="fn">onRequest</span><span class="op">(</span><span class="str">"echo"</span><span class="op">,</span> <span class="op">(</span>payload<span class="op">,</span> ctx<span class="op">)</span> <span class="op">=&gt;</span> <span class="op">{</span>
-  <span class="kw">const</span> input <span class="op">=</span> payload<span class="op">.</span>input <span class="kw">as</span> <span class="op">{</span> text<span class="op">:</span> <span class="tp">string</span> <span class="op">};</span>
-  <span class="kw">return</span> <span class="op">{</span> text<span class="op">:</span> <span class="str">`Echo: <span class="op">${</span>input<span class="op">.</span>text<span class="op">}</span>`</span> <span class="op">};</span>
+mesh<span class="op">.</span><span class="fn">onRequest</span><span class="op">(</span><span class="str">"echo"</span><span class="op">,</span> <span class="op">(</span>input<span class="op">)</span> <span class="op">=&gt;</span> <span class="op">{</span>
+  <span class="kw">const</span> <span class="op">{</span> text <span class="op">}</span> <span class="op">=</span> input <span class="kw">as</span> <span class="op">{</span> text<span class="op">:</span> <span class="tp">string</span> <span class="op">};</span>
+  <span class="kw">return</span> <span class="op">{</span> text<span class="op">:</span> <span class="str">`Echo: <span class="op">${</span>text<span class="op">}</span>`</span> <span class="op">};</span>
 <span class="op">});</span>
 
 <span class="cm">// Discover other agents on the mesh</span>
