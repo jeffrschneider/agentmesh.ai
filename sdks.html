@@ -18,12 +18,11 @@
       <li><a href="index.html">Home</a></li>
       <li><a href="how-it-works.html">How It Works</a></li>
       <li><a href="concepts.html">The Network</a></li>
+      <li><a href="sample-cases.html">Sample Cases</a></li>
       <li><a href="getting-started.html">Getting Started</a></li>
+      <li><a href="examples.html">Examples</a></li>
       <li><a href="sdks.html">SDKs</a></li>
       <li><a href="reference.html">Reference</a></li>
-      <li><a href="examples.html">Examples</a></li>
-      <li><a href="sample-cases.html">Sample Cases</a></li>
-      <li><a href="presence.html">Presence</a></li>
       <li><a href="claude-code.html">For Claude Code</a></li>
     </ul>
     <div class="sidebar-footer">
@@ -94,34 +93,13 @@
       </tbody>
     </table>
 
-    <!-- ─── What Every SDK Provides ─────────────────────────────── -->
-    <h2>What Every SDK Provides</h2>
-    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1rem; margin: 1.5rem 0;">
-      <div class="card" style="background: var(--bg-surface); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 1.25rem;">
-        <h3 style="margin-bottom: 0.5rem; font-size: 1rem;">6 Primitives</h3>
-        <p style="color: var(--text-dim); font-size: 0.9rem;">register, discover, request, respond, emit, subscribe &mdash; the complete protocol surface.</p>
-      </div>
-      <div class="card" style="background: var(--bg-surface); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 1.25rem;">
-        <h3 style="margin-bottom: 0.5rem; font-size: 1rem;">Envelope Codec</h3>
-        <p style="color: var(--text-dim); font-size: 0.9rem;">Wire-compatible JSON serialization with validation. Every SDK produces identical bytes on the wire.</p>
-      </div>
-      <div class="card" style="background: var(--bg-surface); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 1.25rem;">
-        <h3 style="margin-bottom: 0.5rem; font-size: 1rem;">Skill Routing</h3>
-        <p style="color: var(--text-dim); font-size: 0.9rem;">Register handlers for skills. Incoming requests are dispatched to the right handler automatically.</p>
-      </div>
-      <div class="card" style="background: var(--bg-surface); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 1.25rem;">
-        <h3 style="margin-bottom: 0.5rem; font-size: 1rem;">Task Tracking</h3>
-        <p style="color: var(--text-dim); font-size: 0.9rem;">Stateful task lifecycle with validated state machine transitions and history.</p>
-      </div>
-      <div class="card" style="background: var(--bg-surface); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 1.25rem;">
-        <h3 style="margin-bottom: 0.5rem; font-size: 1rem;">Distributed Tracing</h3>
-        <p style="color: var(--text-dim); font-size: 0.9rem;">Trace context propagation with trace_id, span_id, and parent linking across agent hops.</p>
-      </div>
-      <div class="card" style="background: var(--bg-surface); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 1.25rem;">
-        <h3 style="margin-bottom: 0.5rem; font-size: 1rem;">Error Classification</h3>
-        <p style="color: var(--text-dim); font-size: 0.9rem;">16 error codes with automatic retryability detection. Transport, protocol, task, and agent error categories.</p>
-      </div>
-    </div>
+    <p>
+      Both SDKs implement the full protocol &mdash; the six primitives, the signed
+      envelope codec, skill routing, task tracking, distributed tracing, and error
+      classification. Those are all defined once, for every language, in the
+      <a href="reference.html">Reference</a> (envelope fields, error codes, task
+      states, manifest). This page is just how to install a library and connect.
+    </p>
 
     <!-- ─── Quick Start per Language ────────────────────────────── -->
     <h2>Quick Start</h2>
