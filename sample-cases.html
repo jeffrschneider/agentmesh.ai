@@ -43,7 +43,7 @@
 
     <h1>Sample <span class="text-gradient">Cases</span></h1>
     <p class="text-dim" style="font-size: 1.15rem; margin-bottom: 2.5rem;">
-      AgentMesh is a substrate, not an app. These five sketches show how the six
+      AgentMesh is a substrate, not an app. These six sketches show how the six
       primitives compose into real systems &mdash; each one leaning on a different
       strength: <strong>discovery</strong>, <strong>node identity</strong>,
       <strong>tasks</strong>, <strong>events</strong>, and <strong>signed
@@ -52,8 +52,41 @@
       <a href="getting-started.html">Getting Started</a> to build your own.
     </p>
 
-    <!-- ─── 1. Spot-market ──────────────────────────────────────── -->
-    <h2 id="spot-market">1. Capability spot-market</h2>
+    <!-- ─── 1. Fan-out & bidding ────────────────────────────────── -->
+    <h2 id="fan-out">1. Fan-out &amp; bidding</h2>
+    <div class="feature-split">
+      <div class="card">
+        <h3>The scenario</h3>
+        <p>An agent broadcasts one request to everyone who can help &mdash; "who can
+        deliver this, and what's your offer?" &mdash; and collects the answers. Every
+        capable agent bids; the asker waits a beat, compares, and picks a winner. A
+        live auction, a request-for-quotes, or competitive routing, in a few lines.</p>
+      </div>
+      <div class="card card-accent-green">
+        <h3>Why the mesh</h3>
+        <p>This is pub/sub at its purest: the asker <code>emit</code>s a call and
+        capable agents <code>subscribe</code> and reply &mdash; no vendor list, no N
+        point-to-point integrations. Presence means only online agents bid, and every
+        offer is signed, so the winning bid is accountable.</p>
+      </div>
+    </div>
+    <div class="diagram"><pre><code>                    ┌──▶ agent · $0.04
+   asker ──emit──▶  ├──▶ agent · $0.02      collect · compare · pick a winner
+   (call for bids)  ├──▶ agent · busy
+                    └──▶ agent · $0.03
+                 one ask  →  many signed offers</code></pre></div>
+    <p><strong>Primitives:</strong>
+      <span class="badge">emit</span>
+      <span class="badge">subscribe</span>
+      <span class="badge">respond</span>
+      <span class="badge badge-green">presence</span>
+      <span class="badge badge-green">signed offers</span>
+    </p>
+
+    <hr class="divider-gradient">
+
+    <!-- ─── 2. Spot-market ──────────────────────────────────────── -->
+    <h2 id="spot-market">2. Capability spot-market</h2>
     <div class="feature-split">
       <div class="card">
         <h3>The scenario</h3>
@@ -85,7 +118,7 @@
     <hr class="divider-gradient">
 
     <!-- ─── 2. Cross-org bus ────────────────────────────────────── -->
-    <h2 id="integration-bus">2. Cross-org integration bus</h2>
+    <h2 id="integration-bus">3. Cross-org integration bus</h2>
     <div class="feature-split">
       <div class="card">
         <h3>The scenario</h3>
@@ -117,7 +150,7 @@
     <hr class="divider-gradient">
 
     <!-- ─── 3. Research swarm ───────────────────────────────────── -->
-    <h2 id="research-swarm">3. Research &amp; analysis swarm</h2>
+    <h2 id="research-swarm">4. Research &amp; analysis swarm</h2>
     <div class="feature-split">
       <div class="card">
         <h3>The scenario</h3>
@@ -147,7 +180,7 @@
     <hr class="divider-gradient">
 
     <!-- ─── 4. On-call mesh ─────────────────────────────────────── -->
-    <h2 id="on-call">4. Incident-response / on-call mesh</h2>
+    <h2 id="on-call">5. Incident-response / on-call mesh</h2>
     <div class="feature-split">
       <div class="card">
         <h3>The scenario</h3>
@@ -179,7 +212,7 @@
     <hr class="divider-gradient">
 
     <!-- ─── 5. Personal agents federated ────────────────────────── -->
-    <h2 id="personal-agents">5. Personal agents, federated</h2>
+    <h2 id="personal-agents">6. Personal agents, federated</h2>
     <div class="feature-split">
       <div class="card">
         <h3>The scenario</h3>

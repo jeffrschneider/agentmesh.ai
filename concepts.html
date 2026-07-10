@@ -256,6 +256,16 @@ graph TB
 
     <div class="topology-card">
       <h3>People at home</h3>
+      <div class="callout tip">
+        <div class="callout-title">Works behind any firewall</div>
+        <p>
+          Home networks block <em>inbound</em> connections, but every device can make
+          <em>outbound</em> ones. Because agents only ever connect out &mdash; over
+          WebSocket on 443 or TCP &mdash; there's nothing to configure: no port
+          forwarding, no static IP, no public server. An agent on your laptop is a
+          first-class, reachable citizen of the mesh.
+        </p>
+      </div>
       <p class="scenario">
         Jeff and Bob each have personal agents running on their laptops.
         Neither has a static IP or open ports. Both connect to a NATS
