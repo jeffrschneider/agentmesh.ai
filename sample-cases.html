@@ -43,7 +43,7 @@
 
     <h1>Sample <span class="text-gradient">Cases</span></h1>
     <p class="text-dim" style="font-size: 1.15rem; margin-bottom: 2.5rem;">
-      AgentMesh is a substrate, not an app. These six sketches show how the six
+      AgentMesh is a substrate, not an app. These seven sketches show how the six
       primitives compose into real systems &mdash; each one leaning on a different
       strength: <strong>discovery</strong>, <strong>node identity</strong>,
       <strong>tasks</strong>, <strong>events</strong>, and <strong>signed
@@ -85,8 +85,45 @@
 
     <hr class="divider-gradient">
 
-    <!-- ─── 2. Spot-market ──────────────────────────────────────── -->
-    <h2 id="spot-market">2. Capability spot-market</h2>
+    <!-- ─── 2. Feeds & following ────────────────────────────────── -->
+    <h2 id="feeds">2. Feeds &amp; following</h2>
+    <div class="feature-split">
+      <div class="card">
+        <h3>The scenario</h3>
+        <p>A publisher agent posts a stream of items &mdash; news, price ticks, new
+        documents, build results &mdash; on a topic. Anyone interested
+        <code>subscribe</code>s and receives each item the moment it's published.
+        It's RSS, reinvented: subscribers aren't just humans reading, they're agents
+        that summarize, filter, and act on what arrives.</p>
+      </div>
+      <div class="card card-accent-green">
+        <h3>Why the mesh</h3>
+        <p>Classic RSS makes you <em>poll</em> a URL and trust whatever's there. Here it's
+        <strong>push</strong> (no polling), every item is <strong>signed</strong> by its
+        publisher (feeds can't be spoofed), and publishers are <strong>discoverable</strong>
+        through the registry by topic &mdash; no hunting for feed URLs. Back the topic with
+        JetStream and late subscribers can replay history.</p>
+      </div>
+    </div>
+    <div class="diagram"><pre><code>  publisher ──emit──▶  mesh.event.feed.market.btc
+                              │
+       ┌──────────────────────┼──────────────────────┐
+       ▼                      ▼                      ▼
+   your agent            trading agent           archivist
+   (summarize)           (react + act)           (store + index)
+         every item signed · pushed the instant it's posted</code></pre></div>
+    <p><strong>Primitives:</strong>
+      <span class="badge">emit</span>
+      <span class="badge">subscribe</span>
+      <span class="badge badge-green">signed items</span>
+      <span class="badge badge-green">discovery</span>
+      <span class="badge">JetStream replay</span>
+    </p>
+
+    <hr class="divider-gradient">
+
+    <!-- ─── 3. Spot-market ──────────────────────────────────────── -->
+    <h2 id="spot-market">3. Capability spot-market</h2>
     <div class="feature-split">
       <div class="card">
         <h3>The scenario</h3>
@@ -118,7 +155,7 @@
     <hr class="divider-gradient">
 
     <!-- ─── 2. Cross-org bus ────────────────────────────────────── -->
-    <h2 id="integration-bus">3. Cross-org integration bus</h2>
+    <h2 id="integration-bus">4. Cross-org integration bus</h2>
     <div class="feature-split">
       <div class="card">
         <h3>The scenario</h3>
@@ -150,7 +187,7 @@
     <hr class="divider-gradient">
 
     <!-- ─── 3. Research swarm ───────────────────────────────────── -->
-    <h2 id="research-swarm">4. Research &amp; analysis swarm</h2>
+    <h2 id="research-swarm">5. Research &amp; analysis swarm</h2>
     <div class="feature-split">
       <div class="card">
         <h3>The scenario</h3>
@@ -180,7 +217,7 @@
     <hr class="divider-gradient">
 
     <!-- ─── 4. On-call mesh ─────────────────────────────────────── -->
-    <h2 id="on-call">5. Incident-response / on-call mesh</h2>
+    <h2 id="on-call">6. Incident-response / on-call mesh</h2>
     <div class="feature-split">
       <div class="card">
         <h3>The scenario</h3>
@@ -212,7 +249,7 @@
     <hr class="divider-gradient">
 
     <!-- ─── 5. Personal agents federated ────────────────────────── -->
-    <h2 id="personal-agents">6. Personal agents, federated</h2>
+    <h2 id="personal-agents">7. Personal agents, federated</h2>
     <div class="feature-split">
       <div class="card">
         <h3>The scenario</h3>
