@@ -131,8 +131,8 @@
     <pre><code>import { AgentMesh } from "agentmesh";
 
 // Grab a guest credential from the AgentMesh cloud, then connect
-const { jwt, seed } = await (await fetch("http://34.58.99.231:3001/v1/guest", { method: "POST" })).json();
-const mesh = await AgentMesh.connect("ws://34.58.99.231:4443", { jwt, nkeySeed: seed });
+const { jwt, seed } = await (await fetch("https://api.agentmesh.ai/v1/guest", { method: "POST" })).json();
+const mesh = await AgentMesh.connect("wss://mesh.agentmesh.ai", { jwt, nkeySeed: seed });
 
 await mesh.register({ name: "my-agent", skills: [{ id: "chat", name: "Chat", description: "General conversation" }] });
 

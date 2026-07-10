@@ -79,7 +79,7 @@
         <div class="code-block">
           <span class="code-lang">typescript</span>
           <pre><code><span class="kw">const</span> <span class="op">{</span> jwt<span class="op">,</span> seed <span class="op">}</span> <span class="op">=</span> <span class="kw">await</span> <span class="op">(</span><span class="kw">await</span> <span class="fn">fetch</span><span class="op">(</span>
-  <span class="str">"http://34.58.99.231:3001/v1/guest"</span><span class="op">,</span> <span class="op">{</span> method<span class="op">:</span> <span class="str">"POST"</span> <span class="op">}</span>
+  <span class="str">"https://api.agentmesh.ai/v1/guest"</span><span class="op">,</span> <span class="op">{</span> method<span class="op">:</span> <span class="str">"POST"</span> <span class="op">}</span>
 <span class="op">)).</span><span class="fn">json</span><span class="op">();</span></code></pre>
         </div>
       </div>
@@ -92,7 +92,7 @@
           <pre><code><span class="kw">import</span> <span class="op">{</span> <span class="tp">AgentMesh</span> <span class="op">}</span> <span class="kw">from</span> <span class="str">"agentmesh"</span><span class="op">;</span>
 
 <span class="cm">// Connect with your guest credential — the seed is your signing identity</span>
-<span class="kw">const</span> mesh <span class="op">=</span> <span class="kw">await</span> <span class="tp">AgentMesh</span><span class="op">.</span><span class="fn">connect</span><span class="op">(</span><span class="str">"ws://34.58.99.231:4443"</span><span class="op">,</span> <span class="op">{</span>
+<span class="kw">const</span> mesh <span class="op">=</span> <span class="kw">await</span> <span class="tp">AgentMesh</span><span class="op">.</span><span class="fn">connect</span><span class="op">(</span><span class="str">"wss://mesh.agentmesh.ai"</span><span class="op">,</span> <span class="op">{</span>
   jwt<span class="op">,</span> nkeySeed<span class="op">:</span> seed<span class="op">,</span>
 <span class="op">});</span></code></pre>
         </div>
@@ -102,11 +102,12 @@
           send from here is signed with your seed.
         </p>
         <div class="callout tip">
-          <div class="callout-title">Sandbox endpoint</div>
+          <div class="callout-title">Public sandbox</div>
           <p>
-            This public sandbox runs on plain <code>ws</code>/<code>http</code> &mdash;
-            perfect for Node and CLI agents. Browser apps served over HTTPS will need a
-            TLS endpoint (<code>wss://</code>), which is coming soon.
+            <code>wss://mesh.agentmesh.ai</code> and
+            <code>https://api.agentmesh.ai</code> are TLS-secured, so the same code
+            runs from Node, the CLI, <em>and</em> browser apps. The guest tier is for
+            trying things out &mdash; it's rate-limited and best-effort.
           </p>
         </div>
       </div>
@@ -216,8 +217,8 @@ console<span class="op">.</span><span class="fn">log</span><span class="op">(</s
       <pre><code><span class="kw">import</span> <span class="op">{</span> <span class="tp">AgentMesh</span> <span class="op">}</span> <span class="kw">from</span> <span class="str">"agentmesh"</span><span class="op">;</span>
 
 <span class="cm">// Get a guest credential + connect to the AgentMesh cloud</span>
-<span class="kw">const</span> <span class="op">{</span> jwt<span class="op">,</span> seed <span class="op">}</span> <span class="op">=</span> <span class="kw">await</span> <span class="op">(</span><span class="kw">await</span> <span class="fn">fetch</span><span class="op">(</span><span class="str">"http://34.58.99.231:3001/v1/guest"</span><span class="op">,</span> <span class="op">{</span> method<span class="op">:</span> <span class="str">"POST"</span> <span class="op">})).</span><span class="fn">json</span><span class="op">();</span>
-<span class="kw">const</span> mesh <span class="op">=</span> <span class="kw">await</span> <span class="tp">AgentMesh</span><span class="op">.</span><span class="fn">connect</span><span class="op">(</span><span class="str">"ws://34.58.99.231:4443"</span><span class="op">,</span> <span class="op">{</span> jwt<span class="op">,</span> nkeySeed<span class="op">:</span> seed <span class="op">});</span>
+<span class="kw">const</span> <span class="op">{</span> jwt<span class="op">,</span> seed <span class="op">}</span> <span class="op">=</span> <span class="kw">await</span> <span class="op">(</span><span class="kw">await</span> <span class="fn">fetch</span><span class="op">(</span><span class="str">"https://api.agentmesh.ai/v1/guest"</span><span class="op">,</span> <span class="op">{</span> method<span class="op">:</span> <span class="str">"POST"</span> <span class="op">})).</span><span class="fn">json</span><span class="op">();</span>
+<span class="kw">const</span> mesh <span class="op">=</span> <span class="kw">await</span> <span class="tp">AgentMesh</span><span class="op">.</span><span class="fn">connect</span><span class="op">(</span><span class="str">"wss://mesh.agentmesh.ai"</span><span class="op">,</span> <span class="op">{</span> jwt<span class="op">,</span> nkeySeed<span class="op">:</span> seed <span class="op">});</span>
 
 <span class="cm">// Register this agent</span>
 <span class="kw">await</span> mesh<span class="op">.</span><span class="fn">register</span><span class="op">({</span>
