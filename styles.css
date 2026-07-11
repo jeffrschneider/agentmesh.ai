@@ -1101,3 +1101,20 @@ h3[id]::before {
 [data-theme="light"] .hero::after {
   background: rgba(6, 182, 212, 0.04);
 }
+
+/* Numbered end-to-end walkthrough (How It Works) */
+.walkthrough {
+  margin: 1.5rem 0;
+  padding-left: 1.4rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.9rem;
+}
+.walkthrough li {
+  padding-left: 0.4rem;
+  line-height: 1.65;
+}
+.walkthrough li::marker {
+  color: var(--accent);
+  font-weight: 700;
+}

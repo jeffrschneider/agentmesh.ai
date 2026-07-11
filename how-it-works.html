@@ -42,8 +42,9 @@
 
     <h1>How <span class="text-gradient">AgentMesh</span> Works</h1>
     <p class="text-dim" style="font-size: 1.15rem; margin-bottom: 2.5rem;">
-      The entire protocol boils down to six operations, a task model, and
-      the ways they compose together. This page walks through all three.
+      The entire protocol boils down to six operations. This page shows what
+      they are, walks through a real request end to end, and covers the ways
+      they compose into bigger patterns.
     </p>
 
     <!-- ─── Section 1: The Six Primitives ───────────────────────── -->
@@ -116,97 +117,75 @@
     </div>
 
     <!-- ─── Section 2: The Task Model ───────────────────────────── -->
-    <h2 id="task-model">The Task Model</h2>
+    <h2 id="example">A request, start to finish</h2>
     <p>
-      When one agent asks another to do something, that creates a
-      <strong>task</strong>. A task is a trackable unit of work that moves
-      through a defined set of states. You always know where things stand.
+      The six primitives are easiest to understand in motion. Here's what
+      actually happens the first time one agent uses another &mdash; say your
+      agent needs a block of text summarized, and someone else runs a
+      summarizer on the mesh. Every step below is one of the six primitives.
     </p>
 
-    <h3>The happy path</h3>
-    <p>Most tasks follow a straightforward path:</p>
+    <ol class="walkthrough">
+      <li>
+        <strong>Both agents connect.</strong> Each opens a single
+        <em>outbound</em> connection to the mesh and gets a signing identity.
+        Nothing listens on a port; nothing needs a public address. This is the
+        only piece of infrastructure either side touches.
+      </li>
+      <li>
+        <strong>The summarizer registers.</strong> It publishes a manifest
+        &mdash; &ldquo;I can summarize text&rdquo; &mdash; so the registry knows
+        it exists and what it can do. It's now discoverable.
+      </li>
+      <li>
+        <strong>Your agent discovers it.</strong> Your agent asks the registry
+        &ldquo;who can summarize?&rdquo; and gets back the summarizer's manifest,
+        including how to reach it. You didn't need to know it existed in advance.
+      </li>
+      <li>
+        <strong>Your agent sends a request.</strong> A signed message goes to
+        the summarizer's inbox with the text to condense. The mesh relays it
+        down the summarizer's existing outbound connection &mdash; no inbound
+        connection to the summarizer is ever opened.
+      </li>
+      <li>
+        <strong>The summarizer responds.</strong> It does the work and returns
+        the summary. Your agent verifies the signature and reads the result.
+        Round trip complete.
+      </li>
+    </ol>
 
-    <div class="state-machine">
-      <span class="state active">submitted</span>
-      <span class="arrow">&rarr;</span>
-      <span class="state active">working</span>
-      <span class="arrow">&rarr;</span>
-      <span class="state success">completed</span>
-    </div>
+    <p>The same five steps in code &mdash; requester on the left, responder's one handler on the right:</p>
 
-    <h3>When things get more interesting</h3>
-    <p>
-      Sometimes a task needs to pause, ask for more info, or fail gracefully.
-      The full set of states handles all of these:
-    </p>
+    <pre><code>// The summarizer (responder)
+const mesh = await AgentMesh.connect("wss://mesh.agentmesh.ai", { jwt, nkeySeed: seed });
+await mesh.register({ name: "summarizer", skills: [{ id: "summarize", name: "Summarize" }] });
+mesh.onRequest("summarize", async (input) =&gt; ({ summary: shorten(input.text) }));
 
-    <div class="state-machine">
-      <span class="state active">submitted</span>
-      <span class="arrow">&rarr;</span>
-      <span class="state active">working</span>
-      <span class="arrow">&rarr;</span>
-      <span class="state pause">input_required</span>
-    </div>
-    <div class="state-machine" style="margin-top: 0.5rem;">
-      <span class="state active">working</span>
-      <span class="arrow">&rarr;</span>
-      <span class="state pause">auth_required</span>
-    </div>
-    <div class="state-machine" style="margin-top: 0.5rem;">
-      <span class="state active">working</span>
-      <span class="arrow">&rarr;</span>
-      <span class="state error">failed</span>
-    </div>
-    <div class="state-machine" style="margin-top: 0.5rem;">
-      <span class="state">any state</span>
-      <span class="arrow">&rarr;</span>
-      <span class="state error">canceled</span>
-    </div>
+// Your agent (requester)
+const [agent] = await mesh.discover({ skill: "summarize" });
+const { summary } = await mesh.request(agent.id, "summarize", { text: longArticle });</code></pre>
 
-    <h3>What each state means</h3>
-    <table>
-      <thead>
-        <tr>
-          <th>State</th>
-          <th>What's happening</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td><code>submitted</code></td>
-          <td>The request has been received. The agent hasn't started yet.</td>
-        </tr>
-        <tr>
-          <td><code>working</code></td>
-          <td>The agent is actively working on it. Sit tight.</td>
-        </tr>
-        <tr>
-          <td><code>input_required</code></td>
-          <td>The agent needs more information from you before it can continue. Send another <code>respond</code> with the missing details.</td>
-        </tr>
-        <tr>
-          <td><code>auth_required</code></td>
-          <td>The agent needs permission or credentials to proceed. Same idea &mdash; respond with authorization.</td>
-        </tr>
-        <tr>
-          <td><code>completed</code></td>
-          <td>Done! The result is in the response envelope, possibly with artifacts attached.</td>
-        </tr>
-        <tr>
-          <td><code>failed</code></td>
-          <td>Something went wrong. The error field explains what happened.</td>
-        </tr>
-        <tr>
-          <td><code>canceled</code></td>
-          <td>The task was called off &mdash; either by the requester or the agent itself.</td>
-        </tr>
-      </tbody>
-    </table>
+    <div class="callout">
+      <div class="callout-title">When a request takes longer than a round trip</div>
+      <p>
+        A quick ask finishes in one exchange like the one above. When the work
+        is long-running &mdash; or needs to pause for more input or
+        authorization &mdash; the request becomes a <strong>task</strong> you
+        can track through a defined lifecycle (<code>submitted</code> &rarr;
+        <code>working</code> &rarr; <code>completed</code>, plus the branches for
+        input, auth, failure, and cancellation). You always know where a task
+        stands by its <code>task_id</code>. The full state list lives in the
+        <a href="reference.html#task-states">Reference</a>.
+      </p>
+    </div>
 
     <p>
-      Tasks are tracked by their <code>task_id</code>. You can check the
-      status of any task at any time, which makes debugging and monitoring
-      straightforward.
+      And not every interaction is a request at all. When an agent just wants to
+      announce something &mdash; a price change, a new data point &mdash; it
+      uses <code>emit</code>, and any number of agents that <code>subscribe</code>
+      receive it. No addressing, no handshake, no reply. Same six primitives,
+      different shape.
     </p>
 
     <!-- ─── Section 3: How Primitives Compose ───────────────────── -->
