@@ -9,7 +9,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
   <style>
-    /* ══════════ THE WIRE — design token system ══════════ */
+    /* ══════════ THE WIRE : design token system ══════════ */
     :root{
       --ink:#0A1417; --panel:#0F1D22; --panel-2:#12242A; --line:#1C2E33;
       --paper:#E7EFEC; --dim:#7C918C; --faint:#4A5D5A;
@@ -125,6 +125,35 @@
     .env ul li{ margin:8px 0; }
     .env ul b{ color:var(--paper); font-weight:600; }
 
+    /* ── the stack (web analogy) ── */
+    .stack{ display:grid; grid-template-columns:1fr 40px 1fr; align-items:center; gap:0; margin-top:26px; }
+    .stack .col-h{ font-family:var(--wire); font-size:.72rem; letter-spacing:.14em; text-transform:uppercase;
+      color:var(--faint); margin-bottom:12px; }
+    .stack .layer{ display:flex; justify-content:space-between; align-items:center; gap:12px;
+      padding:12px 14px; border:1px solid var(--line); border-radius:9px; margin-bottom:9px;
+      background:var(--panel); font-family:var(--wire); font-size:.84rem; }
+    .stack .layer .lyr{ color:var(--paper); font-weight:500; }
+    .stack .layer .did{ color:var(--dim); font-size:.78rem; }
+    .stack .layer.tools{ border-left:3px solid var(--address); }
+    .stack .layer.knowhow{ border-left:3px solid var(--broadcast); }
+    .stack .map{ text-align:center; color:var(--signal); font-family:var(--wire); font-size:1.05rem; }
+    .stack .am{ border:1px solid var(--signal); border-radius:11px; padding:14px;
+      background:rgba(242,169,59,.06); box-shadow:0 22px 48px -26px rgba(242,169,59,.6); }
+    .stack .am .am-label{ font-family:var(--wire); font-weight:600; color:var(--signal); font-size:.9rem; margin-bottom:8px; }
+    .stack .am .am-row{ display:flex; justify-content:space-between; gap:12px; padding:6px 0;
+      font-family:var(--wire); font-size:.82rem; border-top:1px solid rgba(242,169,59,.14); }
+    .stack .am .am-row:first-of-type{ border-top:0; }
+    .stack .am .am-row .k{ color:var(--paper); font-weight:500; }
+    .stack .am .am-row .v{ color:var(--dim); font-size:.78rem; }
+    .triad{ margin-top:28px; font-family:var(--disp); font-size:1.35rem; font-weight:600; line-height:1.45;
+      color:var(--paper); max-width:none; }
+    .triad b{ font-weight:700; }
+    .triad .t-tools{ color:var(--address); }
+    .triad .t-know{ color:var(--broadcast); }
+    .triad .t-am{ color:var(--signal); }
+    .stack-note{ margin-top:14px; font-family:var(--wire); font-size:.78rem; color:var(--faint); max-width:64ch; }
+    @media (max-width:900px){ .stack{ grid-template-columns:1fr; } .stack .map{ padding:6px 0; } }
+
     /* ── three pairs (the six primitives, as pairs) ── */
     .pairs{ display:grid; gap:16px; margin-top:26px; }
     .pair{ display:grid; grid-template-columns:170px 1fr; gap:0; border:1px solid var(--line);
@@ -198,10 +227,10 @@
       <!-- HERO: the protocol running -->
       <div class="wrap hero">
         <span class="eyebrow"><span class="tag">agentmesh</span> · signed agent&#8209;to&#8209;agent protocol · v0.2</span>
-        <h1>A signed <span class="sig">wire</span> for AI&nbsp;agents</h1>
-        <p class="lede">Agents find each other and exchange signed messages over one mesh.
-          Ask once, and every capable agent answers. Every reply carries a verifiable signature,
-          no matter which connection carried it.</p>
+        <h1>The web,<br>for AI&nbsp;agents</h1>
+        <p class="lede">The web ran on a stack of protocols, each with one job: find, reach, trust, talk.
+          The agent web needs the same, and AgentMesh is its network layer: how any agent finds,
+          reaches, and trusts any other.</p>
         <div class="cta">
           <a class="btn btn-signal" href="run-a-test-node.html">▶ get a sandbox credential</a>
           <a class="btn btn-ghost" href="how-it-works.html">read the protocol</a>
@@ -221,6 +250,46 @@
             a live auction in two primitives.</div>
         </div>
       </div>
+
+      <!-- THE STACK: web analogy -->
+      <section class="band">
+        <div class="wrap">
+          <p class="kicker">the stack</p>
+          <h2>The web took a stack. So does this.</h2>
+          <p>The web was never one protocol. DNS to find, TCP to reach, TLS to trust, HTTP to talk.
+            The agent web is assembling the same layers now, and AgentMesh is the one that connects
+            agents to each other.</p>
+
+          <div class="stack">
+            <div class="col">
+              <div class="col-h">the web</div>
+              <div class="layer"><span class="lyr">HTML</span><span class="did">content</span></div>
+              <div class="layer"><span class="lyr">HTTP</span><span class="did">request / respond</span></div>
+              <div class="layer"><span class="lyr">TLS</span><span class="did">trust</span></div>
+              <div class="layer"><span class="lyr">TCP</span><span class="did">reach</span></div>
+              <div class="layer"><span class="lyr">DNS</span><span class="did">find</span></div>
+            </div>
+            <div class="map">▶</div>
+            <div class="col">
+              <div class="col-h">the agent web</div>
+              <div class="layer knowhow"><span class="lyr">Skills</span><span class="did">know-how</span></div>
+              <div class="layer tools"><span class="lyr">MCP</span><span class="did">tools &amp; data</span></div>
+              <div class="am">
+                <div class="am-label">AgentMesh</div>
+                <div class="am-row"><span class="k">trust</span><span class="v">signed envelopes</span></div>
+                <div class="am-row"><span class="k">reach</span><span class="v">one mesh, anywhere</span></div>
+                <div class="am-row"><span class="k">find</span><span class="v">discovery + presence</span></div>
+              </div>
+            </div>
+          </div>
+
+          <p class="triad"><b class="t-tools">MCP</b> gives agents tools.
+            <b class="t-know">Skills</b> give them know-how.
+            <b class="t-am">AgentMesh</b> gives them each other.</p>
+          <p class="stack-note">AgentMesh sits alongside efforts like A2A at the agent-to-agent layer,
+            and provides the running mesh underneath: discovery, presence, identity, and transport.</p>
+        </div>
+      </section>
 
       <!-- WHAT: the envelope -->
       <section class="band">
