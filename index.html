@@ -39,17 +39,21 @@
 
   <!-- ─── Hero ────────────────────────────────────────────────── -->
   <section class="hero">
-    <canvas class="hero-mesh" aria-hidden="true"></canvas>
-    <h1>The web, <span class="text-gradient">for AI agents</span></h1>
-    <p class="subtitle">
-      AgentMesh is a platform for connecting AI agents. Agents discover each
-      other, send signed requests, broadcast events, and work together, no
-      matter where they run. Every agent stays reachable from anywhere over a
-      single outbound connection, even behind a home firewall.
-    </p>
-    <div class="hero-actions">
-      <a href="getting-started.html" class="btn btn-primary">Get Started</a>
-      <a href="how-it-works.html" class="btn btn-outline">How It Works</a>
+    <div class="hero-text">
+      <h1>The web, <span class="text-gradient">for AI agents</span></h1>
+      <p class="subtitle">
+        AgentMesh is a platform for connecting AI agents. Agents discover each
+        other, send signed requests, broadcast events, and work together, no
+        matter where they run. Every agent stays reachable from anywhere over a
+        single outbound connection, even behind a home firewall.
+      </p>
+      <div class="hero-actions">
+        <a href="getting-started.html" class="btn btn-primary">Get Started</a>
+        <a href="how-it-works.html" class="btn btn-outline">How It Works</a>
+      </div>
+    </div>
+    <div class="hero-visual">
+      <canvas class="hero-mesh" aria-hidden="true"></canvas>
     </div>
   </section>
 
@@ -283,8 +287,8 @@
     var ctx = canvas.getContext('2d');
     var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-    // Palette stops (cyan -> purple -> pink) as RGB for alpha blending.
-    var STOPS = [[34, 211, 238], [167, 139, 250], [244, 114, 182]];
+    // Bold neon palette: electric cyan -> violet -> hot magenta.
+    var STOPS = [[0, 229, 255], [138, 43, 255], [255, 45, 149]];
     function palette(p) {
       p = p < 0 ? 0 : p > 1 ? 1 : p;
       var seg = p * (STOPS.length - 1);
@@ -296,7 +300,7 @@
     var W = 0, H = 0, DPR = 1, cells = [], r = 20, t = 0, raf = 0;
 
     function build() {
-      var cols = 20;
+      var cols = Math.max(7, Math.min(14, Math.round(W / 42))); // chunky honeycomb
       var dx = W / cols;               // horizontal spacing (pointy-top hex)
       r = dx / Math.sqrt(3);           // center-to-vertex radius
       var dy = 1.5 * r;                // vertical spacing
@@ -334,20 +338,27 @@
 
     function draw() {
       ctx.clearRect(0, 0, W, H);
-      ctx.lineWidth = 1;
+      ctx.lineWidth = 1.5;
       for (var i = 0; i < cells.length; i++) {
         var c = cells[i];
         var wave = 0.5 + 0.5 * Math.sin((c.cx / W + c.cy / H) * 6.2 - t); // 0..1, diagonal
-        var col = palette(c.p + wave * 0.15);
+        var col = palette(c.p + wave * 0.22);
         var rgb = (col[0] | 0) + ',' + (col[1] | 0) + ',' + (col[2] | 0);
         hexPath(c.cx, c.cy);
-        if (wave > 0.5) {
-          ctx.fillStyle = 'rgba(' + rgb + ',' + ((wave - 0.5) * 0.28).toFixed(3) + ')';
-          ctx.fill();
+        // Always-visible bold fill, brightening with the wave.
+        ctx.fillStyle = 'rgba(' + rgb + ',' + (0.07 + wave * wave * 0.55).toFixed(3) + ')';
+        ctx.fill();
+        // Bright stroke, with a neon glow on the lit cells.
+        if (wave > 0.62) {
+          ctx.shadowColor = 'rgb(' + rgb + ')';
+          ctx.shadowBlur = 4 + wave * 12;
+        } else {
+          ctx.shadowBlur = 0;
         }
-        ctx.strokeStyle = 'rgba(' + rgb + ',' + (0.10 + wave * 0.45).toFixed(3) + ')';
+        ctx.strokeStyle = 'rgba(' + rgb + ',' + (0.3 + wave * 0.65).toFixed(3) + ')';
         ctx.stroke();
       }
+      ctx.shadowBlur = 0;
     }
 
     function loop() {
