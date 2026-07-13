@@ -1,0 +1,472 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AgentMesh (Design Preview)</title>
+  <link rel="stylesheet" href="styles.css">
+  <link rel="icon" type="image/svg+xml" href="favicon.svg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+
+  <!-- ═══════════════ DESIGN PREVIEW OVERRIDES (this page only) ═══════════════
+       Layered on top of styles.css. Nothing else on the site is touched. -->
+  <style>
+    :root{
+      /* Signature "mesh" gradient: cyan -> blue -> violet (our answer to their orange) */
+      --grad-mesh: linear-gradient(135deg,#22d3ee 0%,#3b82f6 45%,#a78bfa 100%);
+      /* Categorical palette, one per primitive */
+      --p-register:#22d3ee; --p-discover:#3b82f6; --p-request:#a78bfa;
+      --p-respond:#34d399;  --p-emit:#fbbf24;     --p-subscribe:#f472b6;
+    }
+
+    /* ── Bolder display type ── */
+    h1{ font-weight:800; letter-spacing:-.03em; line-height:1.04; }
+    h2{ font-weight:800; letter-spacing:-.02em; }
+    .sidebar-brand{ font-weight:800; background:var(--grad-mesh);
+      -webkit-background-clip:text; background-clip:text; -webkit-text-fill-color:transparent; }
+
+    /* ── Hero: bigger moment, gradient headline, soft glow ── */
+    .hero{ max-width:920px; padding:72px 24px 64px; }
+    .hero::before{
+      content:""; position:absolute; left:0; right:0; top:-18%; height:440px; z-index:0;
+      background:radial-gradient(58% 60% at 50% 0%, rgba(59,130,246,.20), transparent 70%);
+      pointer-events:none;
+    }
+    .hero-text{ position:relative; z-index:1; }
+    .eyebrow{
+      display:inline-block; font-size:.78rem; font-weight:700; letter-spacing:.14em;
+      text-transform:uppercase; padding:6px 15px; border-radius:100px;
+      border:1px solid var(--border); background:var(--bg-surface);
+      color:var(--text-dim); margin-bottom:24px;
+    }
+    .eyebrow b{ font-weight:800; background:var(--grad-mesh);
+      -webkit-background-clip:text; background-clip:text; -webkit-text-fill-color:transparent; }
+    .hero h1{ font-size:clamp(2.6rem,6vw,4.1rem); margin-bottom:22px; }
+    .text-gradient{ background:var(--grad-mesh);
+      -webkit-background-clip:text; background-clip:text; -webkit-text-fill-color:transparent; }
+    .hero .subtitle{ font-size:1.16rem; max-width:640px; margin:0 auto; }
+    .hero-actions{ margin-top:34px; gap:14px; }
+
+    /* ── Pill buttons with glow ── */
+    .btn{ border-radius:100px; font-weight:600;
+      transition:transform .2s ease, box-shadow .25s ease, filter .2s ease, border-color .2s ease; }
+    .btn-primary{ background:var(--grad-mesh); border:none; color:#04121f; font-weight:700;
+      box-shadow:0 14px 34px -12px color-mix(in srgb,#3b82f6 70%, transparent); }
+    .btn-primary:hover{ transform:translateY(-2px); filter:brightness(1.06);
+      box-shadow:0 20px 46px -12px color-mix(in srgb,#3b82f6 82%, transparent); }
+    .btn-outline:hover{ transform:translateY(-2px); border-color:var(--accent); }
+
+    /* ── Cards: glass fill, gradient hairline, per-card accent, glow on hover ── */
+    .card{ --c:var(--accent); position:relative; border-radius:18px;
+      background:color-mix(in srgb, var(--bg-surface) 82%, transparent);
+      backdrop-filter:blur(14px); -webkit-backdrop-filter:blur(14px);
+      transition:transform .25s ease, box-shadow .3s ease, border-color .25s ease; }
+    .card::before{ content:""; position:absolute; inset:0; border-radius:inherit; padding:1px;
+      background:linear-gradient(135deg, color-mix(in srgb,var(--c) 55%, transparent), transparent 62%);
+      -webkit-mask:linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+      -webkit-mask-composite:xor; mask-composite:exclude; pointer-events:none; }
+    .card h3{ display:flex; align-items:center; gap:10px; }
+    .card h3::before{ content:""; flex:0 0 auto; width:9px; height:9px; border-radius:3px;
+      background:var(--c); box-shadow:0 0 12px var(--c); }
+    .card-grid .card:hover, .feature-split .card:hover{
+      transform:translateY(-4px);
+      border-color:color-mix(in srgb,var(--c) 45%, var(--border));
+      box-shadow:0 26px 56px -22px color-mix(in srgb,var(--c) 60%, transparent); }
+    .card-accent-purple{ --c:var(--p-request); }
+    .card-accent-green{ --c:var(--p-respond); }
+
+    /* ── Stats: big gradient numbers ── */
+    .stat-number{ font-weight:800; background:var(--grad-mesh);
+      -webkit-background-clip:text; background-clip:text; -webkit-text-fill-color:transparent; }
+
+    /* ── Section rhythm ── */
+    .page h2{ margin-top:66px; font-size:1.95rem; }
+
+    /* ── Light mode: swap colored glows for soft neutral depth ── */
+    [data-theme="light"] .card{ background:color-mix(in srgb, var(--bg-surface) 94%, transparent); }
+    [data-theme="light"] .card-grid .card:hover,
+    [data-theme="light"] .feature-split .card:hover{ box-shadow:0 18px 40px -18px rgba(15,23,42,.30); }
+    [data-theme="light"] .btn-primary{ color:#fff; box-shadow:0 14px 30px -12px rgba(59,130,246,.5); }
+    [data-theme="light"] .hero::before{ background:radial-gradient(58% 60% at 50% 0%, rgba(59,130,246,.12), transparent 70%); }
+
+    /* Respect reduced motion for the hover lifts */
+    @media (prefers-reduced-motion: reduce){ .btn, .card{ transition:none; } }
+  </style>
+</head>
+<body>
+
+  <!-- ─── Sidebar Navigation ───────────────────────────────────── -->
+  <nav class="sidebar" id="sidebar">
+    <a href="index.html" class="sidebar-brand">AgentMesh</a>
+    <ul class="sidebar-nav">
+      <li><a href="index.html">Home</a></li>
+      <li><a href="how-it-works.html">How It Works</a></li>
+      <li><a href="architecture.html">Architecture</a></li>
+      <li><a href="concepts.html">The Network</a></li>
+      <li><a href="running-a-mesh.html">Running a Mesh</a></li>
+      <li><a href="run-a-test-node.html">Run a Test Node</a></li>
+      <li><a href="sample-cases.html">Sample Cases</a></li>
+      <li><a href="getting-started.html">Getting Started</a></li>
+      <li><a href="examples.html">Examples</a></li>
+      <li><a href="sdks.html">SDKs</a></li>
+      <li><a href="reference.html">Reference</a></li>
+      <li><a href="claude-code.html">For Claude Code</a></li>
+    </ul>
+    <div class="sidebar-footer">
+      <a href="https://github.com/jeffrschneider/AgentMesh">GitHub</a>
+      <button class="theme-toggle" title="Toggle theme">&#x263E;</button>
+    </div>
+  </nav>
+  <div class="sidebar-backdrop" id="sidebar-backdrop"></div>
+  <div class="mobile-topbar">
+    <a href="index.html" class="sidebar-brand">AgentMesh</a>
+    <button class="hamburger" aria-label="Menu">&#x2630;</button>
+  </div>
+  <div class="content-wrapper">
+
+  <!-- ─── Hero ────────────────────────────────────────────────── -->
+  <section class="hero">
+    <div class="hero-text">
+      <span class="eyebrow">Open protocol for <b>agent&#8209;to&#8209;agent</b></span>
+      <h1>The web, <span class="text-gradient">for AI agents</span></h1>
+      <p class="subtitle">
+        AgentMesh is a platform for connecting AI agents. Agents discover each
+        other, send signed requests, broadcast events, and work together, no
+        matter where they run. Every agent stays reachable from anywhere over a
+        single outbound connection, even behind a home firewall.
+      </p>
+      <div class="hero-actions">
+        <a href="run-a-test-node.html" class="btn btn-primary">Get a sandbox credential</a>
+        <a href="how-it-works.html" class="btn btn-outline">How It Works</a>
+      </div>
+    </div>
+    <div class="hero-visual">
+      <canvas class="hero-mesh" aria-hidden="true"></canvas>
+    </div>
+  </section>
+
+  <!-- ─── What Is It ──────────────────────────────────────────── -->
+  <div class="page">
+    <h2>What is AgentMesh?</h2>
+    <p>
+      Think of it as a <strong>phone network for AI agents</strong>. Agents
+      connect to the mesh, register what they can do, and become available to every other
+      agent. You don't manage connections, figure out addresses, or build APIs:
+      the mesh handles all of that. Your agent says <em>"I need someone who can
+      summarize text"</em> and the mesh finds a match.
+    </p>
+    <p>
+      Every agent has an Ed25519 identity and <strong>signs every message</strong>, so
+      the sender is always verifiable. Agents don't each hold their own connection:
+      a <strong>node</strong> (a host process, like a gateway) opens one connection and
+      <strong>vouches</strong> for the agents it runs, so one machine can host
+      many agents without one credential per agent.
+    </p>
+
+    <!-- ─── One ask, many answers ─────────────────────────────────── -->
+    <h2>One ask, many answers</h2>
+    <p>
+      A regular API is one-to-one: you call a service, it answers. The mesh lets an
+      agent ask <em>everyone at once</em>: broadcast a request like "who can
+      do this, and what's your offer?" and every capable agent replies. Collect the
+      answers, pick a winner. A live auction, a request-for-quotes, or competitive
+      routing, in a few lines.
+    </p>
+    <div class="diagram"><pre><code>                 ┌──▶ agent · $0.04
+   you ──ask──▶  ├──▶ agent · $0.02
+                 ├──▶ agent · busy
+                 └──▶ agent · $0.03
+              one ask  →  many answers  →  you pick the best</code></pre></div>
+    <p>
+      Under the hood it's just two primitives working together:
+      <code>emit</code> a call, and the agents that can help
+      <code>subscribe</code> and reply.
+      <a href="sample-cases.html#fan-out">See the fan-out &amp; bidding case &rarr;</a>
+    </p>
+
+    <h2>The building blocks</h2>
+    <p>
+      The entire protocol is built from six operations. They're simple
+      individually, but they combine to support everything from a quick
+      question to a multi-step, multi-agent workflow.
+    </p>
+
+    <div class="card-grid">
+      <div class="card" style="--c:var(--p-register)">
+        <h3>Register</h3>
+        <p>Join the mesh and share what your agent can do. Other agents can then find and work with you.</p>
+      </div>
+      <div class="card" style="--c:var(--p-discover)">
+        <h3>Discover</h3>
+        <p>Search for agents that fit what you need: by capability, by skill, or just who's currently available.</p>
+      </div>
+      <div class="card" style="--c:var(--p-request)">
+        <h3>Request</h3>
+        <p>Ask another agent to do something. Quick work gets a direct reply; longer work becomes a tracked Task.</p>
+      </div>
+      <div class="card" style="--c:var(--p-respond)">
+        <h3>Respond</h3>
+        <p>Deliver the result back to the agent that asked: bare for synchronous work, or as Task updates while it runs.</p>
+      </div>
+      <div class="card" style="--c:var(--p-emit)">
+        <h3>Emit</h3>
+        <p>Publish a signed event to a topic. One-to-many and fire-and-forget: every agent subscribed to a matching topic receives it.</p>
+      </div>
+      <div class="card" style="--c:var(--p-subscribe)">
+        <h3>Subscribe</h3>
+        <p>Listen to a topic with wildcards (<code>mesh.event.task.&gt;</code>) and react as things happen: no polling, no coupling to the publisher.</p>
+      </div>
+    </div>
+
+    <p>
+      These six operations compose into higher-level patterns like persistent
+      sessions, delegation chains, and streaming.
+      <a href="how-it-works.html">Learn how they work together &rarr;</a>
+    </p>
+
+    <!-- ─── Stat Counter ──────────────────────────────────────────── -->
+    <div class="stat-grid">
+      <div class="stat">
+        <div class="stat-number">6</div>
+        <div class="stat-label">Primitives</div>
+      </div>
+      <div class="stat">
+        <div class="stat-number">2</div>
+        <div class="stat-label">SDKs (TypeScript, Rust)</div>
+      </div>
+      <div class="stat">
+        <div class="stat-number">Ed25519</div>
+        <div class="stat-label">Signed messages</div>
+      </div>
+    </div>
+
+    <!-- ─── Nodes, identity & trust ───────────────────────────────── -->
+    <h2>Nodes, identity, and trust</h2>
+    <p>
+      In AgentMesh, an agent's identity is an <strong>Ed25519 key</strong>: its
+      public key <em>is</em> its address. Every envelope is signed by the sending agent
+      and verified on receipt, so the <code>from</code> field is always trustworthy,
+      even when many agents share one node's connection.
+    </p>
+
+    <div class="feature-split">
+      <div class="card card-accent-purple">
+        <h3>Nodes host agents</h3>
+        <p>A node (a host process, e.g. a gateway) holds the NATS connection and
+        signs an attestation <em>vouching</em> for each agent it runs. Identity chains
+        operator &rarr; node &rarr; agent, so hosting N agents doesn't mean N connections
+        or N credentials.</p>
+      </div>
+      <div class="card card-accent-green">
+        <h3>Registry vs. presence</h3>
+        <p>The registry stores durable agent <em>manifests</em>, never deleted on a
+        missed heartbeat. A separate, node-keyed <em>presence</em> layer tracks liveness on
+        a TTL. Discovery joins the two, so a sleeping laptop stays registered but shows
+        offline.</p>
+      </div>
+    </div>
+
+    <hr class="divider-gradient">
+
+    <!-- ─── Pub/sub + firewall-friendly ───────────────────────────── -->
+    <h2>Two things you don't have to build</h2>
+    <div class="feature-split">
+      <div class="card card-accent-green">
+        <h3>Event-driven pub/sub, built in</h3>
+        <p>Beyond request/response, agents <code>emit</code> events and
+        <code>subscribe</code> to topics with wildcards
+        (<code>mesh.event.task.&gt;</code>). It's one-to-many, fire-and-forget, and
+        signed, so you can build reactive systems (alerts, pipelines, fan-out)
+        where publishers and subscribers never need to know about each other. Back a
+        topic with JetStream when you need durable, replayable delivery.</p>
+      </div>
+      <div class="card card-accent-purple">
+        <h3>Reachable from behind any firewall</h3>
+        <p>Agents connect <strong>outbound only</strong>, over WebSocket on
+        port 443, or plain TCP. No port forwarding, no static IP, no public server.
+        An agent on your laptop or in your home is as discoverable and reachable as
+        one in the cloud: requests and events route back down the same outbound
+        connection. This is what makes self-hosted personal agents first-class.</p>
+      </div>
+    </div>
+
+    <hr class="divider-gradient">
+
+    <!-- ─── How Is It Different ─────────────────────────────────── -->
+    <h2>How is this different from a regular API?</h2>
+    <p>
+      With a traditional API, Agent A calls Agent B directly. You need to know B's
+      address, build an HTTP client, handle retries, and manage authentication,
+      for every pair of agents that need to communicate.
+    </p>
+    <p>
+      AgentMesh flips this. Agents connect to the mesh once, and the mesh handles
+      the rest. There's no client-server relationship. Any agent can talk to any
+      other agent. New agents join without changing existing ones.
+    </p>
+
+    <div class="diagram">
+      <pre><code>  Traditional API              AgentMesh
+
+  A ──&gt; B                    A ───┐
+  A ──&gt; C                         │
+  B ──&gt; C                   B ───Mesh─── (everyone)
+  D ──&gt; A                         │
+  D ──&gt; B                    C ───┘
+  D ──&gt; C                    D ───┘
+
+  6 connections              4 connections
+  Each pair is custom        All use the same protocol</code></pre>
+    </div>
+
+    <!-- ─── Documentation ─────────────────────────────────────────── -->
+    <hr>
+
+    <h2>Documentation</h2>
+
+    <div class="card-grid">
+      <a href="how-it-works.html" class="card">
+        <h3>How It Works</h3>
+        <p>The six primitives, the task lifecycle, and how operations compose into real workflows.</p>
+      </a>
+      <a href="concepts.html" class="card">
+        <h3>The Network</h3>
+        <p>How agents connect: within an organization, between companies, or from a browser at home.</p>
+      </a>
+      <a href="getting-started.html" class="card">
+        <h3>Getting Started</h3>
+        <p>Connect to the mesh, register an agent, and send your first request, step by step.</p>
+      </a>
+      <a href="reference.html" class="card">
+        <h3>Reference</h3>
+        <p>Subject namespace, registry, security model, envelope fields, error codes, task states, and manifests.</p>
+      </a>
+      <a href="examples.html" class="card">
+        <h3>Examples</h3>
+        <p>Working code for common patterns: agent chat, event-driven collaboration, and request routing.</p>
+      </a>
+      <a href="run-a-test-node.html" class="card">
+        <h3>Run a Test Node</h3>
+        <p>Join the public sandbox in one command, or stand up a complete mesh of your own with the CLI.</p>
+      </a>
+      <a href="claude-code.html" class="card">
+        <h3>For Claude Code</h3>
+        <p>How agentic coding tools like Claude Code build, connect, and orchestrate agents on the mesh.</p>
+      </a>
+    </div>
+  </div>
+
+  <!-- ─── Footer ──────────────────────────────────────────────── -->
+  <footer class="footer">
+    <p>AgentMesh: Open platform for agent-to-agent communication.
+      <a href="https://github.com/jeffrschneider/AgentMesh">GitHub</a>
+    </p>
+  </footer>
+
+  </div><!-- /.content-wrapper -->
+
+  <script src="script.js"></script>
+  <script>
+  // Hero mesh: a honeycomb of hexagons (~20 columns) with a diagonal wave of
+  // color and brightness sweeping through the cells. Reduced-motion => static.
+  (function () {
+    var canvas = document.querySelector('.hero-mesh');
+    if (!canvas || !canvas.getContext) return;
+    var ctx = canvas.getContext('2d');
+    var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    // Bold neon palette: electric cyan -> violet -> hot magenta.
+    var STOPS = [[0, 229, 255], [138, 43, 255], [255, 45, 149]];
+    function palette(p) {
+      p = p < 0 ? 0 : p > 1 ? 1 : p;
+      var seg = p * (STOPS.length - 1);
+      var i = Math.floor(seg), f = seg - i;
+      var a = STOPS[i], b = STOPS[Math.min(i + 1, STOPS.length - 1)];
+      return [a[0] + (b[0] - a[0]) * f, a[1] + (b[1] - a[1]) * f, a[2] + (b[2] - a[2]) * f];
+    }
+
+    var W = 0, H = 0, DPR = 1, cells = [], r = 20, t = 0, raf = 0;
+
+    function build() {
+      var cols = Math.max(11, Math.min(28, Math.round(W / 31))); // ~2x denser honeycomb
+      var dx = W / cols;               // horizontal spacing (pointy-top hex)
+      r = dx / Math.sqrt(3);           // center-to-vertex radius
+      var dy = 1.5 * r;                // vertical spacing
+      var rows = Math.ceil(H / dy) + 2;
+      cells = [];
+      for (var row = -1; row < rows; row++) {
+        for (var col = -1; col <= cols; col++) {
+          var cx = col * dx + (row & 1 ? dx / 2 : 0);
+          var cy = row * dy;
+          cells.push({ cx: cx, cy: cy, p: (cx / W + cy / H) / 2 });
+        }
+      }
+    }
+
+    function resize() {
+      DPR = Math.min(window.devicePixelRatio || 1, 1.5);
+      W = canvas.clientWidth; H = canvas.clientHeight;
+      if (W === 0 || H === 0) return;
+      canvas.width = Math.round(W * DPR);
+      canvas.height = Math.round(H * DPR);
+      ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
+      build();
+    }
+
+    function hexPath(cx, cy) {
+      ctx.beginPath();
+      for (var k = 0; k < 6; k++) {
+        var ang = Math.PI / 180 * (60 * k - 90); // pointy-top
+        var x = cx + r * 0.9 * Math.cos(ang);
+        var y = cy + r * 0.9 * Math.sin(ang);
+        if (k === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+      }
+      ctx.closePath();
+    }
+
+    function draw() {
+      ctx.clearRect(0, 0, W, H);
+      ctx.lineWidth = 1.5;
+      for (var i = 0; i < cells.length; i++) {
+        var c = cells[i];
+        var wave = 0.5 + 0.5 * Math.sin((c.cx / W + c.cy / H) * 6.2 - t); // 0..1, diagonal
+        var col = palette(c.p + wave * 0.22);
+        var rgb = (col[0] | 0) + ',' + (col[1] | 0) + ',' + (col[2] | 0);
+        hexPath(c.cx, c.cy);
+        // Always-visible bold fill, brightening with the wave.
+        ctx.fillStyle = 'rgba(' + rgb + ',' + (0.07 + wave * wave * 0.6).toFixed(3) + ')';
+        ctx.fill();
+        // Cheap "glow" on lit cells: a brighter, slightly thicker stroke.
+        // (shadowBlur is far too slow to run per-cell every frame.)
+        ctx.strokeStyle = 'rgba(' + rgb + ',' + (0.28 + wave * wave * 0.7).toFixed(3) + ')';
+        ctx.lineWidth = wave > 0.72 ? 2 : 1.2;
+        ctx.stroke();
+      }
+    }
+
+    function loop() {
+      t += 0.02;
+      draw();
+      raf = requestAnimationFrame(loop);
+    }
+    function start() { if (!raf && !reduce) raf = requestAnimationFrame(loop); }
+    function stop() { if (raf) { cancelAnimationFrame(raf); raf = 0; } }
+
+    // Only animate while the band is actually on-screen and the tab is visible.
+    var inView = true;
+    function sync() { if (inView && !document.hidden) start(); else stop(); }
+
+    var ro = window.ResizeObserver ? new ResizeObserver(resize) : null;
+    if (ro) ro.observe(canvas); else window.addEventListener('resize', resize);
+    if (window.IntersectionObserver) {
+      new IntersectionObserver(function (es) { inView = es[0].isIntersecting; sync(); }).observe(canvas);
+    }
+    document.addEventListener('visibilitychange', sync);
+
+    resize();
+    if (reduce) draw(); else sync();
+  })();
+  </script>
+</body>
+</html>
