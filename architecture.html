@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Architecture: AgentMesh</title>
+  <link rel="stylesheet" href="styles.css">
+  <link rel="icon" type="image/svg+xml" href="favicon.svg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+</head>
+<body>
+
+  <!-- Sidebar Navigation -->
+  <nav class="sidebar" id="sidebar">
+    <a href="index.html" class="sidebar-brand">AgentMesh</a>
+    <ul class="sidebar-nav">
+      <li><a href="index.html">Home</a></li>
+      <li><a href="how-it-works.html">How It Works</a></li>
+      <li><a href="architecture.html">Architecture</a></li>
+      <li><a href="concepts.html">The Network</a></li>
+      <li><a href="sample-cases.html">Sample Cases</a></li>
+      <li><a href="getting-started.html">Getting Started</a></li>
+      <li><a href="examples.html">Examples</a></li>
+      <li><a href="sdks.html">SDKs</a></li>
+      <li><a href="reference.html">Reference</a></li>
+      <li><a href="claude-code.html">For Claude Code</a></li>
+    </ul>
+    <div class="sidebar-footer">
+      <a href="https://github.com/jeffrschneider/AgentMesh">GitHub</a>
+      <button class="theme-toggle" title="Toggle theme">&#x263E;</button>
+    </div>
+  </nav>
+  <div class="sidebar-backdrop" id="sidebar-backdrop"></div>
+  <div class="mobile-topbar">
+    <a href="index.html" class="sidebar-brand">AgentMesh</a>
+    <button class="hamburger" aria-label="Menu">&#x2630;</button>
+  </div>
+  <div class="content-wrapper">
+
+  <!-- Page Content -->
+  <div class="page">
+
+    <h1>Where <span class="text-gradient">AgentMesh</span> fits</h1>
+    <p class="text-dim" style="font-size: 1.15rem; margin-bottom: 2.5rem;">
+      A reference architecture for agentic solutions has many moving parts.
+      AgentMesh is one of them: the connective substrate that lets all the
+      others reach each other. Here is the whole picture, and the slice
+      AgentMesh occupies.
+    </p>
+
+    <figure style="margin: 0 0 2.5rem; border: 1px solid var(--border); border-radius: var(--radius-lg); overflow: hidden; background: #0b1220;">
+      <img src="ref-arch.svg" alt="Reference architecture for agentic solutions: a layered core (surfaces, orchestration, a hybrid agent runtime spanning on-device and server, capabilities, model plane, and the Agent Mesh interconnect bus, over context and registry), three cross-cutting spines (identity and trust, observability, economics), and a local-first personal-agent principal on the edge." style="width: 100%; height: auto; display: block;">
+      <figcaption class="text-dim" style="padding: 12px 16px; font-size: 0.9rem; border-top: 1px solid var(--border);">
+        A best-of reference architecture for agentic solutions.
+        <a href="ref-arch.svg" target="_blank" rel="noopener">Open full size &rarr;</a>
+      </figcaption>
+    </figure>
+
+    <h2 id="picture">The shape of an agentic solution</h2>
+    <p>
+      Strip an agentic system down and the same elements keep appearing: a
+      <strong>runtime</strong> that runs the agent loop, the
+      <strong>capabilities</strong> it can act with (tools, skills, code, the
+      browser), the <strong>context and knowledge</strong> it reasons over, an
+      <strong>orchestration</strong> layer that coordinates several agents, a
+      <strong>model plane</strong> that routes to language models, and the
+      <strong>surfaces</strong> people and programs meet it through. Running
+      through all of them are three cross-cutting spines:
+      <strong>identity, trust and policy</strong>;
+      <strong>observability and evaluation</strong>; and
+      <strong>economics and metering</strong>.
+    </p>
+    <p>
+      Two elements most maps leave out, but that matter as agents leave the
+      data center: the <strong>personal agent</strong> (a human's local-first
+      proxy, holding private memory, credentials and consent) and
+      <strong>hybrid execution</strong> (one runtime that spans an on-device
+      side and a server side, placing each piece of work where privacy,
+      latency, cost and connectivity say it belongs).
+    </p>
+
+    <h2 id="interconnect">AgentMesh is the interconnect</h2>
+    <p>
+      AgentMesh occupies exactly one box: the <strong>interconnect</strong>.
+      It is the signed agent-to-agent protocol that lets any agent discover
+      and talk to any other over a single substrate, instead of every pair
+      wiring up its own point-to-point connection. Everything else in the
+      diagram is a part; AgentMesh is how the parts reach each other.
+    </p>
+    <p>
+      Concretely it provides six primitives (<code>register</code>,
+      <code>discover</code>, <code>request</code>, <code>respond</code>,
+      <code>emit</code>, <code>subscribe</code>), agent and node identity, an
+      optional task lifecycle, streaming, and presence.
+      <a href="how-it-works.html">See how the six primitives work &rarr;</a>
+    </p>
+
+    <h2 id="spines">It carries the cross-cutting spines</h2>
+    <p>
+      Three of the spines are not abstract policy on an agent network: they
+      live on the wire, and the interconnect is where they land.
+    </p>
+    <ul>
+      <li><strong>Identity and trust.</strong> Every envelope is signed by the
+        sending agent, and a node vouches for the agents it hosts, so the
+        <code>from</code> field stays verifiable no matter which connection
+        carried the message.</li>
+      <li><strong>Observability.</strong> Trace context rides in the envelope,
+        so a request's path across a chain of agents can be reconstructed end
+        to end.</li>
+      <li><strong>Economics.</strong> Agents can declare cost in their
+        manifests and the mesh can emit metering events, giving the economic
+        layer real signal to act on.</li>
+    </ul>
+
+    <h2 id="edge">It makes personal agents and hybrid execution real</h2>
+    <p>
+      The two newer elements lean on the interconnect more than on anything
+      else in the stack.
+    </p>
+    <ul>
+      <li><strong>Personal agents.</strong> AgentMesh's node model lets one
+        host hold a single credentialed connection and vouch for many agents,
+        reachable over an outbound-only connection, with presence that
+        tolerates a sleeping laptop. A personal agent behind a home firewall
+        becomes a first-class peer, with no per-agent credential ceremony.</li>
+      <li><strong>Hybrid execution.</strong> The mesh gives location
+        transparency: an agent does not know or care whether its peer runs
+        on-device or in the cloud. The same protocol spans the device and
+        server sides, so work moves across that boundary freely.</li>
+    </ul>
+
+    <h2 id="scope">What it deliberately is not</h2>
+    <p>
+      AgentMesh is the interconnect, not the runtime, the orchestrator, or the
+      model gateway. Keeping it a thin, signed protocol is the point: the
+      other elements stay swappable and are built by whoever consumes the mesh.
+      The Egg Gateway, for instance, builds its runtime and orchestration on
+      top of AgentMesh rather than inside it.
+    </p>
+    <p>
+      Ready to go deeper?
+      <a href="reference.html">Read the protocol reference &rarr;</a>
+      or <a href="sdks.html">pick up an SDK</a>.
+    </p>
+
+  </div>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <p>AgentMesh: Open protocol for agent-to-agent communication.
+      <a href="https://github.com/jeffrschneider/AgentMesh">GitHub</a>
+    </p>
+  </footer>
+
+  </div><!-- /.content-wrapper -->
+
+  <script src="script.js"></script>
+</body>
+</html>
