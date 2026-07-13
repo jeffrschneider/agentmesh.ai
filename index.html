@@ -316,7 +316,7 @@
     }
 
     function resize() {
-      DPR = Math.min(window.devicePixelRatio || 1, 2);
+      DPR = Math.min(window.devicePixelRatio || 1, 1.5);
       W = canvas.clientWidth; H = canvas.clientHeight;
       if (W === 0 || H === 0) return;
       canvas.width = Math.round(W * DPR);
@@ -346,19 +346,14 @@
         var rgb = (col[0] | 0) + ',' + (col[1] | 0) + ',' + (col[2] | 0);
         hexPath(c.cx, c.cy);
         // Always-visible bold fill, brightening with the wave.
-        ctx.fillStyle = 'rgba(' + rgb + ',' + (0.07 + wave * wave * 0.55).toFixed(3) + ')';
+        ctx.fillStyle = 'rgba(' + rgb + ',' + (0.07 + wave * wave * 0.6).toFixed(3) + ')';
         ctx.fill();
-        // Bright stroke, with a neon glow on the lit cells.
-        if (wave > 0.62) {
-          ctx.shadowColor = 'rgb(' + rgb + ')';
-          ctx.shadowBlur = 4 + wave * 12;
-        } else {
-          ctx.shadowBlur = 0;
-        }
-        ctx.strokeStyle = 'rgba(' + rgb + ',' + (0.3 + wave * 0.65).toFixed(3) + ')';
+        // Cheap "glow" on lit cells: a brighter, slightly thicker stroke.
+        // (shadowBlur is far too slow to run per-cell every frame.)
+        ctx.strokeStyle = 'rgba(' + rgb + ',' + (0.28 + wave * wave * 0.7).toFixed(3) + ')';
+        ctx.lineWidth = wave > 0.72 ? 2 : 1.2;
         ctx.stroke();
       }
-      ctx.shadowBlur = 0;
     }
 
     function loop() {
@@ -366,11 +361,22 @@
       draw();
       raf = requestAnimationFrame(loop);
     }
+    function start() { if (!raf && !reduce) raf = requestAnimationFrame(loop); }
+    function stop() { if (raf) { cancelAnimationFrame(raf); raf = 0; } }
+
+    // Only animate while the band is actually on-screen and the tab is visible.
+    var inView = true;
+    function sync() { if (inView && !document.hidden) start(); else stop(); }
 
     var ro = window.ResizeObserver ? new ResizeObserver(resize) : null;
     if (ro) ro.observe(canvas); else window.addEventListener('resize', resize);
+    if (window.IntersectionObserver) {
+      new IntersectionObserver(function (es) { inView = es[0].isIntersecting; sync(); }).observe(canvas);
+    }
+    document.addEventListener('visibilitychange', sync);
+
     resize();
-    if (reduce) { draw(); } else { cancelAnimationFrame(raf); loop(); }
+    if (reduce) draw(); else sync();
   })();
   </script>
 </body>
