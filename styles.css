@@ -297,7 +297,7 @@ hr {
 .hero-visual {
   order: -1;
   width: 100%;
-  height: clamp(200px, 40vh, 340px);
+  height: clamp(90px, 18vh, 153px);
   position: relative;
   border-radius: var(--radius-lg);
   overflow: hidden;
@@ -320,7 +320,7 @@ hr {
 
 @media (max-width: 600px) {
   .hero { padding: 36px 20px 44px; }
-  .hero-visual { height: clamp(160px, 32vh, 240px); }
+  .hero-visual { height: clamp(72px, 14vh, 108px); }
 }
 
 .hero h1 {
