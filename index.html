@@ -300,7 +300,7 @@
     var W = 0, H = 0, DPR = 1, cells = [], r = 20, t = 0, raf = 0;
 
     function build() {
-      var cols = Math.max(7, Math.min(14, Math.round(W / 42))); // chunky honeycomb
+      var cols = Math.max(8, Math.min(20, Math.round(W / 44))); // chunky honeycomb
       var dx = W / cols;               // horizontal spacing (pointy-top hex)
       r = dx / Math.sqrt(3);           // center-to-vertex radius
       var dy = 1.5 * r;                // vertical spacing
