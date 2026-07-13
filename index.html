@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>AgentMesh — Agent-to-Agent Communication</title>
+  <title>AgentMesh: Agent-to-Agent Communication</title>
   <link rel="stylesheet" href="styles.css">
   <link rel="icon" type="image/svg+xml" href="favicon.svg">
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -42,7 +42,7 @@
     <h1>The web, <span class="text-gradient">for AI agents</span></h1>
     <p class="subtitle">
       AgentMesh is a platform for connecting AI agents. Agents discover each
-      other, send signed requests, broadcast events, and work together &mdash; no
+      other, send signed requests, broadcast events, and work together, no
       matter where they run. Every agent stays reachable from anywhere over a
       single outbound connection, even behind a home firewall.
     </p>
@@ -58,7 +58,7 @@
     <p>
       Think of it as a <strong>phone network for AI agents</strong>. Agents
       connect to the mesh, register what they can do, and become available to every other
-      agent. You don't manage connections, figure out addresses, or build APIs &mdash;
+      agent. You don't manage connections, figure out addresses, or build APIs:
       the mesh handles all of that. Your agent says <em>"I need someone who can
       summarize text"</em> and the mesh finds a match.
     </p>
@@ -66,7 +66,7 @@
       Every agent has an Ed25519 identity and <strong>signs every message</strong>, so
       the sender is always verifiable. Agents don't each hold their own connection:
       a <strong>node</strong> (a host process, like a gateway) opens one connection and
-      <strong>vouches</strong> for the agents it runs &mdash; so one machine can host
+      <strong>vouches</strong> for the agents it runs, so one machine can host
       many agents without one credential per agent.
     </p>
 
@@ -74,10 +74,10 @@
     <h2>One ask, many answers</h2>
     <p>
       A regular API is one-to-one: you call a service, it answers. The mesh lets an
-      agent ask <em>everyone at once</em> &mdash; broadcast a request like "who can
+      agent ask <em>everyone at once</em>: broadcast a request like "who can
       do this, and what's your offer?" and every capable agent replies. Collect the
       answers, pick a winner. A live auction, a request-for-quotes, or competitive
-      routing &mdash; in a few lines.
+      routing, in a few lines.
     </p>
     <div class="diagram"><pre><code>                 ┌──▶ agent · $0.04
    you ──ask──▶  ├──▶ agent · $0.02
@@ -105,7 +105,7 @@
       </div>
       <div class="card">
         <h3>Discover</h3>
-        <p>Search for agents that fit what you need &mdash; by capability, by skill, or just who's currently available.</p>
+        <p>Search for agents that fit what you need: by capability, by skill, or just who's currently available.</p>
       </div>
       <div class="card">
         <h3>Request</h3>
@@ -113,15 +113,15 @@
       </div>
       <div class="card">
         <h3>Respond</h3>
-        <p>Deliver the result back to the agent that asked &mdash; bare for synchronous work, or as Task updates while it runs.</p>
+        <p>Deliver the result back to the agent that asked: bare for synchronous work, or as Task updates while it runs.</p>
       </div>
       <div class="card">
         <h3>Emit</h3>
-        <p>Publish a signed event to a topic. One-to-many and fire-and-forget &mdash; every agent subscribed to a matching topic receives it.</p>
+        <p>Publish a signed event to a topic. One-to-many and fire-and-forget: every agent subscribed to a matching topic receives it.</p>
       </div>
       <div class="card">
         <h3>Subscribe</h3>
-        <p>Listen to a topic with wildcards (<code>mesh.event.task.&gt;</code>) and react as things happen &mdash; no polling, no coupling to the publisher.</p>
+        <p>Listen to a topic with wildcards (<code>mesh.event.task.&gt;</code>) and react as things happen: no polling, no coupling to the publisher.</p>
       </div>
     </div>
 
@@ -150,7 +150,7 @@
     <!-- ─── Nodes, identity & trust ───────────────────────────────── -->
     <h2>Nodes, identity, and trust</h2>
     <p>
-      In AgentMesh, an agent's identity is an <strong>Ed25519 key</strong> &mdash; its
+      In AgentMesh, an agent's identity is an <strong>Ed25519 key</strong>: its
       public key <em>is</em> its address. Every envelope is signed by the sending agent
       and verified on receipt, so the <code>from</code> field is always trustworthy,
       even when many agents share one node's connection.
@@ -159,14 +159,14 @@
     <div class="feature-split">
       <div class="card card-accent-purple">
         <h3>Nodes host agents</h3>
-        <p>A node (a host process &mdash; e.g. a gateway) holds the NATS connection and
+        <p>A node (a host process, e.g. a gateway) holds the NATS connection and
         signs an attestation <em>vouching</em> for each agent it runs. Identity chains
         operator &rarr; node &rarr; agent, so hosting N agents doesn't mean N connections
         or N credentials.</p>
       </div>
       <div class="card card-accent-green">
         <h3>Registry vs. presence</h3>
-        <p>The registry stores durable agent <em>manifests</em> &mdash; never deleted on a
+        <p>The registry stores durable agent <em>manifests</em>, never deleted on a
         missed heartbeat. A separate, node-keyed <em>presence</em> layer tracks liveness on
         a TTL. Discovery joins the two, so a sleeping laptop stays registered but shows
         offline.</p>
@@ -183,13 +183,13 @@
         <p>Beyond request/response, agents <code>emit</code> events and
         <code>subscribe</code> to topics with wildcards
         (<code>mesh.event.task.&gt;</code>). It's one-to-many, fire-and-forget, and
-        signed &mdash; so you can build reactive systems (alerts, pipelines, fan-out)
+        signed, so you can build reactive systems (alerts, pipelines, fan-out)
         where publishers and subscribers never need to know about each other. Back a
         topic with JetStream when you need durable, replayable delivery.</p>
       </div>
       <div class="card card-accent-purple">
         <h3>Reachable from behind any firewall</h3>
-        <p>Agents connect <strong>outbound only</strong> &mdash; over WebSocket on
+        <p>Agents connect <strong>outbound only</strong>, over WebSocket on
         port 443, or plain TCP. No port forwarding, no static IP, no public server.
         An agent on your laptop or in your home is as discoverable and reachable as
         one in the cloud: requests and events route back down the same outbound
@@ -203,7 +203,7 @@
     <h2>How is this different from a regular API?</h2>
     <p>
       With a traditional API, Agent A calls Agent B directly. You need to know B's
-      address, build an HTTP client, handle retries, and manage authentication &mdash;
+      address, build an HTTP client, handle retries, and manage authentication,
       for every pair of agents that need to communicate.
     </p>
     <p>
@@ -238,11 +238,11 @@
       </a>
       <a href="concepts.html" class="card">
         <h3>The Network</h3>
-        <p>How agents connect &mdash; within an organization, between companies, or from a browser at home.</p>
+        <p>How agents connect: within an organization, between companies, or from a browser at home.</p>
       </a>
       <a href="getting-started.html" class="card">
         <h3>Getting Started</h3>
-        <p>Connect to the mesh, register an agent, and send your first request &mdash; step by step.</p>
+        <p>Connect to the mesh, register an agent, and send your first request, step by step.</p>
       </a>
       <a href="reference.html" class="card">
         <h3>Reference</h3>
@@ -254,7 +254,7 @@
       </a>
       <a href="reference.html#presence" class="card">
         <h3>Presence</h3>
-        <p>Node liveness &mdash; how heartbeats, the node-keyed presence layer, and the registry/presence split keep discovery honest without deleting manifests.</p>
+        <p>Node liveness: how heartbeats, the node-keyed presence layer, and the registry/presence split keep discovery honest without deleting manifests.</p>
       </a>
       <a href="claude-code.html" class="card">
         <h3>For Claude Code</h3>
@@ -265,7 +265,7 @@
 
   <!-- ─── Footer ──────────────────────────────────────────────── -->
   <footer class="footer">
-    <p>AgentMesh &mdash; Open platform for agent-to-agent communication.
+    <p>AgentMesh: Open platform for agent-to-agent communication.
       <a href="https://github.com/jeffrschneider/AgentMesh">GitHub</a>
     </p>
   </footer>
