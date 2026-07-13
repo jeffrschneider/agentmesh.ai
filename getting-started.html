@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Getting Started — AgentMesh</title>
+  <title>Getting Started: AgentMesh</title>
   <link rel="stylesheet" href="styles.css">
   <link rel="icon" type="image/svg+xml" href="favicon.svg">
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -61,7 +61,7 @@
           <pre><code>npm install https://storage.googleapis.com/agentmesh-releases/agentmesh-0.2.0.tgz</code></pre>
         </div>
         <p>
-          That's the whole SDK &mdash; connection handling, signing, envelope building, and discovery.
+          That's the whole SDK: connection handling, signing, envelope building, and discovery.
         </p>
       </div>
 
@@ -69,10 +69,10 @@
       <div class="step">
         <h3>Get a guest credential</h3>
         <p>
-          The AgentMesh cloud is <strong>guarded</strong> &mdash; you connect with a
+          The AgentMesh cloud is <strong>guarded</strong>. You connect with a
           credential, not anonymously. Grab a free <strong>guest</strong> credential from
           the cloud's auth endpoint. It returns a signing <code>seed</code> (your Ed25519
-          identity &mdash; its public key <em>is</em> your address on the mesh) and a
+          identity: its public key <em>is</em> your address on the mesh) and a
           <code>jwt</code> that authorizes the connection.
         </p>
         <div class="code-block">
@@ -97,7 +97,7 @@
         </div>
         <p>
           You now have a live, signed connection to the AgentMesh cloud over a single
-          outbound WebSocket &mdash; nothing to host, no ports to open. Every message you
+          outbound WebSocket: nothing to host, no ports to open. Every message you
           send from here is signed with your seed.
         </p>
         <div class="callout tip">
@@ -106,7 +106,7 @@
             <code>wss://mesh.agentmesh.ai</code> and
             <code>https://api.agentmesh.ai</code> are TLS-secured, so the same code
             runs from Node, the CLI, <em>and</em> browser apps. The guest tier is for
-            trying things out &mdash; it's rate-limited and best-effort.
+            trying things out. It's rate-limited and best-effort.
           </p>
         </div>
       </div>
@@ -208,7 +208,7 @@ console<span class="op">.</span><span class="fn">log</span><span class="op">(</s
     <h2>Putting it all together</h2>
     <p>
       Here's the complete agent in a single file. Copy it into a <code>.ts</code> file and
-      run it &mdash; it connects to the public sandbox, no setup required.
+      run it. It connects to the public sandbox, no setup required.
     </p>
 
     <div class="code-block">
@@ -276,7 +276,7 @@ console<span class="op">.</span><span class="fn">log</span><span class="op">(</s
       <li><strong>Closed</strong> the connection cleanly.</li>
     </ol>
     <p>
-      The mesh handled all the hard parts behind the scenes &mdash; message routing,
+      The mesh handled all the hard parts behind the scenes: message routing,
       envelope construction, distributed tracing, and error propagation. Your code
       just focused on the logic.
     </p>
@@ -289,7 +289,7 @@ console<span class="op">.</span><span class="fn">log</span><span class="op">(</s
     <div class="card-grid">
       <a href="concepts.html" class="card">
         <h3>The Network</h3>
-        <p>How agents connect &mdash; within an organization, between companies, or from a browser at home.</p>
+        <p>How agents connect: within an organization, between companies, or from a browser at home.</p>
       </a>
       <a href="reference.html" class="card">
         <h3>Reference</h3>
@@ -309,7 +309,7 @@ console<span class="op">.</span><span class="fn">log</span><span class="op">(</s
 
   <!-- ─── Footer ──────────────────────────────────────────────── -->
   <footer class="footer">
-    <p>AgentMesh &mdash; Open protocol for agent-to-agent communication.
+    <p>AgentMesh, an open protocol for agent-to-agent communication.
       <a href="https://github.com/jeffrschneider/AgentMesh">GitHub</a>
     </p>
   </footer>

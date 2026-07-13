@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>SDKs — AgentMesh</title>
+  <title>SDKs: AgentMesh</title>
   <link rel="stylesheet" href="styles.css">
   <link rel="icon" type="image/svg+xml" href="favicon.svg">
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -42,7 +42,7 @@
     <h1>SDKs</h1>
     <p class="subtitle">
       Official AgentMesh SDKs for connecting your agents to the mesh.
-      Every SDK implements the full protocol &mdash; all 6 primitives, envelope codec,
+      Every SDK implements the full protocol: all 6 primitives, envelope codec,
       skill routing, task tracking, distributed tracing, heartbeats, and error handling.
     </p>
   </section>
@@ -53,12 +53,12 @@
     <h2>Status</h2>
     <p>Both SDKs implement <strong>AgentMesh Protocol v0.2.0</strong> and produce wire-compatible
        messages. A Rust agent and a TypeScript agent speak the same signed envelope format over
-       NATS &mdash; cross-language signature verification is part of the test suite.</p>
+       NATS. Cross-language signature verification is part of the test suite.</p>
 
     <div class="callout tip">
       <div class="callout-title">TypeScript &amp; Rust</div>
       <p>
-        AgentMesh ships two reference SDKs &mdash; <strong>TypeScript</strong> and
+        AgentMesh ships two reference SDKs: <strong>TypeScript</strong> and
         <strong>Rust</strong>. They share one wire format: canonical-JSON envelopes,
         Ed25519 signing (§4.5), and node vouching (§4.4), verified byte-for-byte
         across languages.
@@ -94,7 +94,7 @@
     </table>
 
     <p>
-      Both SDKs implement the full protocol &mdash; the six primitives, the signed
+      Both SDKs implement the full protocol: the six primitives, the signed
       envelope codec, skill routing, task tracking, distributed tracing, and error
       classification. Those are all defined once, for every language, in the
       <a href="reference.html">Reference</a> (envelope fields, error codes, task
@@ -139,8 +139,8 @@ mesh.register(RegisterOptions { name: "my-agent".into(), ..Default::default() })
     <!-- ─── Source ──────────────────────────────────────────────── -->
     <h2>Source Code</h2>
     <ul style="line-height: 2;">
-      <li><a href="https://github.com/jeffrschneider/AgentMesh/tree/main/sdk-typescript">sdk-typescript/</a> &mdash; TypeScript (reference)</li>
-      <li><a href="https://github.com/jeffrschneider/AgentMesh/tree/main/sdk-rust">sdk-rust/</a> &mdash; Rust</li>
+      <li><a href="https://github.com/jeffrschneider/AgentMesh/tree/main/sdk-typescript">sdk-typescript/</a>, TypeScript (reference)</li>
+      <li><a href="https://github.com/jeffrschneider/AgentMesh/tree/main/sdk-rust">sdk-rust/</a>, Rust</li>
     </ul>
 
   </div>

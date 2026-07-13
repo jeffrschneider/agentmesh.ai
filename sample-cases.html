@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Sample Cases — AgentMesh</title>
+  <title>Sample Cases: AgentMesh</title>
   <link rel="stylesheet" href="styles.css">
   <link rel="icon" type="image/svg+xml" href="favicon.svg">
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -43,7 +43,7 @@
     <h1>Sample <span class="text-gradient">Cases</span></h1>
     <p class="text-dim" style="font-size: 1.15rem; margin-bottom: 2.5rem;">
       AgentMesh is a substrate, not an app. These seven sketches show how the six
-      primitives compose into real systems &mdash; each one leaning on a different
+      primitives compose into real systems, each one leaning on a different
       strength: <strong>discovery</strong>, <strong>node identity</strong>,
       <strong>tasks</strong>, <strong>events</strong>, and <strong>signed
       messages</strong>. They're starting points to think with, not finished
@@ -56,15 +56,15 @@
     <div class="feature-split">
       <div class="card">
         <h3>The scenario</h3>
-        <p>An agent broadcasts one request to everyone who can help &mdash; "who can
-        deliver this, and what's your offer?" &mdash; and collects the answers. Every
+        <p>An agent broadcasts one request to everyone who can help, "who can
+        deliver this, and what's your offer?", and collects the answers. Every
         capable agent bids; the asker waits a beat, compares, and picks a winner. A
         live auction, a request-for-quotes, or competitive routing, in a few lines.</p>
       </div>
       <div class="card card-accent-green">
         <h3>Why the mesh</h3>
         <p>This is pub/sub at its purest: the asker <code>emit</code>s a call and
-        capable agents <code>subscribe</code> and reply &mdash; no vendor list, no N
+        capable agents <code>subscribe</code> and reply: no vendor list, no N
         point-to-point integrations. Presence means only online agents bid, and every
         offer is signed, so the winning bid is accountable.</p>
       </div>
@@ -89,8 +89,8 @@
     <div class="feature-split">
       <div class="card">
         <h3>The scenario</h3>
-        <p>A publisher agent posts a stream of items &mdash; news, price ticks, new
-        documents, build results &mdash; on a topic. Anyone interested
+        <p>A publisher agent posts a stream of items, news, price ticks, new
+        documents, build results, on a topic. Anyone interested
         <code>subscribe</code>s and receives each item the moment it's published.
         It's RSS, reinvented: subscribers aren't just humans reading, they're agents
         that summarize, filter, and act on what arrives.</p>
@@ -100,7 +100,7 @@
         <p>Classic RSS makes you <em>poll</em> a URL and trust whatever's there. Here it's
         <strong>push</strong> (no polling), every item is <strong>signed</strong> by its
         publisher (feeds can't be spoofed), and publishers are <strong>discoverable</strong>
-        through the registry by topic &mdash; no hunting for feed URLs. Back the topic with
+        through the registry by topic, no hunting for feed URLs. Back the topic with
         JetStream and late subscribers can replay history.</p>
       </div>
     </div>
@@ -158,7 +158,7 @@
     <div class="feature-split">
       <div class="card">
         <h3>The scenario</h3>
-        <p>Two companies each run a node behind their own firewall &mdash; a NATS
+        <p>Two companies each run a node behind their own firewall, a NATS
         leaf connection, outbound only, no open ports. Their agents discover and
         call each other directly: Acme's invoicing agent asks Globex's
         purchase-order agent, no middleware in between.</p>
@@ -168,7 +168,7 @@
         <p>The <strong>node vouch</strong> is the trust boundary: a node signs an
         attestation for the agents it hosts, so "who is allowed to speak for
         Globex" is cryptographic, not a shared API key. New partners join by
-        connecting a node &mdash; not by building another point-to-point integration.</p>
+        connecting a node, not by building another point-to-point integration.</p>
       </div>
     </div>
     <div class="diagram"><pre><code>   Acme node ──leaf(outbound)──▶  shared hub  ◀──leaf── Globex node
@@ -191,7 +191,7 @@
       <div class="card">
         <h3>The scenario</h3>
         <p>A coordinator fans a big question out to specialist agents it doesn't
-        host &mdash; search, extract, summarize, critique &mdash; then aggregates
+        host, search, extract, summarize, critique, then aggregates
         the results. The pool grows by registration: a new specialist joins and is
         instantly part of the swarm.</p>
       </div>
@@ -252,7 +252,7 @@
     <div class="feature-split">
       <div class="card">
         <h3>The scenario</h3>
-        <p>Self-hosted personal AI agents are everywhere now &mdash;
+        <p>Self-hosted personal AI agents are everywhere now:
         <a href="https://openclaw.ai/">OpenClaw</a>,
         <a href="https://hermes-agent.nousresearch.com/">Hermes</a>, the Egg
         Gateway. Each runs on your own machine and knows <em>you</em>. But each is
@@ -261,11 +261,11 @@
       </div>
       <div class="card card-accent-purple">
         <h3>Why the mesh</h3>
-        <p>Each personal agent is already a <strong>node</strong> &mdash; a
+        <p>Each personal agent is already a <strong>node</strong>, a
         host process that holds one connection and vouches for the agent it runs.
         That's exactly the mesh's model. Put them on AgentMesh and they discover
         and delegate to each other <strong>peer-to-peer</strong>: your agent hires
-        a specialist, or asks a friend's agent &mdash; signed end to end, nothing
+        a specialist, or asks a friend's agent, signed end to end, nothing
         through a vendor cloud, state staying on each machine.</p>
       </div>
     </div>
@@ -287,7 +287,7 @@
     <div class="callout tip">
       <div class="callout-title">The common thread</div>
       <p>
-        None of these needs special protocol support &mdash; they're all just
+        None of these needs special protocol support. They're all just
         conventions over the same six primitives. Discovery finds the right agent,
         presence tells you if it's reachable, nodes and signatures make identity
         trustworthy, and tasks carry the long work. Pick a strength, compose the
@@ -308,7 +308,7 @@
       </a>
       <a href="sdks.html" class="card">
         <h3>SDKs</h3>
-        <p>TypeScript and Rust &mdash; same signed wire format, cross-verified.</p>
+        <p>TypeScript and Rust, same signed wire format, cross-verified.</p>
       </a>
     </div>
 
@@ -316,7 +316,7 @@
 
   <!-- ─── Footer ──────────────────────────────────────────────── -->
   <footer class="footer">
-    <p>AgentMesh &mdash; Open protocol for agent-to-agent communication.
+    <p>AgentMesh: open protocol for agent-to-agent communication.
       <a href="https://github.com/jeffrschneider/AgentMesh">GitHub</a>
     </p>
   </footer>

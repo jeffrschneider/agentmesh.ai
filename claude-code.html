@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>For Claude Code — AgentMesh</title>
+  <title>For Claude Code: AgentMesh</title>
   <link rel="stylesheet" href="styles.css">
   <link rel="icon" type="image/svg+xml" href="favicon.svg">
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -44,7 +44,7 @@
     <p class="text-dim" style="font-size: 1.15rem; margin-bottom: 2.5rem;">
       Agentic coding tools like Claude Code, Cursor, and Windsurf can build,
       connect, and orchestrate agents on AgentMesh. This page has everything
-      you need &mdash; copy a prompt, paste it into your tool, and go.
+      you need: copy a prompt, paste it into your tool, and go.
     </p>
 
     <div class="card-grid" style="margin-bottom: 2.5rem;">
@@ -79,7 +79,7 @@
     <h2 id="workflow">The workflow</h2>
     <p>
       Here's what it looks like to build an AgentMesh agent with Claude Code.
-      You don't write the networking code &mdash; you describe the agent's
+      You don't write the networking code. You describe the agent's
       purpose, and Claude Code handles the rest.
     </p>
 
@@ -115,7 +115,7 @@ a request, summarizes the input text in 2-3 sentences.</code></pre>
       <div class="step">
         <h3>Claude Code writes the agent</h3>
         <p>
-          It generates a complete agent &mdash; connection setup, registration,
+          It generates a complete agent: connection setup, registration,
           request handler, error handling, and graceful shutdown. The SDK's
           TypeScript types guide it to produce correct envelope structures
           and use the right primitives.
@@ -147,7 +147,7 @@ a request, summarizes the input text in 2-3 sentences.</code></pre>
     <h2 id="mapi">The MAPI protocol spec</h2>
     <p>
       AgentMesh publishes its complete protocol interface as a
-      <a href="https://markdownapi.org">MAPI</a> (Markdown API) file &mdash;
+      <a href="https://markdownapi.org">MAPI</a> (Markdown API) file,
       a structured markdown document that LLMs parse natively. The file
       describes every primitive, every type, every error code, and every
       subject pattern in a format that Claude Code can read and reason about.
@@ -158,8 +158,8 @@ a request, summarizes the input text in 2-3 sentences.</code></pre>
         <div class="mapi-cta-text">
           <h3>agentmesh.mapi.md</h3>
           <p>
-            The complete AgentMesh protocol &mdash; all six primitives, the envelope
-            schema, task lifecycle, 16 error codes, and every TypeScript type &mdash;
+            The complete AgentMesh protocol, all six primitives, the envelope
+            schema, task lifecycle, 16 error codes, and every TypeScript type,
             in a single file that LLMs understand natively.
           </p>
         </div>
@@ -183,7 +183,7 @@ a request, summarizes the input text in 2-3 sentences.</code></pre>
       <p>
         Paste this into Claude Code:
         <code>Read docs/agentmesh.mapi.md and build me an agent that...</code>
-        &mdash; it will use the spec to produce correct, type-safe code on
+        It will use the spec to produce correct, type-safe code on
         the first try.
       </p>
     </div>
@@ -192,12 +192,12 @@ a request, summarizes the input text in 2-3 sentences.</code></pre>
       The MAPI file covers:
     </p>
     <ul>
-      <li><strong>Global types</strong> &mdash; <code>Envelope</code>, <code>Manifest</code>, <code>Skill</code>, <code>Task</code>, <code>TraceContext</code>, and all other shared interfaces</li>
-      <li><strong>All six primitives</strong> &mdash; register, discover, request, respond, emit, and inbound request handling, each with input/output types and NATS subjects</li>
-      <li><strong>Task lifecycle</strong> &mdash; the full state machine with all valid transitions</li>
-      <li><strong>Subscriptions</strong> &mdash; mesh events and task updates with wildcard patterns</li>
-      <li><strong>Error codes</strong> &mdash; all 22 structured error codes with retry guidance</li>
-      <li><strong>Subject namespace</strong> &mdash; the complete routing map</li>
+      <li><strong>Global types</strong>: <code>Envelope</code>, <code>Manifest</code>, <code>Skill</code>, <code>Task</code>, <code>TraceContext</code>, and all other shared interfaces</li>
+      <li><strong>All six primitives</strong>: register, discover, request, respond, emit, and inbound request handling, each with input/output types and NATS subjects</li>
+      <li><strong>Task lifecycle</strong>: the full state machine with all valid transitions</li>
+      <li><strong>Subscriptions</strong>: mesh events and task updates with wildcard patterns</li>
+      <li><strong>Error codes</strong>: all 22 structured error codes with retry guidance</li>
+      <li><strong>Subject namespace</strong>: the complete routing map</li>
     </ul>
 
     <!-- ─── Example ────────────────────────────────────────────── -->
@@ -286,7 +286,7 @@ console<span class="op">.</span><span class="fn">log</span><span class="op">(</s
     <p>
       Once your app is connected to the mesh, you can add user-to-user
       communication with the Presence service. This prompt gives Claude Code
-      everything it needs &mdash; contacts, messaging, skill routing, and
+      everything it needs: contacts, messaging, skill routing, and
       online/offline status.
     </p>
     <p>
@@ -550,7 +550,7 @@ automatically drains queued messages and emits delivery receipts.
         <h3>Agents as teammates</h3>
         <p>
           Your coding tool discovers and uses agents on the mesh the same way
-          it uses libraries &mdash; except agents are live services that think,
+          it uses libraries, except agents are live services that think,
           answer questions, and do work.
         </p>
       </div>
@@ -565,7 +565,7 @@ automatically drains queued messages and emits delivery receipts.
       <div class="card">
         <h3>Protocol-native AI</h3>
         <p>
-          The MAPI spec is structured markdown &mdash; the native language of
+          The MAPI spec is structured markdown, the native language of
           LLMs. No OpenAPI conversion, no JSON Schema juggling. Claude Code
           reads the protocol description directly and writes correct code.
         </p>
@@ -591,7 +591,7 @@ automatically drains queued messages and emits delivery receipts.
       </a>
       <a href="reference.html" class="card">
         <h3>Reference</h3>
-        <p>Full protocol reference &mdash; subjects, envelope fields, error codes, task states, and manifests.</p>
+        <p>Full protocol reference: subjects, envelope fields, error codes, task states, and manifests.</p>
       </a>
     </div>
 
@@ -599,7 +599,7 @@ automatically drains queued messages and emits delivery receipts.
 
   <!-- ─── Footer ──────────────────────────────────────────────── -->
   <footer class="footer">
-    <p>AgentMesh &mdash; Open protocol for agent-to-agent communication.
+    <p>AgentMesh: Open protocol for agent-to-agent communication.
       <a href="https://github.com/jeffrschneider/AgentMesh">GitHub</a>
     </p>
   </footer>

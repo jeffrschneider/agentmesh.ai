@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Examples — AgentMesh</title>
+  <title>Examples: AgentMesh</title>
   <link rel="stylesheet" href="styles.css">
   <link rel="icon" type="image/svg+xml" href="favicon.svg">
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -43,7 +43,7 @@
     <h1>Examples</h1>
     <p>
       Real working examples of agents communicating on the mesh. Each one shows
-      complete, runnable code &mdash; not just snippets &mdash; so you can see
+      complete, runnable code, not just snippets, so you can see
       exactly how the pieces fit together.
     </p>
 
@@ -55,7 +55,7 @@
       chat message, and Bob's agent replies.
     </p>
 
-    <h3>Bob's side &mdash; handle chat requests</h3>
+    <h3>Bob's side: handle chat requests</h3>
     <p>
       Bob's agent connects to the mesh, registers with a "chat" skill, and
       listens for incoming requests. When one arrives, it reads the message
@@ -79,9 +79,9 @@ mesh<span class="op">.</span><span class="fn">onRequest</span><span class="op">(
 <span class="op">});</span></code></pre>
     </div>
 
-    <h3>Jeff's side &mdash; discover and send</h3>
+    <h3>Jeff's side: discover and send</h3>
     <p>
-      Jeff's agent connects, registers itself (with no skills &mdash; it's a
+      Jeff's agent connects, registers itself (with no skills, since it's a
       consumer, not a provider), discovers agents that can chat, finds Bob,
       and sends a message.
     </p>
@@ -116,7 +116,7 @@ console<span class="op">.</span><span class="fn">log</span><span class="op">(</s
       results, and sends a request. Under the hood, the mesh creates a task, routes
       the message to Bob's inbox, Bob's <code>onRequest</code> handler runs and
       returns a result, and the mesh delivers that result back to Jeff as a response
-      envelope. All of this &mdash; routing, tracing, envelope construction &mdash;
+      envelope. All of this, routing, tracing, envelope construction,
       is handled automatically.
     </p>
 
@@ -128,10 +128,10 @@ console<span class="op">.</span><span class="fn">log</span><span class="op">(</s
       Not everything is a request/response. Sometimes agents need to react to
       things happening on the mesh without being asked directly. This example
       shows a document watcher that emits events and a summarizer that reacts
-      to them &mdash; completely decoupled.
+      to them, completely decoupled.
     </p>
 
-    <h3>Document watcher &mdash; emit events</h3>
+    <h3>Document watcher: emit events</h3>
     <p>
       When a new document is uploaded, this agent publishes an event to the
       mesh. It doesn't know or care who's listening.
@@ -155,7 +155,7 @@ mesh<span class="op">.</span><span class="fn">emit</span><span class="op">(</spa
 <span class="op">});</span></code></pre>
     </div>
 
-    <h3>Summarizer &mdash; react to document events</h3>
+    <h3>Summarizer: react to document events</h3>
     <p>
       This agent subscribes to all document events using a wildcard pattern.
       When a new document arrives, it kicks off a summarization workflow.
@@ -185,8 +185,8 @@ mesh<span class="op">.</span><span class="fn">subscribe</span><span class="op">(
     <p>
       This example uses the <code>emit</code> and <code>subscribe</code> primitives
       to create a reactive system. The document watcher doesn't need to know which
-      agents care about new uploads &mdash; it just fires the event. The summarizer
-      doesn't need to know where documents come from &mdash; it just reacts when one
+      agents care about new uploads. It just fires the event. The summarizer
+      doesn't need to know where documents come from. It just reacts when one
       appears. The wildcard pattern <code>document.&gt;</code> catches all events
       under the <code>document</code> namespace: <code>document.uploaded</code>,
       <code>document.deleted</code>, <code>document.updated</code>, and anything
@@ -202,7 +202,7 @@ mesh<span class="op">.</span><span class="fn">subscribe</span><span class="op">(
       A more sophisticated pattern: an agent that acts as a help desk router. It
       takes a user's question, figures out what topic it falls under, discovers
       all agents with skills in that topic, and routes the question to the right
-      specialist. This is capability-based routing &mdash; the help desk doesn't
+      specialist. This is capability-based routing. The help desk doesn't
       hard-code which agent handles what.
     </p>
 
@@ -250,7 +250,7 @@ mesh<span class="op">.</span><span class="fn">subscribe</span><span class="op">(
       capability, it shows up in the results. The help desk picks one and
       forwards the question via <code>request</code>. If no agents match, it
       returns a graceful fallback message. This pattern is powerful because it's
-      completely dynamic &mdash; new specialist agents can join or leave the mesh
+      completely dynamic. New specialist agents can join or leave the mesh
       at any time, and the help desk automatically adapts without code changes.
     </p>
 
@@ -262,8 +262,8 @@ mesh<span class="op">.</span><span class="fn">subscribe</span><span class="op">(
       <p>
         A "user-to-user messaging" example used to live here, built on the 0.1 demo
         Presence service (human accounts, contacts, store-and-forward DMs). That
-        service was playground scaffolding &mdash; an application on top of the mesh,
-        not part of the protocol &mdash; and has been retired. The three examples
+        service was playground scaffolding, an application on top of the mesh,
+        not part of the protocol, and has been retired. The three examples
         above cover the actual protocol surface.
       </p>
     </div>
@@ -274,7 +274,7 @@ mesh<span class="op">.</span><span class="fn">subscribe</span><span class="op">(
     <div class="callout tip">
       <div class="callout-title">Build on these patterns</div>
       <p>
-        These examples cover the core patterns &mdash; direct request/response,
+        These examples cover the core patterns: direct request/response,
         event-driven collaboration, and capability-based routing. They combine
         to handle almost any agent workflow. To learn more, check out the
         <a href="getting-started.html">Getting Started guide</a> to build your
@@ -287,7 +287,7 @@ mesh<span class="op">.</span><span class="fn">subscribe</span><span class="op">(
 
   <!-- ─── Footer ──────────────────────────────────────────────── -->
   <footer class="footer">
-    <p>AgentMesh &mdash; Open protocol for agent-to-agent communication.
+    <p>AgentMesh: open protocol for agent-to-agent communication.
       <a href="https://github.com/jeffrschneider/AgentMesh">GitHub</a>
     </p>
   </footer>

@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>The Network — AgentMesh</title>
+  <title>The Network: AgentMesh</title>
   <link rel="stylesheet" href="styles.css">
   <link rel="icon" type="image/svg+xml" href="favicon.svg">
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -66,7 +66,7 @@
     <h1>The Network</h1>
     <p class="text-dim" style="font-size: 1.15rem; margin-bottom: 2.5rem;">
       AgentMesh runs on <a href="https://nats.io">NATS</a>, a lightweight
-      messaging system designed for exactly this kind of thing &mdash;
+      messaging system designed for exactly this kind of thing,
       connecting distributed software that needs to talk to each other in
       real time. This page explains how the network works at different
       scales, from a single office to agents spread across the world.
@@ -76,7 +76,7 @@
     <h2 id="big-idea">The Big Idea</h2>
     <p>
       Every agent connects to a NATS server. Once connected, the agent can
-      send messages to any other agent on the same server &mdash; without
+      send messages to any other agent on the same server, without
       knowing the other agent's IP address, without opening ports, and
       without building an API.
     </p>
@@ -106,7 +106,7 @@ graph LR
       <div class="callout-title">Two meanings of "node"</div>
       <p>
         On this page, <strong>node</strong> means a NATS <em>network</em> node (a
-        server or leaf connection) &mdash; it's about topology. Elsewhere in AgentMesh,
+        server or leaf connection), it's about topology. Elsewhere in AgentMesh,
         a <strong>node</strong> is an <em>identity</em> concept: a host process that
         holds one connection and vouches for the agents it runs
         (see <a href="how-it-works.html#nodes">How It Works</a>). Same word, two layers.
@@ -117,14 +117,14 @@ graph LR
     <h2 id="within-org">Within an Organization</h2>
     <p>
       The simplest deployment is a single NATS server running on your
-      company's network &mdash; behind the firewall, on a VM, in a
+      company's network, behind the firewall, on a VM, in a
       container, wherever you run internal services.
     </p>
     <p>
       Every agent in the organization connects to this server. Because
       everything stays on the internal network, there's no exposure to the
       public internet. Agents can discover each other, send requests, and
-      share events &mdash; all within the safety of your own
+      share events, all within the safety of your own
       infrastructure.
     </p>
 
@@ -149,7 +149,7 @@ graph TB
       </div>
       <p>
         All traffic stays inside the firewall. The agents register with the
-        mesh, discover each other through the registry, and collaborate &mdash;
+        mesh, discover each other through the registry, and collaborate,
         all without any external network access.
       </p>
     </div>
@@ -158,7 +158,7 @@ graph TB
       <div class="callout-title">Scaling up</div>
       <p>
         For high availability, you can run a cluster of NATS servers within
-        your network. They replicate automatically &mdash; if one goes down,
+        your network. They replicate automatically: if one goes down,
         the others keep the mesh running. Agents reconnect seamlessly.
       </p>
     </div>
@@ -172,7 +172,7 @@ graph TB
     <p>
       Each organization keeps its own NATS server behind its own firewall.
       To connect the two, one of them extends a <strong>leaf node</strong>
-      connection to a shared hub &mdash; a NATS server running in the cloud.
+      connection to a shared hub: a NATS server running in the cloud.
       A leaf node is just an outbound connection (like opening a web page),
       so it doesn't require opening any inbound ports or poking holes in
       the firewall.
@@ -241,8 +241,8 @@ graph TB
     <h2 id="individuals">Between Individuals</h2>
     <p>
       AgentMesh isn't just for companies with IT departments. Individual
-      users &mdash; each at home, on a laptop, behind a residential router
-      &mdash; can connect their agents too.
+      users, each at home, on a laptop, behind a residential router,
+      can connect their agents too.
     </p>
     <p>
       The trick is <strong>WebSockets</strong>. Home networks typically
@@ -259,8 +259,8 @@ graph TB
         <div class="callout-title">Works behind any firewall</div>
         <p>
           Home networks block <em>inbound</em> connections, but every device can make
-          <em>outbound</em> ones. Because agents only ever connect out &mdash; over
-          WebSocket on 443 or TCP &mdash; there's nothing to configure: no port
+          <em>outbound</em> ones. Because agents only ever connect out, over
+          WebSocket on 443 or TCP, there's nothing to configure: no port
           forwarding, no static IP, no public server. An agent on your laptop is a
           first-class, reachable citizen of the mesh.
         </p>
@@ -297,7 +297,7 @@ graph TB
         From Jeff's perspective, his agent connects to a URL
         (<code>wss://mesh.example.com:4443</code>), registers, and
         immediately sees Bob's agent in the registry. He can send requests,
-        receive responses, and subscribe to events &mdash; all through that
+        receive responses, and subscribe to events, all through that
         single outbound WebSocket.
       </p>
     </div>
@@ -307,7 +307,7 @@ graph TB
       <a href="examples.html">WeBrowse demo</a> works. Each user opens a
       browser tab, types their name, and their personal agent connects to
       the cloud NATS server over WebSockets. Agents discover each other
-      and can chat in real time &mdash; even though both users are behind
+      and can chat in real time, even though both users are behind
       NAT on residential internet.
     </p>
 
@@ -370,25 +370,25 @@ graph TB
           <td>Agents on the same network</td>
           <td>Native TCP (port 4222)</td>
           <td>Each agent connects outbound to the NATS server</td>
-          <td>None &mdash; internal only</td>
+          <td>None: internal only</td>
         </tr>
         <tr>
           <td>Org to cloud hub</td>
           <td>Leaf node (outbound TCP or TLS)</td>
           <td>The org's NATS server connects outbound to the hub</td>
-          <td>None &mdash; outbound only</td>
+          <td>None: outbound only</td>
         </tr>
         <tr>
           <td>Browser or home agent to cloud</td>
           <td>WebSocket (port 4443, TLS)</td>
           <td>The agent connects outbound to the hub</td>
-          <td>None &mdash; outbound only</td>
+          <td>None: outbound only</td>
         </tr>
         <tr>
           <td>Server agents to cloud</td>
           <td>Native TCP or TLS (port 4222)</td>
           <td>The agent connects outbound to the hub</td>
-          <td>None &mdash; outbound only</td>
+          <td>None: outbound only</td>
         </tr>
       </tbody>
     </table>
@@ -399,7 +399,7 @@ graph TB
         Notice that every connection is <strong>outbound</strong>. Nobody
         needs to open inbound ports, configure port forwarding, or set up
         a VPN. This is what makes it possible for agents to connect from
-        anywhere &mdash; a corporate data center, a home laptop, or a
+        anywhere: a corporate data center, a home laptop, or a
         browser tab.
       </p>
     </div>
@@ -421,7 +421,7 @@ graph TB
 
   <!-- ─── Footer ──────────────────────────────────────────────── -->
   <footer class="footer">
-    <p>AgentMesh &mdash; Open protocol for agent-to-agent communication.
+    <p>AgentMesh: Open protocol for agent-to-agent communication.
       <a href="https://github.com/jeffrschneider/AgentMesh">GitHub</a>
     </p>
   </footer>
