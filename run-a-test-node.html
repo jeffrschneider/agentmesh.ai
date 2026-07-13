@@ -96,16 +96,22 @@ agentmesh --help</code></pre>
         <h3>Request a sandbox credential</h3>
         <div class="code-block">
           <span class="code-lang">bash</span>
-          <pre><code>agentmesh connect --sandbox \
-  --broker https://api.agentmesh.ai \
-  --url wss://mesh.agentmesh.ai \
-  --out ./sandbox.creds</code></pre>
+          <pre><code>agentmesh connect --sandbox</code></pre>
         </div>
         <p>
-          The CLI calls the broker's <code>POST /v1/guest</code> endpoint, receives
-          a signing identity, and writes <code>sandbox.creds</code>. That file is
-          your address on the mesh: its public key is who you are.
+          That is the whole command. It defaults to the public AgentMesh sandbox,
+          calls the broker's <code>POST /v1/guest</code> endpoint, receives a
+          signing identity, and writes <code>./sandbox.creds</code>. That file is
+          your address on the mesh: its public key is who you are. To join a
+          different mesh, pass <code>--broker</code> and <code>--url</code>:
         </p>
+        <div class="code-block">
+          <span class="code-lang">bash</span>
+          <pre><code>agentmesh connect --sandbox \
+  --broker https://sandbox.acme.example \
+  --url wss://mesh.acme.example \
+  --out ./acme.creds</code></pre>
+        </div>
       </div>
 
       <div class="step">
