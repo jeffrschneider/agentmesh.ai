@@ -21,77 +21,89 @@
     }
 
     /* ── Bolder display type ── */
-    h1{ font-weight:800; letter-spacing:-.03em; line-height:1.04; }
+    h1{ font-weight:800; letter-spacing:-.025em; line-height:1.02; }
     h2{ font-weight:800; letter-spacing:-.02em; }
     .sidebar-brand{ font-weight:800; background:var(--grad-mesh);
       -webkit-background-clip:text; background-clip:text; -webkit-text-fill-color:transparent; }
 
-    /* ── Hero: bigger moment, gradient headline, soft glow ── */
-    .hero{ max-width:920px; padding:72px 24px 64px; }
-    .hero::before{
-      content:""; position:absolute; left:0; right:0; top:-18%; height:440px; z-index:0;
-      background:radial-gradient(58% 60% at 50% 0%, rgba(59,130,246,.20), transparent 70%);
-      pointer-events:none;
-    }
-    .hero-text{ position:relative; z-index:1; }
-    .eyebrow{
-      display:inline-block; font-size:.78rem; font-weight:700; letter-spacing:.14em;
-      text-transform:uppercase; padding:6px 15px; border-radius:100px;
-      border:1px solid var(--border); background:var(--bg-surface);
-      color:var(--text-dim); margin-bottom:24px;
-    }
+    /* ── HERO: static gradient-glow band, no animation ── */
+    .hero{ position:relative; max-width:none; width:100%; margin:0 0 8px;
+      min-height:520px; padding:104px 24px 112px; overflow:hidden;
+      display:flex; align-items:center; justify-content:center; text-align:center;
+      background:
+        radial-gradient(38% 55% at 18% 12%, rgba(34,211,238,.20), transparent 60%),
+        radial-gradient(42% 60% at 84% 18%, rgba(167,139,250,.22), transparent 62%),
+        radial-gradient(70% 80% at 50% 118%, rgba(59,130,246,.20), transparent 66%); }
+    /* fade the band edges into the page background */
+    .hero::before{ content:""; position:absolute; inset:0; z-index:1; pointer-events:none;
+      background:linear-gradient(180deg, transparent 60%, var(--bg) 100%); }
+    .hero-text{ position:relative; z-index:2; max-width:760px; }
+    .eyebrow{ display:inline-block; font-size:.78rem; font-weight:700; letter-spacing:.16em;
+      text-transform:uppercase; padding:7px 16px; border-radius:100px; margin-bottom:26px;
+      border:1px solid rgba(255,255,255,.16); background:rgba(255,255,255,.06);
+      -webkit-backdrop-filter:blur(6px); backdrop-filter:blur(6px); color:#e2e8f0; }
     .eyebrow b{ font-weight:800; background:var(--grad-mesh);
       -webkit-background-clip:text; background-clip:text; -webkit-text-fill-color:transparent; }
-    .hero h1{ font-size:clamp(2.6rem,6vw,4.1rem); margin-bottom:22px; }
+    .hero h1{ font-size:clamp(2.9rem,7vw,5rem); margin-bottom:24px;
+      text-shadow:0 2px 44px rgba(0,0,0,.55); }
     .text-gradient{ background:var(--grad-mesh);
       -webkit-background-clip:text; background-clip:text; -webkit-text-fill-color:transparent; }
-    .hero .subtitle{ font-size:1.16rem; max-width:640px; margin:0 auto; }
-    .hero-actions{ margin-top:34px; gap:14px; }
+    .hero .subtitle{ font-size:1.2rem; max-width:600px; margin:0 auto; color:#cbd5e1; }
+    .hero-actions{ margin-top:38px; gap:14px; }
 
     /* ── Pill buttons with glow ── */
-    .btn{ border-radius:100px; font-weight:600;
+    .btn{ border-radius:100px; font-weight:700; padding:13px 26px;
       transition:transform .2s ease, box-shadow .25s ease, filter .2s ease, border-color .2s ease; }
-    .btn-primary{ background:var(--grad-mesh); border:none; color:#04121f; font-weight:700;
-      box-shadow:0 14px 34px -12px color-mix(in srgb,#3b82f6 70%, transparent); }
-    .btn-primary:hover{ transform:translateY(-2px); filter:brightness(1.06);
-      box-shadow:0 20px 46px -12px color-mix(in srgb,#3b82f6 82%, transparent); }
-    .btn-outline:hover{ transform:translateY(-2px); border-color:var(--accent); }
+    .btn-primary{ background:var(--grad-mesh); border:none; color:#04121f;
+      box-shadow:0 16px 40px -12px rgba(34,211,238,.55); }
+    .btn-primary:hover{ transform:translateY(-2px); filter:brightness(1.07);
+      box-shadow:0 22px 50px -12px rgba(59,130,246,.72); }
+    .btn-outline{ background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.22); color:#f8fafc; }
+    .btn-outline:hover{ transform:translateY(-2px); border-color:var(--accent-hover); }
 
-    /* ── Cards: glass fill, gradient hairline, per-card accent, glow on hover ── */
-    .card{ --c:var(--accent); position:relative; border-radius:18px;
-      background:color-mix(in srgb, var(--bg-surface) 82%, transparent);
-      backdrop-filter:blur(14px); -webkit-backdrop-filter:blur(14px);
-      transition:transform .25s ease, box-shadow .3s ease, border-color .25s ease; }
-    .card::before{ content:""; position:absolute; inset:0; border-radius:inherit; padding:1px;
-      background:linear-gradient(135deg, color-mix(in srgb,var(--c) 55%, transparent), transparent 62%);
-      -webkit-mask:linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
-      -webkit-mask-composite:xor; mask-composite:exclude; pointer-events:none; }
-    .card h3{ display:flex; align-items:center; gap:10px; }
-    .card h3::before{ content:""; flex:0 0 auto; width:9px; height:9px; border-radius:3px;
-      background:var(--c); box-shadow:0 0 12px var(--c); }
-    .card-grid .card:hover, .feature-split .card:hover{
-      transform:translateY(-4px);
-      border-color:color-mix(in srgb,var(--c) 45%, var(--border));
-      box-shadow:0 26px 56px -22px color-mix(in srgb,var(--c) 60%, transparent); }
-    .card-accent-purple{ --c:var(--p-request); }
-    .card-accent-green{ --c:var(--p-respond); }
+    /* ── COLORFUL PRIMITIVE CARDS: tinted fill + colored icon tile per primitive ── */
+    .primitives{ margin-top:8px; }
+    .primitives .card{ --c:var(--accent); position:relative; border-radius:18px; padding:26px 24px;
+      background:color-mix(in srgb, var(--c) 9%, var(--bg-surface));
+      border:1px solid color-mix(in srgb, var(--c) 30%, var(--border));
+      transition:transform .22s ease, box-shadow .3s ease, border-color .22s ease; }
+    .primitives .card:hover{ transform:translateY(-5px);
+      border-color:color-mix(in srgb, var(--c) 55%, var(--border));
+      box-shadow:0 28px 62px -22px color-mix(in srgb, var(--c) 75%, transparent); }
+    .primitives .card h3{ display:flex; align-items:center; gap:13px; margin-top:0; }
+    .primitives .card h3::before{ content:var(--icon,""); flex:0 0 auto;
+      width:36px; height:36px; border-radius:11px; display:grid; place-items:center;
+      font-size:1.05rem; font-weight:800; line-height:1; color:var(--c);
+      background:color-mix(in srgb, var(--c) 20%, transparent);
+      border:1px solid color-mix(in srgb, var(--c) 45%, transparent);
+      box-shadow:0 0 20px -5px var(--c); }
 
     /* ── Stats: big gradient numbers ── */
     .stat-number{ font-weight:800; background:var(--grad-mesh);
       -webkit-background-clip:text; background-clip:text; -webkit-text-fill-color:transparent; }
 
+    /* feature-split accent cards map to the palette */
+    .card-accent-purple{ --c:var(--p-request); }
+    .card-accent-green{ --c:var(--p-respond); }
+
     /* ── Section rhythm ── */
-    .page h2{ margin-top:66px; font-size:1.95rem; }
+    .page h2{ margin-top:70px; font-size:2rem; }
 
-    /* ── Light mode: swap colored glows for soft neutral depth ── */
-    [data-theme="light"] .card{ background:color-mix(in srgb, var(--bg-surface) 94%, transparent); }
-    [data-theme="light"] .card-grid .card:hover,
-    [data-theme="light"] .feature-split .card:hover{ box-shadow:0 18px 40px -18px rgba(15,23,42,.30); }
+    /* ── Light mode: soften the glow orbs, neutralize glows ── */
+    [data-theme="light"] .hero{
+      background:
+        radial-gradient(38% 55% at 18% 12%, rgba(34,211,238,.14), transparent 60%),
+        radial-gradient(42% 60% at 84% 18%, rgba(167,139,250,.16), transparent 62%),
+        radial-gradient(70% 80% at 50% 118%, rgba(59,130,246,.13), transparent 66%); }
+    [data-theme="light"] .hero h1{ text-shadow:none; }
+    [data-theme="light"] .hero .subtitle{ color:var(--text-dim); }
+    [data-theme="light"] .eyebrow{ border-color:var(--border); background:var(--bg-surface); color:var(--text-dim); }
     [data-theme="light"] .btn-primary{ color:#fff; box-shadow:0 14px 30px -12px rgba(59,130,246,.5); }
-    [data-theme="light"] .hero::before{ background:radial-gradient(58% 60% at 50% 0%, rgba(59,130,246,.12), transparent 70%); }
+    [data-theme="light"] .btn-outline{ background:transparent; border-color:var(--border); color:var(--text); }
+    [data-theme="light"] .primitives .card:hover{ box-shadow:0 22px 48px -22px color-mix(in srgb,var(--c) 55%, transparent); }
 
-    /* Respect reduced motion for the hover lifts */
     @media (prefers-reduced-motion: reduce){ .btn, .card{ transition:none; } }
+    @media (max-width:820px){ .hero{ min-height:440px; padding:72px 20px 84px; } }
   </style>
 </head>
 <body>
@@ -141,9 +153,6 @@
         <a href="how-it-works.html" class="btn btn-outline">How It Works</a>
       </div>
     </div>
-    <div class="hero-visual">
-      <canvas class="hero-mesh" aria-hidden="true"></canvas>
-    </div>
   </section>
 
   <!-- ─── What Is It ──────────────────────────────────────────── -->
@@ -192,28 +201,28 @@
       question to a multi-step, multi-agent workflow.
     </p>
 
-    <div class="card-grid">
-      <div class="card" style="--c:var(--p-register)">
+    <div class="card-grid primitives">
+      <div class="card" style="--c:var(--p-register); --icon:'+'">
         <h3>Register</h3>
         <p>Join the mesh and share what your agent can do. Other agents can then find and work with you.</p>
       </div>
-      <div class="card" style="--c:var(--p-discover)">
+      <div class="card" style="--c:var(--p-discover); --icon:'\25CE'">
         <h3>Discover</h3>
         <p>Search for agents that fit what you need: by capability, by skill, or just who's currently available.</p>
       </div>
-      <div class="card" style="--c:var(--p-request)">
+      <div class="card" style="--c:var(--p-request); --icon:'\2192'">
         <h3>Request</h3>
         <p>Ask another agent to do something. Quick work gets a direct reply; longer work becomes a tracked Task.</p>
       </div>
-      <div class="card" style="--c:var(--p-respond)">
+      <div class="card" style="--c:var(--p-respond); --icon:'\2190'">
         <h3>Respond</h3>
         <p>Deliver the result back to the agent that asked: bare for synchronous work, or as Task updates while it runs.</p>
       </div>
-      <div class="card" style="--c:var(--p-emit)">
+      <div class="card" style="--c:var(--p-emit); --icon:'\2191'">
         <h3>Emit</h3>
         <p>Publish a signed event to a topic. One-to-many and fire-and-forget: every agent subscribed to a matching topic receives it.</p>
       </div>
-      <div class="card" style="--c:var(--p-subscribe)">
+      <div class="card" style="--c:var(--p-subscribe); --icon:'\2193'">
         <h3>Subscribe</h3>
         <p>Listen to a topic with wildcards (<code>mesh.event.task.&gt;</code>) and react as things happen: no polling, no coupling to the publisher.</p>
       </div>
@@ -367,106 +376,5 @@
   </div><!-- /.content-wrapper -->
 
   <script src="script.js"></script>
-  <script>
-  // Hero mesh: a honeycomb of hexagons (~20 columns) with a diagonal wave of
-  // color and brightness sweeping through the cells. Reduced-motion => static.
-  (function () {
-    var canvas = document.querySelector('.hero-mesh');
-    if (!canvas || !canvas.getContext) return;
-    var ctx = canvas.getContext('2d');
-    var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-
-    // Bold neon palette: electric cyan -> violet -> hot magenta.
-    var STOPS = [[0, 229, 255], [138, 43, 255], [255, 45, 149]];
-    function palette(p) {
-      p = p < 0 ? 0 : p > 1 ? 1 : p;
-      var seg = p * (STOPS.length - 1);
-      var i = Math.floor(seg), f = seg - i;
-      var a = STOPS[i], b = STOPS[Math.min(i + 1, STOPS.length - 1)];
-      return [a[0] + (b[0] - a[0]) * f, a[1] + (b[1] - a[1]) * f, a[2] + (b[2] - a[2]) * f];
-    }
-
-    var W = 0, H = 0, DPR = 1, cells = [], r = 20, t = 0, raf = 0;
-
-    function build() {
-      var cols = Math.max(11, Math.min(28, Math.round(W / 31))); // ~2x denser honeycomb
-      var dx = W / cols;               // horizontal spacing (pointy-top hex)
-      r = dx / Math.sqrt(3);           // center-to-vertex radius
-      var dy = 1.5 * r;                // vertical spacing
-      var rows = Math.ceil(H / dy) + 2;
-      cells = [];
-      for (var row = -1; row < rows; row++) {
-        for (var col = -1; col <= cols; col++) {
-          var cx = col * dx + (row & 1 ? dx / 2 : 0);
-          var cy = row * dy;
-          cells.push({ cx: cx, cy: cy, p: (cx / W + cy / H) / 2 });
-        }
-      }
-    }
-
-    function resize() {
-      DPR = Math.min(window.devicePixelRatio || 1, 1.5);
-      W = canvas.clientWidth; H = canvas.clientHeight;
-      if (W === 0 || H === 0) return;
-      canvas.width = Math.round(W * DPR);
-      canvas.height = Math.round(H * DPR);
-      ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
-      build();
-    }
-
-    function hexPath(cx, cy) {
-      ctx.beginPath();
-      for (var k = 0; k < 6; k++) {
-        var ang = Math.PI / 180 * (60 * k - 90); // pointy-top
-        var x = cx + r * 0.9 * Math.cos(ang);
-        var y = cy + r * 0.9 * Math.sin(ang);
-        if (k === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
-      }
-      ctx.closePath();
-    }
-
-    function draw() {
-      ctx.clearRect(0, 0, W, H);
-      ctx.lineWidth = 1.5;
-      for (var i = 0; i < cells.length; i++) {
-        var c = cells[i];
-        var wave = 0.5 + 0.5 * Math.sin((c.cx / W + c.cy / H) * 6.2 - t); // 0..1, diagonal
-        var col = palette(c.p + wave * 0.22);
-        var rgb = (col[0] | 0) + ',' + (col[1] | 0) + ',' + (col[2] | 0);
-        hexPath(c.cx, c.cy);
-        // Always-visible bold fill, brightening with the wave.
-        ctx.fillStyle = 'rgba(' + rgb + ',' + (0.07 + wave * wave * 0.6).toFixed(3) + ')';
-        ctx.fill();
-        // Cheap "glow" on lit cells: a brighter, slightly thicker stroke.
-        // (shadowBlur is far too slow to run per-cell every frame.)
-        ctx.strokeStyle = 'rgba(' + rgb + ',' + (0.28 + wave * wave * 0.7).toFixed(3) + ')';
-        ctx.lineWidth = wave > 0.72 ? 2 : 1.2;
-        ctx.stroke();
-      }
-    }
-
-    function loop() {
-      t += 0.02;
-      draw();
-      raf = requestAnimationFrame(loop);
-    }
-    function start() { if (!raf && !reduce) raf = requestAnimationFrame(loop); }
-    function stop() { if (raf) { cancelAnimationFrame(raf); raf = 0; } }
-
-    // Only animate while the band is actually on-screen and the tab is visible.
-    var inView = true;
-    function sync() { if (inView && !document.hidden) start(); else stop(); }
-
-    var ro = window.ResizeObserver ? new ResizeObserver(resize) : null;
-    if (ro) ro.observe(canvas); else window.addEventListener('resize', resize);
-    if (window.IntersectionObserver) {
-      new IntersectionObserver(function (es) { inView = es[0].isIntersecting; sync(); }).observe(canvas);
-    }
-    document.addEventListener('visibilitychange', sync);
-
-    resize();
-    if (reduce) draw(); else sync();
-  })();
-  </script>
 </body>
 </html>
