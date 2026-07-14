@@ -152,6 +152,20 @@
         </details>
 
         <details>
+          <summary>What does AgentMesh deliberately not standardize?</summary>
+          <div class="a">
+            <p>A lot, on purpose. No auction or bidding protocol (fan-out &amp; bidding is a
+              <b>pattern</b> composed from emit/subscribe: a convention, not a standard). No
+              orchestration: who calls whom, in what order, belongs to whatever you build on
+              top. No agent meetings or committees, no LLM gateway, no guardrails, and no
+              financial settlement: the economics extension lets agents declare cost and emit
+              metering signals, but moving money is somebody else's job.</p>
+            <p>The rule is simple: if it isn't a property of the channel, it isn't in the core.
+              Everything above rides <b>on</b> the mesh, as patterns or extensions.</p>
+          </div>
+        </details>
+
+        <details>
           <summary>What's the difference between a node and a mesh server?</summary>
           <div class="a">
             <p>A <b>node</b> is a participant: your host process, holding one outbound
@@ -193,6 +207,34 @@
               implementation. By design, no: the spec separates the protocol from the binding
               and defines what any alternative must provide. Nothing above the binding layer
               knows it's NATS.</p>
+          </div>
+        </details>
+
+        <details>
+          <summary>I build agents with Google ADK, LangChain, or another framework. How does this fit?</summary>
+          <div class="a">
+            <p>Frameworks build the <b>inside</b> of an agent: the reasoning loop, tools,
+              memory. AgentMesh is what runs <b>between</b> agents. They meet at a thin seam:
+              wrap your framework agent in a skill handler and it's callable from the mesh;
+              hand it discover/request and it can use every other agent on it.</p>
+            <p>The mesh never sees your framework, only signed envelopes, so an ADK agent, a
+              LangChain agent, and a hand-rolled one interoperate without knowing the others
+              exist. (And the division of labor holds: MCP connects an agent to its tools;
+              AgentMesh connects it to its peers.)</p>
+          </div>
+        </details>
+
+        <details>
+          <summary>Could personal-agent products like OpenClaw or Hermes use this?</summary>
+          <div class="a">
+            <p>That's the flagship consumer shape. A personal-agent host runs as a <b>node</b>:
+              one outbound connection from your machine, your agent reachable behind your home
+              firewall, presence that tolerates a sleeping laptop, no per-agent credential
+              ceremony.</p>
+            <p>What the mesh adds is each other: your assistant can discover and call a
+              colleague's, across products, without either vendor building a pairwise
+              integration. Private by default; nothing about your agent is discoverable unless
+              you choose to share it.</p>
           </div>
         </details>
 
