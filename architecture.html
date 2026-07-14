@@ -4,166 +4,269 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Architecture: AgentMesh</title>
-  <link rel="stylesheet" href="styles.css">
   <link rel="icon" type="image/svg+xml" href="favicon.svg">
   <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    /* ══════════ THE WIRE : design token system ══════════ */
+    :root{
+      --ink:#0A1417; --panel:#0F1D22; --line:#1C2E33;
+      --paper:#E7EFEC; --dim:#7C918C; --faint:#4A5D5A;
+      --signal:#F2A93B; --verify:#43D6A6; --address:#6BA8FF; --broadcast:#B69CFF;
+      --disp:'Space Grotesk', sans-serif;
+      --body:'IBM Plex Sans', system-ui, sans-serif;
+      --wire:'IBM Plex Mono', ui-monospace, monospace;
+    }
+    *{ box-sizing:border-box; }
+    html,body{ margin:0; }
+    body{ background:var(--ink); color:var(--paper); font-family:var(--body);
+      font-size:16px; line-height:1.6; -webkit-font-smoothing:antialiased;
+      background-image:
+        linear-gradient(var(--line) 1px, transparent 1px),
+        linear-gradient(90deg, var(--line) 1px, transparent 1px);
+      background-size:64px 64px, 64px 64px;
+      background-position:-1px -1px;
+    }
+    body::before{
+      content:""; position:fixed; inset:0; z-index:0; pointer-events:none;
+      background:
+        radial-gradient(80% 45% at 30% 0%, rgba(242,169,59,.10), transparent 60%),
+        radial-gradient(70% 50% at 100% 10%, rgba(67,214,166,.08), transparent 55%),
+        linear-gradient(180deg, rgba(10,20,23,.72), var(--ink) 62%);
+    }
+    a{ color:inherit; }
+
+    .layout{ position:relative; z-index:1; display:grid; grid-template-columns:248px 1fr; min-height:100vh; }
+    .rail{ border-right:1px solid var(--line); padding:26px 22px; position:sticky; top:0; align-self:start; height:100vh; }
+    .brand{ font-family:var(--wire); font-weight:600; font-size:.82rem; letter-spacing:.02em;
+      display:flex; align-items:center; gap:9px; color:var(--paper); text-decoration:none; margin-bottom:30px; }
+    .brand .dot{ width:9px; height:9px; border-radius:2px; background:var(--signal);
+      box-shadow:0 0 0 3px rgba(242,169,59,.15), 8px 0 0 -2px var(--verify), 16px 0 0 -2px var(--address); }
+    .rail .grp{ font-family:var(--wire); font-size:.64rem; letter-spacing:.18em; text-transform:uppercase;
+      color:var(--faint); margin:16px 0 4px; }
+    .rail .grp:first-child{ margin-top:0; }
+    .rail nav a{ display:block; font-family:var(--wire); font-size:.8rem; color:var(--dim);
+      text-decoration:none; padding:6px 0; border-left:2px solid transparent; padding-left:12px; margin-left:-12px; }
+    .rail nav a:hover{ color:var(--paper); }
+    .rail nav a.on{ color:var(--paper); border-left-color:var(--signal); }
+    .rail .foot{ margin-top:26px; padding-top:18px; border-top:1px solid var(--line);
+      font-family:var(--wire); font-size:.72rem; color:var(--faint); }
+
+    .main{ min-width:0; }
+    .wrap{ max-width:980px; margin:0 auto; padding:0 40px; }
+
+    .eyebrow{ font-family:var(--wire); font-size:.76rem; letter-spacing:.04em; color:var(--dim); }
+    .eyebrow .tag{ color:var(--signal); }
+    h1,h2{ font-family:var(--disp); font-weight:700; letter-spacing:-.02em; line-height:1.08; }
+    .lede{ color:var(--dim); font-size:1.12rem; max-width:60ch; }
+    .mono{ font-family:var(--wire); }
+
+    .hero{ padding:74px 0 42px; border-bottom:1px solid var(--line); }
+    .hero .eyebrow{ margin-bottom:22px; display:block; }
+    .hero h1{ font-size:clamp(2.2rem,4.6vw,3.2rem); margin:0 0 18px; }
+    .hero h1 .am{ color:var(--signal); }
+
+    section.band{ padding:56px 0; border-bottom:1px solid var(--line); }
+    section.band h2{ font-size:1.8rem; margin:0 0 14px; }
+    section.band p{ color:var(--dim); max-width:66ch; }
+    section.band p b, section.band li b{ color:var(--paper); font-weight:600; }
+    .kicker{ font-family:var(--wire); font-size:.74rem; letter-spacing:.12em; text-transform:uppercase;
+      color:var(--faint); margin:0 0 16px; }
+
+    .figure{ margin:28px 0 8px; background:#0b1220; border:1px solid var(--line); border-radius:12px;
+      overflow:hidden; }
+    .figure .bar{ display:flex; align-items:center; gap:8px; padding:10px 16px; border-bottom:1px solid var(--line);
+      font-family:var(--wire); font-size:.72rem; color:var(--faint); background:rgba(255,255,255,.015); }
+    .figure img{ width:100%; height:auto; display:block; }
+    .figure .cap{ padding:10px 16px; border-top:1px solid var(--line); font-family:var(--wire);
+      font-size:.74rem; color:var(--dim); }
+    .figure .cap a{ color:var(--verify); }
+
+    ul.plain{ margin:18px 0 0; padding-left:20px; color:var(--dim); max-width:70ch; }
+    ul.plain li{ margin:10px 0; }
+    ul.plain b{ color:var(--paper); font-weight:600; }
+
+    .callout{ border:1px solid var(--line); border-left:3px solid var(--signal); border-radius:10px;
+      background:var(--panel); padding:14px 18px; margin:22px 0; max-width:70ch; }
+    .callout .t{ font-family:var(--wire); font-size:.74rem; letter-spacing:.1em; text-transform:uppercase;
+      color:var(--faint); margin-bottom:6px; }
+    .callout p{ margin:0; color:var(--dim); }
+    .callout p b{ color:var(--paper); }
+
+    footer{ padding:34px 0 60px; }
+    footer .wrap{ font-family:var(--wire); font-size:.78rem; color:var(--faint); display:flex; gap:14px; }
+    footer a{ color:var(--dim); text-decoration:none; }
+
+    @media (max-width:900px){
+      .layout{ grid-template-columns:1fr; }
+      .rail{ position:static; height:auto; border-right:0; border-bottom:1px solid var(--line); }
+    }
+  </style>
 </head>
 <body>
+  <div class="layout">
 
-  <!-- Sidebar Navigation -->
-  <nav class="sidebar" id="sidebar">
-    <a href="index.html" class="sidebar-brand">AgentMesh</a>
-    <ul class="sidebar-nav">
-      <li class="nav-grp">learn</li>
-      <li><a href="index.html">Home</a></li>
-      <li><a href="how-it-works.html">How It Works</a></li>
-      <li><a href="architecture.html">Architecture</a></li>
-      <li><a href="topologies.html">Topologies</a></li>
-      <li><a href="world-wide-mesh.html">World Wide Mesh</a></li>
-      <li class="nav-grp">build</li>
-      <li><a href="getting-started.html">Getting Started</a></li>
-      <li><a href="use-cases.html">Use Cases</a></li>
-      <li><a href="examples.html">Examples</a></li>
-      <li><a href="sdks.html">SDKs</a></li>
-      <li class="nav-grp">operate</li>
-      <li><a href="running-a-mesh.html">Running a Mesh</a></li>
-      <li><a href="run-a-test-node.html">Run a Test Node</a></li>
-      <li class="nav-grp">reference</li>
-      <li><a href="reference.html">Reference</a></li>
-      <li><a href="faq.html">FAQ</a></li>
-      <li><a href="claude-code.html">For Claude Code</a></li>
-    </ul>
-    <div class="sidebar-footer">
-      <a href="https://github.com/jeffrschneider/AgentMesh">GitHub</a>
-      <button class="theme-toggle" title="Toggle theme">&#x263E;</button>
-    </div>
-  </nav>
-  <div class="sidebar-backdrop" id="sidebar-backdrop"></div>
-  <div class="mobile-topbar">
-    <a href="index.html" class="sidebar-brand">AgentMesh</a>
-    <button class="hamburger" aria-label="Menu">&#x2630;</button>
+    <aside class="rail">
+      <a class="brand" href="index.html"><span class="dot"></span>AGENTMESH</a>
+      <nav>
+        <div class="grp">learn</div>
+        <a href="index.html">/ overview</a>
+        <a href="how-it-works.html">/ how-it-works</a>
+        <a class="on" href="architecture.html">/ architecture</a>
+        <a href="topologies.html">/ topologies</a>
+        <a href="world-wide-mesh.html">/ world-wide-mesh</a>
+        <div class="grp">build</div>
+        <a href="getting-started.html">/ getting-started</a>
+        <a href="use-cases.html">/ use-cases</a>
+        <a href="examples.html">/ examples</a>
+        <a href="sdks.html">/ sdks</a>
+        <div class="grp">operate</div>
+        <a href="running-a-mesh.html">/ running-a-mesh</a>
+        <a href="run-a-test-node.html">/ run-a-test-node</a>
+        <div class="grp">reference</div>
+        <a href="reference.html">/ reference</a>
+        <a href="faq.html">/ faq</a>
+        <a href="claude-code.html">/ claude-code</a>
+      </nav>
+      <div class="foot">v0.2 · signed a2a protocol<br>github.com/jeffrschneider/AgentMesh</div>
+    </aside>
+
+    <main class="main">
+
+      <div class="wrap hero">
+        <span class="eyebrow"><span class="tag">agentmesh</span> · reference architecture</span>
+        <h1>Where <span class="am">AgentMesh</span> fits</h1>
+        <p class="lede">A reference architecture for agentic solutions has many moving parts.
+          AgentMesh is one of them: the connective substrate that lets all the others reach
+          each other. Here is the whole picture, and the slice AgentMesh occupies.</p>
+      </div>
+
+      <!-- the diagram -->
+      <section class="band">
+        <div class="wrap">
+          <div class="figure">
+            <div class="bar">reference architecture · the amber pill is agentmesh</div>
+            <img src="ref-arch.svg"
+                 alt="Reference architecture for agentic solutions: a layered core (surfaces, orchestration, a hybrid agent runtime spanning on-device and server, capabilities, model plane, and the AgentMesh interconnect bus, over context and registry), three cross-cutting spines (identity and trust, observability, economics), and a local-first personal-agent principal on the edge. The AgentMesh interconnect is highlighted in amber.">
+            <div class="cap">A reference architecture for agentic solutions.
+              <a href="ref-arch.svg" target="_blank" rel="noopener">Open full size →</a></div>
+          </div>
+          <div class="callout">
+            <div class="t">two maps, two axes</div>
+            <p>The <a href="index.html">homepage's stack</a> answers a different question than
+              this page. The stack says which <b>spec</b> owns which job across the ecosystem
+              (ARD finds, A2A talks, AgentMesh connects). This page says where the mesh sits
+              inside <b>one agentic solution</b>: the boxes around it are components you build
+              or buy, not specifications.</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- the shape -->
+      <section class="band">
+        <div class="wrap">
+          <p class="kicker">the picture</p>
+          <h2>The shape of an agentic solution</h2>
+          <p>Strip an agentic system down and the same elements keep appearing: a
+            <b>runtime</b> that runs the agent loop, the <b>capabilities</b> it can act with
+            (tools, skills, code, the browser), the <b>context and knowledge</b> it reasons
+            over, an <b>orchestration</b> layer that coordinates several agents, a
+            <b>model plane</b> that routes to language models, and the <b>surfaces</b> people
+            and programs meet it through. Running through all of them are three cross-cutting
+            spines: <b>identity, trust and policy</b>; <b>observability and evaluation</b>;
+            and <b>economics and metering</b>.</p>
+          <p>Two elements most maps leave out, but that matter as agents leave the data
+            center: the <b>personal agent</b> (a human's local-first proxy, holding private
+            memory, credentials, and consent) and <b>hybrid execution</b> (one runtime that
+            spans an on-device side and a server side, placing each piece of work where
+            privacy, latency, cost, and connectivity say it belongs).</p>
+        </div>
+      </section>
+
+      <!-- the interconnect -->
+      <section class="band">
+        <div class="wrap">
+          <p class="kicker">the slice</p>
+          <h2>AgentMesh is the interconnect</h2>
+          <p>AgentMesh occupies exactly one box: the <b>interconnect</b>, the amber pill in
+            the diagram. It is the signed agent-to-agent protocol that lets any agent discover
+            and talk to any other over a single substrate, instead of every pair wiring up its
+            own point-to-point connection. Everything else in the diagram is a part; AgentMesh
+            is how the parts reach each other.</p>
+          <p>Concretely it provides six primitives (<span class="mono">register</span>,
+            <span class="mono">discover</span>, <span class="mono">request</span>,
+            <span class="mono">respond</span>, <span class="mono">emit</span>,
+            <span class="mono">subscribe</span>), agent and node identity, an optional task
+            lifecycle, streaming, and presence.
+            <a href="how-it-works.html">See how the six primitives work →</a></p>
+        </div>
+      </section>
+
+      <!-- spines -->
+      <section class="band">
+        <div class="wrap">
+          <p class="kicker">on the wire</p>
+          <h2>It carries the cross-cutting spines</h2>
+          <p>Three of the spines are not abstract policy on an agent network: they live on the
+            wire, and the interconnect is where they land.</p>
+          <ul class="plain">
+            <li><b>Identity and trust.</b> Every envelope is signed by the sending agent, and
+              a node vouches for the agents it hosts, so the <span class="mono">from</span>
+              field stays verifiable no matter which connection carried the message.</li>
+            <li><b>Observability.</b> Trace context rides in the envelope, so a request's path
+              across a chain of agents can be reconstructed end to end.</li>
+            <li><b>Economics.</b> Agents can declare cost in their manifests and the mesh can
+              emit metering events, giving the economic layer real signal to act on.</li>
+          </ul>
+        </div>
+      </section>
+
+      <!-- edge -->
+      <section class="band">
+        <div class="wrap">
+          <p class="kicker">at the edge</p>
+          <h2>It makes personal agents and hybrid execution real</h2>
+          <p>The two newer elements lean on the interconnect more than on anything else in the
+            stack.</p>
+          <ul class="plain">
+            <li><b>Personal agents.</b> AgentMesh's node model lets one host hold a single
+              credentialed connection and vouch for many agents, reachable over an
+              outbound-only connection, with presence that tolerates a sleeping laptop. A
+              personal agent behind a home firewall becomes a first-class peer, with no
+              per-agent credential ceremony.</li>
+            <li><b>Hybrid execution.</b> The mesh gives location transparency: an agent does
+              not know or care whether its peer runs on-device or in the cloud. The same
+              protocol spans the device and server sides, so work moves across that boundary
+              freely.</li>
+          </ul>
+        </div>
+      </section>
+
+      <!-- non-goals -->
+      <section class="band" style="border-bottom:0">
+        <div class="wrap">
+          <p class="kicker">the boundary</p>
+          <h2>What it deliberately is not</h2>
+          <p>AgentMesh is the interconnect, not the runtime, the orchestrator, or the model
+            gateway. Keeping it a thin, signed protocol is the point: the other elements stay
+            swappable and are built by whoever consumes the mesh. A host that consumes the
+            mesh, for instance, builds its runtime and orchestration on top of AgentMesh
+            rather than inside it.
+            <a href="faq.html">More on what it deliberately doesn't standardize →</a></p>
+          <p>Ready to go deeper? <a href="reference.html">Read the protocol reference</a> or
+            <a href="sdks.html">pick up an SDK</a>.</p>
+        </div>
+      </section>
+
+      <footer>
+        <div class="wrap">
+          <span>AgentMesh · open protocol for agent-to-agent communication</span>
+          <a href="https://github.com/jeffrschneider/AgentMesh">GitHub ↗</a>
+        </div>
+      </footer>
+
+    </main>
   </div>
-  <div class="content-wrapper">
-
-  <!-- Page Content -->
-  <div class="page">
-
-    <h1>Where <span class="text-gradient">AgentMesh</span> fits</h1>
-    <p class="text-dim" style="font-size: 1.15rem; margin-bottom: 2.5rem;">
-      A reference architecture for agentic solutions has many moving parts.
-      AgentMesh is one of them: the connective substrate that lets all the
-      others reach each other. Here is the whole picture, and the slice
-      AgentMesh occupies.
-    </p>
-
-    <figure style="margin: 0 0 2.5rem; border: 1px solid var(--border); border-radius: var(--radius-lg); overflow: hidden; background: #0b1220;">
-      <img src="ref-arch.svg" alt="Reference architecture for agentic solutions: a layered core (surfaces, orchestration, a hybrid agent runtime spanning on-device and server, capabilities, model plane, and the Agent Mesh interconnect bus, over context and registry), three cross-cutting spines (identity and trust, observability, economics), and a local-first personal-agent principal on the edge." style="width: 100%; height: auto; display: block;">
-      <figcaption class="text-dim" style="padding: 12px 16px; font-size: 0.9rem; border-top: 1px solid var(--border);">
-        A best-of reference architecture for agentic solutions.
-        <a href="ref-arch.svg" target="_blank" rel="noopener">Open full size &rarr;</a>
-      </figcaption>
-    </figure>
-
-    <h2 id="picture">The shape of an agentic solution</h2>
-    <p>
-      Strip an agentic system down and the same elements keep appearing: a
-      <strong>runtime</strong> that runs the agent loop, the
-      <strong>capabilities</strong> it can act with (tools, skills, code, the
-      browser), the <strong>context and knowledge</strong> it reasons over, an
-      <strong>orchestration</strong> layer that coordinates several agents, a
-      <strong>model plane</strong> that routes to language models, and the
-      <strong>surfaces</strong> people and programs meet it through. Running
-      through all of them are three cross-cutting spines:
-      <strong>identity, trust and policy</strong>;
-      <strong>observability and evaluation</strong>; and
-      <strong>economics and metering</strong>.
-    </p>
-    <p>
-      Two elements most maps leave out, but that matter as agents leave the
-      data center: the <strong>personal agent</strong> (a human's local-first
-      proxy, holding private memory, credentials and consent) and
-      <strong>hybrid execution</strong> (one runtime that spans an on-device
-      side and a server side, placing each piece of work where privacy,
-      latency, cost and connectivity say it belongs).
-    </p>
-
-    <h2 id="interconnect">AgentMesh is the interconnect</h2>
-    <p>
-      AgentMesh occupies exactly one box: the <strong>interconnect</strong>.
-      It is the signed agent-to-agent protocol that lets any agent discover
-      and talk to any other over a single substrate, instead of every pair
-      wiring up its own point-to-point connection. Everything else in the
-      diagram is a part; AgentMesh is how the parts reach each other.
-    </p>
-    <p>
-      Concretely it provides six primitives (<code>register</code>,
-      <code>discover</code>, <code>request</code>, <code>respond</code>,
-      <code>emit</code>, <code>subscribe</code>), agent and node identity, an
-      optional task lifecycle, streaming, and presence.
-      <a href="how-it-works.html">See how the six primitives work &rarr;</a>
-    </p>
-
-    <h2 id="spines">It carries the cross-cutting spines</h2>
-    <p>
-      Three of the spines are not abstract policy on an agent network: they
-      live on the wire, and the interconnect is where they land.
-    </p>
-    <ul>
-      <li><strong>Identity and trust.</strong> Every envelope is signed by the
-        sending agent, and a node vouches for the agents it hosts, so the
-        <code>from</code> field stays verifiable no matter which connection
-        carried the message.</li>
-      <li><strong>Observability.</strong> Trace context rides in the envelope,
-        so a request's path across a chain of agents can be reconstructed end
-        to end.</li>
-      <li><strong>Economics.</strong> Agents can declare cost in their
-        manifests and the mesh can emit metering events, giving the economic
-        layer real signal to act on.</li>
-    </ul>
-
-    <h2 id="edge">It makes personal agents and hybrid execution real</h2>
-    <p>
-      The two newer elements lean on the interconnect more than on anything
-      else in the stack.
-    </p>
-    <ul>
-      <li><strong>Personal agents.</strong> AgentMesh's node model lets one
-        host hold a single credentialed connection and vouch for many agents,
-        reachable over an outbound-only connection, with presence that
-        tolerates a sleeping laptop. A personal agent behind a home firewall
-        becomes a first-class peer, with no per-agent credential ceremony.</li>
-      <li><strong>Hybrid execution.</strong> The mesh gives location
-        transparency: an agent does not know or care whether its peer runs
-        on-device or in the cloud. The same protocol spans the device and
-        server sides, so work moves across that boundary freely.</li>
-    </ul>
-
-    <h2 id="scope">What it deliberately is not</h2>
-    <p>
-      AgentMesh is the interconnect, not the runtime, the orchestrator, or the
-      model gateway. Keeping it a thin, signed protocol is the point: the
-      other elements stay swappable and are built by whoever consumes the mesh.
-      A host that consumes the mesh, for instance, builds its runtime and
-      orchestration on top of AgentMesh rather than inside it.
-    </p>
-    <p>
-      Ready to go deeper?
-      <a href="reference.html">Read the protocol reference &rarr;</a>
-      or <a href="sdks.html">pick up an SDK</a>.
-    </p>
-
-  </div>
-
-  <!-- Footer -->
-  <footer class="footer">
-    <p>AgentMesh: Open protocol for agent-to-agent communication.
-      <a href="https://github.com/jeffrschneider/AgentMesh">GitHub</a>
-    </p>
-  </footer>
-
-  </div><!-- /.content-wrapper -->
-
-  <script src="script.js"></script>
 </body>
 </html>
