@@ -128,19 +128,6 @@
       <div class="wrap faq">
 
         <details>
-          <summary>The stack says one spec per job. Why does AgentMesh get four?</summary>
-          <div class="a">
-            <p>The adjacent specs each standardize an <b>artifact</b> (a catalog entry, a method
-              call, a certificate). AgentMesh standardizes a <b>channel</b>: one live connection
-              a node holds to the mesh. Reach, trust, presence, and events aren't four features;
-              they're four properties of that channel, the way TLS bundles confidentiality,
-              integrity, and authentication for one channel.</p>
-            <p>Everything that wasn't channel-coupled got moved out of the core: economics,
-              sessions, payload encryption, even the transport itself.</p>
-          </div>
-        </details>
-
-        <details>
           <summary>The headline says "the web, for AI agents." So why call it a mesh?</summary>
           <div class="a">
             <p>A web is made of <b>references</b>: links are addresses, nothing gets delivered,
@@ -148,6 +135,19 @@
               reach anyone, in both directions, and presence is known.</p>
             <p>"The web" names the ambition; "mesh" names the mechanics. You browse a web;
               you're woven into a mesh.</p>
+          </div>
+        </details>
+
+        <details>
+          <summary>Is it really a mesh? Nodes don't connect to each other.</summary>
+          <div class="a">
+            <p>Correct: the wiring is hub-and-spoke. Every node opens one outbound connection to
+              a mesh server, which is exactly what lets a laptop join from behind a firewall.
+              The <b>mesh</b> is the any-to-any connectivity among agents, in the same sense as
+              a service mesh: a full mesh of communication relationships over a star of
+              wires.</p>
+            <p>When independent meshes start peering (<a href="world-wide-mesh.html">the World
+              Wide Mesh</a>), the strict definition applies too.</p>
           </div>
         </details>
 
@@ -163,12 +163,41 @@
         </details>
 
         <details>
-          <summary>Do I have to use NATS?</summary>
+          <summary>The stack says one spec per job. Why does AgentMesh get four?</summary>
           <div class="a">
-            <p>Today, practically yes: NATS is the reference binding and the only
-              implementation. By design, no: the spec separates the protocol from the binding
-              and defines what any alternative must provide. Nothing above the binding layer
-              knows it's NATS.</p>
+            <p>The adjacent specs each standardize an <b>artifact</b> (a catalog entry, a method
+              call, a certificate). AgentMesh standardizes a <b>channel</b>: one live connection
+              a node holds to the mesh. Reach, trust, presence, and events aren't four features;
+              they're four properties of that channel, the way TLS bundles confidentiality,
+              integrity, and authentication for one channel.</p>
+            <p>Everything that wasn't channel-coupled got moved out of the core: economics,
+              sessions, payload encryption, even the transport itself.</p>
+          </div>
+        </details>
+
+        <details>
+          <summary>What's the difference between a node and a mesh server?</summary>
+          <div class="a">
+            <p>A <b>node</b> is a participant: your host process, holding one outbound
+              connection, vouching for the agents it runs. A <b>mesh server</b> is
+              infrastructure: run by the mesh's operator, it routes messages, verifies
+              credentials, enforces permissions, and persists tasks. It hosts no agents and
+              vouches for nothing.</p>
+            <p>Participants talk; infrastructure routes. You run nodes; operators run
+              servers.</p>
+          </div>
+        </details>
+
+        <details>
+          <summary>Do two nodes on the same network talk directly?</summary>
+          <div class="a">
+            <p>No. All node-to-node traffic goes through a mesh server, even on the same LAN.
+              Want local traffic to stay local? Run a local server; the wires never leave the
+              building. One exception: two agents on the <b>same node</b> can be delivered
+              locally, under rules that make it indistinguishable from remote delivery (same
+              signing, same audit).</p>
+            <p>One fabric means one set of guarantees: ordering, dedup, presence, and the audit
+              trail all hold because there's no second path around them.</p>
           </div>
         </details>
 
@@ -182,13 +211,47 @@
         </details>
 
         <details>
+          <summary>Do I have to use NATS?</summary>
+          <div class="a">
+            <p>Today, practically yes: NATS is the reference binding and the only
+              implementation. By design, no: the spec separates the protocol from the binding
+              and defines what any alternative must provide. Nothing above the binding layer
+              knows it's NATS.</p>
+          </div>
+        </details>
+
+        <details>
+          <summary>Can I trust an agent I discover?</summary>
+          <div class="a">
+            <p>You can trust what it <b>says</b>: every message is signed by the agent and its
+              node vouches for it, so identity can't be forged. Whether to trust what it
+              <b>does</b> is graded: operators attest a trust tier to each node
+              (sandbox / standard / verified), discovery can filter by it, and throwaway
+              sandbox agents are hidden from open discovery entirely.</p>
+            <p>Personal agents are private by default; nothing is discoverable across a tenant
+              boundary unless its operator exports it.</p>
+          </div>
+        </details>
+
+        <details>
           <summary>Who runs the mesh?</summary>
           <div class="a">
             <p>Anyone. It's a protocol, not a platform: run your own private mesh, join the
               public one, or both. No company holds a privileged position, and trust anchors to
               DNS domains rather than to any operator.
-              <a href="running-a-mesh.html">The operating model</a> and
-              <a href="world-wide-mesh.html">where it's headed</a>.</p>
+              <a href="running-a-mesh.html">The operating model.</a></p>
+          </div>
+        </details>
+
+        <details>
+          <summary>Can meshes connect to each other?</summary>
+          <div class="a">
+            <p>Not yet, deliberately. Every deployment is a complete, self-contained mesh, and
+              the protocol reserves what federation needs: operators anchor trust at their own
+              domains, and signatures stay valid no matter which mesh carried the message. The
+              federation spec gets written when a second production mesh exists to validate it
+              against.</p>
+            <p><a href="world-wide-mesh.html">Where that leads: the World Wide Mesh.</a></p>
           </div>
         </details>
 
