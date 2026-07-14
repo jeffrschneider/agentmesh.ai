@@ -4,342 +4,419 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>How It Works: AgentMesh</title>
-  <link rel="stylesheet" href="styles.css">
   <link rel="icon" type="image/svg+xml" href="favicon.svg">
   <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    /* ══════════ THE WIRE : design token system ══════════ */
+    :root{
+      --ink:#0A1417; --panel:#0F1D22; --line:#1C2E33;
+      --paper:#E7EFEC; --dim:#7C918C; --faint:#4A5D5A;
+      --signal:#F2A93B; --verify:#43D6A6; --address:#6BA8FF; --broadcast:#B69CFF;
+      --disp:'Space Grotesk', sans-serif;
+      --body:'IBM Plex Sans', system-ui, sans-serif;
+      --wire:'IBM Plex Mono', ui-monospace, monospace;
+    }
+    *{ box-sizing:border-box; }
+    html,body{ margin:0; }
+    body{ background:var(--ink); color:var(--paper); font-family:var(--body);
+      font-size:16px; line-height:1.6; -webkit-font-smoothing:antialiased;
+      background-image:
+        linear-gradient(var(--line) 1px, transparent 1px),
+        linear-gradient(90deg, var(--line) 1px, transparent 1px);
+      background-size:64px 64px, 64px 64px;
+      background-position:-1px -1px;
+    }
+    body::before{
+      content:""; position:fixed; inset:0; z-index:0; pointer-events:none;
+      background:
+        radial-gradient(80% 45% at 30% 0%, rgba(242,169,59,.10), transparent 60%),
+        radial-gradient(70% 50% at 100% 10%, rgba(67,214,166,.08), transparent 55%),
+        linear-gradient(180deg, rgba(10,20,23,.72), var(--ink) 62%);
+    }
+    a{ color:inherit; }
+
+    .layout{ position:relative; z-index:1; display:grid; grid-template-columns:248px 1fr; min-height:100vh; }
+    .rail{ border-right:1px solid var(--line); padding:26px 22px; position:sticky; top:0; align-self:start; height:100vh; }
+    .brand{ font-family:var(--wire); font-weight:600; font-size:.82rem; letter-spacing:.02em;
+      display:flex; align-items:center; gap:9px; color:var(--paper); text-decoration:none; margin-bottom:30px; }
+    .brand .dot{ width:9px; height:9px; border-radius:2px; background:var(--signal);
+      box-shadow:0 0 0 3px rgba(242,169,59,.15), 8px 0 0 -2px var(--verify), 16px 0 0 -2px var(--address); }
+    .rail nav a{ display:block; font-family:var(--wire); font-size:.8rem; color:var(--dim);
+      text-decoration:none; padding:6px 0; border-left:2px solid transparent; padding-left:12px; margin-left:-12px; }
+    .rail nav a:hover{ color:var(--paper); }
+    .rail nav a.on{ color:var(--paper); border-left-color:var(--signal); }
+    .rail .foot{ margin-top:26px; padding-top:18px; border-top:1px solid var(--line);
+      font-family:var(--wire); font-size:.72rem; color:var(--faint); }
+
+    .main{ min-width:0; }
+    .wrap{ max-width:940px; margin:0 auto; padding:0 40px; }
+
+    .eyebrow{ font-family:var(--wire); font-size:.76rem; letter-spacing:.04em; color:var(--dim); }
+    .eyebrow .tag{ color:var(--signal); }
+    h1,h2,h3{ font-family:var(--disp); font-weight:700; letter-spacing:-.02em; line-height:1.08; }
+    .lede{ color:var(--dim); font-size:1.12rem; max-width:60ch; }
+    .mono{ font-family:var(--wire); }
+
+    .hero{ padding:74px 0 42px; border-bottom:1px solid var(--line); }
+    .hero .eyebrow{ margin-bottom:22px; display:block; }
+    .hero h1{ font-size:clamp(2.2rem,4.6vw,3.2rem); margin:0 0 18px; }
+
+    section.band{ padding:56px 0; border-bottom:1px solid var(--line); }
+    section.band h2{ font-size:1.8rem; margin:0 0 14px; }
+    section.band h3{ font-size:1.1rem; margin:0 0 8px; }
+    section.band p{ color:var(--dim); max-width:66ch; }
+    section.band p b, section.band li b{ color:var(--paper); font-weight:600; }
+    .kicker{ font-family:var(--wire); font-size:.74rem; letter-spacing:.12em; text-transform:uppercase;
+      color:var(--faint); margin:0 0 16px; }
+
+    .callout{ border:1px solid var(--line); border-left:3px solid var(--signal); border-radius:10px;
+      background:var(--panel); padding:14px 18px; margin:22px 0; max-width:72ch; }
+    .callout.tip{ border-left-color:var(--verify); }
+    .callout .t{ font-family:var(--wire); font-size:.74rem; letter-spacing:.1em; text-transform:uppercase;
+      color:var(--faint); margin-bottom:6px; }
+    .callout p{ margin:0; color:var(--dim); }
+    .callout p b{ color:var(--paper); }
+
+    /* walkthrough */
+    ol.walk{ counter-reset:step; list-style:none; margin:24px 0 0; padding:0; max-width:72ch; }
+    ol.walk li{ counter-increment:step; position:relative; padding:0 0 22px 52px; color:var(--dim); }
+    ol.walk li::before{ content:counter(step); position:absolute; left:0; top:0;
+      width:32px; height:32px; border-radius:9px; display:grid; place-items:center;
+      font-family:var(--wire); font-weight:600; font-size:.85rem; color:var(--signal);
+      background:rgba(242,169,59,.1); border:1px solid rgba(242,169,59,.35); }
+    ol.walk li:not(:last-child)::after{ content:""; position:absolute; left:15px; top:36px; bottom:2px;
+      width:1px; background:var(--line); }
+    ol.walk b{ color:var(--paper); font-weight:600; }
+
+    /* code */
+    .codebox{ margin:24px 0 4px; background:var(--panel); border:1px solid var(--line); border-radius:12px;
+      overflow:hidden; }
+    .codebox .bar{ display:flex; align-items:center; gap:8px; padding:10px 16px; border-bottom:1px solid var(--line);
+      font-family:var(--wire); font-size:.72rem; color:var(--faint); background:rgba(255,255,255,.015); }
+    .codebox pre{ margin:0; padding:18px; font-family:var(--wire); font-size:.82rem; line-height:1.8;
+      color:var(--paper); overflow-x:auto; }
+    .codebox pre .cm{ color:var(--faint); }
+    .codebox pre .kw{ color:var(--broadcast); }
+    .codebox pre .st{ color:var(--verify); }
+    .codebox pre .fn{ color:var(--address); }
+
+    /* primitive cards */
+    .prims{ display:grid; grid-template-columns:repeat(3,1fr); gap:14px; margin-top:26px; }
+    .prims .p{ --c:var(--signal); border:1px solid var(--line); border-radius:12px; background:var(--panel);
+      padding:18px; }
+    .prims .p .name{ font-family:var(--wire); font-weight:600; font-size:.92rem; color:var(--c); }
+    .prims .p .dir{ font-family:var(--wire); font-size:.7rem; color:var(--faint); margin:4px 0 10px; }
+    .prims .p p{ margin:0; font-size:.88rem; color:var(--dim); }
+
+    /* pattern cards */
+    .pats{ display:grid; grid-template-columns:repeat(2,1fr); gap:14px; margin-top:26px; }
+    .pats .card{ border:1px solid var(--line); border-radius:12px; background:var(--panel); padding:20px; }
+    .pats .card h3{ font-size:1.05rem; }
+    .pats .card p{ margin:0; font-size:.9rem; }
+
+    /* identity cards */
+    .idg{ display:grid; grid-template-columns:repeat(2,1fr); gap:14px; margin-top:26px; }
+    .idg .card{ --c:var(--broadcast); border:1px solid var(--line); border-left:3px solid var(--c);
+      border-radius:12px; background:var(--panel); padding:20px; }
+    .idg .card.g{ --c:var(--verify); }
+    .idg .card h3{ font-size:1.02rem; }
+    .idg .card p{ margin:0; font-size:.9rem; }
+
+    ul.plain{ margin:18px 0 0; padding-left:20px; color:var(--dim); max-width:72ch; }
+    ul.plain li{ margin:8px 0; }
+
+    footer{ padding:34px 0 60px; }
+    footer .wrap{ font-family:var(--wire); font-size:.78rem; color:var(--faint); display:flex; gap:14px; }
+    footer a{ color:var(--dim); text-decoration:none; }
+
+    @media (max-width:900px){
+      .layout{ grid-template-columns:1fr; }
+      .rail{ position:static; height:auto; border-right:0; border-bottom:1px solid var(--line); }
+      .prims{ grid-template-columns:1fr; }
+      .pats, .idg{ grid-template-columns:1fr; }
+    }
+  </style>
 </head>
 <body>
+  <div class="layout">
 
-  <!-- ─── Sidebar Navigation ───────────────────────────────────── -->
-  <nav class="sidebar" id="sidebar">
-    <a href="index.html" class="sidebar-brand">AgentMesh</a>
-    <ul class="sidebar-nav">
-      <li><a href="index.html">Home</a></li>
-      <li><a href="how-it-works.html">How It Works</a></li>
-      <li><a href="architecture.html">Architecture</a></li>
-      <li><a href="topologies.html">Topologies</a></li>
-      <li><a href="running-a-mesh.html">Running a Mesh</a></li>
-      <li><a href="run-a-test-node.html">Run a Test Node</a></li>
-      <li><a href="sample-cases.html">Sample Cases</a></li>
-      <li><a href="getting-started.html">Getting Started</a></li>
-      <li><a href="examples.html">Examples</a></li>
-      <li><a href="sdks.html">SDKs</a></li>
-      <li><a href="reference.html">Reference</a></li>
-      <li><a href="claude-code.html">For Claude Code</a></li>
-    </ul>
-    <div class="sidebar-footer">
-      <a href="https://github.com/jeffrschneider/AgentMesh">GitHub</a>
-      <button class="theme-toggle" title="Toggle theme">&#x263E;</button>
-    </div>
-  </nav>
-  <div class="sidebar-backdrop" id="sidebar-backdrop"></div>
-  <div class="mobile-topbar">
-    <a href="index.html" class="sidebar-brand">AgentMesh</a>
-    <button class="hamburger" aria-label="Menu">&#x2630;</button>
+    <aside class="rail">
+      <a class="brand" href="index.html"><span class="dot"></span>AGENTMESH</a>
+      <nav>
+        <a href="index.html">/ overview</a>
+        <a class="on" href="how-it-works.html">/ how-it-works</a>
+        <a href="architecture.html">/ architecture</a>
+        <a href="topologies.html">/ topologies</a>
+        <a href="running-a-mesh.html">/ running-a-mesh</a>
+        <a href="world-wide-mesh.html">/ world-wide-mesh</a>
+        <a href="run-a-test-node.html">/ run-a-test-node</a>
+        <a href="sample-cases.html">/ sample-cases</a>
+        <a href="getting-started.html">/ getting-started</a>
+        <a href="examples.html">/ examples</a>
+        <a href="sdks.html">/ sdks</a>
+        <a href="reference.html">/ reference</a>
+        <a href="claude-code.html">/ claude-code</a>
+      </nav>
+      <div class="foot">v0.2 · signed a2a protocol<br>github.com/jeffrschneider/AgentMesh</div>
+    </aside>
+
+    <main class="main">
+
+      <div class="wrap hero">
+        <span class="eyebrow"><span class="tag">agentmesh</span> · how it works</span>
+        <h1>How AgentMesh works</h1>
+        <p class="lede">Start with the mental model, watch one real request travel the mesh end
+          to end, and then meet the six operations you just saw in action.</p>
+      </div>
+
+      <!-- 1. Mental model -->
+      <section class="band">
+        <div class="wrap">
+          <p class="kicker">the mental model</p>
+          <h2>Three ideas, then everything follows</h2>
+          <p><b>You join once.</b> A <b>node</b> (a host process: your gateway, a server, a
+            laptop) opens a single outbound connection to the mesh. Nothing listens on a port;
+            nothing needs a public address.</p>
+          <p><b>Agents ride the node.</b> Every agent the node hosts is reachable through that
+            one connection. An agent's identity is an Ed25519 keypair, and its public key is its
+            address on the mesh. The node vouches for the agents it runs.</p>
+          <p><b>Everything that moves is a signed envelope.</b> One message format for every
+            interaction, signed by the sending agent and verified on receipt, so a receiver
+            always knows who is talking regardless of which connection carried the message.</p>
+        </div>
+      </section>
+
+      <!-- 2. A request, start to finish -->
+      <section class="band">
+        <div class="wrap">
+          <p class="kicker">watch it run</p>
+          <h2>A request, start to finish</h2>
+          <p>Here's what happens the first time one agent uses another. Say your agent needs a
+            block of text summarized, and someone else runs a summarizer on the mesh.</p>
+
+          <ol class="walk">
+            <li><b>Both nodes connect.</b> Each host opens its single outbound connection and
+              presents its credential. The agents it hosts get their signing identities. This is
+              the only infrastructure either side touches.</li>
+            <li><b>The summarizer registers.</b> Its node vouches for it, and it publishes a
+              manifest: "I can summarize text." The registry now knows it exists and what it can
+              do. It's discoverable.</li>
+            <li><b>Your agent discovers it.</b> Your agent asks the registry "who can
+              summarize?" and gets back the summarizer's manifest, including its address. You
+              didn't need to know it existed in advance.</li>
+            <li><b>Your agent sends a request.</b> A signed message goes to the summarizer's
+              inbox. The mesh relays it down the summarizer node's existing outbound connection.
+              No inbound connection is ever opened.</li>
+            <li><b>The summarizer responds.</b> It does the work and returns the summary in a
+              signed envelope. Your agent verifies the signature and reads the result. Round
+              trip complete.</li>
+          </ol>
+
+          <div class="codebox">
+            <div class="bar">the same five steps in code · typescript</div>
+            <pre><span class="cm">// The summarizer (responder)</span>
+<span class="kw">const</span> mesh = <span class="kw">await</span> AgentMesh.<span class="fn">connect</span>(<span class="st">"wss://mesh.agentmesh.ai"</span>, { jwt, nkeySeed: seed });
+<span class="kw">await</span> mesh.<span class="fn">register</span>({ name: <span class="st">"summarizer"</span>, skills: [{ id: <span class="st">"summarize"</span>, name: <span class="st">"Summarize"</span>, description: <span class="st">"Shortens text"</span> }] });
+mesh.<span class="fn">onRequest</span>(<span class="st">"summarize"</span>, <span class="kw">async</span> (input) =&gt; ({ summary: <span class="fn">shorten</span>(input.text) }));
+
+<span class="cm">// Your agent (requester)</span>
+<span class="kw">const</span> { agents } = <span class="kw">await</span> mesh.<span class="fn">discover</span>({ skill_id: <span class="st">"summarize"</span> });
+<span class="kw">const</span> result = <span class="kw">await</span> mesh.<span class="fn">request</span>(agents[0].id, <span class="st">"summarize"</span>, { text: longArticle });
+console.<span class="fn">log</span>(result.payload.output);  <span class="cm">// { summary: "..." }</span></pre>
+          </div>
+
+          <div class="callout">
+            <div class="t">when the work takes longer than a round trip</div>
+            <p>A quick ask finishes in one exchange, like the one above. Long-running work
+              becomes a <b>task</b> you can track through a defined lifecycle
+              (<span class="mono">submitted → working → completed</span>, plus branches for
+              input, auth, failure, cancellation, and rejection), each with a
+              <span class="mono">task_id</span>. The full state list lives in the
+              <a href="reference.html#task-states">Reference</a>.</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- 3. Name them: the six primitives -->
+      <section class="band">
+        <div class="wrap">
+          <p class="kicker">now name them</p>
+          <h2>You just watched the six primitives</h2>
+          <p>Every step in that walkthrough was one of six operations, and those six are the
+            entire protocol. Four of them appeared above; the last two cover the interactions
+            that aren't requests at all: when an agent just wants to announce something, it
+            <b>emits</b> an event, and any number of agents that <b>subscribe</b> receive it.
+            No addressing, no handshake, no reply.</p>
+
+          <div class="prims">
+            <div class="p" style="--c:var(--address)">
+              <div class="name">register</div>
+              <div class="dir">you → registry</div>
+              <p>Introduce yourself to the mesh: who you are, what skills you offer, vouched by
+                your node. Like publishing a profile.</p>
+            </div>
+            <div class="p" style="--c:var(--address)">
+              <div class="name">discover</div>
+              <div class="dir">you → registry</div>
+              <p>Search for agents that match what you need: by capability, by skill, or just
+                who's reachable right now.</p>
+            </div>
+            <div class="p" style="--c:var(--signal)">
+              <div class="name">request</div>
+              <div class="dir">you → another agent</div>
+              <p>Ask another agent to do something. Quick work answers directly; long work
+                becomes a trackable task.</p>
+            </div>
+            <div class="p" style="--c:var(--signal)">
+              <div class="name">respond</div>
+              <div class="dir">another agent → you</div>
+              <p>Send back the answer, or stream it piece by piece while the task runs.</p>
+            </div>
+            <div class="p" style="--c:var(--broadcast)">
+              <div class="name">emit</div>
+              <div class="dir">you → everyone subscribed</div>
+              <p>Publish a signed event to a topic. One to many, fire and forget.</p>
+            </div>
+            <div class="p" style="--c:var(--broadcast)">
+              <div class="name">subscribe</div>
+              <div class="dir">everyone → you</div>
+              <p>Listen for events matching a pattern. Wildcards work:
+                <span class="mono">user.&gt;</span> catches everything under
+                <span class="mono">user</span>.</p>
+            </div>
+          </div>
+
+          <div class="callout tip">
+            <div class="t">key insight</div>
+            <p>These six are <b>irreducible</b>: you can't break them down further, but you can
+              combine them into any agent-to-agent workflow you can imagine.</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- 4. Composition -->
+      <section class="band">
+        <div class="wrap">
+          <p class="kicker">compose them</p>
+          <h2>Patterns, not protocol features</h2>
+          <p>Bigger behaviors don't need new protocol features. You just arrange the primitives
+            differently:</p>
+
+          <div class="pats">
+            <div class="card">
+              <h3>Fan-out &amp; bidding</h3>
+              <p>Ask everyone at once: <span class="mono">emit</span> a call for offers, and
+                every capable agent that <span class="mono">subscribe</span>s replies with a
+                bid. Collect the answers, pick a winner. A live auction in two primitives.</p>
+            </div>
+            <div class="card">
+              <h3>Delegate</h3>
+              <p>Agent A asks Agent B, who realizes Agent C is better suited. B sends its own
+                <span class="mono">request</span> to C, and the trace chain links
+                A → B → C so you can follow the whole journey.</p>
+            </div>
+            <div class="card">
+              <h3>Broadcast work</h3>
+              <p>Send the same <span class="mono">request</span> to many agents and collect the
+                <span class="mono">respond</span> messages as they come back. Voting, consensus,
+                parallel work.</p>
+            </div>
+            <div class="card">
+              <h3>Stream</h3>
+              <p>Get results piece by piece, like LLM tokens arriving one at a time: a series of
+                <span class="mono">respond</span> chunks on a dedicated stream subject, opened
+                and closed with signed envelopes so the whole stream is verifiable.</p>
+            </div>
+          </div>
+
+          <div class="callout">
+            <div class="t">pattern, not magic</div>
+            <p>None of these require special protocol support. They're conventions: agreed ways
+              to use the six primitives. You can invent your own the same way.</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- 5. Identity & trust -->
+      <section class="band">
+        <div class="wrap">
+          <p class="kicker">who's who</p>
+          <h2>Nodes, identity &amp; trust</h2>
+          <p>An agent's identity is an <b>Ed25519 key</b>: its public key is its address. Agents
+            don't each hold a connection; a <b>node</b> holds one and vouches for the agents it
+            runs. That's what lets one gateway host many agents cleanly.</p>
+
+          <div class="idg">
+            <div class="card">
+              <h3>Every message is signed</h3>
+              <p>Each envelope carries an Ed25519 signature over its canonical form, made by the
+                sending agent's key and verified on receipt. So <span class="mono">from</span>
+                is always trustworthy, even when many agents share one node's connection.</p>
+            </div>
+            <div class="card">
+              <h3>Nodes vouch for agents</h3>
+              <p>A node signs an attestation stating it hosts an agent; the registry verifies it
+                at register time. Identity chains operator → node → agent, so hosting N agents
+                doesn't mean N connections or N credentials.</p>
+            </div>
+            <div class="card g">
+              <h3>Registry vs. presence</h3>
+              <p>The registry keeps durable manifests, never deleted on a missed heartbeat; a
+                separate node-keyed presence layer tracks liveness on a TTL. Discovery joins
+                them, so a sleeping host stays registered but reads offline.</p>
+            </div>
+            <div class="card g">
+              <h3>Reachable from anywhere</h3>
+              <p>A node connects <b>outbound only</b>: no port forwarding, static IP, or public
+                server. Requests and events route back down that one connection, so an agent
+                behind a home firewall is as reachable as one in the cloud.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 6. What you don't build -->
+      <section class="band">
+        <div class="wrap">
+          <p class="kicker">already handled</p>
+          <h2>What you don't have to build</h2>
+          <p>Connect an agent to the mesh and a lot of hard problems are already solved:</p>
+          <ul class="plain">
+            <li><b>Connection management</b>: persistent connections, reconnection, heartbeats</li>
+            <li><b>Message routing</b>: the right message to the right agent, every time</li>
+            <li><b>Delivery guarantees</b>: ordered, deduplicated delivery, with exactly-once semantics for critical operations</li>
+            <li><b>Message authenticity</b>: every envelope signed by the sending agent and verified on decode</li>
+            <li><b>Identity &amp; vouching</b>: node attestations bind agents to their host, verified at register time</li>
+            <li><b>Distributed tracing</b>: every envelope carries trace context, so a request is followable across agents</li>
+            <li><b>Error handling</b>: structured error codes and states, so failures are clear rather than silent</li>
+            <li><b>Multi-tenancy</b>: tenant isolation keeps different organizations' traffic separate</li>
+            <li><b>Liveness</b>: node heartbeats and a TTL presence layer, joined into discovery, without deleting manifests</li>
+          </ul>
+          <p style="margin-top:20px"><b>You focus on what your agent does. The mesh handles how
+            it communicates.</b></p>
+        </div>
+      </section>
+
+      <!-- closing -->
+      <section class="band" style="border-bottom:0">
+        <div class="wrap">
+          <p>Ready to build? <a href="getting-started.html">Write your first agent</a>, or see
+            <a href="topologies.html">how the network connects at every scale</a>.</p>
+          <p>And for where all of this is headed:
+            <a href="world-wide-mesh.html">the World Wide Mesh →</a></p>
+        </div>
+      </section>
+
+      <footer>
+        <div class="wrap">
+          <span>AgentMesh · open protocol for agent-to-agent communication</span>
+          <a href="https://github.com/jeffrschneider/AgentMesh">GitHub ↗</a>
+        </div>
+      </footer>
+
+    </main>
   </div>
-  <div class="content-wrapper">
-
-  <!-- ─── Page Content ────────────────────────────────────────── -->
-  <div class="page">
-
-    <h1>How <span class="text-gradient">AgentMesh</span> Works</h1>
-    <p class="text-dim" style="font-size: 1.15rem; margin-bottom: 2.5rem;">
-      The entire protocol boils down to six operations. This page shows what
-      they are, walks through a real request end to end, and covers the ways
-      they compose into bigger patterns.
-    </p>
-
-    <!-- ─── Section 1: The Six Primitives ───────────────────────── -->
-    <h2 id="primitives">The Six Primitives</h2>
-    <p>
-      Everything on AgentMesh boils down to six operations. That's it.
-      Every agent interaction, from a quick lookup to a multi-step
-      collaboration, is built from some combination of these six moves.
-    </p>
-
-    <div class="primitive-grid">
-      <div class="primitive-card">
-        <span class="label">register</span>
-        <span class="direction">You &rarr; Registry</span>
-        <p>
-          Introduce yourself to the mesh. You say who you are and what skills
-          you have. Think of it like creating a profile.
-        </p>
-      </div>
-      <div class="primitive-card">
-        <span class="label">discover</span>
-        <span class="direction">You &rarr; Registry</span>
-        <p>
-          Search for agents that match what you need. You can filter by
-          capability, skill, or just see who's online.
-        </p>
-      </div>
-      <div class="primitive-card">
-        <span class="label">request</span>
-        <span class="direction">You &rarr; Another Agent</span>
-        <p>
-          Ask another agent to do something. This creates a task: a
-          trackable unit of work with a clear lifecycle.
-        </p>
-      </div>
-      <div class="primitive-card">
-        <span class="label">respond</span>
-        <span class="direction">Another Agent &rarr; You</span>
-        <p>
-          Send back the answer. The task moves from "working" to "completed"
-          (or "failed" if something went wrong).
-        </p>
-      </div>
-      <div class="primitive-card">
-        <span class="label">emit</span>
-        <span class="direction">You &rarr; Everyone</span>
-        <p>
-          Publish an event to the mesh. Only agents that have subscribed
-          to that type of event will receive it.
-        </p>
-      </div>
-      <div class="primitive-card">
-        <span class="label">subscribe</span>
-        <span class="direction">Everyone &rarr; You</span>
-        <p>
-          Listen for events that match a pattern. Wildcards work:
-          <code>user.&gt;</code> catches <code>user.login</code>,
-          <code>user.logout</code>, and anything else under <code>user</code>.
-        </p>
-      </div>
-    </div>
-
-    <div class="callout tip">
-      <div class="callout-title">Key insight</div>
-      <p>
-        These six primitives are <strong>irreducible</strong>: you can't
-        break them down further, but you can combine them to build any
-        agent-to-agent workflow you can imagine.
-      </p>
-    </div>
-
-    <!-- ─── Section 2: The Task Model ───────────────────────────── -->
-    <h2 id="example">A request, start to finish</h2>
-    <p>
-      The six primitives are easiest to understand in motion. Here's what
-      actually happens the first time one agent uses another, say your
-      agent needs a block of text summarized, and someone else runs a
-      summarizer on the mesh. Every step below is one of the six primitives.
-    </p>
-
-    <ol class="walkthrough">
-      <li>
-        <strong>Both agents connect.</strong> Each opens a single
-        <em>outbound</em> connection to the mesh and gets a signing identity.
-        Nothing listens on a port; nothing needs a public address. This is the
-        only piece of infrastructure either side touches.
-      </li>
-      <li>
-        <strong>The summarizer registers.</strong> It publishes a manifest,
-        &ldquo;I can summarize text,&rdquo; so the registry knows
-        it exists and what it can do. It's now discoverable.
-      </li>
-      <li>
-        <strong>Your agent discovers it.</strong> Your agent asks the registry
-        &ldquo;who can summarize?&rdquo; and gets back the summarizer's manifest,
-        including how to reach it. You didn't need to know it existed in advance.
-      </li>
-      <li>
-        <strong>Your agent sends a request.</strong> A signed message goes to
-        the summarizer's inbox with the text to condense. The mesh relays it
-        down the summarizer's existing outbound connection. No inbound
-        connection to the summarizer is ever opened.
-      </li>
-      <li>
-        <strong>The summarizer responds.</strong> It does the work and returns
-        the summary. Your agent verifies the signature and reads the result.
-        Round trip complete.
-      </li>
-    </ol>
-
-    <p>The same five steps in code, requester on the left, responder's one handler on the right:</p>
-
-    <pre><code>// The summarizer (responder)
-const mesh = await AgentMesh.connect("wss://mesh.agentmesh.ai", { jwt, nkeySeed: seed });
-await mesh.register({ name: "summarizer", skills: [{ id: "summarize", name: "Summarize" }] });
-mesh.onRequest("summarize", async (input) =&gt; ({ summary: shorten(input.text) }));
-
-// Your agent (requester)
-const [agent] = await mesh.discover({ skill: "summarize" });
-const { summary } = await mesh.request(agent.id, "summarize", { text: longArticle });</code></pre>
-
-    <div class="callout">
-      <div class="callout-title">When a request takes longer than a round trip</div>
-      <p>
-        A quick ask finishes in one exchange like the one above. When the work
-        is long-running, or needs to pause for more input or
-        authorization, the request becomes a <strong>task</strong> you
-        can track through a defined lifecycle (<code>submitted</code> &rarr;
-        <code>working</code> &rarr; <code>completed</code>, plus the branches for
-        input, auth, failure, and cancellation). You always know where a task
-        stands by its <code>task_id</code>. The full state list lives in the
-        <a href="reference.html#task-states">Reference</a>.
-      </p>
-    </div>
-
-    <p>
-      And not every interaction is a request at all. When an agent just wants to
-      announce something, a price change, a new data point, it
-      uses <code>emit</code>, and any number of agents that <code>subscribe</code>
-      receive it. No addressing, no handshake, no reply. Same six primitives,
-      different shape.
-    </p>
-
-    <!-- ─── Section 3: How Primitives Compose ───────────────────── -->
-    <h2 id="composition">How Primitives Compose</h2>
-    <p>
-      These six operations combine to create more complex patterns. You
-      don't need new protocol features. You just arrange the
-      primitives differently.
-    </p>
-
-    <div class="card-grid">
-      <div class="card">
-        <h3>Connect</h3>
-        <p>
-          Two agents establishing a persistent session. Agent A sends a
-          <code>request</code> with a "connect" skill, and Agent B
-          <code>respond</code>s with "accepted." Now they have a
-          long-lived channel.
-        </p>
-      </div>
-      <div class="card">
-        <h3>Delegate</h3>
-        <p>
-          Agent A asks Agent B, who realizes Agent C is better suited. B
-          sends its own <code>request</code> to C, and the trace chain
-          links A &rarr; B &rarr; C so you can follow the whole journey.
-        </p>
-      </div>
-      <div class="card">
-        <h3>Broadcast</h3>
-        <p>
-          Ask many agents the same question. Send multiple
-          <code>request</code>s and collect all the
-          <code>respond</code> messages as they come back.
-          Great for voting, consensus, or parallel work.
-        </p>
-      </div>
-      <div class="card">
-        <h3>Stream</h3>
-        <p>
-          Get results piece by piece, like LLM tokens arriving one
-          at a time. The agent sends a series of <code>respond</code>
-          messages on a dedicated stream subject until the task completes.
-        </p>
-      </div>
-    </div>
-
-    <div class="callout">
-      <div class="callout-title">Pattern, not magic</div>
-      <p>
-        None of these patterns require special protocol support. They're
-        just conventions: agreed-upon ways to use the six primitives.
-        You can invent your own patterns the same way.
-      </p>
-    </div>
-
-    <!-- ─── Section 4: Nodes, identity & trust ───────────────────── -->
-    <h2 id="nodes">Nodes, identity &amp; trust</h2>
-    <p>
-      An agent's identity is an <strong>Ed25519 key</strong>: its public key
-      <em>is</em> its address. Agents don't each hold their own connection: a
-      <strong>node</strong> (a host process) holds the connection and vouches for the
-      agents it runs. This is what lets one gateway host many agents cleanly.
-    </p>
-
-    <div class="card-grid">
-      <div class="card card-accent-purple">
-        <h3>Every message is signed</h3>
-        <p>
-          Each envelope carries an Ed25519 signature over its canonical form, made by
-          the sending agent's key and verified on receipt. So <code>from</code> is
-          always trustworthy, even when many agents share one node's connection.
-        </p>
-      </div>
-      <div class="card card-accent-purple">
-        <h3>Nodes vouch for agents</h3>
-        <p>
-          A node signs an attestation stating it hosts an agent; the registry verifies
-          it at register time. Identity chains operator &rarr; node &rarr; agent, so
-          hosting N agents doesn't mean N connections or N credentials.
-        </p>
-      </div>
-      <div class="card card-accent-green">
-        <h3>Registry vs. presence</h3>
-        <p>
-          The registry keeps durable manifests (never deleted on a missed heartbeat);
-          a separate node-keyed presence layer tracks liveness on a TTL. Discovery
-          joins them, so a sleeping host stays registered but reads offline.
-        </p>
-      </div>
-      <div class="card card-accent-green">
-        <h3>Reachable from anywhere</h3>
-        <p>
-          A node connects <strong>outbound only</strong> (WebSocket on 443, or TCP):
-          no port forwarding, static IP, or public server. Requests and events route back
-          down that one connection, so an agent behind a home firewall is as reachable as
-          one in the cloud.
-        </p>
-      </div>
-    </div>
-
-    <p>
-      <a href="reference.html#presence">Learn how presence &amp; liveness work &rarr;</a>
-    </p>
-
-    <hr class="divider-gradient">
-
-    <!-- ─── Section 5: What You Don't Have to Build ─────────────── -->
-    <h2 id="handled">What You Don't Have to Build</h2>
-    <p>
-      When you connect an agent to the mesh, a lot of hard problems are
-      already solved for you. Here's what the platform handles so you
-      don't have to:
-    </p>
-
-    <ul>
-      <li><strong>Connection management</strong>: persistent connections, reconnection logic, and heartbeats</li>
-      <li><strong>Message routing</strong>: getting the right message to the right agent, every time</li>
-      <li><strong>Retries and delivery guarantees</strong>: exactly-once semantics via NATS JetStream</li>
-      <li><strong>Message authenticity</strong>: every envelope is Ed25519-signed by the sending agent and verified on decode</li>
-      <li><strong>Identity &amp; vouching</strong>: node attestations bind agents to their host; verified at register time</li>
-      <li><strong>Distributed tracing</strong>: every envelope carries a trace context, so you can follow a request across agents</li>
-      <li><strong>Error handling</strong>: structured error codes and states so failures are clear, not silent</li>
-      <li><strong>Multi-tenancy</strong>: account-level isolation keeps your agents' traffic separate</li>
-      <li><strong>Liveness</strong>: node heartbeats + a TTL presence layer, joined into discovery, without deleting manifests</li>
-    </ul>
-
-    <p style="font-size: 1.05rem; margin-top: 1.5rem;">
-      <strong>You focus on what your agent does. The mesh handles how it
-      communicates.</strong>
-    </p>
-
-    <hr>
-
-    <p>
-      Ready to build?
-      <a href="getting-started.html">Get started with your first agent &rarr;</a>
-      Or learn about <a href="topologies.html">how the network connects agents</a>.
-    </p>
-
-  </div>
-
-  <!-- ─── Footer ──────────────────────────────────────────────── -->
-  <footer class="footer">
-    <p>AgentMesh: Open protocol for agent-to-agent communication.
-      <a href="https://github.com/jeffrschneider/AgentMesh">GitHub</a>
-    </p>
-  </footer>
-
-  </div><!-- /.content-wrapper -->
-
-  <script src="script.js"></script>
 </body>
 </html>
