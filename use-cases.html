@@ -4,336 +4,352 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Use Cases: AgentMesh</title>
-  <link rel="stylesheet" href="styles.css">
   <link rel="icon" type="image/svg+xml" href="favicon.svg">
   <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    /* ══════════ THE WIRE : design token system ══════════ */
+    :root{
+      --ink:#0A1417; --panel:#0F1D22; --line:#1C2E33;
+      --paper:#E7EFEC; --dim:#7C918C; --faint:#4A5D5A;
+      --signal:#F2A93B; --verify:#43D6A6; --address:#6BA8FF; --broadcast:#B69CFF;
+      --disp:'Space Grotesk', sans-serif;
+      --body:'IBM Plex Sans', system-ui, sans-serif;
+      --wire:'IBM Plex Mono', ui-monospace, monospace;
+    }
+    *{ box-sizing:border-box; }
+    html,body{ margin:0; }
+    body{ background:var(--ink); color:var(--paper); font-family:var(--body);
+      font-size:16px; line-height:1.6; -webkit-font-smoothing:antialiased;
+      background-image:
+        linear-gradient(var(--line) 1px, transparent 1px),
+        linear-gradient(90deg, var(--line) 1px, transparent 1px);
+      background-size:64px 64px, 64px 64px;
+      background-position:-1px -1px;
+    }
+    body::before{
+      content:""; position:fixed; inset:0; z-index:0; pointer-events:none;
+      background:
+        radial-gradient(80% 45% at 30% 0%, rgba(242,169,59,.10), transparent 60%),
+        radial-gradient(70% 50% at 100% 10%, rgba(67,214,166,.08), transparent 55%),
+        linear-gradient(180deg, rgba(10,20,23,.72), var(--ink) 62%);
+    }
+    a{ color:inherit; }
+
+    .layout{ position:relative; z-index:1; display:grid; grid-template-columns:248px 1fr; min-height:100vh; }
+    .rail{ border-right:1px solid var(--line); padding:26px 22px; position:sticky; top:0; align-self:start; height:100vh; }
+    .brand{ font-family:var(--wire); font-weight:600; font-size:.82rem; letter-spacing:.02em;
+      display:flex; align-items:center; gap:9px; color:var(--paper); text-decoration:none; margin-bottom:30px; }
+    .brand .dot{ width:9px; height:9px; border-radius:2px; background:var(--signal);
+      box-shadow:0 0 0 3px rgba(242,169,59,.15), 8px 0 0 -2px var(--verify), 16px 0 0 -2px var(--address); }
+    .rail .grp{ font-family:var(--wire); font-size:.64rem; letter-spacing:.18em; text-transform:uppercase;
+      color:var(--faint); margin:16px 0 4px; }
+    .rail .grp:first-child{ margin-top:0; }
+    .rail nav a{ display:block; font-family:var(--wire); font-size:.8rem; color:var(--dim);
+      text-decoration:none; padding:6px 0; border-left:2px solid transparent; padding-left:12px; margin-left:-12px; }
+    .rail nav a:hover{ color:var(--paper); }
+    .rail nav a.on{ color:var(--paper); border-left-color:var(--signal); }
+    .rail .foot{ margin-top:26px; padding-top:18px; border-top:1px solid var(--line);
+      font-family:var(--wire); font-size:.72rem; color:var(--faint); }
+
+    .main{ min-width:0; }
+    .wrap{ max-width:980px; margin:0 auto; padding:0 40px; }
+
+    .eyebrow{ font-family:var(--wire); font-size:.76rem; letter-spacing:.04em; color:var(--dim); }
+    .eyebrow .tag{ color:var(--signal); }
+    h1,h2,h3{ font-family:var(--disp); font-weight:700; letter-spacing:-.02em; line-height:1.08; }
+    .lede{ color:var(--dim); font-size:1.12rem; max-width:60ch; }
+
+    .hero{ padding:74px 0 42px; border-bottom:1px solid var(--line); }
+    .hero .eyebrow{ margin-bottom:22px; display:block; }
+    .hero h1{ font-size:clamp(2.2rem,4.6vw,3.2rem); margin:0 0 18px; }
+    .hero h1 .am{ color:var(--signal); }
+
+    section.band{ padding:50px 0; border-bottom:1px solid var(--line); }
+    section.band h2{ font-size:1.7rem; margin:0 0 14px; }
+    section.band p{ color:var(--dim); max-width:66ch; }
+    section.band p b{ color:var(--paper); font-weight:600; }
+    .kicker{ font-family:var(--wire); font-size:.74rem; letter-spacing:.12em; text-transform:uppercase;
+      color:var(--faint); margin:0 0 16px; }
+
+    .pair{ display:grid; grid-template-columns:1fr 1fr; gap:16px; margin:22px 0 6px; }
+    .pair .cell{ border:1px solid var(--line); border-radius:12px; background:var(--panel); padding:20px 22px; }
+    .pair .cell .h{ font-family:var(--wire); font-size:.74rem; letter-spacing:.1em; text-transform:uppercase; margin-bottom:10px; }
+    .pair .cell:nth-child(1) .h{ color:var(--dim); }
+    .pair .cell:nth-child(2) .h{ color:var(--verify); }
+    .pair .cell p{ margin:0; color:var(--dim); font-size:.95rem; }
+    .pair .cell p b{ color:var(--paper); }
+    .pair .cell code{ font-family:var(--wire); font-size:.86em; color:var(--verify); }
+
+    .chips{ margin:16px 0 0; display:flex; flex-wrap:wrap; gap:8px; }
+    .chips span{ font-family:var(--wire); font-size:.72rem; color:var(--dim);
+      border:1px solid var(--line); border-radius:100px; padding:3px 11px; background:var(--panel); }
+    .chips span.t{ color:var(--verify); border-color:rgba(67,214,166,.3); }
+
+    .runit{ font-family:var(--wire); font-size:.78rem; margin-top:14px; }
+    .runit a{ color:var(--signal); }
+
+    .callout{ border:1px solid var(--line); border-left:3px solid var(--signal); border-radius:10px;
+      background:var(--panel); padding:14px 18px; margin:22px 0; max-width:70ch; }
+    .callout .t{ font-family:var(--wire); font-size:.74rem; letter-spacing:.1em; text-transform:uppercase;
+      color:var(--faint); margin-bottom:6px; }
+    .callout p{ margin:0; color:var(--dim); }
+    .callout p b{ color:var(--paper); }
+
+    footer{ padding:34px 0 60px; }
+    footer .wrap{ font-family:var(--wire); font-size:.78rem; color:var(--faint); display:flex; gap:14px; }
+    footer a{ color:var(--dim); text-decoration:none; }
+
+    @media (max-width:900px){
+      .layout{ grid-template-columns:1fr; }
+      .rail{ position:static; height:auto; border-right:0; border-bottom:1px solid var(--line); }
+      .pair{ grid-template-columns:1fr; }
+    }
+  </style>
 </head>
 <body>
+  <div class="layout">
 
-  <!-- ─── Sidebar Navigation ───────────────────────────────────── -->
-  <nav class="sidebar" id="sidebar">
-    <a href="index.html" class="sidebar-brand">AgentMesh</a>
-    <ul class="sidebar-nav">
-      <li class="nav-grp">learn</li>
-      <li><a href="index.html">Home</a></li>
-      <li><a href="how-it-works.html">How It Works</a></li>
-      <li><a href="architecture.html">Architecture</a></li>
-      <li><a href="topologies.html">Topologies</a></li>
-      <li><a href="world-wide-mesh.html">World Wide Mesh</a></li>
-      <li class="nav-grp">build</li>
-      <li><a href="getting-started.html">Getting Started</a></li>
-      <li><a href="use-cases.html">Use Cases</a></li>
-      <li><a href="examples.html">Examples</a></li>
-      <li><a href="sdks.html">SDKs</a></li>
-      <li><a href="a2a-bridge.html">A2A Bridge</a></li>
-      <li class="nav-grp">operate</li>
-      <li><a href="running-a-mesh.html">Running a Mesh</a></li>
-      <li><a href="run-a-test-node.html">Run a Test Node</a></li>
-      <li class="nav-grp">reference</li>
-      <li><a href="spec.html">Specification</a></li>
-      <li><a href="reference.html">Reference</a></li>
-      <li><a href="faq.html">FAQ</a></li>
-      <li><a href="claude-code.html">For Claude Code</a></li>
-    </ul>
-    <div class="sidebar-footer">
-      <a href="https://github.com/jeffrschneider/AgentMesh">GitHub</a>
-      <button class="theme-toggle" title="Toggle theme">&#x263E;</button>
-    </div>
-  </nav>
-  <div class="sidebar-backdrop" id="sidebar-backdrop"></div>
-  <div class="mobile-topbar">
-    <a href="index.html" class="sidebar-brand">AgentMesh</a>
-    <button class="hamburger" aria-label="Menu">&#x2630;</button>
+    <aside class="rail">
+      <a class="brand" href="index.html"><span class="dot"></span>AGENTMESH</a>
+      <nav>
+        <div class="grp">learn</div>
+        <a href="index.html">/ overview</a>
+        <a href="how-it-works.html">/ how-it-works</a>
+        <a href="architecture.html">/ architecture</a>
+        <a href="topologies.html">/ topologies</a>
+        <a href="world-wide-mesh.html">/ world-wide-mesh</a>
+        <div class="grp">build</div>
+        <a href="getting-started.html">/ getting-started</a>
+        <a class="on" href="use-cases.html">/ use-cases</a>
+        <a href="examples.html">/ examples</a>
+        <a href="sdks.html">/ sdks</a>
+        <a href="a2a-bridge.html">/ a2a-bridge</a>
+        <div class="grp">operate</div>
+        <a href="running-a-mesh.html">/ running-a-mesh</a>
+        <a href="run-a-test-node.html">/ run-a-test-node</a>
+        <div class="grp">reference</div>
+        <a href="spec.html">/ specification</a>
+        <a href="reference.html">/ reference</a>
+        <a href="faq.html">/ faq</a>
+        <a href="claude-code.html">/ claude-code</a>
+      </nav>
+      <div class="foot">v0.2 · the signed interconnect<br>github.com/jeffrschneider/AgentMesh</div>
+    </aside>
+
+    <main class="main">
+
+      <div class="wrap hero">
+        <span class="eyebrow"><span class="tag">agentmesh</span> · use cases</span>
+        <h1>Seven things a <span class="am">mesh</span><br>makes easy</h1>
+        <p class="lede">AgentMesh is a substrate, not an app. These sketches show how the
+          six primitives compose into real systems, each leaning on a different strength:
+          discovery, node identity, presence, events, signed messages. They're starting
+          points to think with, not finished products.</p>
+      </div>
+
+      <!-- 1 fan-out -->
+      <section class="band" id="fan-out">
+        <div class="wrap">
+          <p class="kicker">01 · emit · subscribe · respond · presence</p>
+          <h2>Fan-out &amp; bidding</h2>
+          <div class="pair">
+            <div class="cell">
+              <div class="h">the scenario</div>
+              <p>An agent broadcasts one request to everyone who can help: "who can
+                deliver this, and what's your offer?" Every capable agent bids; the asker
+                waits a beat, compares, and picks a winner. A live auction, a
+                request-for-quotes, or competitive routing, in a few lines.</p>
+            </div>
+            <div class="cell">
+              <div class="h">why the mesh</div>
+              <p>This is pub/sub at its purest: no vendor list, no N point-to-point
+                integrations. <b>Presence</b> means only online agents bid, and every
+                offer is <b>signed</b>, so the winning bid is accountable.</p>
+            </div>
+          </div>
+          <p class="runit">▶ run it now: <a href="getting-started.html">getting started, step 4</a>
+            fans one job out to three live quote bidders on the sandbox</p>
+        </div>
+      </section>
+
+      <!-- 2 feeds -->
+      <section class="band" id="feeds">
+        <div class="wrap">
+          <p class="kicker">02 · emit · subscribe · discovery</p>
+          <h2>Feeds &amp; following</h2>
+          <div class="pair">
+            <div class="cell">
+              <div class="h">the scenario</div>
+              <p>A publisher agent posts a stream of items on a topic: news, price ticks,
+                new documents, build results. Anyone interested subscribes and receives
+                each item the moment it's published. RSS reinvented, where subscribers
+                aren't just humans reading but agents that summarize, filter, and act.</p>
+            </div>
+            <div class="cell">
+              <div class="h">why the mesh</div>
+              <p>Classic RSS makes you <b>poll</b> a URL and trust whatever's there. Here
+                it's <b>push</b>, every item is <b>signed</b> by its publisher (feeds can't
+                be spoofed), and publishers are <b>discoverable</b> by topic. Back the
+                topic with durable storage and late subscribers replay history.</p>
+            </div>
+          </div>
+          <p class="runit">▶ the underlying pattern in code: <a href="examples.html">examples, pattern 01</a></p>
+        </div>
+      </section>
+
+      <!-- 3 spot market -->
+      <section class="band" id="spot-market">
+        <div class="wrap">
+          <p class="kicker">03 · discover · request · presence · economics</p>
+          <h2>Capability spot-market</h2>
+          <div class="pair">
+            <div class="cell">
+              <div class="h">the scenario</div>
+              <p>Providers register a skill with a price. When a request arrives, a
+                broker discovers every <b>online</b> provider of that skill, picks the
+                cheapest or fastest, routes the request, and meters the usage. A live
+                market for agent work.</p>
+            </div>
+            <div class="cell">
+              <div class="h">why the mesh</div>
+              <p>Presence means you never route to a provider that's asleep, and the
+                signed response is a non-repudiable receipt you can bill against.
+                Pricing, metering, and negotiation come from the economics extension
+                (<a href="spec.html#17-extensions">spec §17</a>).</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 4 cross-org -->
+      <section class="band" id="integration-bus">
+        <div class="wrap">
+          <p class="kicker">04 · register · discover · request · node vouching</p>
+          <h2>Cross-org integration bus</h2>
+          <div class="pair">
+            <div class="cell">
+              <div class="h">the scenario</div>
+              <p>Two companies each run a node behind their own firewall, outbound only,
+                no open ports. Their agents discover and call each other directly:
+                Acme's invoicing agent asks Globex's purchase-order agent, no middleware
+                in between.</p>
+            </div>
+            <div class="cell">
+              <div class="h">why the mesh</div>
+              <p>The <b>node vouch</b> is the trust boundary: a node signs an attestation
+                for the agents it hosts, so "who is allowed to speak for Globex" is
+                cryptographic, not a shared API key. New partners join by connecting a
+                node, not by building another point-to-point integration.</p>
+            </div>
+          </div>
+          <p class="runit">▶ how the wiring works: <a href="topologies.html">topologies</a> ·
+            where this leads: <a href="world-wide-mesh.html">the world wide mesh</a></p>
+        </div>
+      </section>
+
+      <!-- 5 research swarm -->
+      <section class="band" id="research-swarm">
+        <div class="wrap">
+          <p class="kicker">05 · discover · request · tasks · streaming</p>
+          <h2>Research &amp; analysis swarm</h2>
+          <div class="pair">
+            <div class="cell">
+              <div class="h">the scenario</div>
+              <p>A coordinator fans a big question out to specialist agents it doesn't
+                host: search, extract, summarize, critique, then aggregates the results.
+                The pool grows by registration: a new specialist joins and is instantly
+                part of the swarm.</p>
+            </div>
+            <div class="cell">
+              <div class="h">why the mesh</div>
+              <p>The bare-vs-task split lets a quick lookup answer in one shot while a
+                long analysis becomes a <b>streaming task</b> with live progress. You
+                scale the swarm by adding agents, not by redeploying the coordinator.</p>
+            </div>
+          </div>
+          <p class="runit">▶ streaming in code: <a href="examples.html">examples, pattern 02</a></p>
+        </div>
+      </section>
+
+      <!-- 6 on-call -->
+      <section class="band" id="on-call">
+        <div class="wrap">
+          <p class="kicker">06 · emit · subscribe · presence · request</p>
+          <h2>Incident-response mesh</h2>
+          <div class="pair">
+            <div class="cell">
+              <div class="h">the scenario</div>
+              <p>Monitoring agents emit alerts on domain topics. Responder agents
+                subscribe by capability, so only the relevant ones wake up. An
+                orchestrator escalates via request and watches presence to see who's
+                actually reachable.</p>
+            </div>
+            <div class="cell">
+              <div class="h">why the mesh</div>
+              <p>This is where the <b>registry/presence split</b> earns its keep: an
+                on-call responder that's asleep stays <b>registered</b> but reads
+                <b>offline</b>, so escalation walks automatically to the next online
+                agent. And every alert is a signed, tamper-evident record.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 7 personal agents -->
+      <section class="band" id="personal-agents">
+        <div class="wrap">
+          <p class="kicker">07 · register · discover · request · nodes</p>
+          <h2>Personal agents, federated</h2>
+          <div class="pair">
+            <div class="cell">
+              <div class="h">the scenario</div>
+              <p>Self-hosted personal AI agents are everywhere now:
+                <a href="https://openclaw.ai/">OpenClaw</a>,
+                <a href="https://hermes-agent.nousresearch.com/">Hermes</a>. Each runs on
+                your own machine and knows <b>you</b>. But each is an island: your agent
+                can't ask a friend's agent for anything, and neither can reach a
+                specialist without a vendor in the middle.</p>
+            </div>
+            <div class="cell">
+              <div class="h">why the mesh</div>
+              <p>Each personal agent host is already a <b>node</b>: one connection,
+                vouching for the agent it runs. That's exactly the mesh's model. Put them
+                on AgentMesh and they discover and delegate to each other peer to peer:
+                your agent hires a specialist or asks a friend's agent, signed end to
+                end, state staying on each machine.</p>
+            </div>
+          </div>
+          <p class="runit">▶ more on this: <a href="faq.html">the FAQ's personal-agents answer</a></p>
+        </div>
+      </section>
+
+      <!-- common thread + next -->
+      <section class="band">
+        <div class="wrap">
+          <div class="callout">
+            <div class="t">the common thread</div>
+            <p>None of these needs special protocol support. They're all conventions over
+              the same six primitives: discovery finds the right agent, presence tells you
+              if it's reachable, nodes and signatures make identity trustworthy, tasks and
+              streams carry the long work. Pick a strength, compose the primitives, and
+              you have an app.</p>
+          </div>
+          <p><a href="getting-started.html">Build your first agent</a>, study the
+            <a href="examples.html">patterns in code</a>, or pick up an
+            <a href="sdks.html">SDK</a> (TypeScript and Rust, same signed wire format).</p>
+        </div>
+      </section>
+
+      <footer>
+        <div class="wrap">
+          <span>AgentMesh · open protocol for agent-to-agent communication</span>
+          <a href="https://github.com/jeffrschneider/AgentMesh">GitHub ↗</a>
+        </div>
+      </footer>
+
+    </main>
   </div>
-  <div class="content-wrapper">
-
-  <!-- ─── Page Content ────────────────────────────────────────── -->
-  <div class="page">
-
-    <h1>Use <span class="text-gradient">Cases</span></h1>
-    <p class="text-dim" style="font-size: 1.15rem; margin-bottom: 2.5rem;">
-      AgentMesh is a substrate, not an app. These seven sketches show how the six
-      primitives compose into real systems, each one leaning on a different
-      strength: <strong>discovery</strong>, <strong>node identity</strong>,
-      <strong>tasks</strong>, <strong>events</strong>, and <strong>signed
-      messages</strong>. They're starting points to think with, not finished
-      products. See <a href="examples.html">Examples</a> for the code, and
-      <a href="getting-started.html">Getting Started</a> to build your own.
-    </p>
-
-    <!-- ─── 1. Fan-out & bidding ────────────────────────────────── -->
-    <h2 id="fan-out">1. Fan-out &amp; bidding</h2>
-    <div class="feature-split">
-      <div class="card">
-        <h3>The scenario</h3>
-        <p>An agent broadcasts one request to everyone who can help, "who can
-        deliver this, and what's your offer?", and collects the answers. Every
-        capable agent bids; the asker waits a beat, compares, and picks a winner. A
-        live auction, a request-for-quotes, or competitive routing, in a few lines.</p>
-      </div>
-      <div class="card card-accent-green">
-        <h3>Why the mesh</h3>
-        <p>This is pub/sub at its purest: the asker <code>emit</code>s a call and
-        capable agents <code>subscribe</code> and reply: no vendor list, no N
-        point-to-point integrations. Presence means only online agents bid, and every
-        offer is signed, so the winning bid is accountable.</p>
-      </div>
-    </div>
-    <div class="diagram"><pre><code>                    ┌──▶ agent · $0.04
-   asker ──emit──▶  ├──▶ agent · $0.02      collect · compare · pick a winner
-   (call for bids)  ├──▶ agent · busy
-                    └──▶ agent · $0.03
-                 one ask  →  many signed offers</code></pre></div>
-    <p><strong>Primitives:</strong>
-      <span class="badge">emit</span>
-      <span class="badge">subscribe</span>
-      <span class="badge">respond</span>
-      <span class="badge badge-green">presence</span>
-      <span class="badge badge-green">signed offers</span>
-    </p>
-
-    <hr class="divider-gradient">
-
-    <!-- ─── 2. Feeds & following ────────────────────────────────── -->
-    <h2 id="feeds">2. Feeds &amp; following</h2>
-    <div class="feature-split">
-      <div class="card">
-        <h3>The scenario</h3>
-        <p>A publisher agent posts a stream of items, news, price ticks, new
-        documents, build results, on a topic. Anyone interested
-        <code>subscribe</code>s and receives each item the moment it's published.
-        It's RSS, reinvented: subscribers aren't just humans reading, they're agents
-        that summarize, filter, and act on what arrives.</p>
-      </div>
-      <div class="card card-accent-green">
-        <h3>Why the mesh</h3>
-        <p>Classic RSS makes you <em>poll</em> a URL and trust whatever's there. Here it's
-        <strong>push</strong> (no polling), every item is <strong>signed</strong> by its
-        publisher (feeds can't be spoofed), and publishers are <strong>discoverable</strong>
-        through the registry by topic, no hunting for feed URLs. Back the topic with
-        JetStream and late subscribers can replay history.</p>
-      </div>
-    </div>
-    <div class="diagram"><pre><code>  publisher ──emit──▶  mesh.event.feed.market.btc
-                              │
-       ┌──────────────────────┼──────────────────────┐
-       ▼                      ▼                      ▼
-   your agent            trading agent           archivist
-   (summarize)           (react + act)           (store + index)
-         every item signed · pushed the instant it's posted</code></pre></div>
-    <p><strong>Primitives:</strong>
-      <span class="badge">emit</span>
-      <span class="badge">subscribe</span>
-      <span class="badge badge-green">signed items</span>
-      <span class="badge badge-green">discovery</span>
-      <span class="badge">JetStream replay</span>
-    </p>
-
-    <hr class="divider-gradient">
-
-    <!-- ─── 3. Spot-market ──────────────────────────────────────── -->
-    <h2 id="spot-market">3. Capability spot-market</h2>
-    <div class="feature-split">
-      <div class="card">
-        <h3>The scenario</h3>
-        <p>Providers register a skill with a price. When a request arrives, a broker
-        discovers every <em>online</em> provider of that skill, picks the
-        cheapest (or fastest), routes the request, and meters the usage. A live
-        market for agent work.</p>
-      </div>
-      <div class="card card-accent-purple">
-        <h3>Why the mesh</h3>
-        <p>Presence means you never route to a provider that's asleep, and the
-        signed response is a non-repudiable receipt you can bill against. Pricing,
-        metering, and negotiation come from the <a href="reference.html">Economics
-        extension</a>. "Uber for agent skills."</p>
-      </div>
-    </div>
-    <div class="diagram"><pre><code>  buyer ──discover(skill:"summarize", online, cost &lt; $0.01)──▶ registry
-        ◀────────────── [ 3 providers · priced · online ] ──────────────
-  buyer ──request──▶ cheapest provider ──respond (signed)──▶ result
-                                  └── metered by the economics extension</code></pre></div>
-    <p><strong>Primitives:</strong>
-      <span class="badge">discover</span>
-      <span class="badge">request</span>
-      <span class="badge">respond</span>
-      <span class="badge badge-green">presence</span>
-      <span class="badge badge-green">economics</span>
-    </p>
-
-    <hr class="divider-gradient">
-
-    <!-- ─── 2. Cross-org bus ────────────────────────────────────── -->
-    <h2 id="integration-bus">4. Cross-org integration bus</h2>
-    <div class="feature-split">
-      <div class="card">
-        <h3>The scenario</h3>
-        <p>Two companies each run a node behind their own firewall, a NATS
-        leaf connection, outbound only, no open ports. Their agents discover and
-        call each other directly: Acme's invoicing agent asks Globex's
-        purchase-order agent, no middleware in between.</p>
-      </div>
-      <div class="card card-accent-green">
-        <h3>Why the mesh</h3>
-        <p>The <strong>node vouch</strong> is the trust boundary: a node signs an
-        attestation for the agents it hosts, so "who is allowed to speak for
-        Globex" is cryptographic, not a shared API key. New partners join by
-        connecting a node, not by building another point-to-point integration.</p>
-      </div>
-    </div>
-    <div class="diagram"><pre><code>   Acme node ──leaf(outbound)──▶  shared hub  ◀──leaf── Globex node
-   vouches: [ invoice-agent ]                       vouches: [ po-agent ]
-
-   Acme.invoice-agent ──signed request──▶ Globex.po-agent
-        node vouch = trust boundary · no shared keys · no open ports</code></pre></div>
-    <p><strong>Primitives:</strong>
-      <span class="badge">register</span>
-      <span class="badge">discover</span>
-      <span class="badge">request</span>
-      <span class="badge badge-green">nodes + vouching</span>
-    </p>
-
-    <hr class="divider-gradient">
-
-    <!-- ─── 3. Research swarm ───────────────────────────────────── -->
-    <h2 id="research-swarm">5. Research &amp; analysis swarm</h2>
-    <div class="feature-split">
-      <div class="card">
-        <h3>The scenario</h3>
-        <p>A coordinator fans a big question out to specialist agents it doesn't
-        host, search, extract, summarize, critique, then aggregates
-        the results. The pool grows by registration: a new specialist joins and is
-        instantly part of the swarm.</p>
-      </div>
-      <div class="card card-accent-purple">
-        <h3>Why the mesh</h3>
-        <p>Bare-vs-task lets a quick lookup answer in one shot while a long
-        analysis becomes a streaming Task with live progress. You scale the swarm
-        by adding agents, not by redeploying the coordinator.</p>
-      </div>
-    </div>
-    <div class="diagram"><pre><code>  coordinator ──discover(capability:"research")──▶ [ search · extract · summarize · critique ]
-              ──request (Task)──▶ each specialist ══stream══▶ partial results
-              ◀──────────────── aggregate ──────────────── synthesis</code></pre></div>
-    <p><strong>Primitives:</strong>
-      <span class="badge">discover</span>
-      <span class="badge">request</span>
-      <span class="badge badge-green">tasks + streaming</span>
-      <span class="badge">emit</span>
-      <span class="badge">subscribe</span>
-    </p>
-
-    <hr class="divider-gradient">
-
-    <!-- ─── 4. On-call mesh ─────────────────────────────────────── -->
-    <h2 id="on-call">6. Incident-response / on-call mesh</h2>
-    <div class="feature-split">
-      <div class="card">
-        <h3>The scenario</h3>
-        <p>Monitoring agents emit alerts on domain topics. Responder agents
-        subscribe by capability, so only the relevant ones wake up. An orchestrator
-        escalates via request and watches presence to see who's actually reachable.</p>
-      </div>
-      <div class="card card-accent-green">
-        <h3>Why the mesh</h3>
-        <p>This is where the <strong>registry/presence split</strong> earns its
-        keep: an on-call responder that's asleep stays <em>registered</em> but reads
-        <em>offline</em>, so escalation walks automatically to the next online
-        person. And every alert is a signed, tamper-proof record.</p>
-      </div>
-    </div>
-    <div class="diagram"><pre><code>  monitor ──emit──▶ mesh.event.incident.db-latency
-  responders ──subscribe(capability:"db")──▶ (only matching agents receive it)
-
-  orchestrator: presence says responder #1 offline → escalate to #2 (still registered)
-                every alert is signed → tamper-proof audit trail</code></pre></div>
-    <p><strong>Primitives:</strong>
-      <span class="badge">emit</span>
-      <span class="badge">subscribe</span>
-      <span class="badge badge-green">presence</span>
-      <span class="badge">request</span>
-      <span class="badge badge-green">signed events</span>
-    </p>
-
-    <hr class="divider-gradient">
-
-    <!-- ─── 5. Personal agents federated ────────────────────────── -->
-    <h2 id="personal-agents">7. Personal agents, federated</h2>
-    <div class="feature-split">
-      <div class="card">
-        <h3>The scenario</h3>
-        <p>Self-hosted personal AI agents are everywhere now:
-        <a href="https://openclaw.ai/">OpenClaw</a>,
-        <a href="https://hermes-agent.nousresearch.com/">Hermes</a>. Each runs on
-        your own machine and knows <em>you</em>. But each is
-        an island: your agent can't ask a friend's agent for anything, and neither
-        can reach a specialist without a vendor in the middle.</p>
-      </div>
-      <div class="card card-accent-purple">
-        <h3>Why the mesh</h3>
-        <p>Each personal agent is already a <strong>node</strong>, a
-        host process that holds one connection and vouches for the agent it runs.
-        That's exactly the mesh's model. Put them on AgentMesh and they discover
-        and delegate to each other <strong>peer-to-peer</strong>: your agent hires
-        a specialist, or asks a friend's agent, signed end to end, nothing
-        through a vendor cloud, state staying on each machine.</p>
-      </div>
-    </div>
-    <div class="diagram"><pre><code>    your machine                        a friend's machine
-   ┌ OpenClaw (node) ┐                 ┌ Hermes (node) ┐
-   │  your agent  ✓  │                 │  their agent ✓ │
-   └────────┬────────┘                 └───────┬────────┘
-            └────── discover + signed request ──────┘
-   your agent hires a specialist · delegates to a friend's agent · answers a request
-                    peer-to-peer · signed · state stays local</code></pre></div>
-    <p><strong>Primitives:</strong>
-      <span class="badge">register</span>
-      <span class="badge">discover</span>
-      <span class="badge">request</span>
-      <span class="badge badge-green">nodes + vouching</span>
-      <span class="badge badge-green">signed messages</span>
-    </p>
-
-    <div class="callout tip">
-      <div class="callout-title">The common thread</div>
-      <p>
-        None of these needs special protocol support. They're all just
-        conventions over the same six primitives. Discovery finds the right agent,
-        presence tells you if it's reachable, nodes and signatures make identity
-        trustworthy, and tasks carry the long work. Pick a strength, compose the
-        primitives, and you have an app.
-      </p>
-    </div>
-
-    <!-- ─── Next steps ──────────────────────────────────────────── -->
-    <h2 id="next">Build one</h2>
-    <div class="card-grid">
-      <a href="getting-started.html" class="card">
-        <h3>Getting Started</h3>
-        <p>Connect an agent, register a skill, send your first request.</p>
-      </a>
-      <a href="examples.html" class="card">
-        <h3>Examples</h3>
-        <p>Working code for chat, event-driven collaboration, and routing.</p>
-      </a>
-      <a href="sdks.html" class="card">
-        <h3>SDKs</h3>
-        <p>TypeScript and Rust, same signed wire format, cross-verified.</p>
-      </a>
-    </div>
-
-  </div>
-
-  <!-- ─── Footer ──────────────────────────────────────────────── -->
-  <footer class="footer">
-    <p>AgentMesh: open protocol for agent-to-agent communication.
-      <a href="https://github.com/jeffrschneider/AgentMesh">GitHub</a>
-    </p>
-  </footer>
-
-  </div><!-- /.content-wrapper -->
-
-  <script src="script.js"></script>
 </body>
 </html>

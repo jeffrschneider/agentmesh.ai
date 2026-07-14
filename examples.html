@@ -4,307 +4,308 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Examples: AgentMesh</title>
-  <link rel="stylesheet" href="styles.css">
   <link rel="icon" type="image/svg+xml" href="favicon.svg">
   <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    /* ══════════ THE WIRE : design token system ══════════ */
+    :root{
+      --ink:#0A1417; --panel:#0F1D22; --line:#1C2E33;
+      --paper:#E7EFEC; --dim:#7C918C; --faint:#4A5D5A;
+      --signal:#F2A93B; --verify:#43D6A6; --address:#6BA8FF; --broadcast:#B69CFF;
+      --disp:'Space Grotesk', sans-serif;
+      --body:'IBM Plex Sans', system-ui, sans-serif;
+      --wire:'IBM Plex Mono', ui-monospace, monospace;
+    }
+    *{ box-sizing:border-box; }
+    html,body{ margin:0; }
+    body{ background:var(--ink); color:var(--paper); font-family:var(--body);
+      font-size:16px; line-height:1.6; -webkit-font-smoothing:antialiased;
+      background-image:
+        linear-gradient(var(--line) 1px, transparent 1px),
+        linear-gradient(90deg, var(--line) 1px, transparent 1px);
+      background-size:64px 64px, 64px 64px;
+      background-position:-1px -1px;
+    }
+    body::before{
+      content:""; position:fixed; inset:0; z-index:0; pointer-events:none;
+      background:
+        radial-gradient(80% 45% at 30% 0%, rgba(242,169,59,.10), transparent 60%),
+        radial-gradient(70% 50% at 100% 10%, rgba(67,214,166,.08), transparent 55%),
+        linear-gradient(180deg, rgba(10,20,23,.72), var(--ink) 62%);
+    }
+    a{ color:inherit; }
+
+    .layout{ position:relative; z-index:1; display:grid; grid-template-columns:248px 1fr; min-height:100vh; }
+    .rail{ border-right:1px solid var(--line); padding:26px 22px; position:sticky; top:0; align-self:start; height:100vh; }
+    .brand{ font-family:var(--wire); font-weight:600; font-size:.82rem; letter-spacing:.02em;
+      display:flex; align-items:center; gap:9px; color:var(--paper); text-decoration:none; margin-bottom:30px; }
+    .brand .dot{ width:9px; height:9px; border-radius:2px; background:var(--signal);
+      box-shadow:0 0 0 3px rgba(242,169,59,.15), 8px 0 0 -2px var(--verify), 16px 0 0 -2px var(--address); }
+    .rail .grp{ font-family:var(--wire); font-size:.64rem; letter-spacing:.18em; text-transform:uppercase;
+      color:var(--faint); margin:16px 0 4px; }
+    .rail .grp:first-child{ margin-top:0; }
+    .rail nav a{ display:block; font-family:var(--wire); font-size:.8rem; color:var(--dim);
+      text-decoration:none; padding:6px 0; border-left:2px solid transparent; padding-left:12px; margin-left:-12px; }
+    .rail nav a:hover{ color:var(--paper); }
+    .rail nav a.on{ color:var(--paper); border-left-color:var(--signal); }
+    .rail .foot{ margin-top:26px; padding-top:18px; border-top:1px solid var(--line);
+      font-family:var(--wire); font-size:.72rem; color:var(--faint); }
+
+    .main{ min-width:0; }
+    .wrap{ max-width:980px; margin:0 auto; padding:0 40px; }
+
+    .eyebrow{ font-family:var(--wire); font-size:.76rem; letter-spacing:.04em; color:var(--dim); }
+    .eyebrow .tag{ color:var(--signal); }
+    h1,h2,h3{ font-family:var(--disp); font-weight:700; letter-spacing:-.02em; line-height:1.08; }
+    .lede{ color:var(--dim); font-size:1.12rem; max-width:60ch; }
+
+    .hero{ padding:74px 0 42px; border-bottom:1px solid var(--line); }
+    .hero .eyebrow{ margin-bottom:22px; display:block; }
+    .hero h1{ font-size:clamp(2.2rem,4.6vw,3.2rem); margin:0 0 18px; }
+    .hero h1 .am{ color:var(--signal); }
+
+    section.band{ padding:56px 0; border-bottom:1px solid var(--line); }
+    section.band h2{ font-size:1.8rem; margin:0 0 14px; }
+    section.band h3{ font-size:1.15rem; margin:38px 0 10px; }
+    section.band p{ color:var(--dim); max-width:66ch; }
+    section.band p b, section.band li b{ color:var(--paper); font-weight:600; }
+    .kicker{ font-family:var(--wire); font-size:.74rem; letter-spacing:.12em; text-transform:uppercase;
+      color:var(--faint); margin:0 0 16px; }
+
+    .callout{ border:1px solid var(--line); border-left:3px solid var(--signal); border-radius:10px;
+      background:var(--panel); padding:14px 18px; margin:22px 0; max-width:70ch; }
+    .callout .t{ font-family:var(--wire); font-size:.74rem; letter-spacing:.1em; text-transform:uppercase;
+      color:var(--faint); margin-bottom:6px; }
+    .callout p{ margin:0; color:var(--dim); }
+    .callout p b{ color:var(--paper); }
+
+    pre.code{ background:#0b1220; border:1px solid var(--line); border-radius:12px; padding:16px 18px;
+      overflow-x:auto; font-family:var(--wire); font-size:.82rem; line-height:1.7; color:var(--paper); margin:20px 0; }
+    pre.code .c{ color:var(--faint); }
+    pre.code .s{ color:var(--verify); }
+    pre.out{ background:var(--panel); border:1px solid var(--line); border-left:3px solid var(--verify);
+      border-radius:12px; padding:14px 18px; overflow-x:auto; font-family:var(--wire); font-size:.8rem;
+      line-height:1.7; color:var(--dim); margin:14px 0 6px; }
+    pre.out .ok{ color:var(--verify); }
+    .outlabel{ font-family:var(--wire); font-size:.7rem; letter-spacing:.12em; text-transform:uppercase;
+      color:var(--faint); margin:18px 0 0; }
+    code.inline{ font-family:var(--wire); font-size:.86em; color:var(--verify);
+      background:rgba(67,214,166,.07); border:1px solid rgba(67,214,166,.15); border-radius:5px; padding:1px 5px; }
+
+    footer{ padding:34px 0 60px; }
+    footer .wrap{ font-family:var(--wire); font-size:.78rem; color:var(--faint); display:flex; gap:14px; }
+    footer a{ color:var(--dim); text-decoration:none; }
+
+    @media (max-width:900px){
+      .layout{ grid-template-columns:1fr; }
+      .rail{ position:static; height:auto; border-right:0; border-bottom:1px solid var(--line); }
+    }
+  </style>
 </head>
 <body>
+  <div class="layout">
 
-  <!-- ─── Sidebar Navigation ───────────────────────────────────── -->
-  <nav class="sidebar" id="sidebar">
-    <a href="index.html" class="sidebar-brand">AgentMesh</a>
-    <ul class="sidebar-nav">
-      <li class="nav-grp">learn</li>
-      <li><a href="index.html">Home</a></li>
-      <li><a href="how-it-works.html">How It Works</a></li>
-      <li><a href="architecture.html">Architecture</a></li>
-      <li><a href="topologies.html">Topologies</a></li>
-      <li><a href="world-wide-mesh.html">World Wide Mesh</a></li>
-      <li class="nav-grp">build</li>
-      <li><a href="getting-started.html">Getting Started</a></li>
-      <li><a href="use-cases.html">Use Cases</a></li>
-      <li><a href="examples.html">Examples</a></li>
-      <li><a href="sdks.html">SDKs</a></li>
-      <li><a href="a2a-bridge.html">A2A Bridge</a></li>
-      <li class="nav-grp">operate</li>
-      <li><a href="running-a-mesh.html">Running a Mesh</a></li>
-      <li><a href="run-a-test-node.html">Run a Test Node</a></li>
-      <li class="nav-grp">reference</li>
-      <li><a href="spec.html">Specification</a></li>
-      <li><a href="reference.html">Reference</a></li>
-      <li><a href="faq.html">FAQ</a></li>
-      <li><a href="claude-code.html">For Claude Code</a></li>
-    </ul>
-    <div class="sidebar-footer">
-      <a href="https://github.com/jeffrschneider/AgentMesh">GitHub</a>
-      <button class="theme-toggle" title="Toggle theme">&#x263E;</button>
-    </div>
-  </nav>
-  <div class="sidebar-backdrop" id="sidebar-backdrop"></div>
-  <div class="mobile-topbar">
-    <a href="index.html" class="sidebar-brand">AgentMesh</a>
-    <button class="hamburger" aria-label="Menu">&#x2630;</button>
+    <aside class="rail">
+      <a class="brand" href="index.html"><span class="dot"></span>AGENTMESH</a>
+      <nav>
+        <div class="grp">learn</div>
+        <a href="index.html">/ overview</a>
+        <a href="how-it-works.html">/ how-it-works</a>
+        <a href="architecture.html">/ architecture</a>
+        <a href="topologies.html">/ topologies</a>
+        <a href="world-wide-mesh.html">/ world-wide-mesh</a>
+        <div class="grp">build</div>
+        <a href="getting-started.html">/ getting-started</a>
+        <a href="use-cases.html">/ use-cases</a>
+        <a class="on" href="examples.html">/ examples</a>
+        <a href="sdks.html">/ sdks</a>
+        <a href="a2a-bridge.html">/ a2a-bridge</a>
+        <div class="grp">operate</div>
+        <a href="running-a-mesh.html">/ running-a-mesh</a>
+        <a href="run-a-test-node.html">/ run-a-test-node</a>
+        <div class="grp">reference</div>
+        <a href="spec.html">/ specification</a>
+        <a href="reference.html">/ reference</a>
+        <a href="faq.html">/ faq</a>
+        <a href="claude-code.html">/ claude-code</a>
+      </nav>
+      <div class="foot">v0.2 · the signed interconnect<br>github.com/jeffrschneider/AgentMesh</div>
+    </aside>
+
+    <main class="main">
+
+      <div class="wrap hero">
+        <span class="eyebrow"><span class="tag">agentmesh</span> · examples</span>
+        <h1>Patterns beyond<br>request and <span class="am">respond</span></h1>
+        <p class="lede">The <a href="getting-started.html">getting-started walkthrough</a>
+          covers discover, request, and register. These are the patterns it doesn't:
+          broadcast events and live streaming. Each one runs against the public sandbox in
+          two terminals, and each expected output was produced by running the code before
+          publishing it.</p>
+      </div>
+
+      <!-- ═══ PATTERN 1: EVENTS ═══ -->
+      <section class="band">
+        <div class="wrap">
+          <p class="kicker">pattern 01 · emit + subscribe</p>
+          <h2>Events: react without being asked</h2>
+          <p>Not everything is a request. Sometimes agents should react to things
+            happening on the mesh: a document landed, a price moved, a build finished.
+            The emitter doesn't know or care who's listening; listeners don't know or
+            care who fired the event. Completely decoupled.</p>
+
+          <h3>Terminal 1: the reactor</h3>
+          <p>Subscribe with a wildcard: <code class="inline">docs.*</code> catches
+            <code class="inline">docs.saved</code>, <code class="inline">docs.deleted</code>,
+            and anything else in the namespace. Start this side first.</p>
+          <pre class="code"><span class="c">// reactor.ts — npx tsx reactor.ts (start this one first)</span>
+import { AgentMesh } from <span class="s">"agentmesh"</span>;
+
+const { jwt, seed } = await (await fetch(
+  <span class="s">"https://api.agentmesh.ai/v1/guest"</span>, { method: <span class="s">"POST"</span> }
+)).json();
+const mesh = await AgentMesh.connect(<span class="s">"wss://mesh.agentmesh.ai"</span>, { jwt, nkeySeed: seed });
+
+mesh.subscribe(<span class="s">"docs.*"</span>, (event) =&gt; {
+  console.log(<span class="s">`got ${event.domain}.${event.event_type}:`</span>, event.data);
+});
+
+console.log(<span class="s">"listening for docs.* events..."</span>);
+await new Promise(() =&gt; {});</pre>
+
+          <h3>Terminal 2: the emitter</h3>
+          <pre class="code"><span class="c">// emitter.ts — npx tsx emitter.ts</span>
+import { AgentMesh } from <span class="s">"agentmesh"</span>;
+
+const { jwt, seed } = await (await fetch(
+  <span class="s">"https://api.agentmesh.ai/v1/guest"</span>, { method: <span class="s">"POST"</span> }
+)).json();
+const mesh = await AgentMesh.connect(<span class="s">"wss://mesh.agentmesh.ai"</span>, { jwt, nkeySeed: seed });
+
+mesh.emit(<span class="s">"docs.saved"</span>, { path: <span class="s">"/reports/q3.md"</span>, author: <span class="s">"you"</span> });
+
+await mesh.drain();</pre>
+          <p class="outlabel">terminal 1 prints</p>
+          <pre class="out"><span class="ok">got docs.saved: { path: '/reports/q3.md', author: 'you' }</span></pre>
+          <div class="callout">
+            <div class="t">why this shape matters</div>
+            <p>You could add ten more reactors: an archiver, an indexer, a notifier,
+              without changing a line in the emitter. And because every event travels as a
+              <b>signed envelope</b>, a subscriber always knows which agent fired it. Feeds,
+              alerts, and audit trails are this pattern with different topic names; the
+              <a href="use-cases.html">use cases</a> page sketches several.</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- ═══ PATTERN 2: STREAMING ═══ -->
+      <section class="band">
+        <div class="wrap">
+          <p class="kicker">pattern 02 · streaming</p>
+          <h2>Streaming: answers that arrive in pieces</h2>
+          <p>A bare response returns once. A stream returns as the work happens: LLM
+            tokens, progress updates, partial results. The responder declares a skill
+            with <code class="inline">streaming: true</code> and writes chunks; the
+            requester iterates them as they land.</p>
+
+          <h3>Terminal 1: the streaming responder</h3>
+          <pre class="code"><span class="c">// streamer.ts — npx tsx streamer.ts (start this one first)</span>
+import { AgentMesh } from <span class="s">"agentmesh"</span>;
+
+const { jwt, seed } = await (await fetch(
+  <span class="s">"https://api.agentmesh.ai/v1/guest"</span>, { method: <span class="s">"POST"</span> }
+)).json();
+const mesh = await AgentMesh.connect(<span class="s">"wss://mesh.agentmesh.ai"</span>, { jwt, nkeySeed: seed });
+
+mesh.onStreamRequest(<span class="s">"count"</span>, async (input, ctx, writer) =&gt; {
+  const to = Math.min(Number(input.to ?? 3), 10);
+  for (let i = 1; i &lt;= to; i++) {
+    if (i === to) writer.end({ text: <span class="s">`${i} — done`</span> });
+    else writer.write({ text: String(i) });
+  }
+});
+
+await mesh.register({
+  name: <span class="s">"Stream Demo"</span>,
+  description: <span class="s">"Streams a countdown"</span>,
+  capabilities: [<span class="s">"demo"</span>],
+  skills: [{ id: <span class="s">"count"</span>, name: <span class="s">"Count"</span>, description: <span class="s">"Streams 1..to"</span>, streaming: true }],
+});
+
+console.log(<span class="s">"streaming agent ready, address:"</span>, mesh.id);
+await new Promise(() =&gt; {});</pre>
+
+          <h3>Terminal 2: the consumer</h3>
+          <pre class="code"><span class="c">// consume.ts — paste the address printed by streamer.ts</span>
+import { AgentMesh } from <span class="s">"agentmesh"</span>;
+
+const STREAMER = <span class="s">"UDK...paste-address-here"</span>;
+
+const { jwt, seed } = await (await fetch(
+  <span class="s">"https://api.agentmesh.ai/v1/guest"</span>, { method: <span class="s">"POST"</span> }
+)).json();
+const mesh = await AgentMesh.connect(<span class="s">"wss://mesh.agentmesh.ai"</span>, { jwt, nkeySeed: seed });
+
+const stream = await mesh.requestStream(STREAMER, <span class="s">"count"</span>, { to: 3 });
+for await (const chunk of stream.chunks) {
+  console.log(<span class="s">`chunk ${chunk.chunk_index}${chunk.final ? " (final)" : ""}:`</span>, chunk.data);
+}
+
+await mesh.close();</pre>
+          <p class="outlabel">terminal 2 prints</p>
+          <pre class="out"><span class="ok">chunk 0: { text: '1' }
+chunk 1: { text: '2' }
+chunk 2 (final): { text: '3 — done' }</span></pre>
+          <div class="callout">
+            <div class="t">streams are authenticated too</div>
+            <p>The opening and final chunks are signed, and the final chunk carries the
+              total <b>chunk count</b>, so a consumer detects truncation or injection
+              without paying for a signature on every chunk. Details in
+              <a href="spec.html#11-streaming">spec §11</a>.</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- ═══ PATTERN 3: FAN-OUT (pointer) ═══ -->
+      <section class="band">
+        <div class="wrap">
+          <p class="kicker">pattern 03 · fan-out</p>
+          <h2>Fan-out: one ask, many answers</h2>
+          <p>Discover every agent with a skill, send them all the same request in
+            parallel, compare the answers. You can run this one against live agents
+            right now: the sandbox keeps three quote bidders online for exactly this
+            purpose. It's step four of
+            <a href="getting-started.html">getting started</a>, so it isn't repeated
+            here.</p>
+          <pre class="code"><span class="c">// the shape, from the walkthrough:</span>
+const bidders = agents.filter(a =&gt; a.skills.some(s =&gt; s.id === <span class="s">"quote"</span>));
+const quotes = await Promise.all(bidders.map(b =&gt; mesh.request(b.id, <span class="s">"quote"</span>, job)));</pre>
+        </div>
+      </section>
+
+      <!-- ═══ NEXT ═══ -->
+      <section class="band">
+        <div class="wrap">
+          <p class="kicker">keep going</p>
+          <h2>Compose them</h2>
+          <p>Real systems mix these: an event kicks off a fan-out, the winners stream
+            results back. The <a href="use-cases.html">use cases</a> page walks seven
+            such compositions, and <a href="how-it-works.html">how it works</a> explains
+            the primitives underneath. When your pattern needs agents that are always on,
+            <a href="running-a-mesh.html">run your own mesh</a>.</p>
+        </div>
+      </section>
+
+      <footer>
+        <div class="wrap">
+          <span>AgentMesh · open protocol for agent-to-agent communication</span>
+          <a href="https://github.com/jeffrschneider/AgentMesh">GitHub ↗</a>
+        </div>
+      </footer>
+
+    </main>
   </div>
-  <div class="content-wrapper">
-
-  <!-- ─── Page Content ────────────────────────────────────────── -->
-  <div class="page">
-
-    <h1>Examples</h1>
-    <p>
-      Real working examples of agents communicating on the mesh. Each one shows
-      complete, runnable code, not just snippets, so you can see
-      exactly how the pieces fit together.
-    </p>
-
-    <!-- ─── Example 1: Two-Agent Chat ──────────────────────────── -->
-    <h2 id="two-agent-chat">Example 1: Two-Agent Chat</h2>
-    <p>
-      The simplest possible multi-agent interaction: Jeff's agent and Bob's agent
-      have a conversation through the mesh. Jeff's agent discovers Bob, sends a
-      chat message, and Bob's agent replies.
-    </p>
-
-    <h3>Bob's side: handle chat requests</h3>
-    <p>
-      Bob's agent connects to the mesh, registers with a "chat" skill, and
-      listens for incoming requests. When one arrives, it reads the message
-      and sends back a reply.
-    </p>
-
-    <div class="code-block">
-      <span class="code-lang">typescript</span>
-      <pre><code><span class="cm">// Bob's agent — handles chat requests</span>
-<span class="kw">const</span> mesh <span class="op">=</span> <span class="kw">await</span> <span class="tp">AgentMesh</span><span class="op">.</span><span class="fn">connect</span><span class="op">(</span><span class="str">"ws://nats-server:4443"</span><span class="op">);</span>
-
-<span class="kw">await</span> mesh<span class="op">.</span><span class="fn">register</span><span class="op">({</span>
-  name<span class="op">:</span> <span class="str">"Bob's Agent"</span><span class="op">,</span>
-  skills<span class="op">:</span> <span class="op">[{</span> id<span class="op">:</span> <span class="str">"chat"</span><span class="op">,</span> name<span class="op">:</span> <span class="str">"Chat"</span><span class="op">,</span> description<span class="op">:</span> <span class="str">"Chat with Bob"</span> <span class="op">}],</span>
-<span class="op">});</span>
-
-mesh<span class="op">.</span><span class="fn">onRequest</span><span class="op">(</span><span class="str">"chat"</span><span class="op">,</span> <span class="op">(</span>payload<span class="op">)</span> <span class="op">=&gt;</span> <span class="op">{</span>
-  <span class="kw">const</span> input <span class="op">=</span> payload<span class="op">.</span>input <span class="kw">as</span> <span class="op">{</span> text<span class="op">:</span> <span class="tp">string</span> <span class="op">};</span>
-  console<span class="op">.</span><span class="fn">log</span><span class="op">(</span><span class="str">`Received: <span class="op">${</span>input<span class="op">.</span>text<span class="op">}</span>`</span><span class="op">);</span>
-  <span class="kw">return</span> <span class="op">{</span> text<span class="op">:</span> <span class="str">`Bob says: Got your message!`</span> <span class="op">};</span>
-<span class="op">});</span></code></pre>
-    </div>
-
-    <h3>Jeff's side: discover and send</h3>
-    <p>
-      Jeff's agent connects, registers itself (with no skills, since it's a
-      consumer, not a provider), discovers agents that can chat, finds Bob,
-      and sends a message.
-    </p>
-
-    <div class="code-block">
-      <span class="code-lang">typescript</span>
-      <pre><code><span class="cm">// Jeff's agent — finds Bob and sends a message</span>
-<span class="kw">const</span> mesh <span class="op">=</span> <span class="kw">await</span> <span class="tp">AgentMesh</span><span class="op">.</span><span class="fn">connect</span><span class="op">(</span><span class="str">"ws://nats-server:4443"</span><span class="op">);</span>
-
-<span class="kw">await</span> mesh<span class="op">.</span><span class="fn">register</span><span class="op">({</span>
-  name<span class="op">:</span> <span class="str">"Jeff's Agent"</span><span class="op">,</span>
-  skills<span class="op">:</span> <span class="op">[],</span>
-<span class="op">});</span>
-
-<span class="kw">const</span> <span class="op">{</span> agents <span class="op">}</span> <span class="op">=</span> <span class="kw">await</span> mesh<span class="op">.</span><span class="fn">discover</span><span class="op">({</span> capabilities<span class="op">:</span> <span class="op">[</span><span class="str">"chat"</span><span class="op">]</span> <span class="op">});</span>
-<span class="kw">const</span> bob <span class="op">=</span> agents<span class="op">.</span><span class="fn">find</span><span class="op">(</span>a <span class="op">=&gt;</span> a<span class="op">.</span>name <span class="op">===</span> <span class="str">"Bob's Agent"</span><span class="op">);</span>
-
-<span class="kw">const</span> result <span class="op">=</span> <span class="kw">await</span> mesh<span class="op">.</span><span class="fn">request</span><span class="op">(</span>bob<span class="op">.</span>id<span class="op">,</span> <span class="str">"chat"</span><span class="op">,</span> <span class="op">{</span>
-  text<span class="op">:</span> <span class="str">"Hey Bob, how's it going?"</span><span class="op">,</span>
-<span class="op">});</span>
-
-console<span class="op">.</span><span class="fn">log</span><span class="op">(</span>result<span class="op">.</span>payload<span class="op">.</span>output<span class="op">);</span>
-<span class="cm">// { text: "Bob says: Got your message!" }</span></code></pre>
-    </div>
-
-    <h3>What's happening</h3>
-    <p>
-      This example uses three of the six primitives: <code>register</code>,
-      <code>discover</code>, and <code>request</code>/<code>respond</code>. Bob's
-      agent registers with a "chat" skill, making itself discoverable. Jeff's agent
-      queries the registry for agents with the "chat" capability, picks Bob from the
-      results, and sends a request. Under the hood, the mesh creates a task, routes
-      the message to Bob's inbox, Bob's <code>onRequest</code> handler runs and
-      returns a result, and the mesh delivers that result back to Jeff as a response
-      envelope. All of this, routing, tracing, envelope construction,
-      is handled automatically.
-    </p>
-
-    <hr>
-
-    <!-- ─── Example 2: Event-Driven Collaboration ──────────────── -->
-    <h2 id="event-driven">Example 2: Event-Driven Collaboration</h2>
-    <p>
-      Not everything is a request/response. Sometimes agents need to react to
-      things happening on the mesh without being asked directly. This example
-      shows a document watcher that emits events and a summarizer that reacts
-      to them, completely decoupled.
-    </p>
-
-    <h3>Document watcher: emit events</h3>
-    <p>
-      When a new document is uploaded, this agent publishes an event to the
-      mesh. It doesn't know or care who's listening.
-    </p>
-
-    <div class="code-block">
-      <span class="code-lang">typescript</span>
-      <pre><code><span class="cm">// Document watcher — emits events when files arrive</span>
-<span class="kw">const</span> mesh <span class="op">=</span> <span class="kw">await</span> <span class="tp">AgentMesh</span><span class="op">.</span><span class="fn">connect</span><span class="op">(</span><span class="str">"ws://nats-server:4443"</span><span class="op">);</span>
-
-<span class="kw">await</span> mesh<span class="op">.</span><span class="fn">register</span><span class="op">({</span>
-  name<span class="op">:</span> <span class="str">"Document Watcher"</span><span class="op">,</span>
-  skills<span class="op">:</span> <span class="op">[],</span>
-<span class="op">});</span>
-
-<span class="cm">// When a document is uploaded, publish an event</span>
-mesh<span class="op">.</span><span class="fn">emit</span><span class="op">(</span><span class="str">"document.uploaded"</span><span class="op">,</span> <span class="op">{</span>
-  filename<span class="op">:</span> <span class="str">"quarterly-report.pdf"</span><span class="op">,</span>
-  size<span class="op">:</span> <span class="num">245000</span><span class="op">,</span>
-  uploaded_by<span class="op">:</span> <span class="str">"jeff"</span><span class="op">,</span>
-<span class="op">});</span></code></pre>
-    </div>
-
-    <h3>Summarizer: react to document events</h3>
-    <p>
-      This agent subscribes to all document events using a wildcard pattern.
-      When a new document arrives, it kicks off a summarization workflow.
-    </p>
-
-    <div class="code-block">
-      <span class="code-lang">typescript</span>
-      <pre><code><span class="cm">// Summarizer — reacts to document events</span>
-<span class="kw">const</span> mesh <span class="op">=</span> <span class="kw">await</span> <span class="tp">AgentMesh</span><span class="op">.</span><span class="fn">connect</span><span class="op">(</span><span class="str">"ws://nats-server:4443"</span><span class="op">);</span>
-
-<span class="kw">await</span> mesh<span class="op">.</span><span class="fn">register</span><span class="op">({</span>
-  name<span class="op">:</span> <span class="str">"Summarizer"</span><span class="op">,</span>
-  skills<span class="op">:</span> <span class="op">[{</span> id<span class="op">:</span> <span class="str">"summarize"</span><span class="op">,</span> name<span class="op">:</span> <span class="str">"Summarize"</span><span class="op">,</span> description<span class="op">:</span> <span class="str">"Summarize documents"</span> <span class="op">}],</span>
-<span class="op">});</span>
-
-<span class="cm">// Listen for all document events (wildcard)</span>
-mesh<span class="op">.</span><span class="fn">subscribe</span><span class="op">(</span><span class="str">"document.&gt;"</span><span class="op">,</span> <span class="op">(</span>event<span class="op">)</span> <span class="op">=&gt;</span> <span class="op">{</span>
-  <span class="kw">if</span> <span class="op">(</span>event<span class="op">.</span>event_type <span class="op">===</span> <span class="str">"uploaded"</span><span class="op">)</span> <span class="op">{</span>
-    <span class="kw">const</span> doc <span class="op">=</span> event<span class="op">.</span>data <span class="kw">as</span> <span class="op">{</span> filename<span class="op">:</span> <span class="tp">string</span> <span class="op">};</span>
-    console<span class="op">.</span><span class="fn">log</span><span class="op">(</span><span class="str">`New document: <span class="op">${</span>doc<span class="op">.</span>filename<span class="op">}</span> — queuing for summary`</span><span class="op">);</span>
-    <span class="cm">// Could trigger a request to an LLM agent here</span>
-  <span class="op">}</span>
-<span class="op">});</span></code></pre>
-    </div>
-
-    <h3>What's happening</h3>
-    <p>
-      This example uses the <code>emit</code> and <code>subscribe</code> primitives
-      to create a reactive system. The document watcher doesn't need to know which
-      agents care about new uploads. It just fires the event. The summarizer
-      doesn't need to know where documents come from. It just reacts when one
-      appears. The wildcard pattern <code>document.&gt;</code> catches all events
-      under the <code>document</code> namespace: <code>document.uploaded</code>,
-      <code>document.deleted</code>, <code>document.updated</code>, and anything
-      else. You could add ten more agents that react to document events without
-      changing a single line in the watcher.
-    </p>
-
-    <hr>
-
-    <!-- ─── Example 3: Help Desk ───────────────────────────────── -->
-    <h2 id="help-desk">Example 3: Help Desk (Discover + Request)</h2>
-    <p>
-      A more sophisticated pattern: an agent that acts as a help desk router. It
-      takes a user's question, figures out what topic it falls under, discovers
-      all agents with skills in that topic, and routes the question to the right
-      specialist. This is capability-based routing. The help desk doesn't
-      hard-code which agent handles what.
-    </p>
-
-    <div class="code-block">
-      <span class="code-lang">typescript</span>
-      <pre><code><span class="cm">// Help desk agent — finds the right specialist</span>
-<span class="kw">const</span> mesh <span class="op">=</span> <span class="kw">await</span> <span class="tp">AgentMesh</span><span class="op">.</span><span class="fn">connect</span><span class="op">(</span><span class="str">"ws://nats-server:4443"</span><span class="op">);</span>
-
-<span class="kw">await</span> mesh<span class="op">.</span><span class="fn">register</span><span class="op">({</span>
-  name<span class="op">:</span> <span class="str">"Help Desk"</span><span class="op">,</span>
-  skills<span class="op">:</span> <span class="op">[{</span> id<span class="op">:</span> <span class="str">"help"</span><span class="op">,</span> name<span class="op">:</span> <span class="str">"Help"</span><span class="op">,</span> description<span class="op">:</span> <span class="str">"Route questions to specialists"</span> <span class="op">}],</span>
-<span class="op">});</span>
-
-<span class="kw">async</span> <span class="kw">function</span> <span class="fn">routeQuestion</span><span class="op">(</span>question<span class="op">:</span> <span class="tp">string</span><span class="op">,</span> topic<span class="op">:</span> <span class="tp">string</span><span class="op">)</span> <span class="op">{</span>
-  <span class="kw">const</span> <span class="op">{</span> agents <span class="op">}</span> <span class="op">=</span> <span class="kw">await</span> mesh<span class="op">.</span><span class="fn">discover</span><span class="op">({</span>
-    capabilities<span class="op">:</span> <span class="op">[</span>topic<span class="op">],</span>
-  <span class="op">});</span>
-
-  <span class="kw">if</span> <span class="op">(</span>agents<span class="op">.</span>length <span class="op">===</span> <span class="num">0</span><span class="op">)</span> <span class="op">{</span>
-    <span class="kw">return</span> <span class="op">{</span> text<span class="op">:</span> <span class="str">`Sorry, no agents available for "<span class="op">${</span>topic<span class="op">}</span>"`</span> <span class="op">};</span>
-  <span class="op">}</span>
-
-  <span class="cm">// Pick the first available agent with the right skill</span>
-  <span class="kw">const</span> specialist <span class="op">=</span> agents<span class="op">[</span><span class="num">0</span><span class="op">];</span>
-  <span class="kw">const</span> result <span class="op">=</span> <span class="kw">await</span> mesh<span class="op">.</span><span class="fn">request</span><span class="op">(</span>specialist<span class="op">.</span>id<span class="op">,</span> topic<span class="op">,</span> <span class="op">{</span>
-    text<span class="op">:</span> question<span class="op">,</span>
-  <span class="op">});</span>
-
-  <span class="kw">return</span> result<span class="op">.</span>payload<span class="op">.</span>output<span class="op">;</span>
-<span class="op">}</span>
-
-<span class="cm">// Usage</span>
-<span class="kw">const</span> answer <span class="op">=</span> <span class="kw">await</span> <span class="fn">routeQuestion</span><span class="op">(</span>
-  <span class="str">"What's the weather in Tokyo?"</span><span class="op">,</span>
-  <span class="str">"weather"</span>
-<span class="op">);</span></code></pre>
-    </div>
-
-    <h3>What's happening</h3>
-    <p>
-      The help desk agent doesn't know in advance which agents exist or what
-      they can do. It uses <code>discover</code> at runtime to search the
-      registry for agents whose capabilities match the question's topic. If a
-      weather agent is online and registered with the <code>"weather"</code>
-      capability, it shows up in the results. The help desk picks one and
-      forwards the question via <code>request</code>. If no agents match, it
-      returns a graceful fallback message. This pattern is powerful because it's
-      completely dynamic. New specialist agents can join or leave the mesh
-      at any time, and the help desk automatically adapts without code changes.
-    </p>
-
-    <hr>
-
-    <!-- ─── Example 4 retired ───────────────────────────────────── -->
-    <div class="callout">
-      <div class="callout-title">Removed in 0.2</div>
-      <p>
-        A "user-to-user messaging" example used to live here, built on the 0.1 demo
-        Presence service (human accounts, contacts, store-and-forward DMs). That
-        service was playground scaffolding, an application on top of the mesh,
-        not part of the protocol, and has been retired. The three examples
-        above cover the actual protocol surface.
-      </p>
-    </div>
-
-    <hr>
-
-    <!-- ─── Next Steps ─────────────────────────────────────────── -->
-    <div class="callout tip">
-      <div class="callout-title">Build on these patterns</div>
-      <p>
-        These examples cover the core patterns: direct request/response,
-        event-driven collaboration, and capability-based routing. They combine
-        to handle almost any agent workflow. To learn more, check out the
-        <a href="getting-started.html">Getting Started guide</a> to build your
-        first agent, or browse the <a href="reference.html">Reference</a> for
-        the full API surface.
-      </p>
-    </div>
-
-  </div>
-
-  <!-- ─── Footer ──────────────────────────────────────────────── -->
-  <footer class="footer">
-    <p>AgentMesh: open protocol for agent-to-agent communication.
-      <a href="https://github.com/jeffrschneider/AgentMesh">GitHub</a>
-    </p>
-  </footer>
-
-  </div><!-- /.content-wrapper -->
-
-  <script src="script.js"></script>
 </body>
 </html>
