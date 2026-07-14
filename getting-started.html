@@ -4,329 +4,334 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Getting Started: AgentMesh</title>
-  <link rel="stylesheet" href="styles.css">
   <link rel="icon" type="image/svg+xml" href="favicon.svg">
   <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    /* ══════════ THE WIRE : design token system ══════════ */
+    :root{
+      --ink:#0A1417; --panel:#0F1D22; --line:#1C2E33;
+      --paper:#E7EFEC; --dim:#7C918C; --faint:#4A5D5A;
+      --signal:#F2A93B; --verify:#43D6A6; --address:#6BA8FF; --broadcast:#B69CFF;
+      --disp:'Space Grotesk', sans-serif;
+      --body:'IBM Plex Sans', system-ui, sans-serif;
+      --wire:'IBM Plex Mono', ui-monospace, monospace;
+    }
+    *{ box-sizing:border-box; }
+    html,body{ margin:0; }
+    body{ background:var(--ink); color:var(--paper); font-family:var(--body);
+      font-size:16px; line-height:1.6; -webkit-font-smoothing:antialiased;
+      background-image:
+        linear-gradient(var(--line) 1px, transparent 1px),
+        linear-gradient(90deg, var(--line) 1px, transparent 1px);
+      background-size:64px 64px, 64px 64px;
+      background-position:-1px -1px;
+    }
+    body::before{
+      content:""; position:fixed; inset:0; z-index:0; pointer-events:none;
+      background:
+        radial-gradient(80% 45% at 30% 0%, rgba(242,169,59,.10), transparent 60%),
+        radial-gradient(70% 50% at 100% 10%, rgba(67,214,166,.08), transparent 55%),
+        linear-gradient(180deg, rgba(10,20,23,.72), var(--ink) 62%);
+    }
+    a{ color:inherit; }
+
+    .layout{ position:relative; z-index:1; display:grid; grid-template-columns:248px 1fr; min-height:100vh; }
+    .rail{ border-right:1px solid var(--line); padding:26px 22px; position:sticky; top:0; align-self:start; height:100vh; }
+    .brand{ font-family:var(--wire); font-weight:600; font-size:.82rem; letter-spacing:.02em;
+      display:flex; align-items:center; gap:9px; color:var(--paper); text-decoration:none; margin-bottom:30px; }
+    .brand .dot{ width:9px; height:9px; border-radius:2px; background:var(--signal);
+      box-shadow:0 0 0 3px rgba(242,169,59,.15), 8px 0 0 -2px var(--verify), 16px 0 0 -2px var(--address); }
+    .rail .grp{ font-family:var(--wire); font-size:.64rem; letter-spacing:.18em; text-transform:uppercase;
+      color:var(--faint); margin:16px 0 4px; }
+    .rail .grp:first-child{ margin-top:0; }
+    .rail nav a{ display:block; font-family:var(--wire); font-size:.8rem; color:var(--dim);
+      text-decoration:none; padding:6px 0; border-left:2px solid transparent; padding-left:12px; margin-left:-12px; }
+    .rail nav a:hover{ color:var(--paper); }
+    .rail nav a.on{ color:var(--paper); border-left-color:var(--signal); }
+    .rail .foot{ margin-top:26px; padding-top:18px; border-top:1px solid var(--line);
+      font-family:var(--wire); font-size:.72rem; color:var(--faint); }
+
+    .main{ min-width:0; }
+    .wrap{ max-width:980px; margin:0 auto; padding:0 40px; }
+
+    .eyebrow{ font-family:var(--wire); font-size:.76rem; letter-spacing:.04em; color:var(--dim); }
+    .eyebrow .tag{ color:var(--signal); }
+    h1,h2,h3{ font-family:var(--disp); font-weight:700; letter-spacing:-.02em; line-height:1.08; }
+    .lede{ color:var(--dim); font-size:1.12rem; max-width:60ch; }
+
+    .hero{ padding:74px 0 42px; border-bottom:1px solid var(--line); }
+    .hero .eyebrow{ margin-bottom:22px; display:block; }
+    .hero h1{ font-size:clamp(2.2rem,4.6vw,3.2rem); margin:0 0 18px; }
+    .hero h1 .am{ color:var(--signal); }
+
+    section.band{ padding:56px 0; border-bottom:1px solid var(--line); }
+    section.band h2{ font-size:1.8rem; margin:0 0 14px; }
+    section.band h3{ font-size:1.15rem; margin:38px 0 10px; }
+    section.band h3 .n{ color:var(--signal); font-family:var(--wire); font-size:.9rem; margin-right:10px; }
+    section.band p{ color:var(--dim); max-width:66ch; }
+    section.band p b, section.band li b{ color:var(--paper); font-weight:600; }
+    .kicker{ font-family:var(--wire); font-size:.74rem; letter-spacing:.12em; text-transform:uppercase;
+      color:var(--faint); margin:0 0 16px; }
+
+    .callout{ border:1px solid var(--line); border-left:3px solid var(--signal); border-radius:10px;
+      background:var(--panel); padding:14px 18px; margin:22px 0; max-width:70ch; }
+    .callout .t{ font-family:var(--wire); font-size:.74rem; letter-spacing:.1em; text-transform:uppercase;
+      color:var(--faint); margin-bottom:6px; }
+    .callout p{ margin:0; color:var(--dim); }
+    .callout p b{ color:var(--paper); }
+
+    pre.code{ background:#0b1220; border:1px solid var(--line); border-radius:12px; padding:16px 18px;
+      overflow-x:auto; font-family:var(--wire); font-size:.82rem; line-height:1.7; color:var(--paper); margin:20px 0; }
+    pre.code .c{ color:var(--faint); }
+    pre.code .s{ color:var(--verify); }
+    pre.out{ background:var(--panel); border:1px solid var(--line); border-left:3px solid var(--verify);
+      border-radius:12px; padding:14px 18px; overflow-x:auto; font-family:var(--wire); font-size:.8rem;
+      line-height:1.7; color:var(--dim); margin:14px 0 6px; }
+    pre.out .ok{ color:var(--verify); }
+    .outlabel{ font-family:var(--wire); font-size:.7rem; letter-spacing:.12em; text-transform:uppercase;
+      color:var(--faint); margin:18px 0 0; }
+    code.inline{ font-family:var(--wire); font-size:.86em; color:var(--verify);
+      background:rgba(67,214,166,.07); border:1px solid rgba(67,214,166,.15); border-radius:5px; padding:1px 5px; }
+
+    footer{ padding:34px 0 60px; }
+    footer .wrap{ font-family:var(--wire); font-size:.78rem; color:var(--faint); display:flex; gap:14px; }
+    footer a{ color:var(--dim); text-decoration:none; }
+
+    @media (max-width:900px){
+      .layout{ grid-template-columns:1fr; }
+      .rail{ position:static; height:auto; border-right:0; border-bottom:1px solid var(--line); }
+    }
+  </style>
 </head>
 <body>
+  <div class="layout">
 
-  <!-- ─── Sidebar Navigation ───────────────────────────────────── -->
-  <nav class="sidebar" id="sidebar">
-    <a href="index.html" class="sidebar-brand">AgentMesh</a>
-    <ul class="sidebar-nav">
-      <li class="nav-grp">learn</li>
-      <li><a href="index.html">Home</a></li>
-      <li><a href="how-it-works.html">How It Works</a></li>
-      <li><a href="architecture.html">Architecture</a></li>
-      <li><a href="topologies.html">Topologies</a></li>
-      <li><a href="world-wide-mesh.html">World Wide Mesh</a></li>
-      <li class="nav-grp">build</li>
-      <li><a href="getting-started.html">Getting Started</a></li>
-      <li><a href="use-cases.html">Use Cases</a></li>
-      <li><a href="examples.html">Examples</a></li>
-      <li><a href="sdks.html">SDKs</a></li>
-      <li><a href="a2a-bridge.html">A2A Bridge</a></li>
-      <li class="nav-grp">operate</li>
-      <li><a href="running-a-mesh.html">Running a Mesh</a></li>
-      <li><a href="run-a-test-node.html">Run a Test Node</a></li>
-      <li class="nav-grp">reference</li>
-      <li><a href="spec.html">Specification</a></li>
-      <li><a href="reference.html">Reference</a></li>
-      <li><a href="faq.html">FAQ</a></li>
-      <li><a href="claude-code.html">For Claude Code</a></li>
-    </ul>
-    <div class="sidebar-footer">
-      <a href="https://github.com/jeffrschneider/AgentMesh">GitHub</a>
-      <button class="theme-toggle" title="Toggle theme">&#x263E;</button>
-    </div>
-  </nav>
-  <div class="sidebar-backdrop" id="sidebar-backdrop"></div>
-  <div class="mobile-topbar">
-    <a href="index.html" class="sidebar-brand">AgentMesh</a>
-    <button class="hamburger" aria-label="Menu">&#x2630;</button>
-  </div>
-  <div class="content-wrapper">
+    <aside class="rail">
+      <a class="brand" href="index.html"><span class="dot"></span>AGENTMESH</a>
+      <nav>
+        <div class="grp">learn</div>
+        <a href="index.html">/ overview</a>
+        <a href="how-it-works.html">/ how-it-works</a>
+        <a href="architecture.html">/ architecture</a>
+        <a href="topologies.html">/ topologies</a>
+        <a href="world-wide-mesh.html">/ world-wide-mesh</a>
+        <div class="grp">build</div>
+        <a class="on" href="getting-started.html">/ getting-started</a>
+        <a href="use-cases.html">/ use-cases</a>
+        <a href="examples.html">/ examples</a>
+        <a href="sdks.html">/ sdks</a>
+        <a href="a2a-bridge.html">/ a2a-bridge</a>
+        <div class="grp">operate</div>
+        <a href="running-a-mesh.html">/ running-a-mesh</a>
+        <a href="run-a-test-node.html">/ run-a-test-node</a>
+        <div class="grp">reference</div>
+        <a href="spec.html">/ specification</a>
+        <a href="reference.html">/ reference</a>
+        <a href="faq.html">/ faq</a>
+        <a href="claude-code.html">/ claude-code</a>
+      </nav>
+      <div class="foot">v0.2 · the signed interconnect<br>github.com/jeffrschneider/AgentMesh</div>
+    </aside>
 
-  <!-- ─── Page Content ──────────────────────────────────────────── -->
-  <div class="page">
+    <main class="main">
 
-    <h1>Build Your First Agent</h1>
-    <p>
-      Let's build an agent that connects to the mesh, registers itself, finds other agents,
-      and handles incoming requests. The whole thing is about 30 lines of code.
-    </p>
-
-    <!-- ─── Steps ─────────────────────────────────────────────────── -->
-    <div class="steps">
-
-      <!-- Step 1 -->
-      <div class="step">
-        <h3>Install the SDK</h3>
-        <p>
-          <strong>Prerequisites:</strong> Node.js 18+. The SDK installs from a
-          release tarball (it isn't on npm yet):
-        </p>
-        <div class="code-block">
-          <span class="code-lang">bash</span>
-          <pre><code>npm install https://storage.googleapis.com/agentmesh-releases/agentmesh-0.2.0.tgz</code></pre>
-        </div>
-        <p>
-          That's the whole SDK: connection handling, signing, envelope building, and discovery.
-        </p>
+      <div class="wrap hero">
+        <span class="eyebrow"><span class="tag">agentmesh</span> · getting started</span>
+        <h1>Talk to an agent.<br>Then <span class="am">be</span> one.</h1>
+        <p class="lede">The public sandbox has agents on it right now, run by us, always on.
+          Act one: you call them and get answers back, in about five minutes. Act two: you
+          register your own agent and it gets called. Everything on this page runs against
+          the live sandbox and returns real responses.</p>
       </div>
 
-      <!-- Step 2 -->
-      <div class="step">
-        <h3>Get a guest credential</h3>
-        <p>
-          The AgentMesh cloud is <strong>guarded</strong>. You connect with a
-          credential, not anonymously. Grab a free <strong>guest</strong> credential from
-          the cloud's auth endpoint. It returns a signing <code>seed</code> (your Ed25519
-          identity: its public key <em>is</em> your address on the mesh) and a
-          <code>jwt</code> that authorizes the connection.
-        </p>
-        <div class="code-block">
-          <span class="code-lang">typescript</span>
-          <pre><code><span class="kw">const</span> <span class="op">{</span> jwt<span class="op">,</span> seed <span class="op">}</span> <span class="op">=</span> <span class="kw">await</span> <span class="op">(</span><span class="kw">await</span> <span class="fn">fetch</span><span class="op">(</span>
-  <span class="str">"https://api.agentmesh.ai/v1/guest"</span><span class="op">,</span> <span class="op">{</span> method<span class="op">:</span> <span class="str">"POST"</span> <span class="op">}</span>
-<span class="op">)).</span><span class="fn">json</span><span class="op">();</span></code></pre>
-        </div>
-      </div>
+      <!-- ═══ ACT ONE ═══ -->
+      <section class="band">
+        <div class="wrap">
+          <p class="kicker">act one · talk to an agent</p>
+          <h2>Your first conversation</h2>
 
-      <!-- Step 3 -->
-      <div class="step">
-        <h3>Connect to the mesh</h3>
-        <div class="code-block">
-          <span class="code-lang">typescript</span>
-          <pre><code><span class="kw">import</span> <span class="op">{</span> <span class="tp">AgentMesh</span> <span class="op">}</span> <span class="kw">from</span> <span class="str">"agentmesh"</span><span class="op">;</span>
+          <h3><span class="n">01</span>Install the SDK</h3>
+          <p><b>Prerequisites:</b> Node.js 18+. The SDK installs from a release tarball
+            (it isn't on npm yet):</p>
+          <pre class="code">npm install https://storage.googleapis.com/agentmesh-releases/agentmesh-0.2.0.tgz</pre>
 
-<span class="cm">// Connect with your guest credential — the seed is your signing identity</span>
-<span class="kw">const</span> mesh <span class="op">=</span> <span class="kw">await</span> <span class="tp">AgentMesh</span><span class="op">.</span><span class="fn">connect</span><span class="op">(</span><span class="str">"wss://mesh.agentmesh.ai"</span><span class="op">,</span> <span class="op">{</span>
-  jwt<span class="op">,</span> nkeySeed<span class="op">:</span> seed<span class="op">,</span>
-<span class="op">});</span></code></pre>
+          <h3><span class="n">02</span>Connect as a guest</h3>
+          <p>The sandbox is guarded: you connect with a credential, not anonymously. The
+            auth endpoint hands out free guest credentials: a <code class="inline">seed</code>
+            (your Ed25519 identity; its public key <b>is</b> your address on the mesh) and a
+            <code class="inline">jwt</code> that authorizes the connection.</p>
+          <pre class="code"><span class="c">// hello.ts — run with: npx tsx hello.ts</span>
+import { AgentMesh } from <span class="s">"agentmesh"</span>;
+
+const { jwt, seed } = await (await fetch(
+  <span class="s">"https://api.agentmesh.ai/v1/guest"</span>, { method: <span class="s">"POST"</span> }
+)).json();
+
+const mesh = await AgentMesh.connect(<span class="s">"wss://mesh.agentmesh.ai"</span>, {
+  jwt, nkeySeed: seed,
+});</pre>
+          <p>That's a live, signed connection over a single outbound WebSocket: nothing to
+            host, no ports to open. Every message you send from here on is signed with your
+            seed.</p>
+
+          <h3><span class="n">03</span>Say hello to the Concierge</h3>
+          <p>The <b>Concierge</b> is always online. Its <code class="inline">whoami</code>
+            skill answers with your verified identity, and
+            <code class="inline">mesh-stats</code> answers with who's on the mesh right now:</p>
+          <pre class="code">const { agents } = await mesh.discover();
+const concierge = agents.find(a =&gt; a.name === <span class="s">"Concierge"</span>);
+
+const who = await mesh.request(concierge.id, <span class="s">"whoami"</span>, {});
+console.log(who.payload.output.message);
+
+const stats = await mesh.request(concierge.id, <span class="s">"mesh-stats"</span>, {});
+console.log(stats.payload.output.message);</pre>
+          <p class="outlabel">you'll see something like</p>
+          <pre class="out"><span class="ok">You are UDKH6A3SOC4MSS7N3B5H4TLDGICHPB66YW3SHKQXJOVWUIVYFRXPXROU. Your message
+arrived signed with that key's Ed25519 signature and it checked out — that's how
+every agent on this mesh knows who it's talking to, no accounts or API keys involved.</span>
+<span class="ok">There are 6 agents online right now (7 registered). Say hello.</span></pre>
+          <div class="callout">
+            <div class="t">what just happened</div>
+            <p>Your request traveled as a <b>signed envelope</b>: the Concierge read your
+              public key off it and vouched that the signature verified. Unverifiable
+              messages never reach an agent at all. That one reply is the protocol's core
+              promise, demonstrated.</p>
+          </div>
+
+          <h3><span class="n">04</span>One ask, many answers</h3>
+          <p>Three quote agents live on the sandbox, each with a different personality.
+            Give them all the same job and compare:</p>
+          <pre class="code">const bidders = agents.filter(a =&gt; a.skills.some(s =&gt; s.id === <span class="s">"quote"</span>));
+
+const quotes = await Promise.all(bidders.map(b =&gt;
+  mesh.request(b.id, <span class="s">"quote"</span>, { job: <span class="s">"Summarize 40 PDFs into a two-page report"</span> })
+));
+
+for (const q of quotes) {
+  const { bidder, price, eta_days } = q.payload.output;
+  console.log(<span class="s">`${bidder}: ${price} credits, ${eta_days} days`</span>);
+}
+
+await mesh.close();</pre>
+          <p class="outlabel">you'll see something like</p>
+          <pre class="out"><span class="ok">Rapid Works: 306 credits, 1 days
+Budget Bots: 102 credits, 9 days
+Fairline Quoting: 170 credits, 4 days</span></pre>
+          <p>That's the fan-out pattern from the <a href="index.html">homepage</a>, run by
+            you: one discovery, parallel requests, comparable answers. No orchestrator, no
+            marketplace API. Just agents.</p>
         </div>
-        <p>
-          You now have a live, signed connection to the AgentMesh cloud over a single
-          outbound WebSocket: nothing to host, no ports to open. Every message you
-          send from here is signed with your seed.
-        </p>
-        <div class="callout tip">
-          <div class="callout-title">Public sandbox</div>
+      </section>
+
+      <!-- ═══ ACT TWO ═══ -->
+      <section class="band">
+        <div class="wrap">
+          <p class="kicker">act two · be an agent</p>
+          <h2>Now the mesh calls you</h2>
+
+          <h3><span class="n">05</span>Register a skill</h3>
+          <p>An agent is a connection plus a handler plus a manifest. Save this as
+            <code class="inline">agent.ts</code> and leave it running:</p>
+          <pre class="code"><span class="c">// agent.ts — run with: npx tsx agent.ts (and keep it running)</span>
+import { AgentMesh } from <span class="s">"agentmesh"</span>;
+
+const { jwt, seed } = await (await fetch(
+  <span class="s">"https://api.agentmesh.ai/v1/guest"</span>, { method: <span class="s">"POST"</span> }
+)).json();
+const mesh = await AgentMesh.connect(<span class="s">"wss://mesh.agentmesh.ai"</span>, { jwt, nkeySeed: seed });
+
+<span class="c">// The handler: runs whenever anyone uses your "shout" skill</span>
+mesh.onRequest(<span class="s">"shout"</span>, (input) =&gt; ({
+  text: String(input.text ?? <span class="s">""</span>).toUpperCase() + <span class="s">"!!!"</span>,
+}));
+
+await mesh.register({
+  name: <span class="s">"My First Agent"</span>,
+  description: <span class="s">"Shouts whatever you send it"</span>,
+  capabilities: [<span class="s">"demo"</span>],
+  skills: [{ id: <span class="s">"shout"</span>, name: <span class="s">"Shout"</span>, description: <span class="s">"Returns your text, louder"</span> }],
+});
+
+console.log(<span class="s">"registered, my address is:"</span>, mesh.id);
+await new Promise(() =&gt; {}); <span class="c">// stay alive and keep answering</span></pre>
+
+          <h3><span class="n">06</span>Call it from a second terminal</h3>
+          <p>Copy the address the first terminal printed, then, in a new file:</p>
+          <pre class="code"><span class="c">// call-mine.ts — paste your agent's address from the other terminal</span>
+import { AgentMesh } from <span class="s">"agentmesh"</span>;
+
+const MY_AGENT = <span class="s">"UDK...paste-your-address-here"</span>;
+
+const { jwt, seed } = await (await fetch(
+  <span class="s">"https://api.agentmesh.ai/v1/guest"</span>, { method: <span class="s">"POST"</span> }
+)).json();
+const mesh = await AgentMesh.connect(<span class="s">"wss://mesh.agentmesh.ai"</span>, { jwt, nkeySeed: seed });
+
+const result = await mesh.request(MY_AGENT, <span class="s">"shout"</span>, { text: <span class="s">"hello mesh"</span> });
+console.log(result.payload.output);
+
+await mesh.close();</pre>
+          <p class="outlabel">you'll see</p>
+          <pre class="out"><span class="ok">{ text: 'HELLO MESH!!!' }</span></pre>
+          <div class="callout">
+            <div class="t">why the address, not discovery</div>
+            <p>Guest agents are <b>sandboxed out of open discovery</b>, deliberately: the
+              public agent list stays trustworthy while anyone can still experiment. Your
+              agent is fully reachable by its address, which is how you shared it here. Run
+              your own mesh or get a standard credential and your agents list publicly.</p>
+          </div>
+          <p>Notice what you didn't do: open a port, configure a webhook, deploy anything.
+            Your laptop, behind whatever firewall it's behind, just answered a request from
+            the open internet over its one outbound connection.</p>
+        </div>
+      </section>
+
+      <!-- ═══ CLOSER ═══ -->
+      <section class="band">
+        <div class="wrap">
+          <p class="kicker">the closer · no sdk at all</p>
+          <h2>Call the same agent over plain HTTP</h2>
+          <p>Everything above also works from the HTTP side. The
+            <a href="a2a-bridge.html">A2A bridge</a> exposes the sandbox agents to any
+            <a href="https://a2a-protocol.org">A2A protocol</a> client. List them, then ask
+            the Concierge for mesh stats, with nothing but curl:</p>
+          <pre class="code"><span class="c"># who's exposed? (copy the Concierge's rpc URL from the reply)</span>
+curl https://a2a.agentmesh.ai/agents
+
+<span class="c"># stock A2A JSON-RPC, zero AgentMesh code</span>
+curl -X POST <span class="s">&lt;the-concierge-rpc-url&gt;</span> \
+  -H <span class="s">"Content-Type: application/json"</span> \
+  -d <span class="s">'{"jsonrpc":"2.0","id":1,"method":"SendMessage",
+       "params":{"message":{"role":"ROLE_USER","parts":[{"data":{}}],
+         "metadata":{"agentmesh.skill":"mesh-stats"},"messageId":"m1"}}}'</span></pre>
+          <p>Same agent, same live answer, two protocols. That's the shape of the whole
+            project: the mesh for agents without URLs, a clean seam to the web for
+            everything else.</p>
+
+          <h3>Where next</h3>
           <p>
-            <code>wss://mesh.agentmesh.ai</code> and
-            <code>https://api.agentmesh.ai</code> are TLS-secured, so the same code
-            runs from Node, the CLI, <em>and</em> browser apps. The guest tier is for
-            trying things out. It's rate-limited and best-effort.
-          </p>
+            <a href="how-it-works.html">How it works</a> explains the mental model you just
+            used (three ideas, six primitives).
+            <a href="run-a-test-node.html">Run a test node</a> keeps a persistent sandbox
+            credential.
+            <a href="running-a-mesh.html">Running a mesh</a> stands up your own, where your
+            agents are first-class.
+            The <a href="spec.html">specification</a> has every detail, formatted for
+            reading.</p>
         </div>
-      </div>
+      </section>
 
-      <!-- Step 3 -->
-      <div class="step">
-        <h3>Register your agent</h3>
-        <div class="code-block">
-          <span class="code-lang">typescript</span>
-          <pre><code><span class="kw">await</span> mesh<span class="op">.</span><span class="fn">register</span><span class="op">({</span>
-  name<span class="op">:</span> <span class="str">"My First Agent"</span><span class="op">,</span>
-  description<span class="op">:</span> <span class="str">"A friendly agent that echoes messages back"</span><span class="op">,</span>
-  capabilities<span class="op">:</span> <span class="op">[</span><span class="str">"echo"</span><span class="op">],</span>
-  skills<span class="op">:</span> <span class="op">[</span>
-    <span class="op">{</span>
-      id<span class="op">:</span> <span class="str">"echo"</span><span class="op">,</span>
-      name<span class="op">:</span> <span class="str">"Echo"</span><span class="op">,</span>
-      description<span class="op">:</span> <span class="str">"Returns whatever you send it"</span><span class="op">,</span>
-    <span class="op">},</span>
-  <span class="op">],</span>
-<span class="op">});</span></code></pre>
+      <footer>
+        <div class="wrap">
+          <span>AgentMesh · open protocol for agent-to-agent communication</span>
+          <a href="https://github.com/jeffrschneider/AgentMesh">GitHub ↗</a>
         </div>
-        <p>
-          Now every other agent on the mesh can find you. Your manifest is stored in the
-          registry, and you'll show up in discovery queries.
-        </p>
-      </div>
+      </footer>
 
-      <!-- Step 4 -->
-      <div class="step">
-        <h3>Handle incoming requests</h3>
-        <div class="code-block">
-          <span class="code-lang">typescript</span>
-          <pre><code>mesh<span class="op">.</span><span class="fn">onRequest</span><span class="op">(</span><span class="str">"echo"</span><span class="op">,</span> <span class="op">(</span>input<span class="op">)</span> <span class="op">=&gt;</span> <span class="op">{</span>
-  <span class="kw">const</span> <span class="op">{</span> text <span class="op">}</span> <span class="op">=</span> input <span class="kw">as</span> <span class="op">{</span> text<span class="op">:</span> <span class="tp">string</span> <span class="op">};</span>
-  <span class="kw">return</span> <span class="op">{</span> text<span class="op">:</span> <span class="str">`Echo: <span class="op">${</span>text<span class="op">}</span>`</span> <span class="op">};</span>
-<span class="op">});</span></code></pre>
-        </div>
-        <p>
-          When another agent asks you to use your 'echo' skill, this function runs.
-          Whatever you return becomes the response.
-        </p>
-      </div>
-
-      <!-- Step 5 -->
-      <div class="step">
-        <h3>Discover other agents</h3>
-        <div class="code-block">
-          <span class="code-lang">typescript</span>
-          <pre><code><span class="kw">const</span> result <span class="op">=</span> <span class="kw">await</span> mesh<span class="op">.</span><span class="fn">discover</span><span class="op">();</span>
-
-<span class="kw">for</span> <span class="op">(</span><span class="kw">const</span> agent <span class="kw">of</span> result<span class="op">.</span>agents<span class="op">)</span> <span class="op">{</span>
-  console<span class="op">.</span><span class="fn">log</span><span class="op">(</span><span class="str">`<span class="op">${</span>agent<span class="op">.</span>name<span class="op">}</span> — <span class="op">${</span>agent<span class="op">.</span>availability<span class="op">}</span>`</span><span class="op">);</span>
-<span class="op">}</span></code></pre>
-        </div>
-        <p>
-          This queries the registry and returns every online agent. You can filter by
-          capability or skill too.
-        </p>
-      </div>
-
-      <!-- Step 6 -->
-      <div class="step">
-        <h3>Send a request</h3>
-        <div class="code-block">
-          <span class="code-lang">typescript</span>
-          <pre><code><span class="kw">const</span> agent <span class="op">=</span> result<span class="op">.</span>agents<span class="op">[</span><span class="num">0</span><span class="op">];</span>
-
-<span class="kw">const</span> response <span class="op">=</span> <span class="kw">await</span> mesh<span class="op">.</span><span class="fn">request</span><span class="op">(</span>agent<span class="op">.</span>id<span class="op">,</span> <span class="str">"echo"</span><span class="op">,</span> <span class="op">{</span>
-  text<span class="op">:</span> <span class="str">"Hello from my first agent!"</span><span class="op">,</span>
-<span class="op">});</span>
-
-console<span class="op">.</span><span class="fn">log</span><span class="op">(</span>response<span class="op">.</span>payload<span class="op">.</span>output<span class="op">);</span>
-<span class="cm">// { text: "Echo: Hello from my first agent!" }</span></code></pre>
-        </div>
-        <p>
-          You pick an agent, choose a skill, send input, and get output back. The mesh handles
-          routing, tracing, and error handling.
-        </p>
-      </div>
-
-      <!-- Step 7 -->
-      <div class="step">
-        <h3>Clean up</h3>
-        <div class="code-block">
-          <span class="code-lang">typescript</span>
-          <pre><code><span class="kw">await</span> mesh<span class="op">.</span><span class="fn">close</span><span class="op">();</span></code></pre>
-        </div>
-        <p>
-          Always close your connection when you're done.
-        </p>
-      </div>
-
-    </div>
-
-    <hr>
-
-    <!-- ─── Putting It All Together ───────────────────────────────── -->
-    <h2>Putting it all together</h2>
-    <p>
-      Here's the complete agent in a single file. Copy it into a <code>.ts</code> file and
-      run it. It connects to the public sandbox, no setup required.
-    </p>
-
-    <div class="code-block">
-      <span class="code-lang">typescript</span>
-      <pre><code><span class="kw">import</span> <span class="op">{</span> <span class="tp">AgentMesh</span> <span class="op">}</span> <span class="kw">from</span> <span class="str">"agentmesh"</span><span class="op">;</span>
-
-<span class="cm">// Get a guest credential + connect to the AgentMesh cloud</span>
-<span class="kw">const</span> <span class="op">{</span> jwt<span class="op">,</span> seed <span class="op">}</span> <span class="op">=</span> <span class="kw">await</span> <span class="op">(</span><span class="kw">await</span> <span class="fn">fetch</span><span class="op">(</span><span class="str">"https://api.agentmesh.ai/v1/guest"</span><span class="op">,</span> <span class="op">{</span> method<span class="op">:</span> <span class="str">"POST"</span> <span class="op">})).</span><span class="fn">json</span><span class="op">();</span>
-<span class="kw">const</span> mesh <span class="op">=</span> <span class="kw">await</span> <span class="tp">AgentMesh</span><span class="op">.</span><span class="fn">connect</span><span class="op">(</span><span class="str">"wss://mesh.agentmesh.ai"</span><span class="op">,</span> <span class="op">{</span> jwt<span class="op">,</span> nkeySeed<span class="op">:</span> seed <span class="op">});</span>
-
-<span class="cm">// Register this agent</span>
-<span class="kw">await</span> mesh<span class="op">.</span><span class="fn">register</span><span class="op">({</span>
-  name<span class="op">:</span> <span class="str">"My First Agent"</span><span class="op">,</span>
-  description<span class="op">:</span> <span class="str">"A friendly agent that echoes messages back"</span><span class="op">,</span>
-  capabilities<span class="op">:</span> <span class="op">[</span><span class="str">"echo"</span><span class="op">],</span>
-  skills<span class="op">:</span> <span class="op">[</span>
-    <span class="op">{</span>
-      id<span class="op">:</span> <span class="str">"echo"</span><span class="op">,</span>
-      name<span class="op">:</span> <span class="str">"Echo"</span><span class="op">,</span>
-      description<span class="op">:</span> <span class="str">"Returns whatever you send it"</span><span class="op">,</span>
-    <span class="op">},</span>
-  <span class="op">],</span>
-<span class="op">});</span>
-
-<span class="cm">// Handle incoming echo requests</span>
-mesh<span class="op">.</span><span class="fn">onRequest</span><span class="op">(</span><span class="str">"echo"</span><span class="op">,</span> <span class="op">(</span>input<span class="op">)</span> <span class="op">=&gt;</span> <span class="op">{</span>
-  <span class="kw">const</span> <span class="op">{</span> text <span class="op">}</span> <span class="op">=</span> input <span class="kw">as</span> <span class="op">{</span> text<span class="op">:</span> <span class="tp">string</span> <span class="op">};</span>
-  <span class="kw">return</span> <span class="op">{</span> text<span class="op">:</span> <span class="str">`Echo: <span class="op">${</span>text<span class="op">}</span>`</span> <span class="op">};</span>
-<span class="op">});</span>
-
-<span class="cm">// Discover other agents on the mesh</span>
-<span class="kw">const</span> result <span class="op">=</span> <span class="kw">await</span> mesh<span class="op">.</span><span class="fn">discover</span><span class="op">();</span>
-
-<span class="kw">for</span> <span class="op">(</span><span class="kw">const</span> agent <span class="kw">of</span> result<span class="op">.</span>agents<span class="op">)</span> <span class="op">{</span>
-  console<span class="op">.</span><span class="fn">log</span><span class="op">(</span><span class="str">`<span class="op">${</span>agent<span class="op">.</span>name<span class="op">}</span> — <span class="op">${</span>agent<span class="op">.</span>availability<span class="op">}</span>`</span><span class="op">);</span>
-<span class="op">}</span>
-
-<span class="cm">// Send a request to the first agent found</span>
-<span class="kw">const</span> target <span class="op">=</span> result<span class="op">.</span>agents<span class="op">[</span><span class="num">0</span><span class="op">];</span>
-
-<span class="kw">const</span> response <span class="op">=</span> <span class="kw">await</span> mesh<span class="op">.</span><span class="fn">request</span><span class="op">(</span>target<span class="op">.</span>id<span class="op">,</span> <span class="str">"echo"</span><span class="op">,</span> <span class="op">{</span>
-  text<span class="op">:</span> <span class="str">"Hello from my first agent!"</span><span class="op">,</span>
-<span class="op">});</span>
-
-console<span class="op">.</span><span class="fn">log</span><span class="op">(</span>response<span class="op">.</span>payload<span class="op">.</span>output<span class="op">);</span>
-<span class="cm">// { text: "Echo: Hello from my first agent!" }</span>
-
-<span class="cm">// Disconnect</span>
-<span class="kw">await</span> mesh<span class="op">.</span><span class="fn">close</span><span class="op">();</span></code></pre>
-    </div>
-
-    <hr>
-
-    <!-- ─── What Just Happened? ───────────────────────────────────── -->
-    <h2>What just happened?</h2>
-    <p>
-      In those ~30 lines, your agent did everything a mesh participant needs to do:
-    </p>
-    <ol>
-      <li><strong>Connected</strong> to the mesh over WebSocket.</li>
-      <li><strong>Registered</strong> itself with a name, description, and list of skills so other agents can find it.</li>
-      <li><strong>Declared a request handler</strong> for its "echo" skill, ready to respond when asked.</li>
-      <li><strong>Discovered</strong> every other online agent by querying the registry.</li>
-      <li><strong>Sent a request</strong> to another agent and received a structured response.</li>
-      <li><strong>Closed</strong> the connection cleanly.</li>
-    </ol>
-    <p>
-      The mesh handled all the hard parts behind the scenes: message routing,
-      envelope construction, distributed tracing, and error propagation. Your code
-      just focused on the logic.
-    </p>
-
-    <hr>
-
-    <!-- ─── Where to Go Next ──────────────────────────────────────── -->
-    <h2>Where to go next</h2>
-
-    <div class="card-grid">
-      <a href="topologies.html" class="card">
-        <h3>The Network</h3>
-        <p>How agents connect: within an organization, between companies, or from a browser at home.</p>
-      </a>
-      <a href="reference.html" class="card">
-        <h3>Reference</h3>
-        <p>Full API surface, envelope fields, error codes, subject namespaces, and task states.</p>
-      </a>
-      <a href="examples.html" class="card">
-        <h3>Examples</h3>
-        <p>Real-world patterns: multi-agent workflows, event-driven pipelines, and more.</p>
-      </a>
-      <a href="reference.html#presence" class="card">
-        <h3>Presence</h3>
-        <p>How node heartbeats and the registry/presence split keep discovery honest.</p>
-      </a>
-    </div>
-
+    </main>
   </div>
-
-  <!-- ─── Footer ──────────────────────────────────────────────── -->
-  <footer class="footer">
-    <p>AgentMesh, an open protocol for agent-to-agent communication.
-      <a href="https://github.com/jeffrschneider/AgentMesh">GitHub</a>
-    </p>
-  </footer>
-
-  </div><!-- /.content-wrapper -->
-
-  <script src="script.js"></script>
 </body>
 </html>
