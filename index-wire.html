@@ -125,34 +125,29 @@
     .env ul li{ margin:8px 0; }
     .env ul b{ color:var(--paper); font-weight:600; }
 
-    /* ── the stack (web analogy) ── */
-    .stack{ display:grid; grid-template-columns:1fr 40px 1fr; align-items:center; gap:0; margin-top:26px; }
-    .stack .col-h{ font-family:var(--wire); font-size:.72rem; letter-spacing:.14em; text-transform:uppercase;
-      color:var(--faint); margin-bottom:12px; }
-    .stack .layer{ display:flex; justify-content:space-between; align-items:center; gap:12px;
-      padding:12px 14px; border:1px solid var(--line); border-radius:9px; margin-bottom:9px;
-      background:var(--panel); font-family:var(--wire); font-size:.84rem; }
-    .stack .layer .lyr{ color:var(--paper); font-weight:500; }
-    .stack .layer .did{ color:var(--dim); font-size:.78rem; }
-    .stack .layer.tools{ border-left:3px solid var(--address); }
-    .stack .layer.knowhow{ border-left:3px solid var(--broadcast); }
-    .stack .map{ text-align:center; color:var(--signal); font-family:var(--wire); font-size:1.05rem; }
-    .stack .am{ border:1px solid var(--signal); border-radius:11px; padding:14px;
-      background:rgba(242,169,59,.06); box-shadow:0 22px 48px -26px rgba(242,169,59,.6); }
-    .stack .am .am-label{ font-family:var(--wire); font-weight:600; color:var(--signal); font-size:.9rem; margin-bottom:8px; }
-    .stack .am .am-row{ display:flex; justify-content:space-between; gap:12px; padding:6px 0;
-      font-family:var(--wire); font-size:.82rem; border-top:1px solid rgba(242,169,59,.14); }
-    .stack .am .am-row:first-of-type{ border-top:0; }
-    .stack .am .am-row .k{ color:var(--paper); font-weight:500; }
-    .stack .am .am-row .v{ color:var(--dim); font-size:.78rem; }
+    /* ── the stack (jobs table: Job | Which Spec) ── */
+    .jobs{ width:100%; border-collapse:collapse; margin-top:26px; border:1px solid var(--line);
+      border-radius:12px; overflow:hidden; display:block; }
+    .jobs table{ width:100%; border-collapse:collapse; }
+    .jobs th{ font-family:var(--wire); font-size:.72rem; letter-spacing:.14em; text-transform:uppercase;
+      color:var(--faint); text-align:left; padding:12px 16px; background:rgba(255,255,255,.015);
+      border-bottom:1px solid var(--line); }
+    .jobs td{ padding:12px 16px; border-bottom:1px solid var(--line); font-size:.92rem; color:var(--dim);
+      vertical-align:top; }
+    .jobs tr:last-child td{ border-bottom:0; }
+    .jobs td.spec{ font-family:var(--wire); font-size:.84rem; color:var(--paper); white-space:nowrap; }
+    .jobs tr.ours td{ background:rgba(242,169,59,.05); color:var(--paper); }
+    .jobs tr.ours td.spec{ color:var(--signal); font-weight:600; }
+    .jobs tr.ours:first-of-type td{ border-top:1px solid rgba(242,169,59,.35); }
     .triad{ margin-top:28px; font-family:var(--disp); font-size:1.35rem; font-weight:600; line-height:1.45;
       color:var(--paper); max-width:none; }
     .triad b{ font-weight:700; }
-    .triad .t-tools{ color:var(--address); }
     .triad .t-know{ color:var(--broadcast); }
+    .triad .t-tools{ color:var(--address); }
+    .triad .t-find{ color:var(--verify); }
+    .triad .t-talk{ color:var(--paper); }
     .triad .t-am{ color:var(--signal); }
     .stack-note{ margin-top:14px; font-family:var(--wire); font-size:.78rem; color:var(--faint); max-width:64ch; }
-    @media (max-width:900px){ .stack{ grid-template-columns:1fr; } .stack .map{ padding:6px 0; } }
 
     /* ── three pairs (the six primitives, as pairs) ── */
     .pairs{ display:grid; gap:16px; margin-top:26px; }
@@ -229,8 +224,8 @@
         <span class="eyebrow"><span class="tag">agentmesh</span> · signed agent&#8209;to&#8209;agent protocol · v0.2</span>
         <h1>The web,<br>for AI&nbsp;agents</h1>
         <p class="lede">The web ran on a stack of protocols, each with one job: find, reach, trust, talk.
-          The agent web needs the same, and AgentMesh is its network layer: how any agent finds,
-          reaches, and trusts any other.</p>
+          The agent web is assembling the same stack. AgentMesh is its connective layer: how any
+          agent reaches any other, trusts what it hears, and knows who's there right now.</p>
         <div class="cta">
           <a class="btn btn-signal" href="run-a-test-node.html">▶ get a sandbox credential</a>
           <a class="btn btn-ghost" href="how-it-works.html">read the protocol</a>
@@ -251,43 +246,38 @@
         </div>
       </div>
 
-      <!-- THE STACK: web analogy -->
+      <!-- THE STACK: web analogy + jobs table -->
       <section class="band">
         <div class="wrap">
           <p class="kicker">the stack</p>
           <h2>The web took a stack. So does this.</h2>
-          <p>The web was never one protocol. DNS to find, TCP to reach, TLS to trust, HTTP to talk.
-            The agent web is assembling the same layers now, and AgentMesh is the one that connects
-            agents to each other.</p>
+          <p>The web was never one protocol: DNS found, TCP reached, TLS trusted, HTTP talked.
+            The agent web is assembling the same kind of stack, one spec per job, and AgentMesh
+            deliberately claims one slice of it. Here's who does what:</p>
 
-          <div class="stack">
-            <div class="col">
-              <div class="col-h">the web</div>
-              <div class="layer"><span class="lyr">HTML</span><span class="did">content</span></div>
-              <div class="layer"><span class="lyr">HTTP</span><span class="did">request / respond</span></div>
-              <div class="layer"><span class="lyr">TLS</span><span class="did">trust</span></div>
-              <div class="layer"><span class="lyr">TCP</span><span class="did">reach</span></div>
-              <div class="layer"><span class="lyr">DNS</span><span class="did">find</span></div>
-            </div>
-            <div class="map">▶</div>
-            <div class="col">
-              <div class="col-h">the agent web</div>
-              <div class="layer knowhow"><span class="lyr">Skills</span><span class="did">know-how</span></div>
-              <div class="layer tools"><span class="lyr">MCP</span><span class="did">tools &amp; data</span></div>
-              <div class="am">
-                <div class="am-label">AgentMesh</div>
-                <div class="am-row"><span class="k">trust</span><span class="v">signed envelopes</span></div>
-                <div class="am-row"><span class="k">reach</span><span class="v">one mesh, anywhere</span></div>
-                <div class="am-row"><span class="k">find</span><span class="v">discovery + presence</span></div>
-              </div>
-            </div>
-          </div>
+          <div class="jobs"><table>
+            <thead><tr><th>Job</th><th>Which spec</th></tr></thead>
+            <tbody>
+              <tr><td>Package know-how an agent can load</td><td class="spec">Skills</td></tr>
+              <tr><td>Connect an agent to tools and data</td><td class="spec">MCP</td></tr>
+              <tr><td>Find what agents exist (catalog &amp; search)</td><td class="spec">ARD</td></tr>
+              <tr><td>Call an agent directly (the method surface)</td><td class="spec">A2A</td></tr>
+              <tr><td>Prove who an agent is across organizations</td><td class="spec">ANS / DIDs</td></tr>
+              <tr class="ours"><td>Reach any agent, anywhere: one outbound connection, even behind a firewall</td><td class="spec">AgentMesh</td></tr>
+              <tr class="ours"><td>Trust every message: signed envelopes, node-vouched agents</td><td class="spec">AgentMesh</td></tr>
+              <tr class="ours"><td>Know who's there right now: live presence, not a stale listing</td><td class="spec">AgentMesh</td></tr>
+              <tr class="ours"><td>Broadcast and listen: signed events, one to many</td><td class="spec">AgentMesh</td></tr>
+            </tbody>
+          </table></div>
 
-          <p class="triad"><b class="t-tools">MCP</b> gives agents tools.
-            <b class="t-know">Skills</b> give them know-how.
-            <b class="t-am">AgentMesh</b> gives them each other.</p>
-          <p class="stack-note">AgentMesh sits alongside efforts like A2A at the agent-to-agent layer,
-            and provides the running mesh underneath: discovery, presence, identity, and transport.</p>
+          <p class="triad"><b class="t-know">Skills</b> teach.
+            <b class="t-tools">MCP</b> equips.
+            <b class="t-find">ARD</b> finds.
+            <b class="t-talk">A2A</b> talks.
+            <b class="t-am">AgentMesh</b> connects.</p>
+          <p class="stack-note">The alignment is deliberate, not incidental: AgentMesh's task model is
+            wire-compatible with A2A, its manifests publish as ARD catalog entries, and its identities
+            express as DIDs. The spec states exactly what it leverages, cedes, and owns.</p>
         </div>
       </section>
 
