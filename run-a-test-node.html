@@ -4,269 +4,287 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Run a Test Node: AgentMesh</title>
-  <link rel="stylesheet" href="styles.css">
   <link rel="icon" type="image/svg+xml" href="favicon.svg">
   <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    /* ══════════ THE WIRE : design token system ══════════ */
+    :root{
+      --ink:#0A1417; --panel:#0F1D22; --line:#1C2E33;
+      --paper:#E7EFEC; --dim:#7C918C; --faint:#4A5D5A;
+      --signal:#F2A93B; --verify:#43D6A6; --address:#6BA8FF; --broadcast:#B69CFF;
+      --disp:'Space Grotesk', sans-serif;
+      --body:'IBM Plex Sans', system-ui, sans-serif;
+      --wire:'IBM Plex Mono', ui-monospace, monospace;
+    }
+    *{ box-sizing:border-box; }
+    html,body{ margin:0; }
+    body{ background:var(--ink); color:var(--paper); font-family:var(--body);
+      font-size:16px; line-height:1.6; -webkit-font-smoothing:antialiased;
+      background-image:
+        linear-gradient(var(--line) 1px, transparent 1px),
+        linear-gradient(90deg, var(--line) 1px, transparent 1px);
+      background-size:64px 64px, 64px 64px;
+      background-position:-1px -1px;
+    }
+    body::before{
+      content:""; position:fixed; inset:0; z-index:0; pointer-events:none;
+      background:
+        radial-gradient(80% 45% at 30% 0%, rgba(242,169,59,.10), transparent 60%),
+        radial-gradient(70% 50% at 100% 10%, rgba(67,214,166,.08), transparent 55%),
+        linear-gradient(180deg, rgba(10,20,23,.72), var(--ink) 62%);
+    }
+    a{ color:inherit; }
+
+    .layout{ position:relative; z-index:1; display:grid; grid-template-columns:248px 1fr; min-height:100vh; }
+    .rail{ border-right:1px solid var(--line); padding:26px 22px; position:sticky; top:0; align-self:start; height:100vh; }
+    .brand{ font-family:var(--wire); font-weight:600; font-size:.82rem; letter-spacing:.02em;
+      display:flex; align-items:center; gap:9px; color:var(--paper); text-decoration:none; margin-bottom:30px; }
+    .brand .dot{ width:9px; height:9px; border-radius:2px; background:var(--signal);
+      box-shadow:0 0 0 3px rgba(242,169,59,.15), 8px 0 0 -2px var(--verify), 16px 0 0 -2px var(--address); }
+    .rail .grp{ font-family:var(--wire); font-size:.64rem; letter-spacing:.18em; text-transform:uppercase;
+      color:var(--faint); margin:16px 0 4px; }
+    .rail .grp:first-child{ margin-top:0; }
+    .rail nav a{ display:block; font-family:var(--wire); font-size:.8rem; color:var(--dim);
+      text-decoration:none; padding:6px 0; border-left:2px solid transparent; padding-left:12px; margin-left:-12px; }
+    .rail nav a:hover{ color:var(--paper); }
+    .rail nav a.on{ color:var(--paper); border-left-color:var(--signal); }
+    .rail .foot{ margin-top:26px; padding-top:18px; border-top:1px solid var(--line);
+      font-family:var(--wire); font-size:.72rem; color:var(--faint); }
+
+    .main{ min-width:0; }
+    .wrap{ max-width:980px; margin:0 auto; padding:0 40px; }
+
+    .eyebrow{ font-family:var(--wire); font-size:.76rem; letter-spacing:.04em; color:var(--dim); }
+    .eyebrow .tag{ color:var(--signal); }
+    h1,h2,h3{ font-family:var(--disp); font-weight:700; letter-spacing:-.02em; line-height:1.08; }
+    .lede{ color:var(--dim); font-size:1.12rem; max-width:60ch; }
+
+    .hero{ padding:74px 0 42px; border-bottom:1px solid var(--line); }
+    .hero .eyebrow{ margin-bottom:22px; display:block; }
+    .hero h1{ font-size:clamp(2.2rem,4.6vw,3.2rem); margin:0 0 18px; }
+    .hero h1 .am{ color:var(--signal); }
+
+    section.band{ padding:56px 0; border-bottom:1px solid var(--line); }
+    section.band h2{ font-size:1.8rem; margin:0 0 14px; }
+    section.band h3{ font-size:1.15rem; margin:38px 0 10px; }
+    section.band h3 .n{ color:var(--signal); font-family:var(--wire); font-size:.9rem; margin-right:10px; }
+    section.band p{ color:var(--dim); max-width:66ch; }
+    section.band p b, section.band li b{ color:var(--paper); font-weight:600; }
+    .kicker{ font-family:var(--wire); font-size:.74rem; letter-spacing:.12em; text-transform:uppercase;
+      color:var(--faint); margin:0 0 16px; }
+
+    ul.plain{ margin:18px 0 0; padding-left:20px; color:var(--dim); max-width:70ch; }
+    ul.plain li{ margin:10px 0; }
+    ul.plain b{ color:var(--paper); font-weight:600; }
+
+    .callout{ border:1px solid var(--line); border-left:3px solid var(--signal); border-radius:10px;
+      background:var(--panel); padding:14px 18px; margin:22px 0; max-width:70ch; }
+    .callout .t{ font-family:var(--wire); font-size:.74rem; letter-spacing:.1em; text-transform:uppercase;
+      color:var(--faint); margin-bottom:6px; }
+    .callout p{ margin:6px 0 0; color:var(--dim); }
+    .callout p:first-of-type{ margin-top:0; }
+    .callout p b{ color:var(--paper); }
+    .callout ul{ margin:8px 0 0; padding-left:20px; color:var(--dim); }
+    .callout li{ margin:6px 0; }
+    .callout li b{ color:var(--paper); }
+
+    pre.code{ background:#0b1220; border:1px solid var(--line); border-radius:12px; padding:16px 18px;
+      overflow-x:auto; font-family:var(--wire); font-size:.82rem; line-height:1.7; color:var(--paper); margin:20px 0; }
+    pre.code .c{ color:var(--faint); }
+    pre.code .s{ color:var(--verify); }
+    pre.out{ background:var(--panel); border:1px solid var(--line); border-left:3px solid var(--verify);
+      border-radius:12px; padding:14px 18px; overflow-x:auto; font-family:var(--wire); font-size:.8rem;
+      line-height:1.7; color:var(--dim); margin:14px 0 6px; }
+    pre.out .ok{ color:var(--verify); }
+    .outlabel{ font-family:var(--wire); font-size:.7rem; letter-spacing:.12em; text-transform:uppercase;
+      color:var(--faint); margin:18px 0 0; }
+    code.inline{ font-family:var(--wire); font-size:.86em; color:var(--verify);
+      background:rgba(67,214,166,.07); border:1px solid rgba(67,214,166,.15); border-radius:5px; padding:1px 5px; }
+
+    footer{ padding:34px 0 60px; }
+    footer .wrap{ font-family:var(--wire); font-size:.78rem; color:var(--faint); display:flex; gap:14px; }
+    footer a{ color:var(--dim); text-decoration:none; }
+
+    @media (max-width:900px){
+      .layout{ grid-template-columns:1fr; }
+      .rail{ position:static; height:auto; border-right:0; border-bottom:1px solid var(--line); }
+    }
+  </style>
 </head>
 <body>
+  <div class="layout">
 
-  <!-- ─── Sidebar Navigation ───────────────────────────────────── -->
-  <nav class="sidebar" id="sidebar">
-    <a href="index.html" class="sidebar-brand">AgentMesh</a>
-    <ul class="sidebar-nav">
-      <li class="nav-grp">learn</li>
-      <li><a href="index.html">Home</a></li>
-      <li><a href="how-it-works.html">How It Works</a></li>
-      <li><a href="architecture.html">Architecture</a></li>
-      <li><a href="topologies.html">Topologies</a></li>
-      <li><a href="world-wide-mesh.html">World Wide Mesh</a></li>
-      <li class="nav-grp">build</li>
-      <li><a href="getting-started.html">Getting Started</a></li>
-      <li><a href="use-cases.html">Use Cases</a></li>
-      <li><a href="examples.html">Examples</a></li>
-      <li><a href="sdks.html">SDKs</a></li>
-      <li><a href="a2a-bridge.html">A2A Bridge</a></li>
-      <li class="nav-grp">operate</li>
-      <li><a href="running-a-mesh.html">Running a Mesh</a></li>
-      <li><a href="run-a-test-node.html">Run a Test Node</a></li>
-      <li class="nav-grp">reference</li>
-      <li><a href="spec.html">Specification</a></li>
-      <li><a href="faq.html">FAQ</a></li>
-      <li><a href="claude-code.html">For Claude Code</a></li>
-    </ul>
-    <div class="sidebar-footer">
-      <a href="https://github.com/jeffrschneider/AgentMesh">GitHub</a>
-      <button class="theme-toggle" title="Toggle theme">&#x263E;</button>
-    </div>
-  </nav>
-  <div class="sidebar-backdrop" id="sidebar-backdrop"></div>
-  <div class="mobile-topbar">
-    <a href="index.html" class="sidebar-brand">AgentMesh</a>
-    <button class="hamburger" aria-label="Menu">&#x2630;</button>
-  </div>
-  <div class="content-wrapper">
+    <aside class="rail">
+      <a class="brand" href="index.html"><span class="dot"></span>AGENTMESH</a>
+      <nav>
+        <div class="grp">learn</div>
+        <a href="index.html">/ overview</a>
+        <a href="how-it-works.html">/ how-it-works</a>
+        <a href="architecture.html">/ architecture</a>
+        <a href="topologies.html">/ topologies</a>
+        <a href="world-wide-mesh.html">/ world-wide-mesh</a>
+        <div class="grp">build</div>
+        <a href="getting-started.html">/ getting-started</a>
+        <a href="use-cases.html">/ use-cases</a>
+        <a href="examples.html">/ examples</a>
+        <a href="sdks.html">/ sdks</a>
+        <a href="a2a-bridge.html">/ a2a-bridge</a>
+        <div class="grp">operate</div>
+        <a href="running-a-mesh.html">/ running-a-mesh</a>
+        <a class="on" href="run-a-test-node.html">/ run-a-test-node</a>
+        <div class="grp">reference</div>
+        <a href="spec.html">/ specification</a>
+        <a href="faq.html">/ faq</a>
+        <a href="claude-code.html">/ claude-code</a>
+      </nav>
+      <div class="foot">v0.2 · the signed interconnect<br>github.com/jeffrschneider/AgentMesh</div>
+    </aside>
 
-  <!-- ─── Page Content ──────────────────────────────────────────── -->
-  <div class="page">
+    <main class="main">
 
-    <h1>Run a <span class="text-gradient">Test Node</span></h1>
-    <p class="text-dim" style="font-size: 1.15rem; margin-bottom: 2.5rem;">
-      Two ways to get a node on a mesh from your laptop. Join an existing mesh's
-      public sandbox in seconds, or stand up a complete mesh of your own. Both go
-      through one small tool: the <code>agentmesh</code> CLI.
-    </p>
+      <div class="wrap hero">
+        <span class="eyebrow"><span class="tag">agentmesh</span> · run a test node</span>
+        <h1>Get a node on a mesh,<br>from your <span class="am">laptop</span></h1>
+        <p class="lede">Two paths: join the public sandbox in seconds, or stand up a
+          complete mesh of your own. Both go through one small tool, the
+          <code class="inline">agentmesh</code> CLI, and both were run end to end before
+          this page was published.</p>
+      </div>
 
-    <div class="callout tip">
-      <div class="callout-title">What "node" means here</div>
-      <p>
-        A node is one credentialed connection to a mesh that can host one or more
-        agents. "Run a test node" means: get a credential, point something at the
-        mesh with it, confirm you are on. The <a href="getting-started.html">Getting
-        Started</a> page covers writing the agent itself; this page is about the
-        connection underneath it.
-      </p>
-    </div>
-
-    <h2 id="cli">The CLI</h2>
-    <p>
-      <code>agentmesh</code> is a thin wrapper over
-      <a href="https://github.com/nats-io/nsc"><code>nsc</code></a>, the NATS
-      credential tool. It produces the same operator, account, and node credential
-      chain the mesh uses, so you never have to drive <code>nsc</code> by hand. It
-      lives in the reference repository under <code>cli/agentmesh</code>.
-    </p>
-    <div class="code-block">
-      <span class="code-lang">bash</span>
-      <pre><code>git clone https://github.com/jeffrschneider/AgentMesh
-export PATH="$PWD/AgentMesh/cli:$PATH"
-agentmesh --help</code></pre>
-    </div>
-    <p>
-      <strong>Prerequisites:</strong> <code>curl</code> for <code>connect</code>,
-      and <code>nsc</code> plus a <code>nats-server</code> binary for
-      <code>init</code>.
-    </p>
-
-    <hr>
-
-    <!-- ─── Path A: join a sandbox ────────────────────────────────── -->
-    <h2 id="join">Path A: join a mesh's sandbox</h2>
-    <p>
-      The fastest way on. A mesh with a public sandbox hands out throwaway
-      credentials, no signup. One command fetches one and writes it as a standard
-      <code>.creds</code> file.
-    </p>
-
-    <div class="steps">
-      <div class="step">
-        <h3>Request a sandbox credential</h3>
-        <div class="code-block">
-          <span class="code-lang">bash</span>
-          <pre><code>agentmesh connect --sandbox</code></pre>
+      <!-- what a node is + the CLI -->
+      <section class="band">
+        <div class="wrap">
+          <p class="kicker">setup</p>
+          <h2>The CLI</h2>
+          <div class="callout">
+            <div class="t">what "node" means here</div>
+            <p>A node is one credentialed connection to a mesh that can host one or more
+              agents. "Run a test node" means: get a credential, point something at the
+              mesh with it, confirm you're on.
+              <a href="getting-started.html">Getting started</a> covers writing the agent
+              itself; this page is about the connection underneath it.</p>
+          </div>
+          <p><code class="inline">agentmesh</code> is a thin wrapper over
+            <a href="https://github.com/nats-io/nsc">nsc</a>, the NATS credential tool.
+            It produces the same operator, account, and node credential chain the mesh
+            uses, so you never drive <code class="inline">nsc</code> by hand. It lives in
+            the reference repository:</p>
+          <pre class="code">git clone https://github.com/jeffrschneider/AgentMesh
+export PATH=<span class="s">"$PWD/AgentMesh/cli:$PATH"</span>
+agentmesh --help</pre>
+          <p><b>Prerequisites:</b> <code class="inline">curl</code> for
+            <code class="inline">connect</code>; <code class="inline">nsc</code> and a
+            <code class="inline">nats-server</code> binary for
+            <code class="inline">init</code>.</p>
         </div>
-        <p>
-          That is the whole command. It defaults to the public AgentMesh sandbox,
-          calls the broker's <code>POST /v1/guest</code> endpoint, receives a
-          signing identity, and writes <code>./sandbox.creds</code>. That file is
-          your address on the mesh: its public key is who you are. To join a
-          different mesh, pass <code>--broker</code> and <code>--url</code>:
-        </p>
-        <div class="code-block">
-          <span class="code-lang">bash</span>
-          <pre><code>agentmesh connect --sandbox \
+      </section>
+
+      <!-- path A -->
+      <section class="band">
+        <div class="wrap">
+          <p class="kicker">path a · join the sandbox</p>
+          <h2>One command onto the public mesh</h2>
+          <p>A mesh with a public sandbox hands out throwaway credentials, no signup. One
+            command fetches one and writes it as a standard
+            <code class="inline">.creds</code> file:</p>
+          <pre class="code">agentmesh connect --sandbox</pre>
+          <p class="outlabel">you'll see</p>
+          <pre class="out"><span class="ok">[agentmesh] requesting sandbox credential from https://api.agentmesh.ai
+[agentmesh] sandbox credential written: ./sandbox.creds
+
+Point an agent at the mesh:
+  url:   wss://mesh.agentmesh.ai
+  creds: ./sandbox.creds</span></pre>
+          <p>That file is your address on the mesh: its public key is who you are. Hand
+            the URL and creds file to any AgentMesh SDK and continue with the normal
+            connect, register, discover, request flow. To join a different mesh, pass
+            <code class="inline">--broker</code> and <code class="inline">--url</code>:</p>
+          <pre class="code">agentmesh connect --sandbox \
   --broker https://sandbox.acme.example \
   --url wss://mesh.acme.example \
-  --out ./acme.creds</code></pre>
+  --out ./acme.creds</pre>
+          <div class="callout">
+            <div class="t">the sandbox contract</div>
+            <p>A sandbox credential is deliberately throwaway, and the broker enforces it:</p>
+            <ul>
+              <li><b>Ephemeral.</b> Idle credentials are reclaimed. Send a heartbeat to
+                <code class="inline">POST /v1/guest/heartbeat</code> to keep a long
+                session alive, or <code class="inline">POST /v1/guest/release</code> to
+                hand it back.</li>
+              <li><b>Quota-capped.</b> Limits per client and in total.</li>
+              <li><b>Not publicly discoverable.</b> Agents registered under a sandbox
+                credential stay out of open discovery. They're for trying things, not
+                production.</li>
+            </ul>
+            <p>For anything you intend to keep, stand up your own mesh (below).</p>
+          </div>
         </div>
-      </div>
+      </section>
 
-      <div class="step">
-        <h3>Point an agent at it</h3>
-        <p>
-          Hand the URL and creds file to any AgentMesh SDK. From there it is the
-          normal connect, register, discover, request flow from
-          <a href="getting-started.html">Getting Started</a>.
-        </p>
-        <div class="code-block">
-          <span class="code-lang">bash</span>
-          <pre><code># url:   wss://mesh.agentmesh.ai
-# creds: ./sandbox.creds</code></pre>
-        </div>
-      </div>
-    </div>
+      <!-- path B -->
+      <section class="band">
+        <div class="wrap">
+          <p class="kicker">path b · stand up your own</p>
+          <h2>A complete mesh, one command</h2>
+          <p>One command produces a self-contained mesh: its own operator root key, its
+            own accounts, JetStream enabled, and a ready-to-run server config. Nothing
+            leaves your machine.</p>
 
-    <div class="callout tip">
-      <div class="callout-title">The sandbox contract</div>
-      <p>
-        A sandbox credential is deliberately throwaway. The broker enforces it:
-      </p>
-      <ul>
-        <li><strong>Ephemeral.</strong> Each credential has an idle timeout. Leave
-          it idle and the broker reclaims it, so abandoned sessions do not pile up.
-          Send a heartbeat to <code>POST /v1/guest/heartbeat</code> to keep a
-          long-lived session alive, or <code>POST /v1/guest/release</code> to hand
-          it back when you are done.</li>
-        <li><strong>Quota-capped.</strong> There are limits on how many sandbox
-          credentials one client can hold at once, and how many exist in total.</li>
-        <li><strong>Not publicly discoverable.</strong> Agents that register under a
-          sandbox credential are kept out of open discovery. They are for trying
-          things, not for durable or production work.</li>
-      </ul>
-      <p>
-        For anything you intend to keep, run your own mesh (below) or get a real
-        account. See <a href="running-a-mesh.html">Running a Mesh</a>.
-      </p>
-    </div>
+          <h3><span class="n">01</span>Initialize the instance</h3>
+          <pre class="code">agentmesh init --name acme --dir ./acme-mesh</pre>
+          <p>This generates the operator, a system account, and an
+            <code class="inline">agents</code> account (with JetStream), mints a first
+            node credential, and writes a <code class="inline">nats.conf</code>. It uses
+            an isolated <code class="inline">nsc</code> store inside the instance
+            directory, so it never touches a global setup.</p>
 
-    <hr>
+          <h3><span class="n">02</span>Start the server</h3>
+          <pre class="code">nats-server -c ./acme-mesh/nats.conf</pre>
+          <p class="outlabel">you'll see</p>
+          <pre class="out"><span class="ok">[INF] Listening for websocket clients on ws://0.0.0.0:4443
+[INF] Server is ready</span></pre>
+          <p>Your mesh is listening for WebSocket clients. The first node's credential is
+            at <code class="inline">./acme-mesh/creds/node-1.creds</code>.</p>
 
-    <!-- ─── Path B: stand up your own ─────────────────────────────── -->
-    <h2 id="own">Path B: stand up your own mesh</h2>
-    <p>
-      One command produces a complete, self-contained mesh: its own operator root
-      key, its own accounts, JetStream enabled, and a ready-to-run server config.
-      Nothing leaves your machine.
-    </p>
+          <h3><span class="n">03</span>Connect a node</h3>
+          <p>Point an SDK at your local mesh with that credential, exactly as in path A
+            but against your own server: url <code class="inline">ws://localhost:4443</code>,
+            creds <code class="inline">./acme-mesh/creds/node-1.creds</code>.</p>
 
-    <div class="steps">
-      <div class="step">
-        <h3>Initialize the instance</h3>
-        <div class="code-block">
-          <span class="code-lang">bash</span>
-          <pre><code>agentmesh init --name acme --dir ./acme-mesh</code></pre>
-        </div>
-        <p>
-          This generates the operator, a system account, and an <code>agents</code>
-          account (with JetStream), mints a first node credential, and writes a
-          <code>nats.conf</code>. It uses an isolated <code>nsc</code> store inside
-          the instance directory, so it never touches a global setup.
-        </p>
-      </div>
-
-      <div class="step">
-        <h3>Start the server</h3>
-        <div class="code-block">
-          <span class="code-lang">bash</span>
-          <pre><code>nats-server -c ./acme-mesh/nats.conf</code></pre>
-        </div>
-        <p>
-          Your mesh is now listening for WebSocket clients (port 4443 by default).
-          The first node's credential is at
-          <code>./acme-mesh/creds/node-1.creds</code>.
-        </p>
-      </div>
-
-      <div class="step">
-        <h3>Connect a node</h3>
-        <p>
-          Point an SDK at your local mesh with that credential, exactly as in Path
-          A but against your own server:
-        </p>
-        <div class="code-block">
-          <span class="code-lang">bash</span>
-          <pre><code># url:   ws://localhost:4443
-# creds: ./acme-mesh/creds/node-1.creds</code></pre>
-        </div>
-      </div>
-
-      <div class="step">
-        <h3>Add more nodes</h3>
-        <div class="code-block">
-          <span class="code-lang">bash</span>
-          <pre><code>nsc -H ./acme-mesh/.nsc add user -a agents -n node-2
+          <h3><span class="n">04</span>Add more nodes</h3>
+          <pre class="code">nsc -H ./acme-mesh/.nsc add user -a agents -n node-2
 nsc -H ./acme-mesh/.nsc generate creds -a agents -n node-2 \
-  &gt; ./acme-mesh/creds/node-2.creds</code></pre>
+  &gt; ./acme-mesh/creds/node-2.creds</pre>
+          <p>Each node gets its own credential. That's the whole lifecycle for a private
+            mesh you control.</p>
+
+          <div class="callout">
+            <div class="t">before production</div>
+            <p><code class="inline">init</code> writes a development config: WebSocket
+              without TLS, and a memory resolver with accounts baked into the file. For a
+              real deployment, terminate TLS (serve <code class="inline">wss://</code>)
+              and move to a NATS account resolver if you need to add accounts without
+              restarting. Connecting independent meshes (federation) is planned
+              separately: <a href="spec.html#21-federation-planned">spec §21</a>.</p>
+          </div>
+
+          <p>From here: <a href="getting-started.html">build your first agent</a> on the
+            connection you just made, or read
+            <a href="running-a-mesh.html">running a mesh</a> for who operates instances
+            and how meshes will interconnect.</p>
         </div>
-        <p>
-          Each node gets its own credential. That is the whole lifecycle for a
-          private mesh you control.
-        </p>
-      </div>
-    </div>
+      </section>
 
-    <div class="callout">
-      <div class="callout-title">Before production</div>
-      <p>
-        <code>init</code> writes a development config: WebSocket without TLS, and a
-        memory resolver with accounts baked into the file. For a real deployment,
-        terminate TLS (serve <code>wss://</code>) and move to a NATS account
-        resolver if you need to add accounts without restarting. Connecting
-        independent meshes to each other (federation) is planned separately; see
-        the reference spec.
-      </p>
-    </div>
+      <footer>
+        <div class="wrap">
+          <span>AgentMesh · open protocol for agent-to-agent communication</span>
+          <a href="https://github.com/jeffrschneider/AgentMesh">GitHub ↗</a>
+        </div>
+      </footer>
 
-    <hr>
-
-    <!-- ─── Where to Go Next ──────────────────────────────────────── -->
-    <h2>Where to go next</h2>
-    <div class="card-grid">
-      <a href="getting-started.html" class="card">
-        <h3>Build Your First Agent</h3>
-        <p>Now that you have a connection, write the agent that registers, discovers, and responds.</p>
-      </a>
-      <a href="running-a-mesh.html" class="card">
-        <h3>Running a Mesh</h3>
-        <p>Who owns the network, public versus private versus personal instances, and where federation is headed.</p>
-      </a>
-      <a href="spec.html" class="card">
-        <h3>Specification</h3>
-        <p>Envelope fields, subject namespaces, error codes, and the full protocol surface.</p>
-      </a>
-    </div>
-
+    </main>
   </div>
-
-  <!-- ─── Footer ──────────────────────────────────────────────── -->
-  <footer class="footer">
-    <p>AgentMesh, an open protocol for agent-to-agent communication.
-      <a href="https://github.com/jeffrschneider/AgentMesh">GitHub</a>
-    </p>
-  </footer>
-
-  </div><!-- /.content-wrapper -->
-
-  <script src="script.js"></script>
 </body>
 </html>
