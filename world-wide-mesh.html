@@ -76,13 +76,6 @@
       overflow:hidden; }
     .figure .bar{ display:flex; align-items:center; gap:8px; padding:10px 16px; border-bottom:1px solid var(--line);
       font-family:var(--wire); font-size:.72rem; color:var(--faint); background:rgba(255,255,255,.015); }
-    .figure pre{ margin:0; padding:20px 18px; font-family:var(--wire); font-size:.82rem; line-height:1.75;
-      color:var(--paper); overflow-x:auto; }
-    .figure pre .k{ color:var(--dim); }
-    .figure pre .am{ color:var(--signal); }
-    .figure pre .ok{ color:var(--verify); }
-    .figure pre .bl{ color:var(--address); }
-    .figure pre .vi{ color:var(--broadcast); }
 
     ul.plain{ margin:18px 0 0; padding-left:20px; color:var(--dim); max-width:66ch; }
     ul.plain li{ margin:10px 0; }
@@ -176,14 +169,67 @@
 
           <div class="figure">
             <div class="bar">the world wide mesh · one protocol, many operators</div>
-<pre><span class="k">   ┌─────────────────┐      ┌─────────────────┐      ┌─────────────────┐</span>
-<span class="k">   │</span> <span class="bl">jeff's mesh</span>     <span class="k">│</span>      <span class="k">│</span> <span class="am">public mesh</span>     <span class="k">│</span>      <span class="k">│</span> <span class="ok">acme corp mesh</span>  <span class="k">│</span>
-<span class="k">   │</span> <span class="k">(home server)</span>   <span class="k">│</span><span class="am">◀────▶</span><span class="k">│</span> <span class="k">(community run)</span> <span class="k">│</span><span class="am">◀────▶</span><span class="k">│</span> <span class="k">(private cloud)</span> <span class="k">│</span>
-<span class="k">   │</span>  <span class="vi">personal agent</span> <span class="k">│</span>      <span class="k">│</span>  <span class="vi">echo · weather</span> <span class="k">│</span>      <span class="k">│</span>  <span class="vi">doc · review</span>   <span class="k">│</span>
-<span class="k">   └─────────────────┘      └─────────────────┘      └─────────────────┘</span>
-<span class="k">        operator:</span> <span class="ok">jeff.example</span>     <span class="k">operator:</span> <span class="ok">agentmesh.ai</span>     <span class="k">operator:</span> <span class="ok">acme.example</span>
-<span class="k">           each anchors its root key at a domain it controls</span>
-<span class="k">           exports</span> <span class="am">only</span> <span class="k">what its operator chooses to share</span></pre>
+            <svg viewBox="0 0 920 340" role="img" aria-label="Three independent meshes: Jeff's personal mesh, the public mesh, and Acme Corp's private mesh, peering with each other. Each operator anchors its root key at a domain it controls and exports only what it chooses."
+                 style="display:block;width:100%;height:auto;padding:10px 8px 4px">
+              <defs>
+                <marker id="arrA" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+                  <path d="M0,0 L10,5 L0,10 z" fill="#F2A93B"/>
+                </marker>
+              </defs>
+              <style>
+                .bx{ fill:#0C1A1F; stroke:#274049; rx:14; }
+                .ttl{ font:600 17px 'IBM Plex Mono',monospace; }
+                .sub{ font:400 12px 'IBM Plex Mono',monospace; fill:#7C918C; }
+                .chip{ fill:rgba(182,156,255,.08); stroke:rgba(182,156,255,.35); rx:8; }
+                .chipt{ font:500 11.5px 'IBM Plex Mono',monospace; fill:#B69CFF; }
+                .op{ font:400 12px 'IBM Plex Mono',monospace; fill:#4A5D5A; }
+                .opd{ font:500 12px 'IBM Plex Mono',monospace; fill:#43D6A6; }
+                .lnk{ stroke:#F2A93B; stroke-width:1.6; }
+                .lnkt{ font:500 11px 'IBM Plex Mono',monospace; fill:#F2A93B; letter-spacing:.08em; }
+                .cap{ font:400 12.5px 'IBM Plex Mono',monospace; fill:#4A5D5A; }
+              </style>
+
+              <!-- Jeff's mesh -->
+              <rect class="bx" x="24" y="36" width="248" height="168"/>
+              <text class="ttl" x="48" y="74" fill="#6BA8FF">jeff's mesh</text>
+              <text class="sub" x="48" y="96">home server</text>
+              <rect class="chip" x="48" y="118" width="152" height="30"/>
+              <text class="chipt" x="62" y="138">personal agent</text>
+              <text class="op" x="48" y="230">operator:</text>
+              <text class="opd" x="128" y="230">jeff.example</text>
+
+              <!-- Public mesh -->
+              <rect class="bx" x="336" y="36" width="248" height="168" stroke="#F2A93B" stroke-opacity="0.55"/>
+              <text class="ttl" x="360" y="74" fill="#F2A93B">public mesh</text>
+              <text class="sub" x="360" y="96">community run</text>
+              <rect class="chip" x="360" y="118" width="76" height="30"/>
+              <text class="chipt" x="374" y="138">echo</text>
+              <rect class="chip" x="446" y="118" width="106" height="30"/>
+              <text class="chipt" x="460" y="138">weather</text>
+              <text class="op" x="360" y="230">operator:</text>
+              <text class="opd" x="440" y="230">agentmesh.ai</text>
+
+              <!-- Acme mesh -->
+              <rect class="bx" x="648" y="36" width="248" height="168"/>
+              <text class="ttl" x="672" y="74" fill="#43D6A6">acme corp mesh</text>
+              <text class="sub" x="672" y="96">private cloud</text>
+              <rect class="chip" x="672" y="118" width="66" height="30"/>
+              <text class="chipt" x="686" y="138">doc</text>
+              <rect class="chip" x="748" y="118" width="94" height="30"/>
+              <text class="chipt" x="762" y="138">review</text>
+              <text class="op" x="672" y="230">operator:</text>
+              <text class="opd" x="752" y="230">acme.example</text>
+
+              <!-- peering links -->
+              <line class="lnk" x1="278" y1="120" x2="330" y2="120" marker-start="url(#arrA)" marker-end="url(#arrA)"/>
+              <text class="lnkt" x="304" y="106" text-anchor="middle">peer</text>
+              <line class="lnk" x1="590" y1="120" x2="642" y2="120" marker-start="url(#arrA)" marker-end="url(#arrA)"/>
+              <text class="lnkt" x="616" y="106" text-anchor="middle">peer</text>
+
+              <!-- caption -->
+              <text class="cap" x="460" y="286" text-anchor="middle">each operator anchors its root key at a domain it controls</text>
+              <text class="cap" x="460" y="310" text-anchor="middle">and exports only what it chooses to share</text>
+            </svg>
           </div>
 
           <p>An agent on your personal mesh discovers and calls an agent on a partner's mesh,
