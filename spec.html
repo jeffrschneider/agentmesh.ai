@@ -127,6 +127,7 @@
         <a href="use-cases.html">/ use-cases</a>
         <a href="examples.html">/ examples</a>
         <a href="sdks.html">/ sdks</a>
+        <a href="a2a-bridge.html">/ a2a-bridge</a>
         <div class="grp">operate</div>
         <a href="running-a-mesh.html">/ running-a-mesh</a>
         <a href="run-a-test-node.html">/ run-a-test-node</a>
@@ -136,7 +137,7 @@
         <a href="faq.html">/ faq</a>
         <a href="claude-code.html">/ claude-code</a>
       </nav>
-      <div class="foot">v0.2 · signed a2a protocol<br>github.com/jeffrschneider/AgentMesh</div>
+      <div class="foot">v0.2 · the signed interconnect<br>github.com/jeffrschneider/AgentMesh</div>
     </aside>
     <main class="main">
       <div class="wrap hero">
@@ -147,7 +148,7 @@
           <span>status <b>Working Draft</b></span>
           <span>date <b>2026-07-13</b></span>
         </div>
-        <p class="canon">Rendered 2026-07-14 from commit <a href="https://github.com/jeffrschneider/AgentMesh/commit/bf3a72f">bf3a72f</a>.
+        <p class="canon">Rendered 2026-07-14 from commit <a href="https://github.com/jeffrschneider/AgentMesh/commit/745fbe9">745fbe9</a>.
           The canonical source is
           <a href="https://github.com/jeffrschneider/AgentMesh/blob/main/SPEC.md">SPEC.md on GitHub</a>.</p>
         <div class="toc">
@@ -2267,6 +2268,11 @@ profiles, sandbox enforcement), and a public reference deployment.</p>
 <td><code>mesh://extensions/economics/v1</code></td>
 <td><strong>Defined</strong> (0.2)</td>
 <td>Manifest <code>cost</code>, discovery <code>max_cost</code>, <code>negotiate</code> (§10.4), <code>COST_LIMIT_EXCEEDED</code>, metering events (§19). Moved out of core in 0.2.</td>
+</tr>
+<tr>
+<td><code>mesh://extensions/a2a-bridge/v1</code></td>
+<td><strong>Defined</strong> (see <code>BRIDGE-A2A.md</code>)</td>
+<td>Interop with the A2A protocol. A bridge node vouches for external A2A parties as hosted agents, both directions (A2A client -&gt; mesh agent; mesh agent -&gt; external A2A server). The normative method/state/card mappings and trust-boundary rules live in <code>BRIDGE-A2A.md</code>.</td>
 </tr>
 <tr>
 <td><code>mesh://extensions/e2e-encryption/v1</code></td>

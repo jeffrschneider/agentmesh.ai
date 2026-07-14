@@ -184,6 +184,7 @@ const page = `<!DOCTYPE html>
         <a href="use-cases.html">/ use-cases</a>
         <a href="examples.html">/ examples</a>
         <a href="sdks.html">/ sdks</a>
+        <a href="a2a-bridge.html">/ a2a-bridge</a>
         <div class="grp">operate</div>
         <a href="running-a-mesh.html">/ running-a-mesh</a>
         <a href="run-a-test-node.html">/ run-a-test-node</a>
@@ -193,7 +194,7 @@ const page = `<!DOCTYPE html>
         <a href="faq.html">/ faq</a>
         <a href="claude-code.html">/ claude-code</a>
       </nav>
-      <div class="foot">v0.2 · signed a2a protocol<br>github.com/jeffrschneider/AgentMesh</div>
+      <div class="foot">v0.2 · the signed interconnect<br>github.com/jeffrschneider/AgentMesh</div>
     </aside>
     <main class="main">
       <div class="wrap hero">

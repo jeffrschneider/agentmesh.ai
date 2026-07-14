@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>A2A Bridge: AgentMesh</title>
+  <link rel="icon" type="image/svg+xml" href="favicon.svg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    /* ══════════ THE WIRE : design token system ══════════ */
+    :root{
+      --ink:#0A1417; --panel:#0F1D22; --line:#1C2E33;
+      --paper:#E7EFEC; --dim:#7C918C; --faint:#4A5D5A;
+      --signal:#F2A93B; --verify:#43D6A6; --address:#6BA8FF; --broadcast:#B69CFF;
+      --disp:'Space Grotesk', sans-serif;
+      --body:'IBM Plex Sans', system-ui, sans-serif;
+      --wire:'IBM Plex Mono', ui-monospace, monospace;
+    }
+    *{ box-sizing:border-box; }
+    html,body{ margin:0; }
+    body{ background:var(--ink); color:var(--paper); font-family:var(--body);
+      font-size:16px; line-height:1.6; -webkit-font-smoothing:antialiased;
+      background-image:
+        linear-gradient(var(--line) 1px, transparent 1px),
+        linear-gradient(90deg, var(--line) 1px, transparent 1px);
+      background-size:64px 64px, 64px 64px;
+      background-position:-1px -1px;
+    }
+    body::before{
+      content:""; position:fixed; inset:0; z-index:0; pointer-events:none;
+      background:
+        radial-gradient(80% 45% at 30% 0%, rgba(242,169,59,.10), transparent 60%),
+        radial-gradient(70% 50% at 100% 10%, rgba(67,214,166,.08), transparent 55%),
+        linear-gradient(180deg, rgba(10,20,23,.72), var(--ink) 62%);
+    }
+    a{ color:inherit; }
+
+    .layout{ position:relative; z-index:1; display:grid; grid-template-columns:248px 1fr; min-height:100vh; }
+    .rail{ border-right:1px solid var(--line); padding:26px 22px; position:sticky; top:0; align-self:start; height:100vh; }
+    .brand{ font-family:var(--wire); font-weight:600; font-size:.82rem; letter-spacing:.02em;
+      display:flex; align-items:center; gap:9px; color:var(--paper); text-decoration:none; margin-bottom:30px; }
+    .brand .dot{ width:9px; height:9px; border-radius:2px; background:var(--signal);
+      box-shadow:0 0 0 3px rgba(242,169,59,.15), 8px 0 0 -2px var(--verify), 16px 0 0 -2px var(--address); }
+    .rail .grp{ font-family:var(--wire); font-size:.64rem; letter-spacing:.18em; text-transform:uppercase;
+      color:var(--faint); margin:16px 0 4px; }
+    .rail .grp:first-child{ margin-top:0; }
+    .rail nav a{ display:block; font-family:var(--wire); font-size:.8rem; color:var(--dim);
+      text-decoration:none; padding:6px 0; border-left:2px solid transparent; padding-left:12px; margin-left:-12px; }
+    .rail nav a:hover{ color:var(--paper); }
+    .rail nav a.on{ color:var(--paper); border-left-color:var(--signal); }
+    .rail .foot{ margin-top:26px; padding-top:18px; border-top:1px solid var(--line);
+      font-family:var(--wire); font-size:.72rem; color:var(--faint); }
+
+    .main{ min-width:0; }
+    .wrap{ max-width:980px; margin:0 auto; padding:0 40px; }
+
+    .eyebrow{ font-family:var(--wire); font-size:.76rem; letter-spacing:.04em; color:var(--dim); }
+    .eyebrow .tag{ color:var(--signal); }
+    h1,h2{ font-family:var(--disp); font-weight:700; letter-spacing:-.02em; line-height:1.08; }
+    .lede{ color:var(--dim); font-size:1.12rem; max-width:60ch; }
+
+    .hero{ padding:74px 0 42px; border-bottom:1px solid var(--line); }
+    .hero .eyebrow{ margin-bottom:22px; display:block; }
+    .hero h1{ font-size:clamp(2.2rem,4.6vw,3.2rem); margin:0 0 18px; }
+    .hero h1 .am{ color:var(--signal); }
+
+    section.band{ padding:56px 0; border-bottom:1px solid var(--line); }
+    section.band h2{ font-size:1.8rem; margin:0 0 14px; }
+    section.band p{ color:var(--dim); max-width:66ch; }
+    section.band p b, section.band li b{ color:var(--paper); font-weight:600; }
+    .kicker{ font-family:var(--wire); font-size:.74rem; letter-spacing:.12em; text-transform:uppercase;
+      color:var(--faint); margin:0 0 16px; }
+
+    ul.plain{ margin:18px 0 0; padding-left:20px; color:var(--dim); max-width:70ch; }
+    ul.plain li{ margin:10px 0; }
+    ul.plain b{ color:var(--paper); font-weight:600; }
+    ol.plain{ margin:18px 0 0; padding-left:20px; color:var(--dim); max-width:70ch; }
+    ol.plain li{ margin:10px 0; }
+    ol.plain b{ color:var(--paper); font-weight:600; }
+
+    .callout{ border:1px solid var(--line); border-left:3px solid var(--signal); border-radius:10px;
+      background:var(--panel); padding:14px 18px; margin:22px 0; max-width:70ch; }
+    .callout .t{ font-family:var(--wire); font-size:.74rem; letter-spacing:.1em; text-transform:uppercase;
+      color:var(--faint); margin-bottom:6px; }
+    .callout p{ margin:0; color:var(--dim); }
+    .callout p b{ color:var(--paper); }
+
+    .pair{ display:grid; grid-template-columns:1fr 1fr; gap:16px; margin:26px 0 6px; }
+    .pair .cell{ border:1px solid var(--line); border-radius:12px; background:var(--panel); padding:20px 22px; }
+    .pair .cell .h{ font-family:var(--wire); font-size:.74rem; letter-spacing:.1em; text-transform:uppercase; margin-bottom:10px; }
+    .pair .cell:nth-child(1) .h{ color:var(--verify); }
+    .pair .cell:nth-child(2) .h{ color:var(--address); }
+    .pair .cell p{ margin:0; color:var(--dim); font-size:.95rem; }
+    .pair .cell p b{ color:var(--paper); }
+
+    pre.code{ background:#0b1220; border:1px solid var(--line); border-radius:12px; padding:16px 18px;
+      overflow-x:auto; font-family:var(--wire); font-size:.82rem; line-height:1.7; color:var(--paper); margin:22px 0; }
+    pre.code .c{ color:var(--faint); }
+    pre.code .s{ color:var(--verify); }
+    code.inline{ font-family:var(--wire); font-size:.86em; color:var(--verify);
+      background:rgba(67,214,166,.07); border:1px solid rgba(67,214,166,.15); border-radius:5px; padding:1px 5px; }
+
+    footer{ padding:34px 0 60px; }
+    footer .wrap{ font-family:var(--wire); font-size:.78rem; color:var(--faint); display:flex; gap:14px; }
+    footer a{ color:var(--dim); text-decoration:none; }
+
+    @media (max-width:900px){
+      .layout{ grid-template-columns:1fr; }
+      .rail{ position:static; height:auto; border-right:0; border-bottom:1px solid var(--line); }
+      .pair{ grid-template-columns:1fr; }
+    }
+  </style>
+</head>
+<body>
+  <div class="layout">
+
+    <aside class="rail">
+      <a class="brand" href="index.html"><span class="dot"></span>AGENTMESH</a>
+      <nav>
+        <div class="grp">learn</div>
+        <a href="index.html">/ overview</a>
+        <a href="how-it-works.html">/ how-it-works</a>
+        <a href="architecture.html">/ architecture</a>
+        <a href="topologies.html">/ topologies</a>
+        <a href="world-wide-mesh.html">/ world-wide-mesh</a>
+        <div class="grp">build</div>
+        <a href="getting-started.html">/ getting-started</a>
+        <a href="use-cases.html">/ use-cases</a>
+        <a href="examples.html">/ examples</a>
+        <a href="sdks.html">/ sdks</a>
+        <a class="on" href="a2a-bridge.html">/ a2a-bridge</a>
+        <div class="grp">operate</div>
+        <a href="running-a-mesh.html">/ running-a-mesh</a>
+        <a href="run-a-test-node.html">/ run-a-test-node</a>
+        <div class="grp">reference</div>
+        <a href="spec.html">/ specification</a>
+        <a href="reference.html">/ reference</a>
+        <a href="faq.html">/ faq</a>
+        <a href="claude-code.html">/ claude-code</a>
+      </nav>
+      <div class="foot">v0.2 · the signed interconnect<br>github.com/jeffrschneider/AgentMesh</div>
+    </aside>
+
+    <main class="main">
+
+      <div class="wrap hero">
+        <span class="eyebrow"><span class="tag">agentmesh</span> · a2a bridge</span>
+        <h1>Where HTTP agents and <span class="am">mesh</span> agents meet</h1>
+        <p class="lede">The A2A protocol assumes both agents have URLs. Most agents don't.
+          The bridge makes the two worlds guests of each other: any A2A client can call a
+          mesh agent, and any A2A server can join a mesh, with zero changes on either side.</p>
+      </div>
+
+      <section class="band">
+        <div class="wrap">
+          <p class="kicker">why a bridge exists</p>
+          <h2>Two protocols, two assumptions</h2>
+          <p><a href="https://a2a-protocol.org">A2A</a> (the Agent2Agent Protocol) defines how
+            two agents talk once they can reach each other: JSON-RPC over HTTPS, agent cards,
+            tasks, streaming. It is the conversation layer of the stack, and AgentMesh
+            deliberately aligns with it rather than competing: the mesh task model carries the
+            same eight states, on purpose.</p>
+          <p>But A2A's transport assumption is the web server's: a public URL, a TLS
+            certificate, an open port. An agent on a laptop, behind a home router, or inside a
+            corporate network has none of those. AgentMesh exists for exactly that case: one
+            outbound connection, signed envelopes, presence, no ports. The two protocols are
+            answers to different questions, which is why neither replaces the other, and why a
+            bridge between them is useful in both directions.</p>
+        </div>
+      </section>
+
+      <section class="band">
+        <div class="wrap">
+          <p class="kicker">what it is</p>
+          <h2>The bridge is just a node</h2>
+          <p>AgentMesh already has a concept for "one connection vouching for many agents that
+            don't hold their own credentials": the <b>node</b>. The bridge is a node whose
+            hosted agents happen to live on the other side of an HTTP boundary. No new
+            protocol machinery, no spec changes; the 0.2 node model covers it.</p>
+          <div class="pair">
+            <div class="cell">
+              <div class="h">inbound · a2a client → mesh agent</div>
+              <p>Every public mesh agent gets a generated <b>agent card</b> and a JSON-RPC
+                endpoint. A stock A2A client sends <code class="inline">SendMessage</code>;
+                the bridge mints it a hosted mesh identity, signs the envelope as the vouching
+                node, and returns the agent's reply as an A2A message. Streaming skills map to
+                Server-Sent Events.</p>
+            </div>
+            <div class="cell">
+              <div class="h">outbound · a2a server → mesh</div>
+              <p>Point the bridge at any A2A endpoint. It reads the agent card, converts it to
+                a mesh manifest, and registers it as a hosted agent, discoverable like any
+                other. Mesh requests forward as JSON-RPC calls; a health check keeps its
+                presence honest when the remote goes dark.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="band">
+        <div class="wrap">
+          <p class="kicker">trust, stated plainly</p>
+          <h2>What a bridged signature means</h2>
+          <p>End-to-end signatures do not traverse the HTTP leg, in either direction. Inside
+            the mesh, a signature on bridged traffic is the <b>bridge's vouch</b>: "this
+            entered through me," not "the far party signed this." That is what vouching is,
+            and the protocol's trust machinery expresses it rather than hiding it:</p>
+          <ul class="plain">
+            <li><b>Marked provenance.</b> Every bridged agent carries the
+              <code class="inline">mesh://extensions/a2a-bridge/v1</code> marker in its
+              manifest, with direction and endpoint. Discovery can always tell bridged from
+              native.</li>
+            <li><b>Capped standing.</b> A bridge node is attested at most
+              <code class="inline">standard</code> trust tier, deliberately below
+              <code class="inline">verified</code>. Our own hosted bridge follows this rule.</li>
+            <li><b>No visibility laundering.</b> Private, unlisted, and sandboxed mesh agents
+              are never exposed inbound.</li>
+          </ul>
+        </div>
+      </section>
+
+      <section class="band">
+        <div class="wrap">
+          <p class="kicker">try it</p>
+          <h2>The hosted bridge</h2>
+          <p>The public sandbox runs a bridge at
+            <code class="inline">https://a2a.agentmesh.ai</code>. List the exposed agents,
+            fetch a card, and call one, from any HTTP client, no AgentMesh code at all:</p>
+          <pre class="code"><span class="c"># who's exposed?</span>
+curl https://a2a.agentmesh.ai/agents
+
+<span class="c"># call the Echo agent (stock A2A JSON-RPC)</span>
+curl -X POST https://a2a.agentmesh.ai/agents/&lt;agent-id&gt;/rpc \
+  -H <span class="s">"Content-Type: application/json"</span> \
+  -d <span class="s">'{"jsonrpc":"2.0","id":1,"method":"SendMessage",
+       "params":{"message":{"role":"ROLE_USER",
+         "parts":[{"data":{"hello":"mesh"}}],
+         "metadata":{"agentmesh.skill":"echo"},
+         "messageId":"m1"}}}'</span></pre>
+          <p>The reply comes back as an A2A message whose parts carry the mesh agent's output.
+            Behind that one HTTP call: a hosted identity was minted for you, an envelope was
+            signed and routed over the mesh, and the agent's signed reply was verified and
+            translated back.</p>
+        </div>
+      </section>
+
+      <section class="band">
+        <div class="wrap">
+          <p class="kicker">run your own</p>
+          <h2>Modular by design</h2>
+          <p>The bridge is not a feature of our cloud; it is a component of the protocol
+            project, and our cloud just runs an instance of it. The normative mapping (methods,
+            task states, cards, errors, trust rules) lives in
+            <a href="https://github.com/jeffrschneider/AgentMesh/blob/main/BRIDGE-A2A.md">BRIDGE-A2A.md</a>,
+            so a compatible bridge can be written in any language against any mesh. The
+            reference implementation is <code class="inline">bridge-a2a/</code> in the repo:</p>
+          <ol class="plain">
+            <li><b>Translation core.</b> Pure functions implementing the mapping tables. No
+              I/O; embed them in your own gateway if you want.</li>
+            <li><b>Inbound server.</b> JSON-RPC + SSE endpoint and card generation per exposed
+              agent.</li>
+            <li><b>Outbound attach.</b> Card-to-manifest registration and forwarding for
+              external A2A servers.</li>
+          </ol>
+          <pre class="code"><span class="c"># run a bridge against your own mesh</span>
+MESH_URL=ws://your-mesh:4443 \
+CREDS_FILE=./bridge.creds \
+PUBLIC_BASE_URL=https://a2a.your-domain.example \
+ATTACH=https://some-a2a-server.example \
+npx tsx src/main.ts</pre>
+          <p>Ready to go deeper? Read the
+            <a href="https://github.com/jeffrschneider/AgentMesh/blob/main/BRIDGE-A2A.md">mapping spec</a>,
+            the <a href="spec.html">protocol specification</a>, or
+            <a href="getting-started.html">build a mesh agent</a> and call it from an A2A
+            client five minutes later.</p>
+        </div>
+      </section>
+
+      <footer>
+        <div class="wrap">
+          <span>AgentMesh · open protocol for agent-to-agent communication</span>
+          <a href="https://github.com/jeffrschneider/AgentMesh">GitHub ↗</a>
+        </div>
+      </footer>
+
+    </main>
+  </div>
+</body>
+</html>
