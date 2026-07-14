@@ -191,7 +191,7 @@ const page = `<!DOCTYPE html>
         <div class="grp">reference</div>
         <a class="on" href="spec.html">/ specification</a>
         <a href="faq.html">/ faq</a>
-        <a href="claude-code.html">/ claude-code</a>
+        <a href="coding-agents.html">/ coding-agents</a>
       </nav>
       <div class="foot">v0.2 · the signed interconnect<br>github.com/jeffrschneider/AgentMesh</div>
     </aside>
