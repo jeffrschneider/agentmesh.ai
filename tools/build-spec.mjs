@@ -190,7 +190,6 @@ const page = `<!DOCTYPE html>
         <a href="run-a-test-node.html">/ run-a-test-node</a>
         <div class="grp">reference</div>
         <a class="on" href="spec.html">/ specification</a>
-        <a href="reference.html">/ reference</a>
         <a href="faq.html">/ faq</a>
         <a href="claude-code.html">/ claude-code</a>
       </nav>
