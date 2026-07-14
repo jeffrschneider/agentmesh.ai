@@ -1,0 +1,2643 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Specification: AgentMesh</title>
+  <link rel="icon" type="image/svg+xml" href="favicon.svg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root{
+      --ink:#0A1417; --panel:#0F1D22; --line:#1C2E33;
+      --paper:#E7EFEC; --dim:#7C918C; --faint:#4A5D5A;
+      --signal:#F2A93B; --verify:#43D6A6; --address:#6BA8FF; --broadcast:#B69CFF;
+      --disp:'Space Grotesk', sans-serif;
+      --body:'IBM Plex Sans', system-ui, sans-serif;
+      --wire:'IBM Plex Mono', ui-monospace, monospace;
+    }
+    *{ box-sizing:border-box; }
+    html{ scroll-behavior:smooth; scroll-padding-top:20px; }
+    html,body{ margin:0; }
+    body{ background:var(--ink); color:var(--paper); font-family:var(--body);
+      font-size:16px; line-height:1.65; -webkit-font-smoothing:antialiased;
+      background-image:
+        linear-gradient(var(--line) 1px, transparent 1px),
+        linear-gradient(90deg, var(--line) 1px, transparent 1px);
+      background-size:64px 64px, 64px 64px; background-position:-1px -1px;
+    }
+    body::before{ content:""; position:fixed; inset:0; z-index:0; pointer-events:none;
+      background:
+        radial-gradient(80% 45% at 30% 0%, rgba(242,169,59,.10), transparent 60%),
+        radial-gradient(70% 50% at 100% 10%, rgba(67,214,166,.08), transparent 55%),
+        linear-gradient(180deg, rgba(10,20,23,.72), var(--ink) 62%);
+    }
+    a{ color:inherit; }
+    .layout{ position:relative; z-index:1; display:grid; grid-template-columns:248px 1fr; min-height:100vh; }
+    .rail{ border-right:1px solid var(--line); padding:26px 22px; position:sticky; top:0; align-self:start; height:100vh; overflow-y:auto; }
+    .brand{ font-family:var(--wire); font-weight:600; font-size:.82rem; letter-spacing:.02em;
+      display:flex; align-items:center; gap:9px; color:var(--paper); text-decoration:none; margin-bottom:30px; }
+    .brand .dot{ width:9px; height:9px; border-radius:2px; background:var(--signal);
+      box-shadow:0 0 0 3px rgba(242,169,59,.15), 8px 0 0 -2px var(--verify), 16px 0 0 -2px var(--address); }
+    .rail .grp{ font-family:var(--wire); font-size:.64rem; letter-spacing:.18em; text-transform:uppercase;
+      color:var(--faint); margin:16px 0 4px; }
+    .rail .grp:first-child{ margin-top:0; }
+    .rail nav a{ display:block; font-family:var(--wire); font-size:.8rem; color:var(--dim);
+      text-decoration:none; padding:6px 0; border-left:2px solid transparent; padding-left:12px; margin-left:-12px; }
+    .rail nav a:hover{ color:var(--paper); }
+    .rail nav a.on{ color:var(--paper); border-left-color:var(--signal); }
+    .rail .foot{ margin-top:26px; padding-top:18px; border-top:1px solid var(--line);
+      font-family:var(--wire); font-size:.72rem; color:var(--faint); }
+    .main{ min-width:0; }
+    .wrap{ max-width:900px; margin:0 auto; padding:0 40px; }
+    .eyebrow{ font-family:var(--wire); font-size:.76rem; letter-spacing:.04em; color:var(--dim); }
+    .eyebrow .tag{ color:var(--signal); }
+    .hero{ padding:64px 0 30px; border-bottom:1px solid var(--line); }
+    .hero .eyebrow{ margin-bottom:18px; display:block; }
+    .hero h1{ font-family:var(--disp); font-weight:700; letter-spacing:-.02em;
+      font-size:clamp(2rem,4.2vw,2.8rem); margin:0 0 12px; }
+    .metas{ display:flex; gap:10px; flex-wrap:wrap; margin:14px 0 0; }
+    .metas span{ font-family:var(--wire); font-size:.74rem; color:var(--dim);
+      border:1px solid var(--line); border-radius:100px; padding:4px 12px; background:var(--panel); }
+    .metas span b{ color:var(--signal); font-weight:600; }
+    .canon{ margin-top:14px; font-family:var(--wire); font-size:.76rem; color:var(--faint); }
+    .canon a{ color:var(--verify); }
+
+    .toc{ margin:26px 0 0; border:1px solid var(--line); border-radius:12px; background:var(--panel);
+      padding:16px 18px; columns:2; column-gap:28px; }
+    .toc a{ display:block; font-family:var(--wire); font-size:.78rem; color:var(--dim);
+      text-decoration:none; padding:3px 0; break-inside:avoid; }
+    .toc a:hover{ color:var(--signal); }
+
+    .spec{ padding:10px 0 70px; }
+    .spec h1{ display:none; } /* page hero replaces the md title */
+    .spec h2{ font-family:var(--disp); font-weight:700; letter-spacing:-.02em; font-size:1.7rem;
+      margin:54px 0 14px; padding-top:22px; border-top:1px solid var(--line); }
+    .spec h3{ font-family:var(--disp); font-weight:700; font-size:1.2rem; margin:34px 0 10px; }
+    .spec h4{ font-family:var(--disp); font-weight:600; font-size:1.02rem; margin:26px 0 8px; }
+    .spec .hl{ opacity:0; margin-left:8px; font-family:var(--wire); font-size:.8em;
+      color:var(--signal); text-decoration:none; }
+    .spec h2:hover .hl, .spec h3:hover .hl, .spec h4:hover .hl{ opacity:1; }
+    .spec p, .spec li{ color:var(--dim); max-width:76ch; }
+    .spec strong{ color:var(--paper); font-weight:600; }
+    .spec code{ font-family:var(--wire); font-size:.86em; color:var(--verify);
+      background:rgba(67,214,166,.07); border:1px solid rgba(67,214,166,.15);
+      border-radius:5px; padding:1px 5px; }
+    .spec pre{ background:var(--panel); border:1px solid var(--line); border-radius:12px;
+      padding:16px 18px; overflow-x:auto; line-height:1.7; }
+    .spec pre code{ background:none; border:0; padding:0; color:var(--paper); font-size:.82rem; }
+    .spec blockquote{ margin:18px 0; border:1px solid var(--line); border-left:3px solid var(--signal);
+      border-radius:10px; background:var(--panel); padding:12px 18px; }
+    .spec blockquote p{ margin:6px 0; }
+    .spec table{ border-collapse:collapse; margin:18px 0; display:block; overflow-x:auto;
+      border:1px solid var(--line); border-radius:10px; }
+    .spec th{ font-family:var(--wire); font-size:.72rem; letter-spacing:.1em; text-transform:uppercase;
+      color:var(--faint); text-align:left; padding:10px 14px; background:rgba(255,255,255,.015);
+      border-bottom:1px solid var(--line); white-space:nowrap; }
+    .spec td{ padding:9px 14px; border-bottom:1px solid var(--line); font-size:.9rem;
+      color:var(--dim); vertical-align:top; }
+    .spec tr:last-child td{ border-bottom:0; }
+    .spec td:first-child{ color:var(--paper); font-family:var(--wire); font-size:.84rem; }
+    .spec hr{ border:0; border-top:1px solid var(--line); margin:40px 0; }
+    .spec a{ color:var(--verify); }
+    footer{ padding:14px 0 60px; }
+    footer .wrap{ font-family:var(--wire); font-size:.78rem; color:var(--faint); display:flex; gap:14px; }
+    footer a{ color:var(--dim); text-decoration:none; }
+    @media (max-width:900px){
+      .layout{ grid-template-columns:1fr; }
+      .rail{ position:static; height:auto; border-right:0; border-bottom:1px solid var(--line); }
+      .toc{ columns:1; }
+    }
+  </style>
+</head>
+<body>
+  <div class="layout">
+    <aside class="rail">
+      <a class="brand" href="index.html"><span class="dot"></span>AGENTMESH</a>
+      <nav>
+        <div class="grp">learn</div>
+        <a href="index.html">/ overview</a>
+        <a href="how-it-works.html">/ how-it-works</a>
+        <a href="architecture.html">/ architecture</a>
+        <a href="topologies.html">/ topologies</a>
+        <a href="world-wide-mesh.html">/ world-wide-mesh</a>
+        <div class="grp">build</div>
+        <a href="getting-started.html">/ getting-started</a>
+        <a href="use-cases.html">/ use-cases</a>
+        <a href="examples.html">/ examples</a>
+        <a href="sdks.html">/ sdks</a>
+        <div class="grp">operate</div>
+        <a href="running-a-mesh.html">/ running-a-mesh</a>
+        <a href="run-a-test-node.html">/ run-a-test-node</a>
+        <div class="grp">reference</div>
+        <a class="on" href="spec.html">/ specification</a>
+        <a href="reference.html">/ reference</a>
+        <a href="faq.html">/ faq</a>
+        <a href="claude-code.html">/ claude-code</a>
+      </nav>
+      <div class="foot">v0.2 · signed a2a protocol<br>github.com/jeffrschneider/AgentMesh</div>
+    </aside>
+    <main class="main">
+      <div class="wrap hero">
+        <span class="eyebrow"><span class="tag">agentmesh</span> · protocol specification</span>
+        <h1>AgentMesh Protocol Specification</h1>
+        <div class="metas">
+          <span>version <b>0.2.0-draft</b></span>
+          <span>status <b>Working Draft</b></span>
+          <span>date <b>2026-07-13</b></span>
+        </div>
+        <p class="canon">Rendered 2026-07-14 from commit <a href="https://github.com/jeffrschneider/AgentMesh/commit/bf3a72f">bf3a72f</a>.
+          The canonical source is
+          <a href="https://github.com/jeffrschneider/AgentMesh/blob/main/SPEC.md">SPEC.md on GitHub</a>.</p>
+        <div class="toc">
+            <a href="#1-introduction">1. Introduction</a>
+            <a href="#2-terminology">2. Terminology</a>
+            <a href="#3-architecture">3. Architecture</a>
+            <a href="#4-identity-nodes-and-security">4. Identity, Nodes &amp; Security</a>
+            <a href="#5-message-envelope">5. Message Envelope</a>
+            <a href="#6-primitives">6. Primitives</a>
+            <a href="#7-task-model">7. Task Model</a>
+            <a href="#8-agent-manifest">8. Agent Manifest</a>
+            <a href="#9-registry">9. Registry</a>
+            <a href="#10-composed-operations">10. Composed Operations</a>
+            <a href="#11-streaming">11. Streaming</a>
+            <a href="#12-error-model">12. Error Model</a>
+            <a href="#13-observability">13. Observability</a>
+            <a href="#14-subject-namespace">14. Subject Namespace</a>
+            <a href="#15-multi-tenancy">15. Multi-Tenancy</a>
+            <a href="#16-rate-limiting">16. Rate Limiting</a>
+            <a href="#17-extensions">17. Extensions</a>
+            <a href="#18-bindings">18. Bindings</a>
+            <a href="#19-metering-and-cost-economics-extension-not-core-in-0-2">19. Metering and Cost  (Economics extension — not core in 0.2)</a>
+            <a href="#20-versioning">20. Versioning</a>
+            <a href="#21-federation-planned">21. Federation (Planned)</a>
+            <a href="#appendix-a-example-complete-request-respond-flow">Appendix A: Example — Complete Request-Respond Flow</a>
+            <a href="#appendix-b-example-event-driven-collaboration">Appendix B: Example — Event-Driven Collaboration</a>
+            <a href="#appendix-c-example-streaming-llm-output">Appendix C: Example — Streaming LLM Output</a>
+        </div>
+      </div>
+      <div class="wrap spec">
+<blockquote>
+<p><strong>0.2 revision in progress.</strong> This draft is being revised per <code>SPEC-0.2-PLAN.md</code>.
+The prior draft is archived at <code>SPEC-0.1.0.md</code>. Key structural changes:
+a first-class <strong>Node</strong> concept (a host that connects once and vouches for the
+agents it hosts), a <strong>registry/presence split</strong>, <strong>optional Tasks</strong>, and the
+relocation of economics and speculative operations into extensions. All
+structural changes and wording polish are applied across §§1–19 (identity/
+envelope, optional tasks, registry/presence split, composed-op disposition,
+node-held inbox, extensions registry, optional observability, economics →
+extension, tenancy/visibility). <strong>§4.5 message signing is locked to
+always-sign</strong>, with stream chunks authenticated at the stream level rather
+than per chunk (§4.5, §11.6). Implemented: TypeScript and Rust SDKs (node model,
+streaming, chunk verification), platform services (registry, presence, node
+profiles, sandbox enforcement), and a public reference deployment.</p>
+</blockquote>
+<hr>
+<h2 id="1-introduction">1. Introduction<a class="hl" href="#1-introduction">#</a></h2>
+<p>The AgentMesh Protocol is an open specification for reliable, secure agent-to-agent communication over messaging infrastructure. Unlike HTTP-based agent protocols that impose a client-server interaction model, AgentMesh treats the network as a <strong>mesh</strong> — any agent can request, respond, emit, subscribe, and discover any other agent, with the platform providing routing, delivery, persistence, security, and observability.</p>
+<p>AgentMesh is a <strong>platform protocol</strong>, not an application protocol. It defines the low-level primitives and infrastructure services that agents consume, rather than prescribing how agents should behave internally.</p>
+<h3 id="1-1-design-goals">1.1. Design Goals<a class="hl" href="#1-1-design-goals">#</a></h3>
+<ul>
+<li><strong>Mesh-native:</strong> Peer-to-peer topology. Any agent can initiate communication with any other agent. No fixed client-server roles.</li>
+<li><strong>Primitive-first:</strong> A minimal set of irreducible operations from which all higher-level patterns compose.</li>
+<li><strong>Infrastructure-secure:</strong> Identity, authentication, and authorization enforced at the transport layer via cryptographic primitives, not application-layer tokens.</li>
+<li><strong>Async-first:</strong> All interactions are natively asynchronous. Synchronous request-response is a special case, not the default.</li>
+<li><strong>Node-aware:</strong> A single host (a <strong>Node</strong>) MAY connect once and serve many agents. Identity, presence, and delivery are defined so that co-located agents are first-class mesh peers without per-agent connection or credential ceremony.</li>
+<li><strong>Observable:</strong> Distributed <strong>tracing</strong> context is carried in every envelope. Trace/metric/log <em>storage</em> is an optional deployment concern, not a protocol requirement.</li>
+<li><strong>Binding-defined:</strong> The abstract protocol is separated from its platform binding (Section 18). NATS JetStream is the reference binding; alternative bindings MAY be defined but MUST satisfy the Binding Requirements (§18.1).</li>
+</ul>
+<blockquote>
+<p>Economics (cost, negotiation, metering) is <strong>not</strong> part of the core protocol in 0.2. It is defined as an optional extension (see Section 17). This keeps the core focused on connectivity, identity, and delivery.</p>
+</blockquote>
+<h3 id="1-2-non-goals">1.2. Non-Goals<a class="hl" href="#1-2-non-goals">#</a></h3>
+<ul>
+<li>Prescribing agent internal architecture, reasoning, or tool use.</li>
+<li>Defining a user-facing API or UI protocol.</li>
+<li>Replacing HTTP-based protocols for browser-to-agent communication. AgentMesh is agent-to-agent infrastructure.</li>
+</ul>
+<h3 id="1-3-related-specifications">1.3. Related Specifications<a class="hl" href="#1-3-related-specifications">#</a></h3>
+<p>AgentMesh is designed to compose with the emerging agent ecosystem, not replace it. Two specifications overlap its surface directly. For each, this section states explicitly what AgentMesh <strong>leverages</strong> (reuses rather than reinvents), what it <strong>cedes</strong> (defers to that spec as the authority), and the <strong>boundary</strong> (what AgentMesh contributes that the other does not). A third spec, MCP, is listed as an explicit non-overlap.</p>
+<p><strong>A2A (Agent2Agent Protocol)</strong> — a named protocol for direct agent-to-agent calls: a request/response and task method surface (<code>message/send</code>, <code>message/stream</code>, <code>tasks/*</code>), an Agent Card, and a Task lifecycle.</p>
+<ul>
+<li><em>Leverage:</em> the AgentMesh Task model (Section 7) mirrors A2A&#39;s states and object, and the Agent Manifest (Section 8) maps to the A2A Agent Card. Where both name an operation, AgentMesh&#39;s wire form is intended to map one-to-one onto A2A&#39;s, so a gateway between them is a renaming, not a translation.</li>
+<li><em>Cede:</em> AgentMesh does not seek to redefine A2A&#39;s request/response and task <strong>method surface</strong>; A2A is the authority for the direct-call method layer. <em>(Open decision: whether AgentMesh adopts A2A&#39;s method names verbatim on the wire, or keeps its own 1:1-mappable verbs. Not yet resolved.)</em></li>
+<li><em>Boundary:</em> AgentMesh contributes what sits <em>beneath</em> that method layer — a signed, always-on <strong>mesh</strong> that reaches agents behind firewalls, plus <strong>presence</strong> and an <strong>emit/subscribe event bus</strong>, none of which A2A defines.</li>
+</ul>
+<p><strong>ARD (Agentic Resource Discovery)</strong> — a federated discovery and search layer: an artifact-agnostic catalog envelope, <code>/.well-known/ai-catalog.json</code> manifests, and a registry search API that indexes heterogeneous agents (A2A and MCP artifacts among them).</p>
+<ul>
+<li><em>Leverage:</em> an AgentMesh manifest is intended to also publish as an ARD catalog entry, so AgentMesh agents are findable across the wider ecosystem.</li>
+<li><em>Cede:</em> AgentMesh <strong>defers broad, cross-ecosystem discovery to ARD</strong>; ARD is the authority for catalog and search. AgentMesh&#39;s own <code>discover</code> primitive (Section 6) and registry (Section 9) are scoped to <em>live, in-mesh</em> discovery only.</li>
+<li><em>Boundary:</em> AgentMesh contributes <strong>liveness and presence</strong> (who is reachable right now, not just a description) and signed delivery, which ARD does not cover.</li>
+</ul>
+<p><strong>MCP (Model Context Protocol)</strong> connects an agent to its own tools and data (agent-to-resource). It does not overlap AgentMesh&#39;s agent-to-agent surface; the two are complementary and require no alignment.</p>
+<p><strong>Identity and trust</strong> cuts across A2A and ARD, and is also the subject of dedicated identity specs — W3C DIDs and <strong>ANS</strong> (the IETF Agent Name Service, <code>draft-narajala-courtney-ansv2</code>), a domain-anchored, certificate-based trust layer that fills exactly the &quot;who is this agent, and should I trust it&quot; gap A2A and MCP defer. Here AgentMesh is a <em>provider</em> rather than a ceder. Neither A2A nor ARD ships a concrete cryptographic root: ARD&#39;s TrustManifest is a <em>container</em> for pluggable schemes (SPIFFE, DID, attestations), and A2A&#39;s Agent Card <em>declares</em> an auth scheme. AgentMesh defines an actual one (Section 4): an agent&#39;s Ed25519 public key is its ID, and an operator → account → node → agent attestation chain roots trust, anchored at the operator&#39;s DNS domain.</p>
+<ul>
+<li><em>Own (boundary):</em> the cryptographic root of trust — per-agent Ed25519 keys, the operator/node/agent attestation chain, DNS-anchored operator identity, and always-signed envelopes. This is what neither ARD nor A2A provides on its own. AgentMesh&#39;s <em>on-mesh</em> trust stays signature-chain based; it does <strong>not</strong> adopt X.509/CA machinery internally.</li>
+<li><em>Cede:</em> human-readable <strong>naming</strong> to ARD&#39;s <code>urn:air:&lt;publisher&gt;:&lt;namespace&gt;:&lt;agent&gt;</code> scheme (with the operator&#39;s DNS domain as the <code>publisher</code>), and the <strong>auth-advertisement format</strong> to A2A&#39;s Agent Card.</li>
+<li><em>Leverage / express:</em> the same Ed25519 identity is intended to be expressed as a <code>did:key</code> and carried in ARD&#39;s TrustManifest (the attestation chain as its <code>attestations</code>); a signed AgentMesh manifest is, by construction, a signed A2A Agent Card. For <em>cross-organizational</em> trust, an AgentMesh agent MAY additionally carry a domain-anchored <strong>ANS</strong> identity: AgentMesh&#39;s operator DNS anchor (§4.1) aligns with ANS&#39;s domain anchoring, <code>did:key</code> bridges the two (ANS accepts a DID as a principal binding), and ANS&#39;s domain-anchored model plus its SCITT transparency log are directly relevant to Federation (§21). <em>(Open decisions: whether to adopt <code>did:key</code>, <code>urn:air:</code>, and/or an ANS identity as external expressions. SPIFFE is a different model, workload identity via a trust domain, and is not currently planned.)</em></li>
+</ul>
+<p><strong>NATS</strong> is not a peer protocol but AgentMesh&#39;s <strong>substrate</strong>. The reference binding (Section 18) realizes the protocol — transport, identity/credentials, and persistence — on NATS JetStream. NATS is a dependency AgentMesh builds on, not a specification it aligns or competes with; alternative bindings MAY target other infrastructure, provided they meet the Binding Requirements (§18.1).</p>
+<blockquote>
+<p>In one line: <strong>ARD finds, A2A talks, AgentMesh connects</strong> (reach, trust, presence, and events).</p>
+</blockquote>
+<p>Throughout this document, <strong>&quot;A2A&quot; refers to the named Agent2Agent Protocol</strong>, never to &quot;agent-to-agent&quot; used generically; the generic concept is always written out in full.</p>
+<h3 id="1-4-requirements-language">1.4. Requirements Language<a class="hl" href="#1-4-requirements-language">#</a></h3>
+<p>The keywords &quot;MUST&quot;, &quot;MUST NOT&quot;, &quot;REQUIRED&quot;, &quot;SHALL&quot;, &quot;SHALL NOT&quot;, &quot;SHOULD&quot;, &quot;SHOULD NOT&quot;, &quot;RECOMMENDED&quot;, &quot;MAY&quot;, and &quot;OPTIONAL&quot; in this document are to be interpreted as described in <a href="https://tools.ietf.org/html/rfc2119">RFC 2119</a>.</p>
+<hr>
+<h2 id="2-terminology">2. Terminology<a class="hl" href="#2-terminology">#</a></h2>
+<ul>
+<li><strong>AgentMesh:</strong> The open protocol defined by this specification: a signed, mesh-native protocol for agent-to-agent communication that provides identity, discovery, request/response, events, presence, and a task model over a messaging transport. &quot;AgentMesh&quot; names the <em>protocol</em>; a <strong>Mesh</strong> (below) is a running network that speaks it, and an <strong>instance</strong> is one operator&#39;s deployment of that network.</li>
+<li><strong>Agent:</strong> An autonomous software entity that communicates via the AgentMesh protocol. Agents are opaque — the protocol does not require knowledge of their internal implementation. An agent has its own cryptographic keypair; its public key is its <strong>agent ID</strong>. An agent is always <strong>hosted by a Node</strong>.</li>
+<li><strong>Node:</strong> A host that maintains a transport connection to the mesh and serves one or more agents over it. The Node holds the transport credential and <strong>vouches</strong> for the agents it hosts (see Section 4). A Node has its own keypair (the <strong>node ID</strong>). One always-on host — e.g. a personal gateway or a machine running an agent fleet — is one Node hosting N agents.</li>
+<li><strong>Mesh Server:</strong> The infrastructure role a node&#39;s connection terminates at. A mesh server routes messages, verifies node credentials at connection time, enforces subject-level authorization and tenant isolation on every operation, and provides durable delivery, the task store, and the presence substrate. It is run by the instance&#39;s operator, hosts no agents, and vouches for nothing — a mesh server is the opposite of a node in almost every respect. In the reference binding a mesh server is a NATS server (Section 18.2); its client↔server wire protocol is defined by the binding, not by this document (§18.1).</li>
+<li><strong>Presence:</strong> The ephemeral liveness state of a node or agent (<code>online</code>, <code>busy</code>, <code>degraded</code>, <code>offline</code>) plus load signals. Presence is separate from the manifest and expires on missed heartbeats; it never mutates or deletes a manifest (see Section 9).</li>
+<li><strong>Node Profile:</strong> Durable, node-keyed metadata describing the <em>conditions</em> a host runs under — trust tier, expected uptime, reachability, capacity. Joined into discovery like presence; see Section 9.7.</li>
+<li><strong>Mesh:</strong> The interconnected network of nodes, agents, registries, and infrastructure services communicating via AgentMesh.</li>
+<li><strong>Primitive:</strong> An irreducible protocol operation. All agent interactions compose from primitives.</li>
+<li><strong>Composed Operation:</strong> A higher-level interaction pattern built from multiple primitives. Standardized for interoperability but not fundamental.</li>
+<li><strong>Manifest:</strong> A durable self-description document published by an agent, declaring its identity, hosting node, capabilities, and skills. (Liveness is <em>not</em> in the manifest — see Presence; cost is an extension field — see Section 17.)</li>
+<li><strong>Task:</strong> A stateful unit of work with a defined lifecycle, created when an agent processes a request.</li>
+<li><strong>Message:</strong> A structured communication between agents, carrying metadata, identity, and payload.</li>
+<li><strong>Artifact:</strong> A discrete output produced by an agent as the result of a Task, distinct from conversational messages.</li>
+<li><strong>Envelope:</strong> The standard wire format wrapping all protocol messages.</li>
+<li><strong>Subject:</strong> A routing address for messages: hierarchical, dot-delimited, and supporting multi-level wildcards. Realized as a NATS subject in the reference binding (Section 18).</li>
+<li><strong>Binding:</strong> A concrete realization of the abstract protocol on specific infrastructure — transport, identity/credentials, and persistence. NATS JetStream is the reference binding (Section 18); AgentMesh terms such as <strong>NKey</strong> and <strong>User JWT</strong> are binding-level names, not protocol concepts.</li>
+<li><strong>Tenant:</strong> An isolation boundary within the mesh, mapped to a NATS account.</li>
+<li><strong>Registry:</strong> A platform service that stores agent manifests and serves discovery queries.</li>
+<li><strong>Bus:</strong> The event distribution infrastructure supporting publish-subscribe patterns.</li>
+<li><strong>Trace:</strong> A distributed trace spanning multiple agents and operations, identified by a trace ID.</li>
+<li><strong>Span:</strong> A single unit of work within a trace, scoped to one agent&#39;s processing of one operation.</li>
+</ul>
+<hr>
+<h2 id="3-architecture">3. Architecture<a class="hl" href="#3-architecture">#</a></h2>
+<h3 id="3-1-layers">3.1. Layers<a class="hl" href="#3-1-layers">#</a></h3>
+<pre><code>┌───────────────────────────────────────────────────────────┐
+│                    Agent Applications                      │
+│         (LLM agents, tool agents, orchestrators)           │
+├───────────────────────────────────────────────────────────┤
+│                   Composed Operations                      │
+│   connect, delegate, negotiate, stream, broadcast, ...     │
+├───────────────────────────────────────────────────────────┤
+│                    Core Primitives                          │
+│     register, discover, request, respond, emit, subscribe  │
+├───────────────────────────────────────────────────────────┤
+│                     Task Model                             │
+│          lifecycle, state machine, artifacts                │
+├───────────────────────────────────────────────────────────┤
+│                   Message Envelope                         │
+│       identity, tracing, error, versioning                 │
+├───────────────────────────────────────────────────────────┤
+│                  Platform Services                         │
+│         registry, presence, task manager                   │
+├───────────────────────────────────────────────────────────┤
+│                       Nodes                                │
+│   one connection + credential per host; vouches for its    │
+│   agents; holds their durable inboxes; local delivery      │
+├───────────────────────────────────────────────────────────┤
+│                     Transport                              │
+│                   NATS JetStream                           │
+│       subjects, streams, consumers, KV, security           │
+└───────────────────────────────────────────────────────────┘
+</code></pre>
+<h3 id="3-2-topology">3.2. Topology<a class="hl" href="#3-2-topology">#</a></h3>
+<p>AgentMesh is a <strong>mesh topology</strong>. There are no fixed client-server roles. Agents do not connect to the transport individually — a <strong>Node</strong> connects on behalf of the agents it hosts (Section 4). Over that connection, each hosted agent is a first-class peer that can:</p>
+<ul>
+<li>Publish messages to any subject its node is authorized to publish on.</li>
+<li>Subscribe to any subject its node is authorized to subscribe to.</li>
+<li>Request-reply with any agent that is listening on its inbox subject — whether that agent is on another node across the internet or on the <strong>same node</strong> (see Section 4.7, Local Delivery).</li>
+</ul>
+<p>The transport handles routing, delivery, persistence, and node-level security; the reference binding (Section 18) provides these via JetStream and the NATS credential chain. Agents do not need to know each other&#39;s network addresses — only their mesh identities. Whether a peer is remote or co-located is transparent to the agent (<strong>location transparency</strong>).</p>
+<h3 id="3-3-agent-surface-area">3.3. Agent Surface Area<a class="hl" href="#3-3-agent-surface-area">#</a></h3>
+<p>Every agent MUST implement four inbound handlers:</p>
+<table>
+<thead>
+<tr>
+<th>Handler</th>
+<th>Trigger</th>
+<th>Responsibility</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>onRequest(envelope)</code></td>
+<td>Incoming request message on the agent&#39;s inbox subject</td>
+<td>Process the request, create a Task if needed, and respond.</td>
+</tr>
+<tr>
+<td><code>onEvent(envelope)</code></td>
+<td>Incoming event message on a subscribed subject</td>
+<td>React to the event. MAY emit new events or initiate new requests.</td>
+</tr>
+<tr>
+<td><code>onLifecycle(event)</code></td>
+<td>Agent start or stop</td>
+<td>On start: register with the registry. On stop: deregister.</td>
+</tr>
+<tr>
+<td><code>onTaskUpdate(envelope)</code></td>
+<td>Incoming task status or artifact update</td>
+<td>Process updates for tasks this agent has initiated.</td>
+</tr>
+</tbody></table>
+<p>Agents MAY implement additional handlers for composed operations but MUST NOT require counterparties to implement anything beyond these four.</p>
+<hr>
+<h2 id="4-identity-nodes-and-security">4. Identity, Nodes &amp; Security<a class="hl" href="#4-identity-nodes-and-security">#</a></h2>
+<p>AgentMesh separates two identities that v0.1 conflated: the <strong>Node</strong> (a host that connects to the transport) and the <strong>Agent</strong> (a peer that sends and receives messages). A node connects once and serves many agents. This section defines both identities, how a node vouches for its agents, and how a receiver trusts the <code>from</code> field when many agents share one connection.</p>
+<h3 id="4-1-trust-hierarchy">4.1. Trust Hierarchy<a class="hl" href="#4-1-trust-hierarchy">#</a></h3>
+<pre><code>Operator (root of trust)
+  └── Account (tenant isolation boundary)
+        └── Node (a host; holds the transport connection + credential)
+              └── Agent (a peer identity; hosted and vouched for by a Node)
+</code></pre>
+<ul>
+<li><strong>Operator:</strong> The operator of a mesh <strong>instance</strong>. Holds that instance&#39;s root signing key and authorizes the accounts beneath it. An operator is <em>a</em> root of trust, not <em>the</em> root: a deployment is one operator&#39;s instance, and many independent instances MAY exist (public, corporate, or personal). An operator SHOULD be identified by a DNS domain (e.g. <code>mesh.example.com</code>); this domain anchor is reserved for cross-instance (federation) trust, where a peer instance verifies an operator&#39;s root key as published at its domain. Federation itself is out of scope for this spec (see §21).</li>
+<li><strong>Account:</strong> A tenant: the isolation boundary. It issues node credentials and defines the subject import/export rules for cross-tenant communication. (Realized as a NATS account; see §18.2.)</li>
+<li><strong>Node:</strong> A host that connects to the transport. It holds a keypair (the <strong>node ID</strong>) and a signed credential from its account that authorizes its connection and carries its subject publish/subscribe permissions. One node serves one or more agents. (Concrete credential format: §18.2.)</li>
+<li><strong>Agent:</strong> A peer identity with its <strong>own</strong> Ed25519 keypair, generated locally. An agent&#39;s public key is its <strong>agent ID</strong>. Agents do <strong>not</strong> hold transport credentials and do <strong>not</strong> establish their own connections. An agent exists on the mesh because a node <strong>vouches</strong> for it (§4.4).</li>
+</ul>
+<blockquote>
+<p><strong>Why the Node layer.</strong> In v0.1 an agent was a NATS user: 1 agent = 1 NKey = 1 JWT = 1 connection, and <code>from</code> was verified at connection granularity (old §5.3). A host running N agents therefore needed N credentialed connections — the per-agent issuance ceremony that made a commercial credential control plane look necessary. Collapsing the connection+credential to the <strong>node</strong> removes that: agents are cheap, keypair-only identities; only nodes need issued transport credentials.</p>
+</blockquote>
+<h3 id="4-2-node-identity">4.2. Node Identity<a class="hl" href="#4-2-node-identity">#</a></h3>
+<p>Every node MUST possess:</p>
+<ul>
+<li>A <strong>keypair</strong> (Ed25519) — the node&#39;s cryptographic identity (<strong>node ID</strong> = its public key).</li>
+<li>A <strong>signed credential</strong> issued by its account, authorizing the node&#39;s transport connection and carrying its subject publish/subscribe permissions plus expiration/revocation metadata. The credential MAY also carry the node&#39;s <strong>attested profile claims</strong> (<code>trust_tier</code>, <code>role</code>; §9.7), since these are operator-signed and a node MUST NOT self-declare them.</li>
+</ul>
+<p>The node presents these at connection time. All of the node&#39;s hosted agents share this one connection. The concrete credential format (a NATS NKey + a User JWT) is defined in the reference binding (§18.2).</p>
+<h3 id="4-3-agent-identity">4.3. Agent Identity<a class="hl" href="#4-3-agent-identity">#</a></h3>
+<p>Every agent MUST possess an Ed25519 keypair generated on (or provisioned to) its host. The public key is the immutable <strong>agent ID</strong>. Agent keys are <strong>not</strong> issued by the account and require no JWT — an agent&#39;s right to speak on the mesh comes entirely from its node&#39;s vouch (§4.4). This makes creating an agent a local, zero-round-trip operation.</p>
+<h3 id="4-4-vouching-node-agent-attestation">4.4. Vouching (Node → Agent Attestation)<a class="hl" href="#4-4-vouching-node-agent-attestation">#</a></h3>
+<p>A node asserts that it hosts an agent by issuing a signed <strong>attestation</strong>:</p>
+<pre><code class="language-json">{
+  &quot;node&quot;: &quot;&lt;node-nkey-public&gt;&quot;,
+  &quot;agent&quot;: &quot;&lt;agent-nkey-public&gt;&quot;,
+  &quot;issued_at&quot;: &quot;&lt;ISO-8601&gt;&quot;,
+  &quot;expires_at&quot;: &quot;&lt;ISO-8601&gt;&quot;,
+  &quot;sig&quot;: &quot;&lt;Ed25519 signature by the node key over the canonical attestation&gt;&quot;
+}
+</code></pre>
+<ul>
+<li>The attestation is included in the agent&#39;s manifest (<code>node</code> field, Section 8) at <code>register</code> time.</li>
+<li>The registry MUST verify: (a) the attestation signature is valid for the claimed node key, and (b) the <strong>registering connection&#39;s identity is that node</strong>. This binds the agent to a node that actually connected.</li>
+<li>An agent MAY be re-vouched by a different node (e.g. it migrates hosts) by registering a new attestation. Only the current attestation is authoritative.</li>
+</ul>
+<p>The registry records the node→agent binding so any party can resolve &quot;which node hosts agent A?&quot;.</p>
+<h3 id="4-5-message-identity-assertion">4.5. Message Identity Assertion<a class="hl" href="#4-5-message-identity-assertion">#</a></h3>
+<p>Because one node connection carries messages <code>from</code> many agents, the transport can only prove <em>&quot;a legitimate node published this,&quot;</em> not <em>&quot;agent A published this.&quot;</em> AgentMesh closes that gap at the envelope layer:</p>
+<ul>
+<li>Every envelope carries a <code>sig</code> field: an Ed25519 signature over the canonical envelope (all fields except <code>sig</code>) using the <strong>sending agent&#39;s private key</strong> (which its node holds, §4.6).</li>
+<li>A receiver MUST verify <code>sig</code> against the <code>from</code> agent&#39;s public key, and SHOULD confirm (via the registry) that <code>from</code> is currently vouched for by a node.</li>
+<li>This makes <code>from</code> trustworthy independent of which connection carried the message, restoring per-agent identity in a multiplexed world, and keeps envelopes portable across transports. Because the node currently holds its agents&#39; keys, the signature attests the agent identity <strong>as asserted by its node</strong>; it becomes independent per-agent non-repudiation once agents hold their own keys (the E2E work deferred in <code>SPEC-0.2-PLAN.md</code>).</li>
+</ul>
+<blockquote>
+<p><strong>Decision (locked, 2026-07-13): always-sign.</strong> Every envelope is signed and every receiver verifies, with a single exception mechanism for high-frequency streams (§11.6): a stream is authenticated by signing its opening and closing envelopes, and the chunks in between are not individually signed. Rationale for always-sign over cross-node-only:</p>
+<ul>
+<li><strong>One rule, one verification path.</strong> There is no &quot;is this crossing a node boundary?&quot; branch, which is the class of bug where a message that should have been signed is not. Same-node signing (§4.7) adds no cryptographic security under node-held keys (the node holds both keys and delivers the message to itself), but is kept anyway for uniformity and a complete audit trail. The cost is roughly one Ed25519 sign plus one verify per message, negligible beside LLM and network cost.</li>
+<li><strong>Forward-compatible.</strong> When agents eventually hold their own keys, always-sign already yields true per-agent non-repudiation with no protocol change.</li>
+<li><strong>Cross-node-only stays on the table as a later, profiling-driven optimization</strong>, not a second trust mode in 0.2. The real cost lever is per-chunk signing on streams, not per-message signing, and §11.6 addresses that directly.</li>
+</ul>
+</blockquote>
+<h3 id="4-6-authentication-and-authorization">4.6. Authentication &amp; Authorization<a class="hl" href="#4-6-authentication-and-authorization">#</a></h3>
+<p><strong>Transport (node-level):</strong> authentication happens once at connection establishment — the node proves possession of its node key and presents its credential, and the transport verifies the credential chain (node → account → operator). The node&#39;s subject publish/subscribe permissions and its account&#39;s import/export rules are then enforced by the transport on every operation. The concrete mechanism (NKey nonce signing + Node JWT → Account JWT → Operator JWT verification) is defined in the reference binding (§18.2).</p>
+<p><strong>Message (agent-level):</strong> the envelope <code>sig</code> (§4.5) authenticates the individual agent. Receivers use the verified <code>from</code> for authorization decisions.</p>
+<p><strong>Application:</strong> agents and platform services MAY apply their own policy on top of a verified <code>from</code>.</p>
+<h3 id="4-7-local-delivery-same-node-agents">4.7. Local Delivery (Same-Node Agents)<a class="hl" href="#4-7-local-delivery-same-node-agents">#</a></h3>
+<p>Two agents hosted by the same node ARE mesh peers and CAN communicate. A node MAY deliver an envelope addressed to an agent it hosts <strong>without transiting the transport</strong>, provided delivery is <strong>observationally equivalent</strong> to remote delivery:</p>
+<ul>
+<li>Same envelope schema and validation, same identity verification (<code>sig</code> against <code>from</code>), same trace propagation, same per-subject ordering, same dedup-by-<code>id</code> semantics.</li>
+<li>The node MUST record local-delivery envelopes in the same audit/observability path as remote ones — a node sees 100% of its agents&#39; traffic regardless of path, so tracking is complete either way.</li>
+<li>Because signing is always-on (§4.5), a locally-delivered envelope is signed exactly like a remote one; there is <strong>no unsigned local fast path</strong>. A message that later transits the shared transport (for example after an agent migrates nodes, §4.4) therefore always carries a valid <code>sig</code>.</li>
+</ul>
+<p>This preserves <strong>location transparency</strong>: an agent&#39;s code is identical whether its peer is across the internet or in the same process, and moving an agent between hosts changes nothing semantically.</p>
+<ul>
+<li><strong><code>request</code>/<code>respond</code></strong> (point-to-point, addressed): the node SHOULD short-circuit locally when the recipient is a hosted agent and the node is the sole authority for the reply.</li>
+<li><strong><code>emit</code>/<code>subscribe</code></strong> (bus fan-out): membership lives at the transport (who else subscribed?), so events SHOULD transit NATS when the node is online; the node falls back to local event delivery only while offline. Dedup-by-<code>id</code> (§5.5) covers any double-hearing.</li>
+</ul>
+<h3 id="4-8-credential-lifecycle">4.8. Credential Lifecycle<a class="hl" href="#4-8-credential-lifecycle">#</a></h3>
+<p>Credential lifecycle applies to <strong>node</strong> credentials only (agents are keypair-only and are managed by their node). The operator issues and rotates node credentials; no external/commercial control plane is required at the scale this protocol targets. The protocol REQUIRES:</p>
+<ul>
+<li>Account/operator <strong>signing</strong> keys MUST NOT be stored on individual nodes.</li>
+<li>Node credentials MUST have a finite expiration.</li>
+<li>Node revocation MUST be achievable without restarting other nodes or the mesh servers.</li>
+<li>Node credential rotation MUST be achievable without downtime.</li>
+<li>A node MUST protect the agent private keys it holds at rest (host-appropriate key storage).</li>
+</ul>
+<hr>
+<h2 id="5-message-envelope">5. Message Envelope<a class="hl" href="#5-message-envelope">#</a></h2>
+<p>All AgentMesh protocol messages use a standard envelope format. The envelope is the wire format for every primitive operation.</p>
+<h3 id="5-1-envelope-schema">5.1. Envelope Schema<a class="hl" href="#5-1-envelope-schema">#</a></h3>
+<pre><code class="language-json">{
+  &quot;v&quot;: &quot;0.1.0&quot;,
+  &quot;id&quot;: &quot;&lt;message-uuid&gt;&quot;,
+  &quot;type&quot;: &quot;&lt;primitive-type&gt;&quot;,
+  &quot;ts&quot;: &quot;&lt;ISO-8601-timestamp&gt;&quot;,
+
+  &quot;from&quot;: &quot;&lt;agent-nkey-public&gt;&quot;,
+  &quot;to&quot;: &quot;&lt;agent-nkey-public | subject-pattern&gt;&quot;,
+
+  &quot;trace&quot;: {
+    &quot;trace_id&quot;: &quot;&lt;uuid&gt;&quot;,
+    &quot;span_id&quot;: &quot;&lt;uuid&gt;&quot;,
+    &quot;parent_span_id&quot;: &quot;&lt;uuid | null&gt;&quot;
+  },
+
+  &quot;task_id&quot;: &quot;&lt;uuid | null&gt;&quot;,
+  &quot;in_reply_to&quot;: &quot;&lt;message-uuid | null&gt;&quot;,
+  &quot;context_id&quot;: &quot;&lt;uuid | null&gt;&quot;,
+
+  &quot;error&quot;: &quot;&lt;ErrorObject | null&gt;&quot;,
+
+  &quot;payload&quot;: &quot;&lt;arbitrary-json&gt;&quot;,
+  &quot;artifacts&quot;: [&quot;&lt;ArtifactObject&gt;&quot;],
+
+  &quot;meta&quot;: {
+    &quot;&lt;key&gt;&quot;: &quot;&lt;value&gt;&quot;
+  },
+
+  &quot;sig&quot;: &quot;&lt;Ed25519 signature by the `from` agent&#39;s key over the canonical envelope (all fields except `sig`)&gt;&quot;
+}
+</code></pre>
+<h3 id="5-2-field-definitions">5.2. Field Definitions<a class="hl" href="#5-2-field-definitions">#</a></h3>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Type</th>
+<th>Required</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>v</code></td>
+<td>string</td>
+<td>REQUIRED</td>
+<td>Protocol version. Semver format.</td>
+</tr>
+<tr>
+<td><code>id</code></td>
+<td>string</td>
+<td>REQUIRED</td>
+<td>Unique message identifier. UUID v7 RECOMMENDED (time-ordered).</td>
+</tr>
+<tr>
+<td><code>type</code></td>
+<td>enum</td>
+<td>REQUIRED</td>
+<td>The primitive type. One of: <code>register</code>, <code>discover</code>, <code>request</code>, <code>respond</code>, <code>emit</code>, <code>subscribe</code>.</td>
+</tr>
+<tr>
+<td><code>ts</code></td>
+<td>string</td>
+<td>REQUIRED</td>
+<td>ISO 8601 timestamp in UTC. Millisecond precision RECOMMENDED.</td>
+</tr>
+<tr>
+<td><code>from</code></td>
+<td>string</td>
+<td>REQUIRED</td>
+<td>Ed25519 public key of the sending agent (its agent ID). Authenticity is established by the envelope <code>sig</code> (§4.5).</td>
+</tr>
+<tr>
+<td><code>to</code></td>
+<td>string</td>
+<td>RECOMMENDED</td>
+<td>Ed25519 public key of the intended recipient, or a subject pattern for broadcast. MAY be omitted for bus-targeted emits.</td>
+</tr>
+<tr>
+<td><code>trace</code></td>
+<td>object</td>
+<td>REQUIRED</td>
+<td>Distributed tracing context. See Section 13.</td>
+</tr>
+<tr>
+<td><code>trace.trace_id</code></td>
+<td>string</td>
+<td>REQUIRED</td>
+<td>Trace identifier. All messages in a causal chain share the same trace_id.</td>
+</tr>
+<tr>
+<td><code>trace.span_id</code></td>
+<td>string</td>
+<td>REQUIRED</td>
+<td>Span identifier for this specific operation.</td>
+</tr>
+<tr>
+<td><code>trace.parent_span_id</code></td>
+<td>string</td>
+<td>OPTIONAL</td>
+<td>Span ID of the parent operation. Null for root spans.</td>
+</tr>
+<tr>
+<td><code>task_id</code></td>
+<td>string</td>
+<td>OPTIONAL</td>
+<td>Task identifier. Present when the message is part of a Task lifecycle.</td>
+</tr>
+<tr>
+<td><code>in_reply_to</code></td>
+<td>string</td>
+<td>OPTIONAL</td>
+<td>Message ID this message is responding to. Present in <code>respond</code> messages. Links response to request.</td>
+</tr>
+<tr>
+<td><code>context_id</code></td>
+<td>string</td>
+<td>OPTIONAL</td>
+<td>Context identifier. Groups related tasks and messages into a logical session.</td>
+</tr>
+<tr>
+<td><code>error</code></td>
+<td>object</td>
+<td>OPTIONAL</td>
+<td>Error information. Present only when the message represents an error condition. See Section 12.</td>
+</tr>
+<tr>
+<td><code>payload</code></td>
+<td>any</td>
+<td>OPTIONAL</td>
+<td>The message payload. Structure depends on the primitive type and the agent&#39;s skill contract.</td>
+</tr>
+<tr>
+<td><code>artifacts</code></td>
+<td>array</td>
+<td>OPTIONAL</td>
+<td>Output artifacts produced by a Task. See Section 7.5.</td>
+</tr>
+<tr>
+<td><code>meta</code></td>
+<td>object</td>
+<td>OPTIONAL</td>
+<td>Extensible key-value metadata. Used for extensions, routing hints, etc.</td>
+</tr>
+<tr>
+<td><code>sig</code></td>
+<td>string</td>
+<td>REQUIRED</td>
+<td>Ed25519 signature over the canonical envelope (all fields except <code>sig</code>) by the <code>from</code> agent&#39;s private key. Establishes per-agent identity independent of the transport connection. See Sections 4.5 and 5.3.</td>
+</tr>
+</tbody></table>
+<h3 id="5-3-identity-verification">5.3. Identity Verification<a class="hl" href="#5-3-identity-verification">#</a></h3>
+<p>Because one node connection may carry messages from many agents (Section 4), the transport connection identity is the <strong>node</strong>, not the sending agent. Per-agent identity is therefore established by the envelope signature, not the connection:</p>
+<ol>
+<li>The receiver MUST verify <code>sig</code> against the public key in <code>from</code> (an Ed25519 verify over the canonical envelope). If verification fails, the message MUST be rejected with <code>IDENTITY_MISMATCH</code>.</li>
+<li>The receiver SHOULD confirm, via the registry, that <code>from</code> is currently <strong>vouched for</strong> by a node (Section 4.4). An unvouched or revoked agent SHOULD be rejected with <code>UNAUTHORIZED</code>.</li>
+<li>Transport-level node authentication (Section 4.6) still applies underneath: the publishing connection is a cryptographically authenticated node with enforced subject permissions.</li>
+</ol>
+<p>A verified <code>from</code> is trustworthy and non-repudiable: only the holder of the agent&#39;s private key could have produced <code>sig</code>. Agents SHOULD use the verified <code>from</code> for authorization decisions.</p>
+<p>Canonicalization for signing/verification: serialize the envelope excluding <code>sig</code>, sort object keys, and use minimal whitespace (the same canonical-JSON procedure as manifest signing, Section 8.3).</p>
+<h3 id="5-4-message-ordering">5.4. Message Ordering<a class="hl" href="#5-4-message-ordering">#</a></h3>
+<p>Within a single subject, messages are delivered in the order they are published; the binding guarantees this per-subject ordering (§18.1). Cross-subject ordering is NOT guaranteed.</p>
+<p>For operations requiring strict ordering (e.g., streaming responses to a single request), all messages MUST be published to the same subject.</p>
+<h3 id="5-5-idempotency">5.5. Idempotency<a class="hl" href="#5-5-idempotency">#</a></h3>
+<p>The <code>id</code> field enables idempotent processing:</p>
+<ul>
+<li>Senders SHOULD use deterministic IDs for retries of the same logical operation.</li>
+<li>Receivers SHOULD track processed message IDs and skip duplicates.</li>
+<li>Deduplication is keyed by the envelope <code>id</code>; the binding provides publish-side deduplication (§18.8).</li>
+</ul>
+<hr>
+<h2 id="6-primitives">6. Primitives<a class="hl" href="#6-primitives">#</a></h2>
+<p>AgentMesh defines six atomic primitives. All agent interactions compose from these operations.</p>
+<h3 id="6-1-primitive-summary">6.1. Primitive Summary<a class="hl" href="#6-1-primitive-summary">#</a></h3>
+<table>
+<thead>
+<tr>
+<th>Primitive</th>
+<th>Direction</th>
+<th>Subject Pattern</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>register</code></td>
+<td>Agent → Registry</td>
+<td><code>mesh.registry.register</code></td>
+<td>Publish the agent&#39;s manifest to the registry.</td>
+</tr>
+<tr>
+<td><code>discover</code></td>
+<td>Agent → Registry</td>
+<td><code>mesh.registry.discover</code></td>
+<td>Query the registry for agents matching criteria.</td>
+</tr>
+<tr>
+<td><code>request</code></td>
+<td>Agent → Agent</td>
+<td><code>mesh.agent.{agent_id}.inbox</code></td>
+<td>Send a request to a specific agent. Expects a <code>respond</code>.</td>
+</tr>
+<tr>
+<td><code>respond</code></td>
+<td>Agent → Requester</td>
+<td>Reply subject (NATS inbox)</td>
+<td>Return a response to a prior request. Completes or progresses a Task.</td>
+</tr>
+<tr>
+<td><code>emit</code></td>
+<td>Agent → Bus</td>
+<td><code>mesh.event.{domain}.{event_type}</code></td>
+<td>Publish a fire-and-forget event. No reply expected.</td>
+</tr>
+<tr>
+<td><code>subscribe</code></td>
+<td>Agent → Bus</td>
+<td><code>mesh.event.{domain}.{event_type}</code></td>
+<td>Declare interest in events matching a subject pattern.</td>
+</tr>
+</tbody></table>
+<h3 id="6-2-register">6.2. <code>register</code><a class="hl" href="#6-2-register">#</a></h3>
+<p>Publishes or updates the agent&#39;s manifest in the registry.</p>
+<p><strong>Subject:</strong> <code>mesh.registry.register</code></p>
+<p><strong>Envelope:</strong></p>
+<pre><code class="language-json">{
+  &quot;type&quot;: &quot;register&quot;,
+  &quot;from&quot;: &quot;&lt;agent-nkey&gt;&quot;,
+  &quot;payload&quot;: { &quot;&lt;ManifestObject&gt;&quot; }
+}
+</code></pre>
+<p><strong>Behavior:</strong></p>
+<ul>
+<li>The registry MUST validate the manifest schema.</li>
+<li>The registry MUST verify that <code>from</code> matches <code>payload.id</code>.</li>
+<li>If a manifest with the same <code>id</code> already exists, the registry MUST treat this as an update (upsert).</li>
+<li>The registry MUST persist the manifest in durable storage (§18.4).</li>
+<li>The registry SHOULD emit a <code>mesh.event.registry.agent_registered</code> event upon successful registration.</li>
+</ul>
+<p><strong>Errors:</strong></p>
+<ul>
+<li><code>INVALID_MANIFEST</code>: The manifest fails schema validation.</li>
+<li><code>IDENTITY_MISMATCH</code>: The <code>from</code> field does not match the manifest <code>id</code>.</li>
+</ul>
+<h3 id="6-3-discover">6.3. <code>discover</code><a class="hl" href="#6-3-discover">#</a></h3>
+<p>Queries the registry for agents matching specified criteria.</p>
+<p><strong>Subject:</strong> <code>mesh.registry.discover</code> (NATS request-reply)</p>
+<p><strong>Envelope:</strong></p>
+<pre><code class="language-json">{
+  &quot;type&quot;: &quot;discover&quot;,
+  &quot;from&quot;: &quot;&lt;agent-nkey&gt;&quot;,
+  &quot;payload&quot;: {
+    &quot;capabilities&quot;: [&quot;web-scrape&quot;, &quot;search&quot;],
+    &quot;availability&quot;: &quot;online&quot;,
+    &quot;skill_id&quot;: &quot;&lt;optional-specific-skill&gt;&quot;,
+    &quot;tags&quot;: [&quot;&lt;optional-tags&gt;&quot;],
+    &quot;version&quot;: &quot;&lt;optional-semver-range&gt;&quot;,
+    &quot;limit&quot;: 10
+  }
+}
+</code></pre>
+<p><em>(Cost-based discovery filters — <code>max_cost</code> — are provided by the Economics extension, Section 17, not core.)</em></p>
+<p><strong>Response Envelope:</strong></p>
+<pre><code class="language-json">{
+  &quot;type&quot;: &quot;respond&quot;,
+  &quot;in_reply_to&quot;: &quot;&lt;discover-message-id&gt;&quot;,
+  &quot;payload&quot;: {
+    &quot;agents&quot;: [ &quot;&lt;ManifestObject&gt;&quot;, &quot;...&quot; ],
+    &quot;total&quot;: 42
+  }
+}
+</code></pre>
+<p><strong>Behavior:</strong></p>
+<ul>
+<li>The registry MUST filter manifests against all provided criteria using AND semantics.</li>
+<li>The registry MUST only return manifests visible to the requesting agent&#39;s tenant (NATS account), unless cross-tenant discovery has been explicitly configured via account subject imports.</li>
+<li>The registry SHOULD support pagination via <code>limit</code> and a <code>cursor</code> field in subsequent requests.</li>
+<li>Capability matching SHOULD support subset matching: an agent with capabilities <code>[&quot;a&quot;, &quot;b&quot;, &quot;c&quot;]</code> matches a query for <code>[&quot;a&quot;, &quot;b&quot;]</code>.</li>
+</ul>
+<p><strong>Errors:</strong></p>
+<ul>
+<li><code>INVALID_QUERY</code>: The query payload fails schema validation.</li>
+</ul>
+<h3 id="6-4-request">6.4. <code>request</code><a class="hl" href="#6-4-request">#</a></h3>
+<p>Sends a request to a specific agent, expecting a <code>respond</code>.</p>
+<p><strong>Subject:</strong> <code>mesh.agent.{agent_id}.inbox</code></p>
+<p><strong>Envelope:</strong></p>
+<pre><code class="language-json">{
+  &quot;type&quot;: &quot;request&quot;,
+  &quot;from&quot;: &quot;&lt;requester-nkey&gt;&quot;,
+  &quot;to&quot;: &quot;&lt;responder-nkey&gt;&quot;,
+  &quot;trace&quot;: { &quot;trace_id&quot;: &quot;...&quot;, &quot;span_id&quot;: &quot;...&quot;, &quot;parent_span_id&quot;: &quot;...&quot; },
+  &quot;context_id&quot;: &quot;&lt;optional-session-context&gt;&quot;,
+  &quot;payload&quot;: {
+    &quot;skill&quot;: &quot;&lt;skill-id&gt;&quot;,
+    &quot;input&quot;: { &quot;&lt;skill-specific-input&gt;&quot; },
+    &quot;config&quot;: {
+      &quot;timeout_ms&quot;: 30000,
+      &quot;stream&quot;: false,
+      &quot;accepted_output&quot;: [&quot;text/plain&quot;, &quot;application/json&quot;]
+    }
+  },
+  &quot;meta&quot;: {
+    &quot;idempotency_key&quot;: &quot;&lt;optional-dedup-key&gt;&quot;,
+    &quot;priority&quot;: &quot;normal&quot;
+  }
+}
+</code></pre>
+<p><strong>Behavior:</strong></p>
+<ul>
+<li>A request has two possible response shapes, chosen by the responder and discovered by the requester from the first reply (see Section 7.0):<ul>
+<li><strong>Bare response</strong> — the responder answers within the reply window with a single terminal <code>respond</code> (<code>task_id: null</code>). No Task object is created. This is the expected path for quick, synchronous work (status checks, lookups, one-shot answers).</li>
+<li><strong>Task response</strong> — the responder cannot finish now (long-running work), is streaming, or needs further input; it MUST create a Task (see Section 7) and reply with a non-terminal status and a <code>task_id</code>, then deliver progress via task update subjects.</li>
+</ul>
+</li>
+<li>The agent MUST create a Task <strong>only when</strong> it defers, streams, or enters <code>input_required</code>/<code>auth_required</code>. It MUST NOT create a Task solely to answer a request it can complete immediately.</li>
+<li>If the agent cannot handle the request, it MUST respond with an appropriate error (see Section 12). Error responses need not create a Task.</li>
+<li>The request MUST include a reply subject for response delivery.</li>
+<li>If <code>config.stream</code> is <code>true</code>, the agent SHOULD use the Task response shape and deliver incremental results as a sequence of <code>respond</code> messages on a task-specific subject (see Section 11).</li>
+<li>If <code>config.stream</code> is <code>true</code>, the agent SHOULD deliver incremental results as a sequence of <code>respond</code> messages on a task-specific subject (see Section 11).</li>
+<li>If <code>config.timeout_ms</code> is specified, the requester SHOULD cancel the request if no response is received within the timeout.</li>
+<li>If <code>payload.skill</code> is specified, the agent SHOULD dispatch to the named skill. If the skill is not found, the agent MUST respond with a <code>SKILL_NOT_FOUND</code> error.</li>
+</ul>
+<p><strong>Errors:</strong></p>
+<ul>
+<li><code>AGENT_UNAVAILABLE</code>: The agent is not accepting requests (offline or at capacity).</li>
+<li><code>SKILL_NOT_FOUND</code>: The requested skill is not supported by the agent.</li>
+<li><code>INPUT_INVALID</code>: The input payload does not conform to the skill&#39;s expected schema.</li>
+<li><code>UNAUTHORIZED</code>: The requesting agent does not have permission to invoke this skill.</li>
+<li><code>CONTENT_TYPE_NOT_SUPPORTED</code>: The requested output modes are not supported.</li>
+</ul>
+<h3 id="6-5-respond">6.5. <code>respond</code><a class="hl" href="#6-5-respond">#</a></h3>
+<p>Returns a response to a prior <code>request</code>. Completes or progresses a Task.</p>
+<p><strong>Subject:</strong> NATS reply subject (for synchronous) or <code>mesh.task.{task_id}.update</code> (for async updates)</p>
+<p><strong>Envelope:</strong></p>
+<pre><code class="language-json">{
+  &quot;type&quot;: &quot;respond&quot;,
+  &quot;from&quot;: &quot;&lt;responder-nkey&gt;&quot;,
+  &quot;to&quot;: &quot;&lt;requester-nkey&gt;&quot;,
+  &quot;in_reply_to&quot;: &quot;&lt;request-message-id&gt;&quot;,
+  &quot;task_id&quot;: &quot;&lt;task-uuid&gt;&quot;,
+  &quot;trace&quot;: { &quot;trace_id&quot;: &quot;...&quot;, &quot;span_id&quot;: &quot;...&quot;, &quot;parent_span_id&quot;: &quot;...&quot; },
+  &quot;payload&quot;: {
+    &quot;status&quot;: &quot;&lt;TaskState&gt;&quot;,
+    &quot;message&quot;: &quot;&lt;optional-human-readable-status&gt;&quot;,
+    &quot;output&quot;: { &quot;&lt;skill-specific-output&gt;&quot; }
+  },
+  &quot;artifacts&quot;: [
+    {
+      &quot;id&quot;: &quot;&lt;artifact-uuid&gt;&quot;,
+      &quot;name&quot;: &quot;report.pdf&quot;,
+      &quot;media_type&quot;: &quot;application/pdf&quot;,
+      &quot;parts&quot;: [
+        { &quot;text&quot;: &quot;...&quot; },
+        { &quot;data&quot;: { &quot;&lt;structured-data&gt;&quot; } },
+        { &quot;ref&quot;: &quot;nats://objectstore/bucket/key&quot;, &quot;media_type&quot;: &quot;application/pdf&quot;, &quot;size&quot;: 1048576 }
+      ]
+    }
+  ],
+  &quot;error&quot;: null
+}
+</code></pre>
+<p><strong>Behavior:</strong></p>
+<ul>
+<li>A <code>respond</code> MUST reference the original request via <code>in_reply_to</code>.</li>
+<li>A <code>respond</code> carries a <code>task_id</code> <strong>only</strong> when the interaction is in Task mode. A <strong>bare</strong> response (§6.4) sets <code>task_id: null</code> and MUST use a terminal <code>payload.status</code> (<code>completed</code> or <code>failed</code>).</li>
+<li>The <code>payload.status</code> field indicates the outcome (bare) or the Task state transition (Task mode; see Section 7).</li>
+<li>A <code>respond</code> with <code>status: &quot;completed&quot;</code> is a terminal response. In Task mode, no further responses for this Task are expected unless the Task is reopened.</li>
+<li>A <code>respond</code> with <code>status: &quot;input_required&quot;</code> indicates the agent needs additional input to proceed. The requester SHOULD send a new <code>request</code> with the same <code>task_id</code> and <code>context_id</code>.</li>
+<li>Artifacts are deliverables. Messages are communication. Do not use <code>payload.output</code> for large results; use <code>artifacts</code>.</li>
+</ul>
+<h3 id="6-6-emit">6.6. <code>emit</code><a class="hl" href="#6-6-emit">#</a></h3>
+<p>Publishes a fire-and-forget event to the bus. No reply expected.</p>
+<p><strong>Subject:</strong> <code>mesh.event.{domain}.{event_type}</code> (e.g., <code>mesh.event.scraping.profile_found</code>)</p>
+<p><strong>Envelope:</strong></p>
+<pre><code class="language-json">{
+  &quot;type&quot;: &quot;emit&quot;,
+  &quot;from&quot;: &quot;&lt;emitter-nkey&gt;&quot;,
+  &quot;trace&quot;: { &quot;trace_id&quot;: &quot;...&quot;, &quot;span_id&quot;: &quot;...&quot;, &quot;parent_span_id&quot;: &quot;...&quot; },
+  &quot;task_id&quot;: &quot;&lt;optional-originating-task&gt;&quot;,
+  &quot;payload&quot;: {
+    &quot;domain&quot;: &quot;scraping&quot;,
+    &quot;event_type&quot;: &quot;profile_found&quot;,
+    &quot;data&quot;: { &quot;&lt;event-specific-data&gt;&quot; }
+  }
+}
+</code></pre>
+<p><strong>Behavior:</strong></p>
+<ul>
+<li>Events are published to a subject derived from the domain and event type.</li>
+<li>Events MUST be persisted durably for replay (§18.3).</li>
+<li>Events MAY reference a Task via <code>task_id</code> for traceability but are not required to.</li>
+<li>Emitters MUST NOT expect or wait for a response. Events are fire-and-forget from the publisher&#39;s perspective.</li>
+<li>The platform SHOULD enforce rate limiting on event emission per agent per subject.</li>
+</ul>
+<h3 id="6-7-subscribe">6.7. <code>subscribe</code><a class="hl" href="#6-7-subscribe">#</a></h3>
+<p>Declares interest in events matching a subject pattern.</p>
+<p><strong>Subject:</strong> Not a message type — this is a NATS subscription operation.</p>
+<p><strong>Behavior:</strong></p>
+<ul>
+<li>Agents subscribe to event subjects using NATS wildcard patterns:<ul>
+<li><code>mesh.event.scraping.*</code> — all scraping events.</li>
+<li><code>mesh.event.&gt;</code> — all events across all domains.</li>
+<li><code>mesh.event.scraping.profile_found</code> — a specific event type.</li>
+</ul>
+</li>
+<li>Subscriptions MAY be durable or ephemeral. Durable subscriptions MUST provide at-least-once replay with explicit acknowledgment (§18.6).</li>
+<li>The agent&#39;s <code>onEvent</code> handler is invoked for each matching event.</li>
+<li>Subscription permissions are enforced by the transport based on the hosting <strong>node&#39;s</strong> credential, which must permit the subjects of every agent the node hosts (§18.2).</li>
+</ul>
+<hr>
+<h2 id="7-task-model">7. Task Model<a class="hl" href="#7-task-model">#</a></h2>
+<p>A Task is a stateful unit of work. Tasks provide the structure for tracking, resuming, and completing <strong>deferred</strong> work. They are not required for every request.</p>
+<h3 id="7-0-when-a-task-exists">7.0. When a Task Exists<a class="hl" href="#7-0-when-a-task-exists">#</a></h3>
+<p>A responder creates a Task <strong>only</strong> when a request cannot be answered with a single terminal reply — i.e. when the work is long-running, streamed, or needs another round (<code>input_required</code> / <code>auth_required</code>). See Section 6.4.</p>
+<ul>
+<li><strong>No Task</strong> (bare mode): the responder returns a terminal <code>respond</code> (<code>task_id: null</code>). Nothing is persisted; the interaction is a single request/response round. This is the common case.</li>
+<li><strong>Task</strong> (deferred mode): the responder returns a non-terminal <code>respond</code> with a <code>task_id</code>, then drives the Task through its lifecycle (below). The Task is the durable, resumable record of that work.</li>
+</ul>
+<p>Requesters need no advance knowledge of which mode applies: the first <code>respond</code> tells them — a terminal status with <code>task_id: null</code> means done; a <code>task_id</code> with a non-terminal status means subscribe for updates.</p>
+<blockquote>
+<p><strong>A2A alignment.</strong> This Task model mirrors the A2A Protocol (Section 1.3): the state set below, the Task object, and Artifacts/Parts correspond to A2A&#39;s, and the Agent Manifest (Section 8) maps to the A2A Agent Card. This keeps AgentMesh Tasks interoperable with A2A at the task layer.</p>
+</blockquote>
+<h3 id="7-1-task-object">7.1. Task Object<a class="hl" href="#7-1-task-object">#</a></h3>
+<pre><code class="language-json">{
+  &quot;id&quot;: &quot;&lt;uuid&gt;&quot;,
+  &quot;context_id&quot;: &quot;&lt;uuid&gt;&quot;,
+  &quot;requester&quot;: &quot;&lt;agent-nkey&gt;&quot;,
+  &quot;responder&quot;: &quot;&lt;agent-nkey&gt;&quot;,
+  &quot;skill&quot;: &quot;&lt;skill-id&gt;&quot;,
+  &quot;state&quot;: &quot;&lt;TaskState&gt;&quot;,
+  &quot;created_at&quot;: &quot;&lt;ISO-8601&gt;&quot;,
+  &quot;updated_at&quot;: &quot;&lt;ISO-8601&gt;&quot;,
+  &quot;history&quot;: [ &quot;&lt;EnvelopeObject&gt;&quot; ],
+  &quot;artifacts&quot;: [ &quot;&lt;ArtifactObject&gt;&quot; ],
+  &quot;meta&quot;: {}
+}
+</code></pre>
+<h3 id="7-2-task-states">7.2. Task States<a class="hl" href="#7-2-task-states">#</a></h3>
+<pre><code>             ┌──────────┐
+             │ submitted │
+             └─────┬─────┘
+                   │
+             ┌─────▼─────┐
+        ┌────│  working   │────┐
+        │    └─────┬─────┘    │
+        │          │          │
+  ┌─────▼──────┐   │    ┌────▼─────┐
+  │   input    │   │    │   auth   │
+  │  required  │   │    │ required │
+  └─────┬──────┘   │    └────┬─────┘
+        │          │          │
+        └────┬─────┘──────────┘
+             │
+      ┌──────┼──────────┐
+      │      │          │
+┌─────▼──┐ ┌─▼────┐ ┌──▼──────┐
+│completed│ │failed│ │canceled │
+└────────┘ └──────┘ └─────────┘
+</code></pre>
+<table>
+<thead>
+<tr>
+<th>State</th>
+<th>Terminal</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>submitted</code></td>
+<td>No</td>
+<td>Request received, Task created, processing has not yet begun.</td>
+</tr>
+<tr>
+<td><code>working</code></td>
+<td>No</td>
+<td>Agent is actively processing the request.</td>
+</tr>
+<tr>
+<td><code>input_required</code></td>
+<td>No</td>
+<td>Agent needs additional input from the requester to continue.</td>
+</tr>
+<tr>
+<td><code>auth_required</code></td>
+<td>No</td>
+<td>Agent needs additional credentials or authorization to continue.</td>
+</tr>
+<tr>
+<td><code>completed</code></td>
+<td>Yes</td>
+<td>Task finished successfully. Artifacts are available.</td>
+</tr>
+<tr>
+<td><code>failed</code></td>
+<td>Yes</td>
+<td>Task terminated due to an error. Error details in the envelope.</td>
+</tr>
+<tr>
+<td><code>canceled</code></td>
+<td>Yes</td>
+<td>Task was canceled by the requester or the responder.</td>
+</tr>
+<tr>
+<td><code>rejected</code></td>
+<td>Yes</td>
+<td>Responder declined the Task (cannot or will not perform the skill). Distinct from <code>failed</code>, which is an error <em>during</em> execution. Matches A2A&#39;s <code>rejected</code>.</td>
+</tr>
+</tbody></table>
+<blockquote>
+<p>The diagram above shows the execution lifecycle. <code>rejected</code> is an additional terminal state entered directly from <code>submitted</code> when the responder declines the Task, and is omitted from the diagram for clarity.</p>
+</blockquote>
+<h3 id="7-3-task-state-transitions">7.3. Task State Transitions<a class="hl" href="#7-3-task-state-transitions">#</a></h3>
+<table>
+<thead>
+<tr>
+<th>From</th>
+<th>To</th>
+<th>Trigger</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>—</td>
+<td><code>submitted</code></td>
+<td>Agent receives a <code>request</code> and creates a Task.</td>
+</tr>
+<tr>
+<td><code>submitted</code></td>
+<td><code>working</code></td>
+<td>Agent begins processing.</td>
+</tr>
+<tr>
+<td><code>working</code></td>
+<td><code>completed</code></td>
+<td>Agent finishes successfully.</td>
+</tr>
+<tr>
+<td><code>working</code></td>
+<td><code>failed</code></td>
+<td>Agent encounters an unrecoverable error.</td>
+</tr>
+<tr>
+<td><code>working</code></td>
+<td><code>input_required</code></td>
+<td>Agent needs more information from the requester.</td>
+</tr>
+<tr>
+<td><code>working</code></td>
+<td><code>auth_required</code></td>
+<td>Agent needs additional credentials.</td>
+</tr>
+<tr>
+<td><code>working</code></td>
+<td><code>canceled</code></td>
+<td>Requester or responder cancels the Task.</td>
+</tr>
+<tr>
+<td><code>input_required</code></td>
+<td><code>working</code></td>
+<td>Requester provides the requested input via a follow-up <code>request</code>.</td>
+</tr>
+<tr>
+<td><code>auth_required</code></td>
+<td><code>working</code></td>
+<td>Requester provides the required credentials.</td>
+</tr>
+<tr>
+<td><code>submitted</code></td>
+<td><code>canceled</code></td>
+<td>Requester cancels before processing begins.</td>
+</tr>
+<tr>
+<td><code>submitted</code></td>
+<td><code>rejected</code></td>
+<td>Responder declines the Task before processing begins.</td>
+</tr>
+</tbody></table>
+<p>Transitions not listed in this table are invalid. Implementations MUST reject invalid state transitions with a <code>TASK_INVALID_TRANSITION</code> error.</p>
+<h3 id="7-4-task-persistence">7.4. Task Persistence<a class="hl" href="#7-4-task-persistence">#</a></h3>
+<p>Tasks MUST be durably persisted, keyed by <code>task_id</code>, in a store that is the authoritative source of truth for task state and is updated on every state transition. Task status updates and artifact deliveries are published to the task&#39;s update channel for delivery to the requester, with the durable store remaining canonical for lookups.</p>
+<p>The concrete store and channels (a NATS KV bucket plus the <code>mesh.task.{task_id}.update</code> subjects and <code>MESH_TASKS</code> stream) are defined in the reference binding (§18.4).</p>
+<h3 id="7-5-artifacts">7.5. Artifacts<a class="hl" href="#7-5-artifacts">#</a></h3>
+<p>Artifacts are the outputs of a Task — the deliverables. They are distinct from conversational messages.</p>
+<pre><code class="language-json">{
+  &quot;id&quot;: &quot;&lt;artifact-uuid&gt;&quot;,
+  &quot;name&quot;: &quot;&lt;human-readable-name&gt;&quot;,
+  &quot;media_type&quot;: &quot;&lt;MIME-type&gt;&quot;,
+  &quot;parts&quot;: [
+    { &quot;text&quot;: &quot;&lt;text-content&gt;&quot; },
+    { &quot;data&quot;: { &quot;&lt;structured-json&gt;&quot; } },
+    { &quot;ref&quot;: &quot;&lt;nats-object-store-reference&gt;&quot;, &quot;media_type&quot;: &quot;&lt;MIME&gt;&quot;, &quot;size&quot;: 12345 }
+  ],
+  &quot;created_at&quot;: &quot;&lt;ISO-8601&gt;&quot;,
+  &quot;meta&quot;: {}
+}
+</code></pre>
+<p><strong>Part Types:</strong></p>
+<ul>
+<li><code>text</code>: Inline text content.</li>
+<li><code>data</code>: Inline structured JSON data.</li>
+<li><code>ref</code>: A reference to a binary object stored in NATS Object Store. Used for files, images, and large payloads that exceed the NATS maximum message size.</li>
+</ul>
+<p>An artifact MAY contain multiple parts (e.g., a text summary + a data table + a PDF reference).</p>
+<h3 id="7-6-context">7.6. Context<a class="hl" href="#7-6-context">#</a></h3>
+<p>A <code>context_id</code> groups related Tasks into a logical session. When a requester sends multiple related requests, they SHOULD use the same <code>context_id</code>. The responder MAY use the context to maintain conversational state, memory, or shared context across tasks.</p>
+<ul>
+<li>If a <code>request</code> does not include a <code>context_id</code>, the responder MUST generate one and include it in the <code>respond</code>.</li>
+<li>If a <code>request</code> includes both <code>task_id</code> and <code>context_id</code>, the responder MUST verify that the task belongs to the specified context.</li>
+<li>Context expiration and cleanup policies are implementation-defined. Agents SHOULD document their context retention policies in their manifest.</li>
+</ul>
+<hr>
+<h2 id="8-agent-manifest">8. Agent Manifest<a class="hl" href="#8-agent-manifest">#</a></h2>
+<p>The manifest is an agent&#39;s self-description document. It is published to the registry via <code>register</code> and queried via <code>discover</code>.</p>
+<h3 id="8-1-manifest-schema">8.1. Manifest Schema<a class="hl" href="#8-1-manifest-schema">#</a></h3>
+<pre><code class="language-json">{
+  &quot;id&quot;: &quot;&lt;agent-nkey-public&gt;&quot;,
+  &quot;name&quot;: &quot;&lt;human-readable-name&gt;&quot;,
+  &quot;description&quot;: &quot;&lt;what-this-agent-does&gt;&quot;,
+  &quot;version&quot;: &quot;&lt;semver&gt;&quot;,
+  &quot;protocol_version&quot;: &quot;0.1.0&quot;,
+
+  &quot;provider&quot;: {
+    &quot;name&quot;: &quot;&lt;organization-or-individual&gt;&quot;,
+    &quot;url&quot;: &quot;&lt;provider-url&gt;&quot;
+  },
+
+  &quot;endpoint&quot;: &quot;mesh.agent.&lt;agent-nkey&gt;.inbox&quot;,
+
+  &quot;node&quot;: {
+    &quot;id&quot;: &quot;&lt;node-nkey-public&gt;&quot;,
+    &quot;attestation&quot;: {
+      &quot;node&quot;: &quot;&lt;node-nkey-public&gt;&quot;,
+      &quot;agent&quot;: &quot;&lt;agent-nkey-public&gt;&quot;,
+      &quot;issued_at&quot;: &quot;&lt;ISO-8601&gt;&quot;,
+      &quot;expires_at&quot;: &quot;&lt;ISO-8601&gt;&quot;,
+      &quot;sig&quot;: &quot;&lt;Ed25519 signature by the node key&gt;&quot;
+    }
+  },
+
+  &quot;capabilities&quot;: [&quot;&lt;capability-tag&gt;&quot;],
+
+  &quot;skills&quot;: [
+    {
+      &quot;id&quot;: &quot;&lt;skill-id&gt;&quot;,
+      &quot;name&quot;: &quot;&lt;human-readable&gt;&quot;,
+      &quot;description&quot;: &quot;&lt;what-this-skill-does&gt;&quot;,
+      &quot;tags&quot;: [&quot;&lt;tag&gt;&quot;],
+      &quot;input_schema&quot;: { &quot;&lt;json-schema&gt;&quot; },
+      &quot;output_schema&quot;: { &quot;&lt;json-schema&gt;&quot; },
+      &quot;input_modes&quot;: [&quot;text/plain&quot;, &quot;application/json&quot;],
+      &quot;output_modes&quot;: [&quot;text/plain&quot;, &quot;application/json&quot;],
+      &quot;examples&quot;: [
+        {
+          &quot;input&quot;: &quot;&lt;example-input&gt;&quot;,
+          &quot;output&quot;: &quot;&lt;example-output&gt;&quot;
+        }
+      ],
+      &quot;streaming&quot;: false,
+      &quot;estimated_duration_ms&quot;: 5000
+    }
+  ],
+
+  &quot;accepts&quot;: [&quot;&lt;event-subject-patterns-this-agent-subscribes-to&gt;&quot;],
+  &quot;emits&quot;: [&quot;&lt;event-subject-patterns-this-agent-publishes&gt;&quot;],
+
+  &quot;cost&quot;: {
+    &quot;per_request&quot;: 0.01,
+    &quot;per_token&quot;: 0.0001,
+    &quot;currency&quot;: &quot;credits&quot;,
+    &quot;billing_model&quot;: &quot;per_request&quot;
+  },
+
+  &quot;rate_limits&quot;: {
+    &quot;requests_per_second&quot;: 10,
+    &quot;requests_per_minute&quot;: 100,
+    &quot;concurrent_tasks&quot;: 5
+  },
+
+  &quot;trust&quot;: {
+    &quot;tenant&quot;: &quot;&lt;nats-account-public-key&gt;&quot;,
+    &quot;signed_at&quot;: &quot;&lt;ISO-8601&gt;&quot;,
+    &quot;signature&quot;: &quot;&lt;Ed25519-signature-of-canonical-manifest&gt;&quot;
+  },
+
+  &quot;extensions&quot;: [
+    {
+      &quot;uri&quot;: &quot;&lt;extension-identifier-uri&gt;&quot;,
+      &quot;description&quot;: &quot;&lt;what-it-does&gt;&quot;,
+      &quot;required&quot;: false,
+      &quot;version&quot;: &quot;1.0&quot;
+    }
+  ],
+
+  &quot;meta&quot;: {}
+}
+</code></pre>
+<h3 id="8-2-field-requirements">8.2. Field Requirements<a class="hl" href="#8-2-field-requirements">#</a></h3>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Required</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>id</code></td>
+<td>REQUIRED</td>
+<td>Agent&#39;s Ed25519 public key (its agent ID). Immutable identifier.</td>
+</tr>
+<tr>
+<td><code>name</code></td>
+<td>REQUIRED</td>
+<td>Human-readable display name.</td>
+</tr>
+<tr>
+<td><code>description</code></td>
+<td>REQUIRED</td>
+<td>Description of the agent&#39;s purpose and capabilities.</td>
+</tr>
+<tr>
+<td><code>version</code></td>
+<td>REQUIRED</td>
+<td>Agent version. Semver format.</td>
+</tr>
+<tr>
+<td><code>protocol_version</code></td>
+<td>REQUIRED</td>
+<td>AgentMesh protocol version this agent implements.</td>
+</tr>
+<tr>
+<td><code>endpoint</code></td>
+<td>REQUIRED</td>
+<td>NATS subject for direct requests to this agent.</td>
+</tr>
+<tr>
+<td><code>node</code></td>
+<td>REQUIRED</td>
+<td>The hosting node&#39;s ID plus its signed vouching attestation for this agent (Section 4.4).</td>
+</tr>
+<tr>
+<td><code>capabilities</code></td>
+<td>REQUIRED</td>
+<td>Flat list of capability tags for coarse discovery filtering.</td>
+</tr>
+<tr>
+<td><code>skills</code></td>
+<td>REQUIRED</td>
+<td>Detailed skill definitions. MAY be empty array.</td>
+</tr>
+<tr>
+<td><code>rate_limits</code></td>
+<td>RECOMMENDED</td>
+<td>Published rate limits for client-side throttling.</td>
+</tr>
+<tr>
+<td><code>trust</code></td>
+<td>RECOMMENDED</td>
+<td>Cryptographic signature of the manifest for integrity verification.</td>
+</tr>
+<tr>
+<td><code>cost</code></td>
+<td>OPTIONAL</td>
+<td>Economic model (Economics extension, Section 17). Not a core field.</td>
+</tr>
+<tr>
+<td><code>provider</code></td>
+<td>OPTIONAL</td>
+<td>Organization or individual who operates this agent.</td>
+</tr>
+<tr>
+<td><code>accepts</code></td>
+<td>OPTIONAL</td>
+<td>Event subjects this agent subscribes to.</td>
+</tr>
+<tr>
+<td><code>emits</code></td>
+<td>OPTIONAL</td>
+<td>Event subjects this agent publishes.</td>
+</tr>
+<tr>
+<td><code>extensions</code></td>
+<td>OPTIONAL</td>
+<td>Supported protocol extensions.</td>
+</tr>
+<tr>
+<td><code>meta</code></td>
+<td>OPTIONAL</td>
+<td>Extensible metadata.</td>
+</tr>
+</tbody></table>
+<h3 id="8-3-manifest-signing">8.3. Manifest Signing<a class="hl" href="#8-3-manifest-signing">#</a></h3>
+<p>Manifests SHOULD be signed by the agent&#39;s Ed25519 private key. The signing process:</p>
+<ol>
+<li>Serialize the manifest to JSON, excluding the <code>trust.signature</code> field.</li>
+<li>Canonicalize the JSON (sort keys, remove whitespace).</li>
+<li>Sign the canonical bytes with the agent&#39;s Ed25519 private key.</li>
+<li>Set <code>trust.signature</code> to the base64url-encoded signature.</li>
+</ol>
+<p>Consumers of the manifest (registry, other agents) can verify the signature using the agent&#39;s Ed25519 public key (which is the manifest <code>id</code>).</p>
+<h3 id="8-4-availability-is-presence-not-manifest">8.4. Availability is Presence, Not Manifest<a class="hl" href="#8-4-availability-is-presence-not-manifest">#</a></h3>
+<p>Availability is <strong>not</strong> part of the manifest. The manifest is durable description (what an agent <em>is</em>); availability is ephemeral liveness (whether it can be reached <em>right now</em>). They have different lifecycles and different stores — conflating them means a host going offline mutates, or worse deletes, its description. The two are split: the <strong>registry</strong> holds manifests (Section 9.1), a separate <strong>presence</strong> service holds liveness (Section 9.6).</p>
+<p>Presence status values:</p>
+<table>
+<thead>
+<tr>
+<th>Value</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>online</code></td>
+<td>Accepting requests normally.</td>
+</tr>
+<tr>
+<td><code>busy</code></td>
+<td>Operational but at capacity. New requests MAY be queued or rejected.</td>
+</tr>
+<tr>
+<td><code>degraded</code></td>
+<td>Operational but with reduced capability or performance.</td>
+</tr>
+<tr>
+<td><code>offline</code></td>
+<td>Not reachable / not accepting requests.</td>
+</tr>
+</tbody></table>
+<p>Presence is reported per <strong>node</strong> by default (one heartbeat covers all agents the node hosts); an agent MAY report a finer per-agent status. Missing heartbeats expire <em>presence</em> to <code>offline</code> — they never touch the manifest. Discovery joins manifest + presence at query time (Section 9.3).</p>
+<h3 id="8-5-skill-definitions">8.5. Skill Definitions<a class="hl" href="#8-5-skill-definitions">#</a></h3>
+<p>Skills are the fine-grained capabilities an agent offers. Each skill is independently addressable in a <code>request</code>.</p>
+<ul>
+<li><code>id</code>: Stable identifier for the skill. Used in <code>request.payload.skill</code>.</li>
+<li><code>input_schema</code> / <code>output_schema</code>: JSON Schema defining expected input and output structures.</li>
+<li><code>input_modes</code> / <code>output_modes</code>: MIME types the skill accepts and produces.</li>
+<li><code>streaming</code>: Whether this skill supports streaming responses.</li>
+<li><code>estimated_duration_ms</code>: Hint for timeout configuration.</li>
+</ul>
+<hr>
+<h2 id="9-registry">9. Registry<a class="hl" href="#9-registry">#</a></h2>
+<p>The registry is a platform service that stores agent manifests and serves discovery queries.</p>
+<h3 id="9-1-implementation">9.1. Implementation<a class="hl" href="#9-1-implementation">#</a></h3>
+<p>The registry is implemented as a service agent within the mesh, backed by:</p>
+<ul>
+<li>A <strong>NATS KV bucket</strong> (<code>mesh_registry</code>) for manifest storage, keyed by agent ID.</li>
+<li>A <strong>JetStream consumer</strong> on <code>mesh.registry.register</code> for ingesting registrations.</li>
+<li>A <strong>NATS request-reply</strong> listener on <code>mesh.registry.discover</code> for serving queries.</li>
+</ul>
+<h3 id="9-2-registry-operations">9.2. Registry Operations<a class="hl" href="#9-2-registry-operations">#</a></h3>
+<table>
+<thead>
+<tr>
+<th>Operation</th>
+<th>Subject</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Register</td>
+<td><code>mesh.registry.register</code></td>
+<td>Upsert a manifest.</td>
+</tr>
+<tr>
+<td>Deregister</td>
+<td><code>mesh.registry.deregister</code></td>
+<td>Remove a manifest.</td>
+</tr>
+<tr>
+<td>Discover</td>
+<td><code>mesh.registry.discover</code></td>
+<td>Query for matching manifests.</td>
+</tr>
+<tr>
+<td>Get</td>
+<td><code>mesh.registry.get.{agent_id}</code></td>
+<td>Retrieve a specific manifest by agent ID.</td>
+</tr>
+<tr>
+<td>Watch</td>
+<td>KV watch on <code>mesh_registry</code> bucket</td>
+<td>Subscribe to manifest changes (additions, updates, deletions).</td>
+</tr>
+</tbody></table>
+<p>On <code>register</code>, the registry MUST verify the node vouch (Section 4.4) before storing the manifest. <strong>The registry never removes a manifest due to missed heartbeats</strong> — a manifest persists until explicitly deregistered. Liveness lives in the presence service (Section 9.6), not here.</p>
+<h3 id="9-3-discovery-query-language">9.3. Discovery Query Language<a class="hl" href="#9-3-discovery-query-language">#</a></h3>
+<p>Discovery queries support the following filter fields, combined with AND semantics. Manifest filters are served from the registry; the <code>availability</code> filter is joined from the presence service (Section 9.6), and node-profile filters are joined from the node profile (Section 9.7), at query time.</p>
+<table>
+<thead>
+<tr>
+<th>Filter</th>
+<th>Type</th>
+<th>Source</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>capabilities</code></td>
+<td>string[]</td>
+<td>registry</td>
+<td>Agent must have ALL specified capabilities.</td>
+</tr>
+<tr>
+<td><code>skill_id</code></td>
+<td>string</td>
+<td>registry</td>
+<td>Agent must offer a skill with this ID.</td>
+</tr>
+<tr>
+<td><code>tags</code></td>
+<td>string[]</td>
+<td>registry</td>
+<td>Agent must have at least one matching tag across its skills.</td>
+</tr>
+<tr>
+<td><code>availability</code></td>
+<td>enum</td>
+<td>presence</td>
+<td>Agent&#39;s <em>current</em> presence must match (e.g. <code>online</code>).</td>
+</tr>
+<tr>
+<td><code>version</code></td>
+<td>string</td>
+<td>registry</td>
+<td>Semver range the agent version must satisfy.</td>
+</tr>
+<tr>
+<td><code>protocol_version</code></td>
+<td>string</td>
+<td>registry</td>
+<td>Protocol version must match.</td>
+</tr>
+<tr>
+<td><code>node</code></td>
+<td>string</td>
+<td>registry</td>
+<td>Restrict to agents hosted by a specific node.</td>
+</tr>
+<tr>
+<td><code>tenant</code></td>
+<td>string</td>
+<td>registry</td>
+<td>Restrict to agents in a specific tenant/account.</td>
+</tr>
+<tr>
+<td><code>trust_tier</code></td>
+<td>enum</td>
+<td>node profile</td>
+<td>Minimum node standing, e.g. exclude <code>sandbox</code> (Section 9.7).</td>
+</tr>
+<tr>
+<td><code>availability_class</code></td>
+<td>enum</td>
+<td>node profile</td>
+<td>Node&#39;s <em>expected</em> uptime pattern, distinct from the live <code>availability</code> filter (Section 9.7).</td>
+</tr>
+<tr>
+<td><code>reachability</code></td>
+<td>enum</td>
+<td>node profile</td>
+<td>Node reachability (<code>direct</code> / <code>leaf</code>) (Section 9.7).</td>
+</tr>
+</tbody></table>
+<blockquote>
+<p><code>max_cost</code> discovery filtering moves to the Economics extension (Section 17).</p>
+</blockquote>
+<h3 id="9-4-registry-high-availability">9.4. Registry High Availability<a class="hl" href="#9-4-registry-high-availability">#</a></h3>
+<p>The registry MUST be highly available. Recommended deployment:</p>
+<ul>
+<li>Run as a replicated JetStream stream (R3 minimum for production).</li>
+<li>The KV bucket inherits stream replication.</li>
+<li>Multiple registry service instances can serve discover queries concurrently from the same KV bucket.</li>
+</ul>
+<h3 id="9-5-registry-presence">9.5. Registry ≠ Presence<a class="hl" href="#9-5-registry-presence">#</a></h3>
+<p>The registry stores <strong>manifests</strong> — durable descriptions that change rarely. It has no concept of &quot;recently seen&quot; and MUST NOT expire or delete entries based on liveness. Registration is a deliberate act; deregistration is its deliberate inverse. A node that sleeps for a week is still registered when it wakes.</p>
+<h3 id="9-6-presence-service">9.6. Presence Service<a class="hl" href="#9-6-presence-service">#</a></h3>
+<p>Presence is a <strong>separate</strong> platform service tracking ephemeral liveness, backed by a short-TTL store (e.g. a KV bucket with per-key TTL, or the <code>MESH_HEARTBEAT</code> stream):</p>
+<ul>
+<li>Keyed by <strong>node ID</strong> (default) and optionally agent ID for per-agent overrides.</li>
+<li>A node publishes a <strong>heartbeat</strong> (Section 10.9) at an interval (default 30s) carrying its current status and load.</li>
+<li>On heartbeat, presence records <code>last_seen</code> + status.</li>
+<li>If no heartbeat arrives within <code>2 * heartbeat_interval</code>, presence for that node MUST be set to <code>offline</code>. Presence entries MAY be evicted after a longer TTL. <strong>No manifest is affected.</strong></li>
+<li><code>discover</code> with an <code>availability</code> filter joins registry manifests against current presence. A <code>get_presence(node|agent)</code> request-reply returns current liveness.</li>
+</ul>
+<p>This split makes an intermittent node (a laptop that sleeps) a normal, expected state: its presence flips to <code>offline</code> and back to <code>online</code>, while its registration — and its agents&#39; discoverability by description — is untouched.</p>
+<h3 id="9-7-node-profile">9.7. Node Profile<a class="hl" href="#9-7-node-profile">#</a></h3>
+<p>An agent&#39;s manifest describes the <em>agent</em>; a <strong>node profile</strong> describes the <em>host</em> it runs on. Because one node hosts many agents, and an agent may migrate hosts (§4.4), the profile is <strong>node-keyed</strong> — declared once per node — and <strong>joined into discovery results</strong> via the node an agent is currently vouched by. This is the same durable-metadata-joined-at-query-time pattern as presence (§9.6). It lets a requester select not only by what an agent does, but by the conditions under which it runs.</p>
+<p>The profile is a set of orthogonal attributes in two trust classes.</p>
+<p><strong>Attested</strong> — signed by the node&#39;s account/operator; a node MUST NOT self-declare these, and a requester MAY treat them as authoritative:</p>
+<table>
+<thead>
+<tr>
+<th>Attribute</th>
+<th>Values</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>trust_tier</code></td>
+<td><code>verified</code> | <code>standard</code> | <code>sandbox</code></td>
+<td>The standing the operator grants the node. <code>sandbox</code> nodes (guest/throwaway hosts) are for trying things; requesters SHOULD exclude them from sensitive work.</td>
+</tr>
+<tr>
+<td><code>role</code></td>
+<td><code>participant</code> | <code>service</code></td>
+<td><code>service</code> nodes host platform-service agents (registry, presence, task-manager; §9.1); <code>participant</code> nodes host application agents.</td>
+</tr>
+</tbody></table>
+<p><strong>Declared</strong> — self-reported by the node; advisory hints a requester MAY use for selection but MUST NOT rely on for security:</p>
+<table>
+<thead>
+<tr>
+<th>Attribute</th>
+<th>Values</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>availability_class</code></td>
+<td><code>always_on</code> | <code>intermittent</code> | <code>on_demand</code></td>
+<td>The node&#39;s <em>expected</em> uptime pattern. Durable, and distinct from its <em>current</em> presence (§9.6): <code>intermittent</code> means &quot;expect offline gaps,&quot; even while presently <code>online</code>.</td>
+</tr>
+<tr>
+<td><code>reachability</code></td>
+<td><code>direct</code> | <code>leaf</code></td>
+<td>Whether the node is a direct transport peer or connects outbound-only (e.g. behind a firewall).</td>
+</tr>
+<tr>
+<td><code>capacity</code></td>
+<td><code>{ max_agents, max_concurrency }</code></td>
+<td>Declared limits, distinct from the <em>live</em> load carried in the heartbeat (§10.9).</td>
+</tr>
+</tbody></table>
+<p>Attested attributes are signed by the node&#39;s account or operator (e.g. as claims in the node credential, §4.2). Declared attributes are published in the node&#39;s descriptor at connection time and MAY be updated. Both are node-keyed and resolved via the agent&#39;s current vouching node at discovery time.</p>
+<p>A requester combines the three sources: the <strong>manifest</strong> (what the agent is), the <strong>node profile</strong> (the durable conditions it runs under), and <strong>presence</strong> (whether it is reachable now, and its live load). Typical uses: exclude <code>trust_tier: sandbox</code> for sensitive work; prefer <code>availability_class: always_on</code> for latency-sensitive or long-running tasks; require <code>reachability: direct</code> across organizational boundaries; and weigh declared <code>capacity</code> against live load before routing.</p>
+<p>Profile attributes are subject to tenancy visibility (§15): an operator MAY withhold declared attributes (e.g. <code>capacity</code>, <code>reachability</code>) from discovery across an account boundary.</p>
+<hr>
+<h2 id="10-composed-operations">10. Composed Operations<a class="hl" href="#10-composed-operations">#</a></h2>
+<p>Composed operations are higher-level interaction patterns built from primitives. They are standardized for interoperability but are not fundamental — any agent can implement them using the underlying primitives. Because they add no capability (only naming conventions), 0.2 keeps a small core set and <strong>parks</strong> the rest: parked operations remain implementable by any two agents today and will be re-specified when two independent implementations need to interoperate on them.</p>
+<p><strong>0.2 disposition:</strong></p>
+<table>
+<thead>
+<tr>
+<th>Operation</th>
+<th>Status</th>
+<th>Notes</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>stream</code></td>
+<td><strong>Core</strong></td>
+<td>Incremental results (§11)</td>
+</tr>
+<tr>
+<td><code>cancel</code></td>
+<td><strong>Core</strong></td>
+<td>Task cancellation</td>
+</tr>
+<tr>
+<td><code>heartbeat</code></td>
+<td><strong>Core</strong></td>
+<td>Node-level liveness (§9.6)</td>
+</tr>
+<tr>
+<td><code>status</code></td>
+<td><strong>Core</strong></td>
+<td>Operational status query</td>
+</tr>
+<tr>
+<td><code>delegate</code></td>
+<td><strong>Core</strong> (guidance)</td>
+<td>Request forwarding</td>
+</tr>
+<tr>
+<td><code>broadcast</code></td>
+<td><strong>Core</strong> (guidance)</td>
+<td>discover + emit</td>
+</tr>
+<tr>
+<td><code>negotiate</code></td>
+<td><strong>Extension</strong></td>
+<td>Economics extension (§17)</td>
+</tr>
+<tr>
+<td><code>connect</code> / <code>disconnect</code></td>
+<td><strong>Parked</strong></td>
+<td><code>context_id</code> already gives multi-turn continuity without dedicated session infrastructure</td>
+</tr>
+<tr>
+<td><code>authorize</code></td>
+<td><strong>Parked</strong></td>
+<td>Authorization is a node/policy concern, not a mesh query</td>
+</tr>
+<tr>
+<td><code>transfer</code></td>
+<td><strong>Parked</strong></td>
+<td><code>delegate</code> covers the real cases</td>
+</tr>
+<tr>
+<td><code>propose</code></td>
+<td><strong>Parked</strong> <em>(likely to return)</em></td>
+<td>Cross-mesh human-in-the-loop approval</td>
+</tr>
+</tbody></table>
+<p>Parked operations below are retained for reference and marked; they are not part of the 0.2 core surface.</p>
+<h3 id="10-1-connect-parked-0-2-not-core">10.1. <code>connect</code> <em>(Parked — 0.2; not core)</em><a class="hl" href="#10-1-connect-parked-0-2-not-core">#</a></h3>
+<p>Establishes a persistent session between two or more agents.</p>
+<p><strong>Composed from:</strong> <code>discover</code> + <code>request</code> + <code>respond</code> + <code>subscribe</code></p>
+<p><strong>Flow:</strong></p>
+<ol>
+<li>Initiator discovers target agent.</li>
+<li>Initiator sends <code>request</code> with <code>payload.skill: &quot;session.connect&quot;</code> and a proposed <code>context_id</code>.</li>
+<li>Target responds with <code>status: &quot;completed&quot;</code> (accept) or <code>status: &quot;failed&quot;</code> (reject).</li>
+<li>Both parties subscribe to <code>mesh.session.{context_id}.&gt;</code> for session messages.</li>
+<li>Session messages use <code>emit</code> on <code>mesh.session.{context_id}.message</code>.</li>
+</ol>
+<h3 id="10-2-disconnect-parked-0-2-not-core">10.2. <code>disconnect</code> <em>(Parked — 0.2; not core)</em><a class="hl" href="#10-2-disconnect-parked-0-2-not-core">#</a></h3>
+<p>Tears down a session.</p>
+<p><strong>Composed from:</strong> <code>emit</code></p>
+<p><strong>Flow:</strong></p>
+<ol>
+<li>Either party emits <code>mesh.session.{context_id}.disconnect</code>.</li>
+<li>Both parties unsubscribe from the session subjects.</li>
+<li>Agents SHOULD clean up any session-specific state.</li>
+</ol>
+<h3 id="10-3-delegate">10.3. <code>delegate</code><a class="hl" href="#10-3-delegate">#</a></h3>
+<p>Forwards a request to another agent when the receiving agent cannot or should not handle it directly.</p>
+<p><strong>Composed from:</strong> <code>discover</code> + <code>request</code></p>
+<p><strong>Flow:</strong></p>
+<ol>
+<li>Agent A receives a request from Agent B.</li>
+<li>Agent A discovers Agent C with the required capability.</li>
+<li>Agent A sends a new <code>request</code> to Agent C, preserving the original <code>trace_id</code> and <code>context_id</code>.</li>
+<li>Agent A MAY remain in the chain (proxy pattern) or MAY redirect Agent B to Agent C directly (redirect pattern).</li>
+<li>If proxying, Agent A forwards Agent C&#39;s response to Agent B. The <code>meta.delegated_from</code> field SHOULD record the delegation chain.</li>
+</ol>
+<h3 id="10-4-negotiate-moved-to-economics-extension-§17-not-core">10.4. <code>negotiate</code> <em>(Moved to Economics extension — §17; not core)</em><a class="hl" href="#10-4-negotiate-moved-to-economics-extension-§17-not-core">#</a></h3>
+<p>Multi-turn agreement process before work begins. Used for cost negotiation, capability negotiation, or terms agreement.</p>
+<p><strong>Composed from:</strong> <code>request</code> + <code>respond</code> (multi-turn)</p>
+<p><strong>Flow:</strong></p>
+<ol>
+<li>Requester sends <code>request</code> with <code>payload.skill: &quot;negotiate&quot;</code> and proposed terms.</li>
+<li>Responder replies with <code>status: &quot;input_required&quot;</code> and counter-terms.</li>
+<li>Exchange continues until both parties agree (<code>status: &quot;completed&quot;</code>) or one party rejects (<code>status: &quot;failed&quot;</code>).</li>
+</ol>
+<p><strong>Negotiation Payload:</strong></p>
+<pre><code class="language-json">{
+  &quot;skill&quot;: &quot;negotiate&quot;,
+  &quot;input&quot;: {
+    &quot;proposed_skill&quot;: &quot;&lt;skill-id-to-negotiate&gt;&quot;,
+    &quot;proposed_cost&quot;: { &quot;per_request&quot;: 0.01, &quot;currency&quot;: &quot;credits&quot; },
+    &quot;proposed_sla&quot;: { &quot;max_latency_ms&quot;: 5000 },
+    &quot;terms&quot;: { &quot;&lt;domain-specific-terms&gt;&quot; }
+  }
+}
+</code></pre>
+<h3 id="10-5-stream">10.5. <code>stream</code><a class="hl" href="#10-5-stream">#</a></h3>
+<p>Delivers incremental results for a single request as a sequence of ordered messages.</p>
+<p><strong>Composed from:</strong> <code>request</code> + <code>respond</code> (sequential, ordered)</p>
+<p><strong>Flow:</strong></p>
+<ol>
+<li>Requester sends <code>request</code> with <code>config.stream: true</code>.</li>
+<li>Responder sends an initial <code>respond</code> with <code>status: &quot;working&quot;</code> and <code>task_id</code>.</li>
+<li>Responder publishes incremental results as <code>respond</code> messages on <code>mesh.task.{task_id}.stream</code>, each with:<ul>
+<li><code>in_reply_to</code>: the original request ID.</li>
+<li><code>task_id</code>: the task ID.</li>
+<li><code>payload.chunk_index</code>: monotonically increasing integer.</li>
+<li><code>payload.final</code>: boolean indicating whether this is the last chunk.</li>
+</ul>
+</li>
+<li>The final chunk has <code>payload.final: true</code> and <code>payload.status: &quot;completed&quot;</code>.</li>
+</ol>
+<p><strong>Ordering Guarantee:</strong> All stream chunks are published to the same subject (<code>mesh.task.{task_id}.stream</code>), which guarantees ordering within a JetStream stream.</p>
+<h3 id="10-6-broadcast">10.6. <code>broadcast</code><a class="hl" href="#10-6-broadcast">#</a></h3>
+<p>Announces to all agents matching a discovery query.</p>
+<p><strong>Composed from:</strong> <code>discover</code> + <code>emit</code></p>
+<p><strong>Flow:</strong></p>
+<ol>
+<li>Agent discovers all agents matching criteria.</li>
+<li>Agent emits an event to each discovered agent&#39;s inbox, or to a shared event subject that matching agents subscribe to.</li>
+</ol>
+<h3 id="10-7-cancel">10.7. <code>cancel</code><a class="hl" href="#10-7-cancel">#</a></h3>
+<p>Requests cancellation of an in-progress Task.</p>
+<p><strong>Composed from:</strong> <code>request</code> (to the responder&#39;s inbox)</p>
+<p><strong>Flow:</strong></p>
+<ol>
+<li>Requester sends <code>request</code> with <code>payload.skill: &quot;task.cancel&quot;</code> and <code>task_id</code>.</li>
+<li>Responder attempts to cancel the Task and responds with updated Task state.</li>
+<li>Cancellation is best-effort. The Task may have already completed.</li>
+</ol>
+<h3 id="10-8-transfer-parked-0-2-not-core">10.8. <code>transfer</code> <em>(Parked — 0.2; not core)</em><a class="hl" href="#10-8-transfer-parked-0-2-not-core">#</a></h3>
+<p>Hands off a Task to another agent, including accumulated context.</p>
+<p><strong>Composed from:</strong> <code>request</code> + context payload</p>
+<p><strong>Flow:</strong></p>
+<ol>
+<li>Agent A sends <code>request</code> to Agent B with <code>payload.skill: &quot;task.transfer&quot;</code>, including the full Task history and artifacts.</li>
+<li>Agent B creates a new Task (or adopts the existing <code>task_id</code>) and takes over.</li>
+<li>Agent A responds to the original requester with <code>meta.transferred_to: &quot;&lt;agent-B-nkey&gt;&quot;</code>.</li>
+</ol>
+<h3 id="10-9-heartbeat">10.9. <code>heartbeat</code><a class="hl" href="#10-9-heartbeat">#</a></h3>
+<p>Periodic liveness signal. Emitted per <strong>node</strong> (one heartbeat covers all agents the node hosts); a node MAY additionally emit a per-agent heartbeat to override status for a specific agent.</p>
+<p><strong>Composed from:</strong> <code>emit</code> (periodic)</p>
+<p><strong>Subject:</strong> <code>mesh.heartbeat.{node_id}</code> (or <code>mesh.heartbeat.{node_id}.{agent_id}</code> for a per-agent override)</p>
+<p><strong>Flow:</strong></p>
+<ol>
+<li>A node emits a heartbeat at a configurable interval (default: 30 seconds).</li>
+<li>The payload includes current status, aggregate load, and resource utilization.</li>
+<li>The <strong>presence</strong> service (Section 9.6) consumes heartbeats to update liveness. The registry is not involved.</li>
+</ol>
+<p><strong>Heartbeat Payload:</strong></p>
+<pre><code class="language-json">{
+  &quot;availability&quot;: &quot;online&quot;,
+  &quot;active_tasks&quot;: 3,
+  &quot;capacity&quot;: 10,
+  &quot;uptime_seconds&quot;: 86400,
+  &quot;load&quot;: 0.3
+}
+</code></pre>
+<h3 id="10-10-status">10.10. <code>status</code><a class="hl" href="#10-10-status">#</a></h3>
+<p>Queries an agent&#39;s current operational status.</p>
+<p><strong>Composed from:</strong> <code>request</code> (well-known schema)</p>
+<p><strong>Flow:</strong></p>
+<ol>
+<li>Requester sends <code>request</code> with <code>payload.skill: &quot;agent.status&quot;</code>.</li>
+<li>Agent responds with current state, active tasks, availability, and any relevant diagnostics.</li>
+</ol>
+<h3 id="10-11-authorize-parked-0-2-not-core">10.11. <code>authorize</code> <em>(Parked — 0.2; not core)</em><a class="hl" href="#10-11-authorize-parked-0-2-not-core">#</a></h3>
+<p>Queries whether a specific operation is permitted.</p>
+<p><strong>Composed from:</strong> <code>request</code> (against policy)</p>
+<p><strong>Flow:</strong></p>
+<ol>
+<li>Agent A sends <code>request</code> with <code>payload.skill: &quot;auth.check&quot;</code> and the proposed operation details.</li>
+<li>The target (or a dedicated policy agent) responds with <code>allowed: true/false</code> and the reason.</li>
+</ol>
+<h3 id="10-12-propose-parked-0-2-likely-to-return-not-core">10.12. <code>propose</code> <em>(Parked — 0.2, likely to return; not core)</em><a class="hl" href="#10-12-propose-parked-0-2-likely-to-return-not-core">#</a></h3>
+<p>Human-in-the-loop checkpoint. Submits a proposed action for approval before executing.</p>
+<p><strong>Composed from:</strong> <code>request</code> (non-binding)</p>
+<p><strong>Flow:</strong></p>
+<ol>
+<li>Agent sends <code>request</code> with <code>payload.skill: &quot;propose&quot;</code> and the proposed action.</li>
+<li>The recipient (human or orchestrator) reviews and responds with <code>approved: true/false</code>.</li>
+<li>The agent proceeds only if approved.</li>
+</ol>
+<hr>
+<h2 id="11-streaming">11. Streaming<a class="hl" href="#11-streaming">#</a></h2>
+<p>Streaming is the delivery of incremental results for a single Task as an ordered sequence of messages.</p>
+<h3 id="11-1-streaming-model">11.1. Streaming Model<a class="hl" href="#11-1-streaming-model">#</a></h3>
+<p>AgentMesh streaming uses JetStream subjects for ordered, durable delivery:</p>
+<ul>
+<li><strong>Stream Subject:</strong> <code>mesh.task.{task_id}.stream</code></li>
+<li><strong>Control Subject:</strong> <code>mesh.task.{task_id}.update</code></li>
+</ul>
+<p>All chunks for a single Task are published to the same stream subject, guaranteeing ordering.</p>
+<h3 id="11-2-stream-chunk-envelope">11.2. Stream Chunk Envelope<a class="hl" href="#11-2-stream-chunk-envelope">#</a></h3>
+<pre><code class="language-json">{
+  &quot;type&quot;: &quot;respond&quot;,
+  &quot;from&quot;: &quot;&lt;responder-nkey&gt;&quot;,
+  &quot;to&quot;: &quot;&lt;requester-nkey&gt;&quot;,
+  &quot;in_reply_to&quot;: &quot;&lt;original-request-id&gt;&quot;,
+  &quot;task_id&quot;: &quot;&lt;task-uuid&gt;&quot;,
+  &quot;payload&quot;: {
+    &quot;status&quot;: &quot;working&quot;,
+    &quot;chunk_index&quot;: 0,
+    &quot;final&quot;: false,
+    &quot;content_type&quot;: &quot;text/plain&quot;,
+    &quot;data&quot;: &quot;&lt;incremental-content&gt;&quot;
+  }
+}
+</code></pre>
+<h3 id="11-3-stream-lifecycle">11.3. Stream Lifecycle<a class="hl" href="#11-3-stream-lifecycle">#</a></h3>
+<ol>
+<li>Requester sends <code>request</code> with <code>config.stream: true</code>.</li>
+<li>Responder sends initial <code>respond</code> via NATS reply subject with <code>status: &quot;working&quot;</code> and <code>task_id</code>.</li>
+<li>Requester creates a durable JetStream consumer on <code>mesh.task.{task_id}.stream</code>.</li>
+<li>Responder publishes chunks to <code>mesh.task.{task_id}.stream</code>.</li>
+<li>Final chunk has <code>payload.final: true</code> and <code>payload.status: &quot;completed&quot;</code>.</li>
+<li>Responder publishes a final task update to <code>mesh.task.{task_id}.update</code> with <code>status: &quot;completed&quot;</code>.</li>
+</ol>
+<h3 id="11-4-backpressure">11.4. Backpressure<a class="hl" href="#11-4-backpressure">#</a></h3>
+<ul>
+<li>JetStream consumers support flow control via explicit acknowledgment.</li>
+<li>The consumer SHOULD use <code>ack_wait</code> timeouts to detect slow consumers.</li>
+<li>The responder SHOULD use <code>max_pending</code> on the stream to limit unacknowledged chunks.</li>
+<li>If the consumer falls too far behind, the responder MAY pause emission until acknowledgments catch up.</li>
+</ul>
+<h3 id="11-5-reconnection">11.5. Reconnection<a class="hl" href="#11-5-reconnection">#</a></h3>
+<p>If the consumer disconnects and reconnects:</p>
+<ul>
+<li>Durable consumers resume from the last acknowledged position.</li>
+<li>No chunks are lost.</li>
+<li>The requester MAY also call <code>get_task</code> on the KV store to get the current Task state.</li>
+</ul>
+<h3 id="11-6-chunk-signing">11.6. Chunk Signing<a class="hl" href="#11-6-chunk-signing">#</a></h3>
+<p>Signing every chunk of a stream (one Ed25519 signature per token of LLM output) is the one place always-sign (§4.5) would be too costly. Streams are therefore authenticated at the <strong>stream level</strong>, not per chunk:</p>
+<ul>
+<li>The <strong>opening</strong> <code>respond</code> that establishes the <code>task_id</code> and the stream (§11.3, step 2) MUST be signed per §4.5 and MUST be verified. It authenticates the responder agent for the entire stream.</li>
+<li><strong>Chunk</strong> envelopes on <code>mesh.task.{task_id}.stream</code> carry a monotonic <code>payload.chunk_index</code> and MAY omit <code>sig</code>. Their authenticity rests on three things: (a) the signed opening; (b) transport authorization, since only the responder&#39;s node may publish to that task&#39;s stream subject, enforced by the node JWT&#39;s publish permissions and account isolation (§4.6, §15); and (c) ordered, dedup-by-<code>id</code> delivery (§5.5, §11.1).</li>
+<li>The <strong>final</strong> chunk (<code>payload.final: true</code>) MUST be signed and MUST include <code>payload.chunk_count</code>. This brackets the stream so the requester can detect truncation or any missing or injected chunk.</li>
+<li>A requester MAY require per-chunk <code>sig</code> for a given stream (for example across a low-trust boundary) via <code>config.sign_chunks: true</code>; the responder SHOULD honor it. This keeps a strict, fully-signed mode available without making it the default.</li>
+</ul>
+<hr>
+<h2 id="12-error-model">12. Error Model<a class="hl" href="#12-error-model">#</a></h2>
+<h3 id="12-1-error-object">12.1. Error Object<a class="hl" href="#12-1-error-object">#</a></h3>
+<pre><code class="language-json">{
+  &quot;code&quot;: &quot;&lt;ERROR_CODE&gt;&quot;,
+  &quot;message&quot;: &quot;&lt;human-readable-description&gt;&quot;,
+  &quot;details&quot;: { &quot;&lt;structured-context&gt;&quot; },
+  &quot;retryable&quot;: false,
+  &quot;retry_after_ms&quot;: null
+}
+</code></pre>
+<h3 id="12-2-error-codes">12.2. Error Codes<a class="hl" href="#12-2-error-codes">#</a></h3>
+<h4 id="transport-errors">Transport Errors<a class="hl" href="#transport-errors">#</a></h4>
+<table>
+<thead>
+<tr>
+<th>Code</th>
+<th>Description</th>
+<th>Retryable</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>TRANSPORT_TIMEOUT</code></td>
+<td>NATS request timed out waiting for a response.</td>
+<td>Yes</td>
+</tr>
+<tr>
+<td><code>TRANSPORT_NO_RESPONDERS</code></td>
+<td>No agent is listening on the target subject.</td>
+<td>No</td>
+</tr>
+<tr>
+<td><code>TRANSPORT_PERMISSION_DENIED</code></td>
+<td>NATS subject permission denied by the node&#39;s JWT.</td>
+<td>No</td>
+</tr>
+</tbody></table>
+<h4 id="protocol-errors">Protocol Errors<a class="hl" href="#protocol-errors">#</a></h4>
+<table>
+<thead>
+<tr>
+<th>Code</th>
+<th>Description</th>
+<th>Retryable</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>INVALID_ENVELOPE</code></td>
+<td>The message envelope fails schema validation.</td>
+<td>No</td>
+</tr>
+<tr>
+<td><code>INVALID_VERSION</code></td>
+<td>The protocol version is not supported by the receiver.</td>
+<td>No</td>
+</tr>
+<tr>
+<td><code>IDENTITY_MISMATCH</code></td>
+<td>The <code>from</code> field does not match the NATS connection identity.</td>
+<td>No</td>
+</tr>
+<tr>
+<td><code>INVALID_MANIFEST</code></td>
+<td>The manifest fails schema validation.</td>
+<td>No</td>
+</tr>
+<tr>
+<td><code>INVALID_QUERY</code></td>
+<td>The discovery query fails schema validation.</td>
+<td>No</td>
+</tr>
+</tbody></table>
+<h4 id="task-errors">Task Errors<a class="hl" href="#task-errors">#</a></h4>
+<table>
+<thead>
+<tr>
+<th>Code</th>
+<th>Description</th>
+<th>Retryable</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>TASK_NOT_FOUND</code></td>
+<td>The specified task ID does not exist.</td>
+<td>No</td>
+</tr>
+<tr>
+<td><code>TASK_INVALID_TRANSITION</code></td>
+<td>The requested state transition is not valid.</td>
+<td>No</td>
+</tr>
+<tr>
+<td><code>TASK_NOT_CANCELABLE</code></td>
+<td>The task is in a terminal state and cannot be canceled.</td>
+<td>No</td>
+</tr>
+<tr>
+<td><code>TASK_EXPIRED</code></td>
+<td>The task has exceeded its TTL and been purged.</td>
+<td>No</td>
+</tr>
+</tbody></table>
+<h4 id="agent-errors">Agent Errors<a class="hl" href="#agent-errors">#</a></h4>
+<table>
+<thead>
+<tr>
+<th>Code</th>
+<th>Description</th>
+<th>Retryable</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>AGENT_UNAVAILABLE</code></td>
+<td>The agent is not accepting requests.</td>
+<td>Yes</td>
+</tr>
+<tr>
+<td><code>AGENT_OVERLOADED</code></td>
+<td>The agent has exceeded its concurrency limit.</td>
+<td>Yes</td>
+</tr>
+<tr>
+<td><code>SKILL_NOT_FOUND</code></td>
+<td>The requested skill is not offered by this agent.</td>
+<td>No</td>
+</tr>
+<tr>
+<td><code>INPUT_INVALID</code></td>
+<td>The input payload does not match the skill&#39;s schema.</td>
+<td>No</td>
+</tr>
+<tr>
+<td><code>CONTENT_TYPE_NOT_SUPPORTED</code></td>
+<td>The requested output mode is not supported.</td>
+<td>No</td>
+</tr>
+<tr>
+<td><code>UNAUTHORIZED</code></td>
+<td>The requesting agent lacks permission for this operation.</td>
+<td>No</td>
+</tr>
+<tr>
+<td><code>COST_LIMIT_EXCEEDED</code></td>
+<td>The operation would exceed the requester&#39;s budget. <em>(Economics extension, §17.)</em></td>
+<td>No</td>
+</tr>
+</tbody></table>
+<h4 id="processing-errors">Processing Errors<a class="hl" href="#processing-errors">#</a></h4>
+<table>
+<thead>
+<tr>
+<th>Code</th>
+<th>Description</th>
+<th>Retryable</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>INTERNAL_ERROR</code></td>
+<td>An unexpected internal error occurred in the agent.</td>
+<td>Yes</td>
+</tr>
+<tr>
+<td><code>DEPENDENCY_FAILED</code></td>
+<td>A downstream dependency (tool, API, delegated agent) failed.</td>
+<td>Yes</td>
+</tr>
+<tr>
+<td><code>CONTEXT_TOO_LARGE</code></td>
+<td>The accumulated context exceeds the agent&#39;s capacity.</td>
+<td>No</td>
+</tr>
+<tr>
+<td><code>RATE_LIMITED</code></td>
+<td>The sender has exceeded the platform rate limit (see Section 16).</td>
+<td>Yes</td>
+</tr>
+</tbody></table>
+<h3 id="12-3-error-delivery">12.3. Error Delivery<a class="hl" href="#12-3-error-delivery">#</a></h3>
+<p>Errors are delivered as standard <code>respond</code> envelopes with the <code>error</code> field populated and <code>payload.status</code> set to <code>failed</code>:</p>
+<pre><code class="language-json">{
+  &quot;type&quot;: &quot;respond&quot;,
+  &quot;in_reply_to&quot;: &quot;&lt;request-id&gt;&quot;,
+  &quot;task_id&quot;: &quot;&lt;task-id&gt;&quot;,
+  &quot;payload&quot;: { &quot;status&quot;: &quot;failed&quot; },
+  &quot;error&quot;: {
+    &quot;code&quot;: &quot;SKILL_NOT_FOUND&quot;,
+    &quot;message&quot;: &quot;Skill &#39;web-scrape-v2&#39; is not supported. Available skills: web-scrape, search.&quot;,
+    &quot;details&quot;: {
+      &quot;requested_skill&quot;: &quot;web-scrape-v2&quot;,
+      &quot;available_skills&quot;: [&quot;web-scrape&quot;, &quot;search&quot;]
+    },
+    &quot;retryable&quot;: false
+  }
+}
+</code></pre>
+<h3 id="12-4-retry-semantics">12.4. Retry Semantics<a class="hl" href="#12-4-retry-semantics">#</a></h3>
+<p>When <code>error.retryable</code> is <code>true</code>:</p>
+<ul>
+<li>The <code>retry_after_ms</code> field, if present, indicates the minimum time to wait before retrying.</li>
+<li>Clients SHOULD implement exponential backoff with jitter.</li>
+<li>Clients SHOULD set a maximum retry count (default: 3).</li>
+<li>Clients MUST use the same <code>id</code> (or <code>idempotency_key</code>) on retries to enable server-side deduplication.</li>
+</ul>
+<hr>
+<h2 id="13-observability">13. Observability<a class="hl" href="#13-observability">#</a></h2>
+<blockquote>
+<p><strong>Core vs. optional.</strong> Trace <strong>propagation</strong> — the <code>trace</code> object in every envelope — is core and always on; it costs nothing and is the part with real debugging value. Trace/metric/log <strong>storage</strong> (the <code>MESH_TRACE</code>/<code>MESH_METRICS</code>/<code>MESH_LOG</code> streams and the publishing of span/metric/log events) is <strong>optional</strong> and created only if a deployment wants it (§18.3). A minimal deployment carries trace context in-band and stores nothing.</p>
+</blockquote>
+<h3 id="13-1-distributed-tracing">13.1. Distributed Tracing<a class="hl" href="#13-1-distributed-tracing">#</a></h3>
+<p>Every message envelope includes a <code>trace</code> object. The tracing model follows <a href="https://www.w3.org/TR/trace-context/">W3C Trace Context</a> semantics adapted for NATS.</p>
+<p><strong>Propagation Rules:</strong></p>
+<ul>
+<li>When an agent initiates a new interaction (e.g., a user triggers a workflow), it generates a new <code>trace_id</code> and <code>span_id</code>. <code>parent_span_id</code> is null.</li>
+<li>When an agent receives a request and makes downstream requests (delegation, tool calls), it:<ul>
+<li>Preserves the <code>trace_id</code>.</li>
+<li>Generates a new <code>span_id</code> for each downstream operation.</li>
+<li>Sets <code>parent_span_id</code> to its own <code>span_id</code>.</li>
+</ul>
+</li>
+<li>When an agent emits an event as a side-effect of processing a request, it preserves the <code>trace_id</code> and sets <code>parent_span_id</code> to the span that triggered the emit.</li>
+</ul>
+<p><strong>Trace Storage:</strong></p>
+<p>Trace data SHOULD be collected into a dedicated JetStream stream (<code>mesh.trace.&gt;</code>) for analysis. Agents SHOULD publish span completion events:</p>
+<pre><code class="language-json">{
+  &quot;type&quot;: &quot;emit&quot;,
+  &quot;from&quot;: &quot;&lt;agent-nkey&gt;&quot;,
+  &quot;payload&quot;: {
+    &quot;domain&quot;: &quot;trace&quot;,
+    &quot;event_type&quot;: &quot;span_completed&quot;,
+    &quot;data&quot;: {
+      &quot;trace_id&quot;: &quot;&lt;uuid&gt;&quot;,
+      &quot;span_id&quot;: &quot;&lt;uuid&gt;&quot;,
+      &quot;parent_span_id&quot;: &quot;&lt;uuid&gt;&quot;,
+      &quot;agent_id&quot;: &quot;&lt;nkey&gt;&quot;,
+      &quot;operation&quot;: &quot;request&quot;,
+      &quot;skill&quot;: &quot;web-scrape&quot;,
+      &quot;started_at&quot;: &quot;&lt;ISO-8601&gt;&quot;,
+      &quot;ended_at&quot;: &quot;&lt;ISO-8601&gt;&quot;,
+      &quot;duration_ms&quot;: 1234,
+      &quot;status&quot;: &quot;ok&quot;,
+      &quot;error&quot;: null,
+      &quot;tags&quot;: { &quot;task_id&quot;: &quot;...&quot; }
+    }
+  }
+}
+</code></pre>
+<h3 id="13-2-metrics">13.2. Metrics<a class="hl" href="#13-2-metrics">#</a></h3>
+<p>Agents SHOULD publish periodic metrics as events:</p>
+<p><strong>Subject:</strong> <code>mesh.metrics.{agent_id}</code></p>
+<p><strong>Payload:</strong></p>
+<pre><code class="language-json">{
+  &quot;agent_id&quot;: &quot;&lt;nkey&gt;&quot;,
+  &quot;timestamp&quot;: &quot;&lt;ISO-8601&gt;&quot;,
+  &quot;requests_total&quot;: 1000,
+  &quot;requests_failed&quot;: 5,
+  &quot;tasks_active&quot;: 3,
+  &quot;tasks_completed&quot;: 997,
+  &quot;avg_latency_ms&quot;: 250,
+  &quot;p99_latency_ms&quot;: 1200,
+  &quot;bytes_in&quot;: 1048576,
+  &quot;bytes_out&quot;: 2097152
+}
+</code></pre>
+<h3 id="13-3-structured-logging">13.3. Structured Logging<a class="hl" href="#13-3-structured-logging">#</a></h3>
+<p>Agents SHOULD publish structured log events for significant operations:</p>
+<p><strong>Subject:</strong> <code>mesh.log.{agent_id}.{level}</code></p>
+<p>Levels: <code>debug</code>, <code>info</code>, <code>warn</code>, <code>error</code></p>
+<p>Log events MUST include <code>trace_id</code> and <code>span_id</code> when available.</p>
+<hr>
+<h2 id="14-subject-namespace">14. Subject Namespace<a class="hl" href="#14-subject-namespace">#</a></h2>
+<p>All AgentMesh subjects follow a hierarchical naming convention under the <code>mesh.</code> prefix.</p>
+<h3 id="14-1-subject-map">14.1. Subject Map<a class="hl" href="#14-1-subject-map">#</a></h3>
+<table>
+<thead>
+<tr>
+<th>Pattern</th>
+<th>Purpose</th>
+<th>Persistence</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>mesh.registry.register</code></td>
+<td>Agent registration</td>
+<td>JetStream</td>
+</tr>
+<tr>
+<td><code>mesh.registry.deregister</code></td>
+<td>Agent deregistration</td>
+<td>JetStream</td>
+</tr>
+<tr>
+<td><code>mesh.registry.discover</code></td>
+<td>Discovery queries (request-reply)</td>
+<td>Core NATS</td>
+</tr>
+<tr>
+<td><code>mesh.registry.get.{agent_id}</code></td>
+<td>Manifest lookup (request-reply)</td>
+<td>Core NATS</td>
+</tr>
+<tr>
+<td><code>mesh.presence.get</code></td>
+<td>Presence lookup (request-reply)</td>
+<td>Core NATS</td>
+</tr>
+<tr>
+<td><code>mesh.agent.{agent_id}.inbox</code></td>
+<td>Direct requests to an agent</td>
+<td>Core NATS</td>
+</tr>
+<tr>
+<td><code>mesh.task.{task_id}.update</code></td>
+<td>Task state transitions</td>
+<td>JetStream</td>
+</tr>
+<tr>
+<td><code>mesh.task.{task_id}.stream</code></td>
+<td>Task streaming data</td>
+<td>JetStream</td>
+</tr>
+<tr>
+<td><code>mesh.event.{domain}.{event_type}</code></td>
+<td>Domain events</td>
+<td>JetStream</td>
+</tr>
+<tr>
+<td><code>mesh.heartbeat.{node_id}</code></td>
+<td>Node heartbeat signals (presence)</td>
+<td>JetStream (short TTL)</td>
+</tr>
+<tr>
+<td><code>mesh.session.{context_id}.&gt;</code></td>
+<td>Session messages</td>
+<td>JetStream — <em>optional (parked sessions)</em></td>
+</tr>
+<tr>
+<td><code>mesh.trace.&gt;</code></td>
+<td>Trace spans</td>
+<td>JetStream — <em>optional</em></td>
+</tr>
+<tr>
+<td><code>mesh.metrics.{agent_id}</code></td>
+<td>Agent metrics</td>
+<td>JetStream (short TTL) — <em>optional</em></td>
+</tr>
+<tr>
+<td><code>mesh.log.{agent_id}.{level}</code></td>
+<td>Agent logs</td>
+<td>JetStream (short TTL) — <em>optional</em></td>
+</tr>
+</tbody></table>
+<h3 id="14-2-wildcard-usage">14.2. Wildcard Usage<a class="hl" href="#14-2-wildcard-usage">#</a></h3>
+<p>NATS supports two wildcards:</p>
+<ul>
+<li><code>*</code> matches a single token: <code>mesh.event.scraping.*</code> matches <code>mesh.event.scraping.profile_found</code> but not <code>mesh.event.scraping.linkedin.profile_found</code>.</li>
+<li><code>&gt;</code> matches one or more tokens: <code>mesh.event.scraping.&gt;</code> matches all subjects under <code>mesh.event.scraping.</code>.</li>
+</ul>
+<p>Agents SHOULD use wildcards judiciously in subscriptions to avoid receiving unintended messages.</p>
+<h3 id="14-3-subject-permissions">14.3. Subject Permissions<a class="hl" href="#14-3-subject-permissions">#</a></h3>
+<p>A <strong>node&#39;s</strong> User JWT MUST define explicit publish and subscribe permissions covering the subjects of every agent it hosts (its agents&#39; inboxes, the task/event subjects they use, and its node heartbeat). Per-agent identity is asserted in-envelope (§4.5/§5.3); subject permissions are enforced at node granularity by the mesh server.</p>
+<p><strong>Example permissions for a node hosting a web-scraping agent</strong> (<code>AGENT_NKEY</code> = the hosted agent, <code>NODE_NKEY</code> = the node):</p>
+<pre><code class="language-json">{
+  &quot;pub&quot;: {
+    &quot;allow&quot;: [
+      &quot;mesh.registry.register&quot;,
+      &quot;mesh.registry.discover&quot;,
+      &quot;mesh.presence.get&quot;,
+      &quot;mesh.event.scraping.&gt;&quot;,
+      &quot;mesh.heartbeat.NODE_NKEY_HERE&quot;,
+      &quot;mesh.task.*.update&quot;,
+      &quot;mesh.task.*.stream&quot;
+    ]
+  },
+  &quot;sub&quot;: {
+    &quot;allow&quot;: [
+      &quot;mesh.agent.AGENT_NKEY_HERE.inbox&quot;,
+      &quot;mesh.event.registry.&gt;&quot;,
+      &quot;mesh.task.*.update&quot;,
+      &quot;mesh.task.*.stream&quot;,
+      &quot;_INBOX.&gt;&quot;
+    ]
+  }
+}
+</code></pre>
+<hr>
+<h2 id="15-multi-tenancy">15. Multi-Tenancy<a class="hl" href="#15-multi-tenancy">#</a></h2>
+<h3 id="15-1-tenant-model">15.1. Tenant Model<a class="hl" href="#15-1-tenant-model">#</a></h3>
+<p>Multi-tenancy is implemented via NATS accounts. Note that tenancy and instances are different isolation levels: a tenant is an account <strong>within</strong> one operator&#39;s instance, while an organization wanting full isolation runs its <strong>own instance</strong> (its own transport, services, and operator key) on its own infrastructure — no protocol changes required, since every deployment is already a complete, self-contained mesh.</p>
+<ul>
+<li>Each tenant maps to a NATS <strong>account</strong>. Account members are <strong>nodes</strong> (each node&#39;s User JWT is signed by the account); agents belong to a tenant through the node that hosts them.</li>
+<li>Each account has its own subject namespace — subjects are isolated by default.</li>
+<li>Nodes within the same account can freely communicate on any subject their JWT permits, so their hosted agents can reach each other.</li>
+<li>Cross-tenant communication requires explicit <strong>subject import/export</strong> configuration on the account JWTs.</li>
+</ul>
+<p>Discovery visibility follows from this: an agent is discoverable only within its own account unless the account explicitly exports discovery. Personal agents are therefore <strong>private by default</strong> (a personal tenant/account), and become externally discoverable only through deliberate export — the mechanism for &quot;my agent can find my spouse&#39;s agent&quot; without exposing either to the world.</p>
+<h3 id="15-2-cross-tenant-communication">15.2. Cross-Tenant Communication<a class="hl" href="#15-2-cross-tenant-communication">#</a></h3>
+<p>When Tenant A wants to allow its agents to be discoverable by Tenant B:</p>
+<ol>
+<li>Tenant A&#39;s account JWT exports <code>mesh.registry.discover</code> as a service.</li>
+<li>Tenant B&#39;s account JWT imports Tenant A&#39;s <code>mesh.registry.discover</code> service, optionally under a remapped subject (e.g., <code>mesh.external.tenant_a.discover</code>).</li>
+<li>Tenant B&#39;s agents can now discover Tenant A&#39;s agents via the imported subject.</li>
+</ol>
+<p>Subject mapping and transforms can remap imported subjects to maintain namespace consistency.</p>
+<h3 id="15-3-tenant-isolation-guarantees">15.3. Tenant Isolation Guarantees<a class="hl" href="#15-3-tenant-isolation-guarantees">#</a></h3>
+<ul>
+<li><strong>Subject isolation:</strong> Agents in different accounts cannot publish or subscribe to each other&#39;s subjects without explicit import/export.</li>
+<li><strong>Stream isolation:</strong> JetStream streams are account-scoped. Tenant A&#39;s task data is not accessible to Tenant B.</li>
+<li><strong>KV isolation:</strong> KV buckets are account-scoped.</li>
+<li><strong>Connection isolation:</strong> Connection limits, message size limits, and rate limits are configurable per account.</li>
+</ul>
+<hr>
+<h2 id="16-rate-limiting">16. Rate Limiting<a class="hl" href="#16-rate-limiting">#</a></h2>
+<p>Platform services enforce rate limits to prevent abuse and ensure fair resource allocation.</p>
+<h3 id="16-1-nats-subject-rate-limits">16.1. NATS Subject Rate Limits<a class="hl" href="#16-1-nats-subject-rate-limits">#</a></h3>
+<p>All platform service handlers enforce a per-sender rate limit, keyed by the <code>from</code> field in the message envelope.</p>
+<table>
+<thead>
+<tr>
+<th>Parameter</th>
+<th>Default</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Window</td>
+<td>60 seconds (sliding)</td>
+</tr>
+<tr>
+<td>Max requests per window</td>
+<td>60</td>
+</tr>
+</tbody></table>
+<p>When a sender exceeds the limit, the service MUST respond with <code>RATE_LIMITED</code> and <code>retryable: true</code>. The <code>retry_after_ms</code> field SHOULD indicate the time remaining in the current window.</p>
+<p>The rate limit applies uniformly across all subjects — a sender&#39;s requests to <code>mesh.registry.register</code>, <code>mesh.presence.send</code>, and any other service subject share a single counter.</p>
+<h3 id="16-2-http-endpoint-rate-limits">16.2. HTTP Endpoint Rate Limits<a class="hl" href="#16-2-http-endpoint-rate-limits">#</a></h3>
+<p>HTTP endpoints (e.g., the API service) enforce a per-IP rate limit, keyed by the client&#39;s remote address.</p>
+<table>
+<thead>
+<tr>
+<th>Parameter</th>
+<th>Default</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Window</td>
+<td>60 seconds (sliding)</td>
+</tr>
+<tr>
+<td>Max requests per window</td>
+<td>30</td>
+</tr>
+</tbody></table>
+<p>When an IP exceeds the limit, the service MUST respond with HTTP <code>429 Too Many Requests</code> and a JSON body containing the <code>retry_after_ms</code> field.</p>
+<h3 id="16-3-rate-limit-behavior">16.3. Rate Limit Behavior<a class="hl" href="#16-3-rate-limit-behavior">#</a></h3>
+<ul>
+<li>Rate limits use a <strong>sliding window</strong> algorithm: the window starts from the first request and advances with time.</li>
+<li>Expired tracking entries are lazily evicted to avoid unbounded memory growth.</li>
+<li><code>RATE_LIMITED</code> is a retryable error. Clients SHOULD implement backoff as described in Section 12.4.</li>
+<li>Rate limit defaults MAY be overridden via environment variables (<code>RATE_LIMIT_NATS_MAX</code>, <code>RATE_LIMIT_NATS_WINDOW_MS</code>, <code>RATE_LIMIT_HTTP_MAX</code>, <code>RATE_LIMIT_HTTP_WINDOW_MS</code>).</li>
+</ul>
+<h3 id="16-4-resource-caps">16.4. Resource Caps<a class="hl" href="#16-4-resource-caps">#</a></h3>
+<p>To prevent unbounded memory and storage growth, the platform enforces hard caps on accumulated data.</p>
+<h4 id="task-history">Task History<a class="hl" href="#task-history">#</a></h4>
+<p>Each task stores an envelope history for debugging and audit. The platform MUST cap task history at a configurable maximum (default: <strong>50 entries</strong>). When the cap is reached, the oldest entries are discarded. This applies to both server-side (KV-persisted) and client-side (in-memory) task tracking.</p>
+<table>
+<thead>
+<tr>
+<th>Parameter</th>
+<th>Default</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Max history entries per task</td>
+<td>50</td>
+</tr>
+</tbody></table>
+<h4 id="node-held-inbox-replaces-the-server-side-user-queue">Node-Held Inbox (replaces the server-side user queue)<a class="hl" href="#node-held-inbox-replaces-the-server-side-user-queue">#</a></h4>
+<p>Durable delivery is the responsibility of the <strong>hosting node</strong>, not a server-side per-user queue. A node holds its agents&#39; inboxes locally and is the durable endpoint; the transport retains only a short redelivery buffer for messages sent while a node is briefly offline (a JetStream stream with a bounded age/size, delivered on reconnect and acked by the node). This is the inverse of v0.1&#39;s server-side mailbox: the always-on node owns the mailbox, the mesh server is a thin buffer.</p>
+<ul>
+<li>The node MUST ack messages it has durably accepted; unacked messages remain in the redelivery buffer until TTL.</li>
+<li>Redelivery buffer bounds are a transport deployment concern (default: cap by age, e.g. 7 days, and by size per node), not a per-user application queue.</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th>Parameter</th>
+<th>Default</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Redelivery buffer max age (per node)</td>
+<td>7 days</td>
+</tr>
+</tbody></table>
+<h4 id="client-side-task-pruning">Client-Side Task Pruning<a class="hl" href="#client-side-task-pruning">#</a></h4>
+<p>SDK clients SHOULD automatically prune completed and failed tasks from their in-memory task tracker. Tasks in terminal states (<code>completed</code>, <code>failed</code>, <code>canceled</code>) SHOULD be evicted after a configurable TTL (default: <strong>5 minutes</strong>). The prune cycle SHOULD run periodically (default: every <strong>60 seconds</strong>).</p>
+<hr>
+<h2 id="17-extensions">17. Extensions<a class="hl" href="#17-extensions">#</a></h2>
+<h3 id="17-1-extension-model">17.1. Extension Model<a class="hl" href="#17-1-extension-model">#</a></h3>
+<p>Extensions provide additional functionality beyond the core specification. They follow a URI-based identification scheme with versioning.</p>
+<h3 id="17-2-extension-declaration">17.2. Extension Declaration<a class="hl" href="#17-2-extension-declaration">#</a></h3>
+<p>Agents declare supported extensions in their manifest:</p>
+<pre><code class="language-json">{
+  &quot;extensions&quot;: [
+    {
+      &quot;uri&quot;: &quot;mesh://extensions/cost-negotiation/v1&quot;,
+      &quot;description&quot;: &quot;Supports real-time cost negotiation before task execution.&quot;,
+      &quot;required&quot;: false,
+      &quot;version&quot;: &quot;1.0&quot;
+    }
+  ]
+}
+</code></pre>
+<h3 id="17-3-extension-activation">17.3. Extension Activation<a class="hl" href="#17-3-extension-activation">#</a></h3>
+<p>Extensions are activated per-request via the <code>meta</code> field in the message envelope:</p>
+<pre><code class="language-json">{
+  &quot;meta&quot;: {
+    &quot;extensions&quot;: [&quot;mesh://extensions/cost-negotiation/v1&quot;],
+    &quot;mesh://extensions/cost-negotiation/v1&quot;: {
+      &quot;max_budget&quot;: 1.00,
+      &quot;currency&quot;: &quot;credits&quot;
+    }
+  }
+}
+</code></pre>
+<h3 id="17-4-extension-compatibility">17.4. Extension Compatibility<a class="hl" href="#17-4-extension-compatibility">#</a></h3>
+<ul>
+<li>If a request activates an extension the agent does not support, the agent SHOULD ignore it unless the extension is marked <code>required</code> in the agent&#39;s manifest.</li>
+<li>If a <code>required</code> extension is not activated by the client, the agent MUST respond with an error.</li>
+<li>Extensions MUST NOT alter the semantics of core primitives. They extend metadata and behavior, not the fundamental protocol operations.</li>
+<li>Breaking changes to an extension MUST use a new URI.</li>
+</ul>
+<h3 id="17-5-defined-and-planned-extensions">17.5. Defined &amp; Planned Extensions<a class="hl" href="#17-5-defined-and-planned-extensions">#</a></h3>
+<table>
+<thead>
+<tr>
+<th>Extension URI</th>
+<th>Status</th>
+<th>Scope</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>mesh://extensions/economics/v1</code></td>
+<td><strong>Defined</strong> (0.2)</td>
+<td>Manifest <code>cost</code>, discovery <code>max_cost</code>, <code>negotiate</code> (§10.4), <code>COST_LIMIT_EXCEEDED</code>, metering events (§19). Moved out of core in 0.2.</td>
+</tr>
+<tr>
+<td><code>mesh://extensions/e2e-encryption/v1</code></td>
+<td><strong>Planned — deliberately deferred</strong></td>
+<td>End-to-end payload encryption between agents. The core secures the transport (node connection) but not payloads, so the mesh operator can currently read messages. Personal agents will need payload confidentiality; the Node/agent keypairs (§4) are the intended key substrate. <strong>Out of scope for 0.2 by decision (2026-07-09); to be specified after the 0.2 core lands. Do not lose this.</strong></td>
+</tr>
+<tr>
+<td>Sessions (<code>connect</code>/<code>disconnect</code>)</td>
+<td>Candidate</td>
+<td>The parked session operations (§10.1–10.2), if a durable-session extension is ever needed beyond <code>context_id</code>.</td>
+</tr>
+</tbody></table>
+<hr>
+<h2 id="18-bindings">18. Bindings<a class="hl" href="#18-bindings">#</a></h2>
+<p>AgentMesh separates its <strong>abstract protocol</strong> (Sections 4–17) from the concrete <strong>platform binding</strong> that realizes it. The abstract protocol names concepts — a signed operator → account → node credential chain, subject addressing, a durable task store — and a binding defines how those concepts are provided on specific infrastructure. NATS JetStream is the <strong>reference binding</strong>. Alternative bindings MAY be defined but MUST satisfy the requirements in §18.1.</p>
+<h3 id="18-1-binding-requirements">18.1. Binding Requirements<a class="hl" href="#18-1-binding-requirements">#</a></h3>
+<p>Any transport-and-platform binding MUST provide:</p>
+<ul>
+<li><strong>Addressing:</strong> hierarchical, dot-delimited subject addressing with multi-level wildcards, per the Subject Namespace (Section 14).</li>
+<li><strong>Delivery:</strong> ordered, at-least-once delivery per subject, with deduplication keyed by the envelope <code>id</code> (Section 5).</li>
+<li><strong>Request-reply:</strong> correlated request-reply with a per-request reply address and a configurable timeout.</li>
+<li><strong>Durable task store:</strong> a durable, keyed store holding authoritative Task state, updated on every transition (Section 7).</li>
+<li><strong>Large-payload storage:</strong> an object store (or equivalent) for payloads exceeding the message size limit, referenced by artifact <code>ref</code> parts (Section 7.5).</li>
+<li><strong>Identity &amp; credentials:</strong> a signed operator → account → node credential chain (Section 4), node-key connection authentication, subject-scoped publish/subscribe authorization, and tenant import/export enforcement.</li>
+<li><strong>Presence:</strong> periodic node liveness with TTL expiry (Section 9).</li>
+</ul>
+<p>In addition to providing these guarantees, a binding MUST <strong>document the mesh-server
+interface</strong>: the client↔server wire protocol and framing, the connection/authentication
+handshake, the precise semantics of subject authorization, and the durable-consumer
+semantics (acknowledgment, redelivery, resume). This document deliberately does not
+re-specify them for the reference binding — they are the NATS client protocol and
+JetStream API, normatively defined by the <a href="https://docs.nats.io/reference/reference-protocols/nats-protocol">NATS documentation</a>.
+A node (or SDK) built for one binding is not expected to interoperate with a mesh
+server from another binding; interoperability across bindings is at the envelope and
+primitive layer, not the wire layer.</p>
+<h3 id="18-2-nats-jetstream-binding-identity-and-credentials">18.2. NATS JetStream Binding: Identity &amp; Credentials<a class="hl" href="#18-2-nats-jetstream-binding-identity-and-credentials">#</a></h3>
+<p>This realizes the abstract trust roles of §4.1 on NATS:</p>
+<ul>
+<li><strong>Node key</strong> — the node&#39;s Ed25519 keypair is a NATS <strong>NKey</strong>; its public key is the node ID.</li>
+<li><strong>Node credential</strong> — a NATS <strong>User JWT</strong> signed by the node&#39;s Account signing key, carrying the node&#39;s public NKey, its subject publish/subscribe permissions, and expiry/revocation metadata. The node presents it at connection time; all hosted agents share the one connection.</li>
+<li><strong>Account</strong> — a NATS <strong>account</strong>: the tenant isolation boundary. Its signing key signs node User JWTs, and its subject import/export rules govern cross-tenant communication.</li>
+<li><strong>Operator</strong> — the NATS <strong>operator</strong>: signs Account JWTs; its root key is the instance&#39;s root of trust.</li>
+<li><strong>Connection authentication</strong> — at connection establishment the node signs a nonce from the mesh server with its NKey and presents its User JWT; the mesh server verifies the chain <strong>Node JWT → Account JWT → Operator JWT</strong>, then enforces the node&#39;s subject permissions and account import/export on every operation.</li>
+<li>Agents are <strong>not</strong> NATS users and hold no JWT (§4.3); an agent&#39;s right to speak comes from its node&#39;s vouch (§4.4) plus the per-envelope signature (§4.5).</li>
+</ul>
+<h3 id="18-3-streams">18.3. Streams<a class="hl" href="#18-3-streams">#</a></h3>
+<p><strong>Required</strong> (core):</p>
+<table>
+<thead>
+<tr>
+<th>Stream Name</th>
+<th>Subjects</th>
+<th>Retention</th>
+<th>Max Age</th>
+<th>Replicas</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>MESH_REGISTRY</code></td>
+<td><code>mesh.registry.&gt;</code></td>
+<td>Limits</td>
+<td>24h</td>
+<td>3</td>
+<td>Registration events</td>
+</tr>
+<tr>
+<td><code>MESH_TASKS</code></td>
+<td><code>mesh.task.&gt;</code></td>
+<td>Limits</td>
+<td>7d</td>
+<td>3</td>
+<td>Task update delivery + redelivery buffer</td>
+</tr>
+<tr>
+<td><code>MESH_EVENTS</code></td>
+<td><code>mesh.event.&gt;</code></td>
+<td>Interest</td>
+<td>24h</td>
+<td>3</td>
+<td>Domain events</td>
+</tr>
+<tr>
+<td><code>MESH_HEARTBEAT</code></td>
+<td><code>mesh.heartbeat.&gt;</code></td>
+<td>Limits</td>
+<td>5m</td>
+<td>1</td>
+<td>Node heartbeats (presence)</td>
+</tr>
+</tbody></table>
+<p><strong>Optional</strong> (create only if the deployment wants them; the protocol does not require them):</p>
+<table>
+<thead>
+<tr>
+<th>Stream Name</th>
+<th>Subjects</th>
+<th>Purpose</th>
+<th>Notes</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>MESH_TRACE</code></td>
+<td><code>mesh.trace.&gt;</code></td>
+<td>Distributed trace storage</td>
+<td>Trace <em>propagation</em> is in-envelope and always on; this stream only stores spans for analysis.</td>
+</tr>
+<tr>
+<td><code>MESH_METRICS</code></td>
+<td><code>mesh.metrics.&gt;</code></td>
+<td>Agent metrics storage</td>
+<td>Optional.</td>
+</tr>
+<tr>
+<td><code>MESH_LOG</code></td>
+<td><code>mesh.log.&gt;</code></td>
+<td>Structured log storage</td>
+<td>Optional.</td>
+</tr>
+<tr>
+<td><code>MESH_SESSIONS</code></td>
+<td><code>mesh.session.&gt;</code></td>
+<td>Session messages</td>
+<td>Only if the parked <code>connect</code>/<code>disconnect</code> session ops are in use.</td>
+</tr>
+</tbody></table>
+<h3 id="18-4-kv-buckets-and-task-persistence">18.4. KV Buckets &amp; Task Persistence<a class="hl" href="#18-4-kv-buckets-and-task-persistence">#</a></h3>
+<table>
+<thead>
+<tr>
+<th>Bucket Name</th>
+<th>Key Pattern</th>
+<th>TTL</th>
+<th>Replicas</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>mesh_registry</code></td>
+<td><code>{agent_id}</code></td>
+<td>None</td>
+<td>3</td>
+<td>Agent manifest storage</td>
+</tr>
+<tr>
+<td><code>mesh_tasks</code></td>
+<td><code>{task_id}</code></td>
+<td>7d</td>
+<td>3</td>
+<td>Task state (authoritative store)</td>
+</tr>
+<tr>
+<td><code>mesh_sessions</code></td>
+<td><code>{context_id}</code></td>
+<td>1h</td>
+<td>1</td>
+<td>Session metadata</td>
+</tr>
+</tbody></table>
+<p>Tasks (Section 7) are persisted in the <code>mesh_tasks</code> KV bucket keyed by <code>task_id</code>; this KV entry is the authoritative source of truth for task state and is updated on every state transition. Task status and artifact updates are published to <code>mesh.task.{task_id}.update</code> subjects, which the Task Manager consumes; the <code>MESH_TASKS</code> stream captures these for delivery guarantees, while the KV bucket remains canonical for lookups.</p>
+<h3 id="18-5-required-object-store-buckets">18.5. Required Object Store Buckets<a class="hl" href="#18-5-required-object-store-buckets">#</a></h3>
+<table>
+<thead>
+<tr>
+<th>Bucket Name</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>mesh_artifacts</code></td>
+<td>Binary artifact storage (files, images, large payloads)</td>
+</tr>
+</tbody></table>
+<h3 id="18-6-consumer-configuration">18.6. Consumer Configuration<a class="hl" href="#18-6-consumer-configuration">#</a></h3>
+<p><strong>Task Update Consumer (per requester):</strong></p>
+<pre><code>Stream: MESH_TASKS
+Filter: mesh.task.{task_id}.update
+Deliver Policy: All
+Ack Policy: Explicit
+Ack Wait: 30s
+Max Deliver: 3
+Durable: mesh_task_{task_id}_{requester_id}
+</code></pre>
+<p><strong>Event Consumer (per subscriber):</strong></p>
+<pre><code>Stream: MESH_EVENTS
+Filter: mesh.event.{subscribed_pattern}
+Deliver Policy: New (or All for replay)
+Ack Policy: Explicit
+Ack Wait: 30s
+Max Deliver: 5
+Durable: mesh_event_{agent_id}_{subscription_hash}
+</code></pre>
+<h3 id="18-7-request-reply-mapping">18.7. Request-Reply Mapping<a class="hl" href="#18-7-request-reply-mapping">#</a></h3>
+<p>Synchronous <code>request</code>/<code>respond</code> uses NATS core request-reply:</p>
+<ol>
+<li>Requester publishes to <code>mesh.agent.{agent_id}.inbox</code> with a NATS reply subject (<code>_INBOX.{uuid}</code>).</li>
+<li>Responder publishes the response to the reply subject.</li>
+<li>NATS delivers the response to the requester.</li>
+<li>Default timeout: 30 seconds (configurable per request via <code>config.timeout_ms</code>).</li>
+</ol>
+<p>For long-running requests, the responder publishes an immediate acknowledgment response (Task in <code>submitted</code> state) to the reply subject, then delivers subsequent updates via JetStream on <code>mesh.task.{task_id}.update</code>.</p>
+<h3 id="18-8-exactly-once-delivery">18.8. Exactly-Once Delivery<a class="hl" href="#18-8-exactly-once-delivery">#</a></h3>
+<p>For critical operations (task state transitions, artifact delivery):</p>
+<ul>
+<li>Publishers MUST set the <code>Nats-Msg-Id</code> header to the envelope <code>id</code> for JetStream deduplication.</li>
+<li>Consumers MUST use explicit ack policy and track processed message IDs.</li>
+<li>The deduplication window SHOULD be set to at least 2 minutes.</li>
+</ul>
+<h3 id="18-9-message-size">18.9. Message Size<a class="hl" href="#18-9-message-size">#</a></h3>
+<ul>
+<li>NATS default max message size: 1 MB.</li>
+<li>For payloads exceeding the message size limit, agents MUST use NATS Object Store and include a <code>ref</code> part in the artifact.</li>
+<li>The platform SHOULD configure max message size based on deployment requirements.</li>
+</ul>
+<hr>
+<h2 id="19-metering-and-cost-economics-extension-not-core-in-0-2">19. Metering and Cost  <em>(Economics extension — not core in 0.2)</em><a class="hl" href="#19-metering-and-cost-economics-extension-not-core-in-0-2">#</a></h2>
+<blockquote>
+<p><strong>Moved out of core.</strong> In 0.2, economics — the manifest <code>cost</code> block, discovery <code>max_cost</code>, the <code>negotiate</code> operation (§10.4), the <code>COST_LIMIT_EXCEEDED</code> error, and everything below — is the <strong>Economics extension</strong> (<code>mesh://extensions/economics/v1</code>, registered in §17.5), not part of the core protocol. Nothing is buying anything on the mesh yet; keeping economics out of core keeps the core focused on connectivity, identity, and delivery. The material is retained here as the extension&#39;s normative content and will move to a standalone extension document.</p>
+</blockquote>
+<h3 id="19-1-cost-model">19.1. Cost Model<a class="hl" href="#19-1-cost-model">#</a></h3>
+<p>Agents declare their cost structure in the manifest. The platform provides metering infrastructure, but billing is application-defined.</p>
+<h3 id="19-2-metering-events">19.2. Metering Events<a class="hl" href="#19-2-metering-events">#</a></h3>
+<p>The platform SHOULD emit metering events for every completed task:</p>
+<p><strong>Subject:</strong> <code>mesh.event.metering.task_completed</code></p>
+<pre><code class="language-json">{
+  &quot;task_id&quot;: &quot;&lt;uuid&gt;&quot;,
+  &quot;requester&quot;: &quot;&lt;nkey&gt;&quot;,
+  &quot;responder&quot;: &quot;&lt;nkey&gt;&quot;,
+  &quot;skill&quot;: &quot;&lt;skill-id&gt;&quot;,
+  &quot;started_at&quot;: &quot;&lt;ISO-8601&gt;&quot;,
+  &quot;completed_at&quot;: &quot;&lt;ISO-8601&gt;&quot;,
+  &quot;duration_ms&quot;: 1234,
+  &quot;tokens_in&quot;: 500,
+  &quot;tokens_out&quot;: 1200,
+  &quot;cost&quot;: { &quot;amount&quot;: 0.017, &quot;currency&quot;: &quot;credits&quot; },
+  &quot;status&quot;: &quot;completed&quot;
+}
+</code></pre>
+<h3 id="19-3-budget-enforcement">19.3. Budget Enforcement<a class="hl" href="#19-3-budget-enforcement">#</a></h3>
+<p>Agents MAY implement budget enforcement:</p>
+<ul>
+<li>The requester can include <code>meta.budget</code> in the request envelope.</li>
+<li>The responder SHOULD check the budget before beginning work and respond with <code>COST_LIMIT_EXCEEDED</code> if the estimated cost exceeds the budget.</li>
+<li>The <code>negotiate</code> composed operation provides a mechanism for pre-work cost agreement.</li>
+</ul>
+<hr>
+<h2 id="20-versioning">20. Versioning<a class="hl" href="#20-versioning">#</a></h2>
+<h3 id="20-1-protocol-versioning">20.1. Protocol Versioning<a class="hl" href="#20-1-protocol-versioning">#</a></h3>
+<p>The protocol version follows <a href="https://semver.org/">Semantic Versioning</a>:</p>
+<ul>
+<li><strong>Major:</strong> Breaking changes to primitives, envelope format, or security model.</li>
+<li><strong>Minor:</strong> New composed operations, new optional envelope fields, new error codes.</li>
+<li><strong>Patch:</strong> Clarifications, typo fixes, non-normative changes.</li>
+</ul>
+<h3 id="20-2-version-negotiation">20.2. Version Negotiation<a class="hl" href="#20-2-version-negotiation">#</a></h3>
+<ul>
+<li>Every envelope includes a <code>v</code> field with the protocol version.</li>
+<li>Receivers MUST check the <code>v</code> field and reject messages with unsupported major versions using <code>INVALID_VERSION</code>.</li>
+<li>Receivers SHOULD accept messages with the same major version and a higher minor version, ignoring unknown fields.</li>
+<li>The manifest includes <code>protocol_version</code> so that discovery can filter by protocol compatibility.</li>
+</ul>
+<h3 id="20-3-skill-versioning">20.3. Skill Versioning<a class="hl" href="#20-3-skill-versioning">#</a></h3>
+<p>Skills are versioned independently of the protocol:</p>
+<ul>
+<li>Skill IDs SHOULD include a version suffix when breaking changes occur (e.g., <code>web-scrape-v2</code>).</li>
+<li>The manifest <code>version</code> field tracks the agent&#39;s overall version.</li>
+<li>The <code>negotiate</code> composed operation can be used for skill version negotiation.</li>
+</ul>
+<hr>
+<h2 id="21-federation-planned">21. Federation (Planned)<a class="hl" href="#21-federation-planned">#</a></h2>
+<p>This spec defines a single mesh <strong>instance</strong>: one operator, one transport, one
+registry. Many independent instances are expected (public, corporate, personal),
+and connecting them — so an agent on one instance can discover and reach an
+agent on another — is <strong>federation</strong>. Federation will be specified separately
+(a future <code>SPEC-FEDERATION.md</code> or an extension per §17) once a second
+production instance exists to validate the design. Its expected scope:</p>
+<ul>
+<li><strong>Operator-to-operator trust:</strong> verifying a peer instance&#39;s operator root key
+via its DNS domain anchor (§4.1), in the manner of DKIM.</li>
+<li><strong>Peering:</strong> how two instances connect (the NATS transport already provides
+gateway/leaf-node topologies; account import/export governs which subjects
+cross the boundary).</li>
+<li><strong>Cross-instance discovery:</strong> strictly opt-in visibility; nothing is
+discoverable across a boundary unless its operator exports it. Personal and
+private agents remain non-discoverable by default.</li>
+<li><strong>Cross-operator metering/settlement:</strong> economics between instances, layered
+on the Economics extension (§19).</li>
+</ul>
+<p>Nothing in this spec may be implemented in a way that precludes the above; in
+particular, operator identity is plural (§4.1) and envelopes remain valid and
+verifiable independent of which connection or instance carried them (§4.5).</p>
+<hr>
+<h2 id="appendix-a-example-complete-request-respond-flow">Appendix A: Example — Complete Request-Respond Flow<a class="hl" href="#appendix-a-example-complete-request-respond-flow">#</a></h2>
+<pre><code>Agent A (requester)                     Agent B (responder)
+       |                                        |
+       |  1. discover(&quot;web-scrape&quot;)             |
+       |------&gt; mesh.registry.discover          |
+       |&lt;------ [manifest of Agent B]           |
+       |                                        |
+       |  2. request(skill: &quot;web-scrape&quot;)       |
+       |------&gt; mesh.agent.{B}.inbox            |
+       |        reply: _INBOX.abc123            |
+       |                                        |
+       |  3. respond(status: submitted)         |
+       |&lt;------ _INBOX.abc123                   |
+       |        task_id: task-789               |
+       |                                        |
+       |  4. [subscribe to task updates]        |
+       |------&gt; consumer on mesh.task.task-789  |
+       |                                        |
+       |  5. respond(status: working)           |
+       |&lt;------ mesh.task.task-789.update       |
+       |                                        |
+       |  6. respond(status: completed,         |
+       |             artifacts: [...])          |
+       |&lt;------ mesh.task.task-789.update       |
+       |                                        |
+</code></pre>
+<h2 id="appendix-b-example-event-driven-collaboration">Appendix B: Example — Event-Driven Collaboration<a class="hl" href="#appendix-b-example-event-driven-collaboration">#</a></h2>
+<pre><code>Agent A (scraper)       Bus                Agent B (analyzer)    Agent C (reporter)
+       |                 |                        |                      |
+       |  1. emit        |                        |                      |
+       |  profile_found  |                        |                      |
+       |----------------&gt;|  mesh.event.scraping   |                      |
+       |                 |  .profile_found        |                      |
+       |                 |-----------------------&gt;|  2. onEvent          |
+       |                 |                        |     (analyze)        |
+       |                 |                        |                      |
+       |                 |  3. emit               |                      |
+       |                 |  analysis_complete     |                      |
+       |                 |&lt;-----------------------|                      |
+       |                 |  mesh.event.analysis   |                      |
+       |                 |  .complete             |                      |
+       |                 |-----------------------------------------------&gt;|
+       |                 |                        |  4. onEvent          |
+       |                 |                        |     (generate report)|
+</code></pre>
+<h2 id="appendix-c-example-streaming-llm-output">Appendix C: Example — Streaming LLM Output<a class="hl" href="#appendix-c-example-streaming-llm-output">#</a></h2>
+<pre><code>Agent A (requester)                     Agent B (LLM agent)
+       |                                        |
+       |  request(stream: true)                 |
+       |------&gt; mesh.agent.{B}.inbox            |
+       |                                        |
+       |  respond(status: working, task_id)     |
+       |&lt;------ _INBOX (reply subject)          |
+       |                                        |
+       |  [subscribe: mesh.task.{id}.stream]    |
+       |                                        |
+       |  chunk 0: &quot;The &quot;                       |
+       |&lt;------ mesh.task.{id}.stream           |
+       |  chunk 1: &quot;quick &quot;                     |
+       |&lt;------ mesh.task.{id}.stream           |
+       |  chunk 2: &quot;brown fox&quot;                  |
+       |&lt;------ mesh.task.{id}.stream           |
+       |  chunk 3 (final: true)                 |
+       |&lt;------ mesh.task.{id}.stream           |
+       |                                        |
+       |  task update: completed                |
+       |&lt;------ mesh.task.{id}.update           |
+</code></pre>
+<hr>
+<p><em>End of specification.</em></p>
+
+      </div>
+      <footer>
+        <div class="wrap">
+          <span>AgentMesh · open protocol for agent-to-agent communication</span>
+          <a href="https://github.com/jeffrschneider/AgentMesh">GitHub ↗</a>
+        </div>
+      </footer>
+    </main>
+  </div>
+</body>
+</html>

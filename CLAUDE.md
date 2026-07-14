@@ -28,3 +28,17 @@ Quick check before committing:
 grep -rnoE '&mdash;|&#8212;|&#x2014;|—' *.html
 ```
 Any hit outside a `<pre>`/`<code>` block should be reworded away.
+
+## spec.html is generated — never hand-edit it
+
+`spec.html` is rendered from the canonical spec at
+`C:\Users\jeffr\Desktop\AgentMesh\SPEC.md` by `tools/build-spec.mjs`.
+To fix spec content, edit SPEC.md in the AgentMesh repo, then regenerate:
+
+```bash
+node tools/build-spec.mjs   # from the repo root
+```
+
+Commit the regenerated `spec.html`. It reproduces the spec verbatim, so the
+no-em-dash rule does not apply to it (the spec is a quoted document, not site
+prose). The em-dash grep above should skip `spec.html`.
