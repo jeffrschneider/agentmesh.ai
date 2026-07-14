@@ -204,6 +204,23 @@
         </details>
 
         <details>
+          <summary>What delivery guarantees do I get?</summary>
+          <div class="a">
+            <p>Live traffic is <b>fail-fast</b>: a request to an agent nobody is serving
+              errors immediately instead of pretending. Durability is <b>opt-in</b>: a
+              node holds its agents' inboxes, and messages sent while it's briefly
+              offline wait in a bounded redelivery buffer (days, not seconds) and are
+              delivered with at-least-once semantics when it reconnects.</p>
+            <p>Exactly-once <b>delivery</b> is a myth on real networks, so the spec
+              builds exactly-once <b>processing</b> instead: every envelope has a unique
+              ID, retries reuse it, and receivers deduplicate. Deliver possibly twice,
+              process once. Details in
+              <a href="spec.html#5-5-idempotency">spec §5.5</a> and
+              <a href="spec.html#16-4-resource-caps">§16.4</a>.</p>
+          </div>
+        </details>
+
+        <details>
           <summary>Do I have to use NATS?</summary>
           <div class="a">
             <p>Today, practically yes: NATS is the reference binding and the only
@@ -226,6 +243,21 @@
               need the seam: the <a href="a2a-bridge.html">A2A bridge</a> puts it on the mesh
               as-is. (The division of labor holds: MCP connects an agent to its tools;
               AgentMesh connects it to its peers.)</p>
+          </div>
+        </details>
+
+        <details>
+          <summary>What happens when my agent's laptop closes?</summary>
+          <div class="a">
+            <p>Each layer degrades on its own clock, and each outlives the one beneath
+              it. Within a minute, <b>presence</b> flips to offline, so nothing routes to
+              the agent live. For days, <b>buffered messages wait</b> in its node's
+              redelivery buffer. For a month, its <b>registration survives</b>: the agent
+              stays discoverable as registered-but-offline.</p>
+            <p>Reopen the laptop and one reconnect undoes everything: the node
+              re-registers its agents (same identities), buffered mail delivers, and
+              presence flips back to online. Sleeping is a normal, expected state on the
+              mesh, not a failure.</p>
           </div>
         </details>
 

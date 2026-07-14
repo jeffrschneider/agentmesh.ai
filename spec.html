@@ -147,7 +147,7 @@
           <span>status <b>Working Draft</b></span>
           <span>date <b>2026-07-13</b></span>
         </div>
-        <p class="canon">Rendered 2026-07-14 from commit <a href="https://github.com/jeffrschneider/AgentMesh/commit/8c3703a">8c3703a</a>.
+        <p class="canon">Rendered 2026-07-14 from commit <a href="https://github.com/jeffrschneider/AgentMesh/commit/0ef6c51">0ef6c51</a>.
           The canonical source is
           <a href="https://github.com/jeffrschneider/AgentMesh/blob/main/SPEC.md">SPEC.md on GitHub</a>.</p>
         <div class="toc">
@@ -1307,7 +1307,12 @@ profiles, sandbox enforcement), and a public reference deployment.</p>
 <td>Subscribe to manifest changes (additions, updates, deletions).</td>
 </tr>
 </tbody></table>
-<p>On <code>register</code>, the registry MUST verify the node vouch (Section 4.4) before storing the manifest. <strong>The registry never removes a manifest due to missed heartbeats</strong> — a manifest persists until explicitly deregistered. Liveness lives in the presence service (Section 9.6), not here.</p>
+<p>On <code>register</code>, the registry MUST verify the node vouch (Section 4.4) before storing the manifest. <strong>The registry never removes a manifest due to missed heartbeats</strong> — transient staleness is presence&#39;s concern (Section 9.6), not the registry&#39;s. A manifest persists until explicitly deregistered, with two housekeeping exceptions:</p>
+<ul>
+<li><strong>Retention policy.</strong> A registry MAY reclaim manifests whose hosting node has been continuously offline for a period orders of magnitude beyond heartbeat staleness. Retention SHOULD respect the node&#39;s declared <code>availability_class</code> (Section 9.7) — silence is damning for a node that claims to be always on, and meaningless for one that declared itself intermittent. RECOMMENDED defaults: <strong>24 hours</strong> for <code>always_on</code> nodes, the <strong>node-vouch expiry</strong> (below) for <code>intermittent</code>, <code>on_demand</code>, and undeclared nodes, and <strong>1 hour</strong> for sandbox registrations. These defaults deliberately nest with the delivery layers: presence goes stale in seconds (§9.6), buffered delivery waits days (the node-held inbox redelivery buffer, §16.4), registration survives weeks — each layer outlives the one beneath it, so an agent whose mail is still waiting is always still discoverable.</li>
+<li><strong>Vouch expiry.</strong> A registry MAY reclaim any manifest whose node attestation (Section 4.4) has expired, regardless of liveness: the signed claim backing the registration has lapsed, and re-registration with a fresh vouch is the legitimate path back.</li>
+</ul>
+<p>Reclamation is equivalent to deregistration and MUST be observable the same way (Section 9.2 Watch, deregistration events). This keeps the registry convergent when agents exit without deregistering, while guaranteeing that no brief outage — or long sleep by a self-declared intermittent node — ever costs an agent its registration.</p>
 <h3 id="9-3-discovery-query-language">9.3. Discovery Query Language<a class="hl" href="#9-3-discovery-query-language">#</a></h3>
 <p>Discovery queries support the following filter fields, combined with AND semantics. Manifest filters are served from the registry; the <code>availability</code> filter is joined from the presence service (Section 9.6), and node-profile filters are joined from the node profile (Section 9.7), at query time.</p>
 <table>
@@ -2473,6 +2478,7 @@ Durable: mesh_event_{agent_id}_{subscription_hash}
 <li>Default timeout: 30 seconds (configurable per request via <code>config.timeout_ms</code>).</li>
 </ol>
 <p>For long-running requests, the responder publishes an immediate acknowledgment response (Task in <code>submitted</code> state) to the reply subject, then delivers subsequent updates via JetStream on <code>mesh.task.{task_id}.update</code>.</p>
+<p><em>Informative:</em> core NATS answers a request on a subject with no subscribers with an immediate <strong>no-responders</strong> error rather than a timeout. In this binding that signal doubles as a definitive agent-liveness probe: an agent&#39;s inbox has a subscriber exactly while the agent is connected and serving, so a registry implementing the retention policy (§9.2) can distinguish a dead agent on a live node (no responders) from a slow one (any reply, including an error, proves liveness). This is a binding technique, not core protocol — other bindings supply their own liveness signal or rely on node-level presence alone.</p>
 <h3 id="18-8-exactly-once-delivery">18.8. Exactly-Once Delivery<a class="hl" href="#18-8-exactly-once-delivery">#</a></h3>
 <p>For critical operations (task state transitions, artifact delivery):</p>
 <ul>
