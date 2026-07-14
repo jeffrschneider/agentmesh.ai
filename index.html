@@ -48,6 +48,9 @@
       display:flex; align-items:center; gap:9px; color:var(--paper); text-decoration:none; margin-bottom:30px; }
     .brand .dot{ width:9px; height:9px; border-radius:2px; background:var(--signal);
       box-shadow:0 0 0 3px rgba(242,169,59,.15), 8px 0 0 -2px var(--verify), 16px 0 0 -2px var(--address); }
+    .rail .grp{ font-family:var(--wire); font-size:.64rem; letter-spacing:.18em; text-transform:uppercase;
+      color:var(--faint); margin:16px 0 4px; }
+    .rail .grp:first-child{ margin-top:0; }
     .rail nav a{ display:block; font-family:var(--wire); font-size:.8rem; color:var(--dim);
       text-decoration:none; padding:6px 0; border-left:2px solid transparent; padding-left:12px; margin-left:-12px; }
     .rail nav a:hover{ color:var(--paper); }
@@ -225,7 +228,7 @@
         <a href="running-a-mesh.html">/ running-a-mesh</a>
         <a href="world-wide-mesh.html">/ world-wide-mesh</a>
         <a href="run-a-test-node.html">/ run-a-test-node</a>
-        <a href="sample-cases.html">/ sample-cases</a>
+        <a href="use-cases.html">/ sample-cases</a>
         <a href="getting-started.html">/ getting-started</a>
         <a href="examples.html">/ examples</a>
         <a href="sdks.html">/ sdks</a>
@@ -391,7 +394,7 @@
       </section>
 
       <!-- FAQ -->
-      <section class="band">
+      <section class="band" id="faq">
         <div class="wrap">
           <p class="kicker">questions</p>
           <h2>FAQ</h2>
@@ -443,6 +446,41 @@
                   names the mechanics:</b> live, signed, two-way connections instead of
                   hyperlinks.</p>
                 <p>In one line: you browse a web; you're woven into a mesh.</p>
+              </div>
+            </details>
+            <details>
+              <summary>How is this different from A2A?</summary>
+              <div class="a">
+                <p>A2A defines the <b>direct-call surface</b> between two agents: the method
+                  vocabulary for sending a message, tracking a task, and describing an agent
+                  (the Agent Card). It deliberately does not define how agents find a live
+                  connection to each other, who is present, or how events fan out. AgentMesh
+                  claims exactly that complementary slice: the always-on signed mesh that
+                  reaches agents behind firewalls, live presence, and the publish/subscribe
+                  event bus.</p>
+                <p>And the two are aligned on purpose, not competing: AgentMesh's task model
+                  uses A2A's states, its manifests map to A2A Agent Cards, and its wire form is
+                  designed so a gateway between the two is a renaming rather than a
+                  translation. The spec states precisely what it leverages from A2A, what it
+                  cedes to it, and what it owns.</p>
+                <p>The short version from the spec: <b>ARD finds, A2A talks, AgentMesh
+                  connects.</b></p>
+              </div>
+            </details>
+            <details>
+              <summary>Do I have to use NATS?</summary>
+              <div class="a">
+                <p>Today, practically yes; by design, no. The spec separates the <b>abstract
+                  protocol</b> (envelopes, primitives, tasks, identity) from the <b>binding</b>
+                  that realizes it on infrastructure. NATS JetStream is the reference binding:
+                  when these pages say "mesh server," the running implementation is a NATS
+                  server, and it is currently the only binding.</p>
+                <p>But nothing above the binding layer knows that. The spec defines the exact
+                  requirements any alternative binding must meet (ordered delivery,
+                  deduplication, request-reply, a durable task store, the credential chain,
+                  presence), and the core is written against those requirements rather than
+                  against NATS. If a second binding ever matters, the protocol doesn't
+                  change.</p>
               </div>
             </details>
           </div>

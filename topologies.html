@@ -47,6 +47,9 @@
       display:flex; align-items:center; gap:9px; color:var(--paper); text-decoration:none; margin-bottom:30px; }
     .brand .dot{ width:9px; height:9px; border-radius:2px; background:var(--signal);
       box-shadow:0 0 0 3px rgba(242,169,59,.15), 8px 0 0 -2px var(--verify), 16px 0 0 -2px var(--address); }
+    .rail .grp{ font-family:var(--wire); font-size:.64rem; letter-spacing:.18em; text-transform:uppercase;
+      color:var(--faint); margin:16px 0 4px; }
+    .rail .grp:first-child{ margin-top:0; }
     .rail nav a{ display:block; font-family:var(--wire); font-size:.8rem; color:var(--dim);
       text-decoration:none; padding:6px 0; border-left:2px solid transparent; padding-left:12px; margin-left:-12px; }
     .rail nav a:hover{ color:var(--paper); }
@@ -115,18 +118,23 @@
     <aside class="rail">
       <a class="brand" href="index.html"><span class="dot"></span>AGENTMESH</a>
       <nav>
+        <div class="grp">learn</div>
         <a href="index.html">/ overview</a>
         <a href="how-it-works.html">/ how-it-works</a>
         <a href="architecture.html">/ architecture</a>
-        <a class="on" href="topologies.html">/ topologies</a>
-        <a href="running-a-mesh.html">/ running-a-mesh</a>
+        <a href="topologies.html">/ topologies</a>
         <a href="world-wide-mesh.html">/ world-wide-mesh</a>
-        <a href="run-a-test-node.html">/ run-a-test-node</a>
-        <a href="sample-cases.html">/ sample-cases</a>
+        <div class="grp">build</div>
         <a href="getting-started.html">/ getting-started</a>
+        <a href="use-cases.html">/ use-cases</a>
         <a href="examples.html">/ examples</a>
         <a href="sdks.html">/ sdks</a>
+        <div class="grp">operate</div>
+        <a href="running-a-mesh.html">/ running-a-mesh</a>
+        <a href="run-a-test-node.html">/ run-a-test-node</a>
+        <div class="grp">reference</div>
         <a href="reference.html">/ reference</a>
+        <a href="index.html#faq">/ faq</a>
         <a href="claude-code.html">/ claude-code</a>
       </nav>
       <div class="foot">v0.2 · signed a2a protocol<br>github.com/jeffrschneider/AgentMesh</div>
