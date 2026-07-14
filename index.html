@@ -186,20 +186,6 @@
     .docs a h3{ font-size:1.02rem; margin:8px 0 6px; }
     .docs a p{ margin:0; font-size:.88rem; color:var(--dim); }
 
-    /* ── FAQ ── */
-    .faq{ margin-top:26px; }
-    .faq details{ border:1px solid var(--line); border-radius:12px; background:var(--panel);
-      margin-bottom:12px; overflow:hidden; }
-    .faq summary{ cursor:pointer; padding:16px 18px; font-family:var(--disp); font-weight:600;
-      font-size:1.02rem; color:var(--paper); list-style:none; display:flex; gap:12px; align-items:baseline; }
-    .faq summary::-webkit-details-marker{ display:none; }
-    .faq summary::before{ content:"+"; font-family:var(--wire); color:var(--signal); flex:0 0 auto; }
-    .faq details[open] summary::before{ content:"–"; }
-    .faq details[open] summary{ border-bottom:1px solid var(--line); }
-    .faq .a{ padding:16px 18px 6px; color:var(--dim); font-size:.95rem; }
-    .faq .a p{ margin:0 0 14px; max-width:70ch; }
-    .faq .a b{ color:var(--paper); font-weight:600; }
-
     footer{ padding:34px 0 60px; }
     footer .wrap{ font-family:var(--wire); font-size:.78rem; color:var(--faint); display:flex; gap:14px; }
     footer a{ color:var(--dim); text-decoration:none; }
@@ -389,100 +375,6 @@
             <div class="node"><div class="r">node</div><div class="id">node.7f2c…</div><div class="vouch">↓ vouches for agents</div></div>
             <div class="arrow">──▶</div>
             <div class="node"><div class="r">agent</div><div class="id">agent.k3f9…</div><div class="vouch">✓ signs its envelopes</div></div>
-          </div>
-        </div>
-      </section>
-
-      <!-- FAQ -->
-      <section class="band" id="faq">
-        <div class="wrap">
-          <p class="kicker">questions</p>
-          <h2>FAQ</h2>
-          <div class="faq">
-            <details open>
-              <summary>The stack says one spec per job. Why does AgentMesh get four?</summary>
-              <div class="a">
-                <p>Because the adjacent specs each standardize an <b>artifact</b>, and AgentMesh
-                  standardizes a <b>channel</b>. ARD's unit is a catalog entry, A2A's is a method
-                  call, ANS's is a certificate: each is a thing that can be defined on its own, so
-                  a separate spec is natural. AgentMesh's unit is a live connection: one
-                  authenticated, long-lived link a node holds to the mesh.</p>
-                <p>Reach, trust, presence, and events are not four features that happen to share a
-                  spec. They are four properties of that one channel. <b>Reach</b> is the channel
-                  existing. <b>Trust</b> is what it carries being attributable, and the vouch is
-                  issued by the channel's owner: the node that holds the connection signs for the
-                  agents it hosts. <b>Presence</b> is whether the channel is alive right now;
-                  without owning the connection, presence degenerates into polling a directory.
-                  <b>Events</b> are the channel's delivery semantics: the same subjects and the
-                  same signed envelopes, one to many. Pull any one out and its spec would have to
-                  re-specify the channel to say anything.</p>
-                <p>The web made the same call. It split where the interface between jobs was thin
-                  (DNS stayed separate from TCP because a name resolving to an address is a small
-                  handoff) and bundled where the jobs were properties of one thing: TLS carries
-                  confidentiality, integrity, authentication, and session in a single spec because
-                  all four secure the same channel.</p>
-                <p>And the bundling is disciplined, not a kitchen sink: everything that was not
-                  channel-coupled has been moved out of the core. Economics is an extension,
-                  sessions are parked, payload encryption is a planned extension, federation is a
-                  future spec, and the transport itself is a swappable binding. What remains is
-                  what resisted separation.</p>
-                <p>In one line: the adjacent specs define artifacts; AgentMesh defines a channel,
-                  and you can't hold one property of a channel without holding the others.</p>
-              </div>
-            </details>
-            <details>
-              <summary>The headline says "the web, for AI agents." So why is it called a mesh?</summary>
-              <div class="a">
-                <p>Because the two words do different jobs. <b>A web is made of references:</b>
-                  pages point at each other, and a reader pulls one document at a time from a
-                  server. A link is an address, not a channel: it doesn't deliver anything, and
-                  nothing on the web knows you're there.</p>
-                <p><b>A mesh is made of connections:</b> every participant holds a live channel
-                  into one shared fabric, so anyone can reach anyone, in either direction, at
-                  any moment. A mesh knows who's present, can push as well as pull, and has no
-                  divide between servers and visitors: every agent can call and be called.</p>
-                <p>So the headline is deliberate about both halves. <b>"The web" names the
-                  ambition:</b> one open fabric, anyone can join, nobody owns it. <b>"Mesh"
-                  names the mechanics:</b> live, signed, two-way connections instead of
-                  hyperlinks.</p>
-                <p>In one line: you browse a web; you're woven into a mesh.</p>
-              </div>
-            </details>
-            <details>
-              <summary>How is this different from A2A?</summary>
-              <div class="a">
-                <p>A2A defines the <b>direct-call surface</b> between two agents: the method
-                  vocabulary for sending a message, tracking a task, and describing an agent
-                  (the Agent Card). It deliberately does not define how agents find a live
-                  connection to each other, who is present, or how events fan out. AgentMesh
-                  claims exactly that complementary slice: the always-on signed mesh that
-                  reaches agents behind firewalls, live presence, and the publish/subscribe
-                  event bus.</p>
-                <p>And the two are aligned on purpose, not competing: AgentMesh's task model
-                  uses A2A's states, its manifests map to A2A Agent Cards, and its wire form is
-                  designed so a gateway between the two is a renaming rather than a
-                  translation. The spec states precisely what it leverages from A2A, what it
-                  cedes to it, and what it owns.</p>
-                <p>The short version from the spec: <b>ARD finds, A2A talks, AgentMesh
-                  connects.</b></p>
-              </div>
-            </details>
-            <details>
-              <summary>Do I have to use NATS?</summary>
-              <div class="a">
-                <p>Today, practically yes; by design, no. The spec separates the <b>abstract
-                  protocol</b> (envelopes, primitives, tasks, identity) from the <b>binding</b>
-                  that realizes it on infrastructure. NATS JetStream is the reference binding:
-                  when these pages say "mesh server," the running implementation is a NATS
-                  server, and it is currently the only binding.</p>
-                <p>But nothing above the binding layer knows that. The spec defines the exact
-                  requirements any alternative binding must meet (ordered delivery,
-                  deduplication, request-reply, a durable task store, the credential chain,
-                  presence), and the core is written against those requirements rather than
-                  against NATS. If a second binding ever matters, the protocol doesn't
-                  change.</p>
-              </div>
-            </details>
           </div>
         </div>
       </section>
