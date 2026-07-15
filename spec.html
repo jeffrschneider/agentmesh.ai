@@ -1198,6 +1198,21 @@ profiles, sandbox enforcement), and a public reference deployment.</p>
 <td>Organization or individual who operates this agent.</td>
 </tr>
 <tr>
+<td><code>owner</code></td>
+<td>OPTIONAL</td>
+<td>Owner key grouping this agent with others under one identity (§8.6). Defaults to the hosting node&#39;s key; always populated by the registry once stored.</td>
+</tr>
+<tr>
+<td><code>owner_attestation</code></td>
+<td>CONDITIONAL</td>
+<td>Owner-signed attestation binding the agent to <code>owner</code>. REQUIRED when <code>owner</code> differs from the hosting node&#39;s key (§8.6).</td>
+</tr>
+<tr>
+<td><code>visibility</code></td>
+<td>OPTIONAL</td>
+<td>Discovery listing tier: <code>public</code> (default), <code>unlisted</code>, or <code>private</code> (§8.6).</td>
+</tr>
+<tr>
 <td><code>accepts</code></td>
 <td>OPTIONAL</td>
 <td>Event subjects this agent subscribes to.</td>
@@ -1264,6 +1279,36 @@ profiles, sandbox enforcement), and a public reference deployment.</p>
 <li><code>streaming</code>: Whether this skill supports streaming responses.</li>
 <li><code>estimated_duration_ms</code>: Hint for timeout configuration.</li>
 </ul>
+<h3 id="8-6-ownership-and-visibility">8.6. Ownership &amp; Visibility<a class="hl" href="#8-6-ownership-and-visibility">#</a></h3>
+<p>Agents are individually addressed and <strong>never interchangeable</strong> — but they are
+frequently <em>related</em>: one person&#39;s laptop and desktop each host their own
+agents; one operator runs a fleet. The <code>owner</code> field groups agents under one
+identity without merging them.</p>
+<ul>
+<li><strong>Default ownership.</strong> With no explicit owner, an agent&#39;s owner is its
+hosting node&#39;s key. The registry always populates <code>owner</code> on the stored
+manifest.</li>
+<li><strong>Explicit ownership.</strong> An agent MAY register under a separate owner key
+(e.g. a person&#39;s identity key that spans their devices). The registration
+MUST then carry <code>owner_attestation</code>: a signed statement by the owner key
+binding the agent&#39;s ID, with expiry — the same shape as node vouching
+(§4.4). The registry MUST verify it before storing.</li>
+<li><strong>The roster.</strong> Owner-filtered discovery (§9.3 <code>owner</code>) returns everything
+grouped under a key: a person&#39;s or org&#39;s agents, each with its own
+capabilities and live availability. Selection among them belongs to the
+<strong>caller</strong> — agents have distinct capabilities, and nothing in the core ever
+routes &quot;to an owner&quot; or substitutes one agent for another.</li>
+<li><strong>Visibility tiers.</strong> <code>public</code> (listed for everyone), <code>unlisted</code> (excluded
+from listings, reachable by agent ID), <code>private</code> (listed only for its own
+owner). The registry enforces tiers at discovery time; sandbox-attested
+registrations are clamped to at most <code>unlisted</code>. Disclosure of non-public
+rosters to <em>chosen</em> parties (contacts) is an extension concern
+(<code>mesh://extensions/contacts/v1</code>), not core.</li>
+</ul>
+<p>One identity spanning devices deliberately does NOT mean one key on many
+machines: device agents keep their own keys, and the owner key signs an
+attestation per agent. Person-level <em>naming</em> (a human handle resolving to an
+owner key) is likewise out of core — see the Contacts extension.</p>
 <hr>
 <h2 id="9-registry">9. Registry<a class="hl" href="#9-registry">#</a></h2>
 <p>The registry is a platform service that stores agent manifests and serves discovery queries.</p>
@@ -1367,6 +1412,12 @@ profiles, sandbox enforcement), and a public reference deployment.</p>
 <td>string</td>
 <td>registry</td>
 <td>Restrict to agents hosted by a specific node.</td>
+</tr>
+<tr>
+<td><code>owner</code></td>
+<td>string</td>
+<td>registry</td>
+<td>Restrict to agents grouped under a specific owner key (§8.6) — a person&#39;s or org&#39;s roster. Visibility rules still apply: non-public agents appear only to their owner (or per an extension&#39;s consent rules, e.g. Contacts).</td>
 </tr>
 <tr>
 <td><code>tenant</code></td>
@@ -2299,6 +2350,11 @@ profiles, sandbox enforcement), and a public reference deployment.</p>
 <td><code>mesh://extensions/contact/v1</code></td>
 <td><strong>Draft</strong> (see <code>extensions/EXT-3-contact.md</code>)</td>
 <td>Account contact channels (email, verified SMS) and notification preferences; API-layer, consent-gated.</td>
+</tr>
+<tr>
+<td><code>mesh://extensions/contacts/v1</code></td>
+<td><strong>Draft</strong> (see <code>extensions/EXT-4-contacts.md</code>)</td>
+<td>Private, mutual-consent contact exchange between people: handle → owner-key resolution, roster disclosure (§8.6), revocation. Explicitly NOT a public directory and NOT org modeling — public/organizational discovery is ceded to ARD (agenticresourcediscovery.org).</td>
 </tr>
 <tr>
 <td>Sessions (<code>connect</code>/<code>disconnect</code>)</td>
