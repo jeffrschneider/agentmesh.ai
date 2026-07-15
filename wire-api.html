@@ -186,6 +186,64 @@
         </div>
       </section>
 
+      <!-- mechanics -->
+      <section class="band">
+        <div class="wrap">
+          <p class="kicker">mechanics</p>
+          <h2>How a call works</h2>
+          <p>Every subject below follows the same four steps. There is no HTTP here:
+            these are NATS messages, and the envelope is the whole protocol.</p>
+          <table class="tbl">
+            <thead><tr><th>step</th><th>what happens</th></tr></thead>
+            <tbody>
+              <tr><td>1 &middot; build</td>
+                <td>Make an envelope. Set <code class="inline">type</code> to the value the
+                  subject expects (the <b>type field</b> column below), put the operation's
+                  input in <code class="inline">payload</code>, set
+                  <code class="inline">from</code> to your public key.</td></tr>
+              <tr><td>2 &middot; sign</td>
+                <td>Ed25519-sign the canonical JSON (everything except
+                  <code class="inline">sig</code>) with your seed; put the base64url
+                  signature in <code class="inline">sig</code>.</td></tr>
+              <tr><td>3 &middot; request</td>
+                <td>Publish the JSON bytes to the subject using your NATS client's
+                  <b>request</b> call (it attaches a reply inbox for you).</td></tr>
+              <tr><td>4 &middot; read the reply</td>
+                <td>The reply is a signed envelope with
+                  <code class="inline">type: "respond"</code> and
+                  <code class="inline">in_reply_to</code> pointing at your envelope's
+                  <code class="inline">id</code>. The result is in
+                  <code class="inline">payload</code>; failures put an
+                  <code class="inline">error</code> object beside it.</td></tr>
+            </tbody>
+          </table>
+          <p>Worked example, registering an agent. You send this to
+            <code class="inline">mesh.registry.register</code>:</p>
+          <pre class="code">{
+  <span class="s">"v"</span>: <span class="s">"0.2.0"</span>, <span class="s">"id"</span>: <span class="s">"0198c1..."</span>, <span class="s">"type"</span>: <span class="s">"register"</span>, <span class="s">"ts"</span>: <span class="s">"2026-07-14T..."</span>,
+  <span class="s">"from"</span>: <span class="s">"UAB4K2..."</span>,                <span class="c">// your agent's public key</span>
+  <span class="s">"trace"</span>: { <span class="s">"trace_id"</span>: <span class="s">"..."</span>, <span class="s">"span_id"</span>: <span class="s">"..."</span> },
+  <span class="s">"payload"</span>: {                         <span class="c">// the payload IS the manifest</span>
+    <span class="s">"id"</span>: <span class="s">"UAB4K2..."</span>, <span class="s">"name"</span>: <span class="s">"my-agent"</span>,
+    <span class="s">"skills"</span>: [{ <span class="s">"id"</span>: <span class="s">"chat"</span>, <span class="s">"name"</span>: <span class="s">"Chat"</span>, <span class="s">"description"</span>: <span class="s">"..."</span> }],
+    <span class="s">"node"</span>: { <span class="s">"id"</span>: <span class="s">"UBPLAH..."</span>, <span class="s">"attestation"</span>: { <span class="c">/* node vouch, spec 4.4 */</span> } }
+  },
+  <span class="s">"sig"</span>: <span class="s">"hK3n..."</span>
+}</pre>
+          <p>And the registry answers on your reply inbox:</p>
+          <pre class="code">{
+  <span class="s">"v"</span>: <span class="s">"0.2.0"</span>, <span class="s">"id"</span>: <span class="s">"0198c2..."</span>, <span class="s">"type"</span>: <span class="s">"respond"</span>,
+  <span class="s">"from"</span>: <span class="s">"UREG..."</span>,                  <span class="c">// the registry's key: verify it</span>
+  <span class="s">"in_reply_to"</span>: <span class="s">"0198c1..."</span>,         <span class="c">// your envelope's id</span>
+  <span class="s">"payload"</span>: { <span class="s">"status"</span>: <span class="s">"registered"</span>, <span class="s">"agent_id"</span>: <span class="s">"UAB4K2..."</span> },
+  <span class="s">"sig"</span>: <span class="s">"pQ7v..."</span>
+}</pre>
+          <p>Every other subject is the same dance with a different
+            <code class="inline">type</code> and <code class="inline">payload</code>. The
+            tables below give both for each subject.</p>
+        </div>
+      </section>
+
       <!-- registry subjects -->
       <section class="band">
         <div class="wrap">
@@ -193,22 +251,30 @@
           <h2>Registry</h2>
           <p>Request-reply. Send a signed envelope, get a signed respond.</p>
           <table class="tbl">
-            <thead><tr><th>subject</th><th>envelope type</th><th>what it does</th></tr></thead>
+            <thead><tr><th>subject</th><th>type field</th><th>payload in &rarr; reply payload</th></tr></thead>
             <tbody>
               <tr><td>mesh.registry.register</td><td>register</td>
-                <td>Publish a manifest. The node vouch (spec §4.4) is verified before
-                  storage; sandbox-attested nodes get clamped to unlisted visibility.</td></tr>
+                <td><b>In:</b> the manifest itself (see the worked example above).
+                  <b>Reply:</b> <code class="inline">{ status: "registered", agent_id }</code>.
+                  The node vouch (spec §4.4) is verified before storage; sandbox-attested
+                  nodes get clamped to unlisted visibility.</td></tr>
               <tr><td>mesh.registry.deregister</td><td>register</td>
-                <td>Remove a manifest. Must be signed by the agent being removed.</td></tr>
+                <td><b>In:</b> <code class="inline">{ agent_id }</code>, signed by the agent
+                  being removed. <b>Reply:</b> <code class="inline">{ status: "deregistered" }</code>.</td></tr>
               <tr><td>mesh.registry.discover</td><td>discover</td>
-                <td>Query manifests. Availability is joined live from presence at query
-                  time (spec §9.3); results are stamped with each agent's current
-                  status. Payload: <code class="inline">DiscoverQuery</code> filters.</td></tr>
+                <td><b>In:</b> filters, all optional:
+                  <code class="inline">{ capabilities?, skill_id?, tags?, node?, availability?,
+                  trust_tier?, availability_class?, reachability?, limit? }</code>.
+                  <b>Reply:</b> <code class="inline">{ agents: Manifest[], total }</code>, each
+                  manifest stamped with the agent's live availability (spec §9.3).</td></tr>
               <tr><td>mesh.registry.get.&lt;agentId&gt;</td><td>discover</td>
-                <td>One manifest by ID.</td></tr>
+                <td><b>In:</b> empty payload; the agent ID rides in the subject.
+                  <b>Reply:</b> the manifest, or a <code class="inline">NOT_FOUND</code> error.</td></tr>
               <tr><td>mesh.registry.nodes.list</td><td>discover</td>
-                <td>Node inventory: profile (trust tier, role, uptime class, device) joined
-                  with live presence and hosted-agent count. Operator-oriented.</td></tr>
+                <td><b>In:</b> empty payload. <b>Reply:</b>
+                  <code class="inline">{ nodes[], total }</code>: per node, its trust tier,
+                  role, uptime class, device fields, live status, and hosted-agent count.
+                  Operator-oriented.</td></tr>
             </tbody>
           </table>
         </div>
@@ -223,8 +289,12 @@
             <thead><tr><th>subject</th><th>pattern</th><th>what it does</th></tr></thead>
             <tbody>
               <tr><td>mesh.agent.&lt;id&gt;.inbox</td><td>request-reply</td>
-                <td>An agent's front door: send a signed request envelope, await the
-                  respond. Every live SDK agent answers, if only with
+                <td>An agent's front door. <b>In:</b> <code class="inline">type: "request"</code>,
+                  payload <code class="inline">{ skill, input, config? }</code>.
+                  <b>Reply:</b> <code class="inline">type: "respond"</code>, payload
+                  <code class="inline">{ status, output?, message? }</code> (bare), or a Task
+                  acknowledgment, or an <code class="inline">error</code> object. Every live
+                  SDK agent answers, if only with
                   <code class="inline">SKILL_NOT_FOUND</code>.</td></tr>
               <tr><td>mesh.agent.&lt;id&gt;.outbox</td><td>tap (publish)</td>
                 <td>A copy of each response the agent sends, published for observability.
