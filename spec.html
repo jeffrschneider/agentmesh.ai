@@ -133,6 +133,8 @@
         <a href="run-a-test-node.html">/ run-a-test-node</a>
         <div class="grp">reference</div>
         <a class="on" href="spec.html">/ specification</a>
+        <a href="sdk-reference.html">/ sdk-reference</a>
+        <a href="wire-api.html">/ wire-api</a>
         <a href="faq.html">/ faq</a>
         <a href="coding-agents.html">/ coding-agents</a>
       </nav>
@@ -147,7 +149,7 @@
           <span>status <b>Working Draft</b></span>
           <span>date <b>2026-07-13</b></span>
         </div>
-        <p class="canon">Rendered 2026-07-14 from commit <a href="https://github.com/jeffrschneider/AgentMesh/commit/8e15217">8e15217</a>.
+        <p class="canon">Rendered 2026-07-15.
           The canonical source is
           <a href="https://github.com/jeffrschneider/AgentMesh/blob/main/SPEC.md">SPEC.md on GitHub</a>.</p>
         <div class="toc">
@@ -2284,11 +2286,30 @@ profiles, sandbox enforcement), and a public reference deployment.</p>
 <td>End-to-end payload encryption between agents. The core secures the transport (node connection) but not payloads, so the mesh operator can currently read messages. Personal agents will need payload confidentiality; the Node/agent keypairs (§4) are the intended key substrate. <strong>Out of scope for 0.2 by decision (2026-07-09); to be specified after the 0.2 core lands. Do not lose this.</strong></td>
 </tr>
 <tr>
+<td><code>mesh://extensions/device-profile/v1</code></td>
+<td><strong>Draft</strong> (see <code>extensions/EXT-1-device-profile.md</code>)</td>
+<td>Standardized node device self-description (<code>platform</code>, <code>os_version</code>, <code>client</code>, <code>device_class</code>) as declared profile keys (§9.7).</td>
+</tr>
+<tr>
+<td><code>mesh://extensions/usage/v1</code></td>
+<td><strong>Draft</strong> (see <code>extensions/EXT-2-usage.md</code>)</td>
+<td>Durable, identity-resolved usage &amp; engagement store over the activity/heartbeat taps; operator read subjects <code>mesh.usage.*</code>. Operational layer, not core.</td>
+</tr>
+<tr>
+<td><code>mesh://extensions/contact/v1</code></td>
+<td><strong>Draft</strong> (see <code>extensions/EXT-3-contact.md</code>)</td>
+<td>Account contact channels (email, verified SMS) and notification preferences; API-layer, consent-gated.</td>
+</tr>
+<tr>
 <td>Sessions (<code>connect</code>/<code>disconnect</code>)</td>
 <td>Candidate</td>
 <td>The parked session operations (§10.1–10.2), if a durable-session extension is ever needed beyond <code>context_id</code>.</td>
 </tr>
 </tbody></table>
+<p>Extensions whose normative text lives outside this document are collected in
+the <code>extensions/</code> directory (<code>extensions/README.md</code>), which also defines the
+shared rules: optional to implement but mandatory names when implemented,
+carriage only in existing extensible slots, independent versioning.</p>
 <hr>
 <h2 id="18-bindings">18. Bindings<a class="hl" href="#18-bindings">#</a></h2>
 <p>AgentMesh separates its <strong>abstract protocol</strong> (Sections 4–17) from the concrete <strong>platform binding</strong> that realizes it. The abstract protocol names concepts — a signed operator → account → node credential chain, subject addressing, a durable task store — and a binding defines how those concepts are provided on specific infrastructure. NATS JetStream is the <strong>reference binding</strong>. Alternative bindings MAY be defined but MUST satisfy the requirements in §18.1.</p>

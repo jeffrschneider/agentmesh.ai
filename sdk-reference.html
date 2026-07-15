@@ -1,0 +1,487 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SDK Reference: AgentMesh</title>
+  <link rel="icon" type="image/svg+xml" href="favicon.svg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    /* ══════════ THE WIRE : design token system ══════════ */
+    :root{
+      --ink:#0A1417; --panel:#0F1D22; --line:#1C2E33;
+      --paper:#E7EFEC; --dim:#7C918C; --faint:#4A5D5A;
+      --signal:#F2A93B; --verify:#43D6A6; --address:#6BA8FF; --broadcast:#B69CFF;
+      --disp:'Space Grotesk', sans-serif;
+      --body:'IBM Plex Sans', system-ui, sans-serif;
+      --wire:'IBM Plex Mono', ui-monospace, monospace;
+    }
+    *{ box-sizing:border-box; }
+    html,body{ margin:0; }
+    body{ background:var(--ink); color:var(--paper); font-family:var(--body);
+      font-size:16px; line-height:1.6; -webkit-font-smoothing:antialiased;
+      background-image:
+        linear-gradient(var(--line) 1px, transparent 1px),
+        linear-gradient(90deg, var(--line) 1px, transparent 1px);
+      background-size:64px 64px, 64px 64px;
+      background-position:-1px -1px;
+    }
+    body::before{
+      content:""; position:fixed; inset:0; z-index:0; pointer-events:none;
+      background:
+        radial-gradient(80% 45% at 30% 0%, rgba(242,169,59,.10), transparent 60%),
+        radial-gradient(70% 50% at 100% 10%, rgba(67,214,166,.08), transparent 55%),
+        linear-gradient(180deg, rgba(10,20,23,.72), var(--ink) 62%);
+    }
+    a{ color:inherit; }
+
+    .layout{ position:relative; z-index:1; display:grid; grid-template-columns:248px 1fr; min-height:100vh; }
+    .rail{ border-right:1px solid var(--line); padding:26px 22px; position:sticky; top:0; align-self:start; height:100vh; }
+    .brand{ font-family:var(--wire); font-weight:600; font-size:.82rem; letter-spacing:.02em;
+      display:flex; align-items:center; gap:9px; color:var(--paper); text-decoration:none; margin-bottom:30px; }
+    .brand .dot{ width:9px; height:9px; border-radius:2px; background:var(--signal);
+      box-shadow:0 0 0 3px rgba(242,169,59,.15), 8px 0 0 -2px var(--verify), 16px 0 0 -2px var(--address); }
+    .rail .grp{ font-family:var(--wire); font-size:.64rem; letter-spacing:.18em; text-transform:uppercase;
+      color:var(--faint); margin:16px 0 4px; }
+    .rail .grp:first-child{ margin-top:0; }
+    .rail nav a{ display:block; font-family:var(--wire); font-size:.8rem; color:var(--dim);
+      text-decoration:none; padding:6px 0; border-left:2px solid transparent; padding-left:12px; margin-left:-12px; }
+    .rail nav a:hover{ color:var(--paper); }
+    .rail nav a.on{ color:var(--paper); border-left-color:var(--signal); }
+    .rail .foot{ margin-top:26px; padding-top:18px; border-top:1px solid var(--line);
+      font-family:var(--wire); font-size:.72rem; color:var(--faint); }
+
+    .main{ min-width:0; }
+    .wrap{ max-width:980px; margin:0 auto; padding:0 40px; }
+
+    .eyebrow{ font-family:var(--wire); font-size:.76rem; letter-spacing:.04em; color:var(--dim); }
+    .eyebrow .tag{ color:var(--signal); }
+    h1,h2,h3{ font-family:var(--disp); font-weight:700; letter-spacing:-.02em; line-height:1.08; }
+    .lede{ color:var(--dim); font-size:1.12rem; max-width:60ch; }
+
+    .hero{ padding:74px 0 42px; border-bottom:1px solid var(--line); }
+    .hero .eyebrow{ margin-bottom:22px; display:block; }
+    .hero h1{ font-size:clamp(2.2rem,4.6vw,3.2rem); margin:0 0 18px; }
+    .hero h1 .am{ color:var(--signal); }
+
+    section.band{ padding:56px 0; border-bottom:1px solid var(--line); }
+    section.band h2{ font-size:1.8rem; margin:0 0 14px; }
+    section.band h3{ font-size:1.15rem; margin:38px 0 10px; }
+    section.band p{ color:var(--dim); max-width:66ch; }
+    section.band p b{ color:var(--paper); font-weight:600; }
+    .kicker{ font-family:var(--wire); font-size:.74rem; letter-spacing:.12em; text-transform:uppercase;
+      color:var(--faint); margin:0 0 16px; }
+
+    table.tbl{ border-collapse:collapse; margin:22px 0 8px; width:100%; max-width:820px;
+      border:1px solid var(--line); border-radius:10px; overflow:hidden; display:block; }
+    table.tbl th{ font-family:var(--wire); font-size:.72rem; letter-spacing:.1em; text-transform:uppercase;
+      color:var(--faint); text-align:left; padding:10px 14px; background:rgba(255,255,255,.015);
+      border-bottom:1px solid var(--line); white-space:nowrap; }
+    table.tbl td{ padding:10px 14px; border-bottom:1px solid var(--line); font-size:.9rem;
+      color:var(--dim); vertical-align:top; }
+    table.tbl tr:last-child td{ border-bottom:0; }
+    table.tbl td:first-child{ color:var(--paper); font-family:var(--wire); font-size:.84rem; }
+    table.tbl td .ok{ color:var(--verify); }
+
+    .callout{ border:1px solid var(--line); border-left:3px solid var(--signal); border-radius:10px;
+      background:var(--panel); padding:14px 18px; margin:22px 0; max-width:70ch; }
+    .callout .t{ font-family:var(--wire); font-size:.74rem; letter-spacing:.1em; text-transform:uppercase;
+      color:var(--faint); margin-bottom:6px; }
+    .callout p{ margin:0; color:var(--dim); }
+    .callout p b{ color:var(--paper); }
+
+    pre.code{ background:#0b1220; border:1px solid var(--line); border-radius:12px; padding:16px 18px;
+      overflow-x:auto; font-family:var(--wire); font-size:.82rem; line-height:1.7; color:var(--paper); margin:20px 0; }
+    pre.code .c{ color:var(--faint); }
+    pre.code .s{ color:var(--verify); }
+    code.inline{ font-family:var(--wire); font-size:.86em; color:var(--verify);
+      background:rgba(67,214,166,.07); border:1px solid rgba(67,214,166,.15); border-radius:5px; padding:1px 5px; }
+
+    footer{ padding:34px 0 60px; }
+    footer .wrap{ font-family:var(--wire); font-size:.78rem; color:var(--faint); display:flex; gap:14px; }
+    footer a{ color:var(--dim); text-decoration:none; }
+
+    @media (max-width:900px){
+      .layout{ grid-template-columns:1fr; }
+      .rail{ position:static; height:auto; border-right:0; border-bottom:1px solid var(--line); }
+    }
+  </style>
+</head>
+<body>
+  <div class="layout">
+
+    <aside class="rail">
+      <a class="brand" href="index.html"><span class="dot"></span>AGENTMESH</a>
+      <nav>
+        <div class="grp">learn</div>
+        <a href="index.html">/ overview</a>
+        <a href="how-it-works.html">/ how-it-works</a>
+        <a href="architecture.html">/ architecture</a>
+        <a href="topologies.html">/ topologies</a>
+        <a href="world-wide-mesh.html">/ world-wide-mesh</a>
+        <div class="grp">build</div>
+        <a href="getting-started.html">/ getting-started</a>
+        <a href="use-cases.html">/ use-cases</a>
+        <a href="examples.html">/ examples</a>
+        <a href="sdks.html">/ sdks</a>
+        <a href="a2a-bridge.html">/ a2a-bridge</a>
+        <div class="grp">operate</div>
+        <a href="running-a-mesh.html">/ running-a-mesh</a>
+        <a href="run-a-test-node.html">/ run-a-test-node</a>
+        <div class="grp">reference</div>
+        <a href="spec.html">/ specification</a>
+        <a class="on" href="sdk-reference.html">/ sdk-reference</a>
+        <a href="wire-api.html">/ wire-api</a>
+        <a href="faq.html">/ faq</a>
+        <a href="coding-agents.html">/ coding-agents</a>
+      </nav>
+      <div class="foot">v0.2 · the signed interconnect<br>github.com/jeffrschneider/AgentMesh</div>
+    </aside>
+
+    <main class="main">
+
+      <div class="wrap hero">
+        <span class="eyebrow"><span class="tag">agentmesh</span> · sdk reference</span>
+        <h1>The SDK,<br>method by <span class="am">method</span></h1>
+        <p class="lede">The complete public surface of the TypeScript SDK
+          (<code class="inline">agentmesh</code> 0.2.0), plus the Rust parity matrix.
+          Two classes carry the whole model: <code class="inline">AgentMesh</code> is one
+          agent on the wire, <code class="inline">MeshNode</code> is one connection hosting
+          many agents. Every envelope either class sends is Ed25519-signed. For install
+          and first-run, start at <a href="sdks.html">/ sdks</a>.</p>
+      </div>
+
+      <!-- orientation -->
+      <section class="band">
+        <div class="wrap">
+          <p class="kicker">orientation</p>
+          <h2>Two classes, six primitives</h2>
+          <p>Everything below maps onto the protocol's six primitives: <b>register</b>,
+            <b>discover</b>, <b>request</b>, <b>respond</b>, <b>emit</b>,
+            <b>subscribe</b> (<a href="spec.html">spec §6</a>). The SDK adds what the wire
+            leaves to the client: connection care, envelope signing, skill routing, task
+            tracking, and stream verification. You never build or sign an envelope by hand
+            unless you want to.</p>
+        </div>
+      </section>
+
+      <!-- connect -->
+      <section class="band">
+        <div class="wrap">
+          <p class="kicker">agentmesh · connection &amp; identity</p>
+          <h2>Connect</h2>
+          <table class="tbl">
+            <thead><tr><th>member</th><th>what it does</th></tr></thead>
+            <tbody>
+              <tr><td>AgentMesh.connect(servers, opts?)</td>
+                <td>Connect standalone. The agent always holds an Ed25519 keypair (from
+                  <code class="inline">opts.nkeySeed</code>, else freshly generated); its public
+                  nkey is the agent ID and it signs every envelope it sends. Pass
+                  <code class="inline">jwt</code> + <code class="inline">nkeySeed</code> from a
+                  guest or app credential and auth is wired for you.</td></tr>
+              <tr><td>.id</td><td>The agent's ID: its public nkey.</td></tr>
+              <tr><td>.registered</td><td>True after a successful <code class="inline">register()</code>.</td></tr>
+              <tr><td>.isClosed</td><td>True once the underlying connection is gone.</td></tr>
+              <tr><td>.drain() / .close()</td>
+                <td>Lifecycle. Hosted agents (created by a node) detach without closing the
+                  shared connection; standalone agents close their own.</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- registry -->
+      <section class="band">
+        <div class="wrap">
+          <p class="kicker">agentmesh · registry</p>
+          <h2>Register &amp; discover</h2>
+          <table class="tbl">
+            <thead><tr><th>member</th><th>what it does</th></tr></thead>
+            <tbody>
+              <tr><td>register(opts)</td>
+                <td>Publish this agent's manifest and become discoverable. The hosting
+                  node's key vouches for the agent (spec §4.4). With no registry running,
+                  falls back to a peer-to-peer publish.</td></tr>
+              <tr><td>deregister()</td>
+                <td>Remove the manifest from the registry (spec §9.2). The connection
+                  stays up.</td></tr>
+              <tr><td>discover(query?)</td>
+                <td>Find agents. Filters: <code class="inline">capabilities</code>,
+                  <code class="inline">skill_id</code>, <code class="inline">tags</code>,
+                  <code class="inline">node</code>, <code class="inline">availability</code>
+                  (joined live from presence), <code class="inline">trust_tier</code>,
+                  <code class="inline">availability_class</code>,
+                  <code class="inline">reachability</code>, <code class="inline">limit</code>.
+                  Returns manifests stamped with each agent's current availability.</td></tr>
+              <tr><td>getManifest(agentId)</td>
+                <td>Fetch one agent's manifest by ID.</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- messaging -->
+      <section class="band">
+        <div class="wrap">
+          <p class="kicker">agentmesh · messaging</p>
+          <h2>Request &amp; respond</h2>
+          <table class="tbl">
+            <thead><tr><th>member</th><th>what it does</th></tr></thead>
+            <tbody>
+              <tr><td>request(agentId, skill, input, config?)</td>
+                <td>Send a signed request and await the reply. The responder decides the
+                  shape (spec §6.4): a <b>bare</b> terminal answer for work it finishes
+                  immediately, or a <b>Task</b> it progresses over time.</td></tr>
+              <tr><td>requestStream(agentId, skill, input, config?)</td>
+                <td>Streaming request. Returns an async iterable of chunks with
+                  chunk-count verification at the end (spec §11).</td></tr>
+              <tr><td>onRequest(skillId, handler)</td>
+                <td>Serve a skill. The handler gets <code class="inline">(input, ctx)</code>
+                  and returns the output; the SDK wraps it in a signed respond envelope.
+                  Throw <code class="inline">RejectedError</code> to decline (spec §7.2), any
+                  other throw becomes a <code class="inline">failed</code> error reply.</td></tr>
+              <tr><td>onStreamRequest(skillId, handler)</td>
+                <td>Serve a streaming skill: the handler receives a
+                  <code class="inline">StreamWriter</code> and emits chunks.</td></tr>
+              <tr><td>onDefault(handler)</td>
+                <td>Fallback for skills with no registered handler.</td></tr>
+              <tr><td>removeHandler(skillId)</td>
+                <td>Drop a skill handler.</td></tr>
+            </tbody>
+          </table>
+          <div class="callout">
+            <div class="t">bare vs task, in code</div>
+            <p>A bare reply resolves your <code class="inline">request()</code> with
+              <code class="inline">status: "completed"</code> and the output in one hop.
+              A Task reply resolves with <code class="inline">status: "submitted"</code>
+              and a <code class="inline">task_id</code>; progress arrives as further
+              responds and can be fetched with <code class="inline">getTask(taskId)</code>.</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- events + presence -->
+      <section class="band">
+        <div class="wrap">
+          <p class="kicker">agentmesh · events &amp; presence</p>
+          <h2>Emit, subscribe, heartbeat</h2>
+          <table class="tbl">
+            <thead><tr><th>member</th><th>what it does</th></tr></thead>
+            <tbody>
+              <tr><td>emit(topic, data)</td>
+                <td>Fire-and-forget event on <code class="inline">mesh.event.&lt;topic&gt;</code>.</td></tr>
+              <tr><td>subscribe(pattern, handler)</td>
+                <td>React to events. NATS wildcards work:
+                  <code class="inline">orders.*</code>, <code class="inline">orders.&gt;</code>.</td></tr>
+              <tr><td>sendHeartbeat(availability?)</td>
+                <td>One presence beat (<code class="inline">online</code>,
+                  <code class="inline">busy</code>, <code class="inline">degraded</code>,
+                  <code class="inline">offline</code>) for this agent's node (spec §9.6).</td></tr>
+              <tr><td>startHeartbeat(intervalMs?) / stopHeartbeat()</td>
+                <td>Automatic beats, default every 30s. Missed beats flip presence to
+                  offline; the manifest is never touched.</td></tr>
+              <tr><td>getTask(taskId)</td>
+                <td>A locally tracked task by ID (state, timestamps, last update).</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- node -->
+      <section class="band">
+        <div class="wrap">
+          <p class="kicker">meshnode · hosting</p>
+          <h2>MeshNode: many agents, one connection</h2>
+          <p>A node connects once with the <b>node credential</b> and hosts any number of
+            agents over that single socket. Each hosted agent still has its own keypair
+            and signs its own envelopes; the node's key vouches for each of them at
+            register time (spec §4.4). One heartbeat covers them all.</p>
+          <table class="tbl">
+            <thead><tr><th>member</th><th>what it does</th></tr></thead>
+            <tbody>
+              <tr><td>MeshNode.connect(servers, opts?)</td>
+                <td>Connect as a node: <code class="inline">jwt</code> +
+                  <code class="inline">nodeSeed</code>, plus an optional declared
+                  <code class="inline">profile</code> (uptime class, reachability, capacity,
+                  device fields).</td></tr>
+              <tr><td>.id / .profile / .agentCount</td>
+                <td>Node public key, its declared profile, hosted-agent count.</td></tr>
+              <tr><td>addAgent(opts?)</td>
+                <td>Create a hosted agent: fresh keypair (or
+                  <code class="inline">opts.nkeySeed</code> for a stable identity), zero
+                  extra round-trips, vouched by this node.</td></tr>
+              <tr><td>getAgent(agentId) / removeAgent(agentId)</td>
+                <td>Look up or detach a hosted agent.</td></tr>
+              <tr><td>sendHeartbeat / startHeartbeat / stopHeartbeat</td>
+                <td>Node-scoped presence: one beat covers every hosted agent.</td></tr>
+              <tr><td>drain() / close() / .isClosed</td>
+                <td>Connection lifecycle for the node and everything it hosts.</td></tr>
+            </tbody>
+          </table>
+          <pre class="code">const node = await MeshNode.connect(<span class="s">"wss://mesh.agentmesh.ai"</span>, {
+  jwt, nodeSeed,
+  profile: { availability_class: <span class="s">"always_on"</span> },
+});
+const triage  = node.addAgent();  <span class="c">// each gets its own keypair + ID</span>
+const billing = node.addAgent({ nkeySeed: savedSeed });  <span class="c">// stable identity</span>
+node.startHeartbeat();  <span class="c">// one beat covers both</span></pre>
+        </div>
+      </section>
+
+      <!-- errors -->
+      <section class="band">
+        <div class="wrap">
+          <p class="kicker">errors</p>
+          <h2>Errors you'll actually meet</h2>
+          <table class="tbl">
+            <thead><tr><th>export</th><th>meaning</th></tr></thead>
+            <tbody>
+              <tr><td>MeshError</td>
+                <td>Every SDK failure: carries an <code class="inline">ErrorCode</code>, a
+                  message, and whether it's retryable.</td></tr>
+              <tr><td>RejectedError</td>
+                <td>Throw it inside a handler to <b>decline</b> work (terminal
+                  <code class="inline">rejected</code>, not a failure).</td></tr>
+              <tr><td>ErrorCode</td>
+                <td>The spec §12 catalog: <code class="inline">SKILL_NOT_FOUND</code>,
+                  <code class="inline">INVALID_ENVELOPE</code>,
+                  <code class="inline">IDENTITY_MISMATCH</code>,
+                  <code class="inline">TIMEOUT</code>, <code class="inline">RATE_LIMITED</code>,
+                  <code class="inline">INTERNAL_ERROR</code>, and friends.</td></tr>
+              <tr><td>RETRYABLE_CODES</td>
+                <td>The subset worth retrying with backoff. Check
+                  <code class="inline">error.retryable</code> before you loop.</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- identity -->
+      <section class="band">
+        <div class="wrap">
+          <p class="kicker">identity &amp; signing</p>
+          <h2>The crypto, exported</h2>
+          <p>The SDK signs for you, but every primitive is public for tooling, audits, and
+            other runtimes. Signatures are Ed25519 over the canonical JSON of the envelope
+            minus <code class="inline">sig</code>, verified against
+            <code class="inline">from</code> (spec §4-5).</p>
+          <table class="tbl">
+            <thead><tr><th>export</th><th>what it does</th></tr></thead>
+            <tbody>
+              <tr><td>createAgentIdentity()</td>
+                <td>Fresh keypair: <code class="inline">{ publicKey, seed }</code>. The seed is
+                  the private key: store it, never send it.</td></tr>
+              <tr><td>keyPairFromSeed(seed)</td>
+                <td>Rebuild a keypair from a stored seed string.</td></tr>
+              <tr><td>signEnvelope(env, kp)</td>
+                <td>Sign in place, setting <code class="inline">sig</code>.</td></tr>
+              <tr><td>verifyEnvelopeSig(env)</td>
+                <td>Check <code class="inline">sig</code> against
+                  <code class="inline">env.from</code>. Servers do exactly this on every
+                  message they accept.</td></tr>
+              <tr><td>canonicalJSON(value)</td>
+                <td>The deterministic serialization both languages sign: keys sorted
+                  recursively, no insignificant whitespace.</td></tr>
+              <tr><td>createAttestation(nodeKp, agentPub, ttl?) / verifyAttestation(att)</td>
+                <td>Node vouching (spec §4.4): the signed statement that a node hosts an
+                  agent, with expiry.</td></tr>
+              <tr><td>createEnvelope(params)</td>
+                <td>Build a valid envelope by hand (auto-fills version, ID, timestamp,
+                  trace). Pair with <code class="inline">signEnvelope</code>.</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- device profile -->
+      <section class="band">
+        <div class="wrap">
+          <p class="kicker">extensions · ext-1</p>
+          <h2>Device profile, auto-filled</h2>
+          <p>The SDK implements
+            <code class="inline">mesh://extensions/device-profile/v1</code>: at connect it
+            detects what the runtime can know on its own and declares it in the node
+            profile. Your explicit profile keys always win.</p>
+          <table class="tbl">
+            <thead><tr><th>export</th><th>what it does</th></tr></thead>
+            <tbody>
+              <tr><td>detectDeviceProfile()</td>
+                <td><code class="inline">platform</code> from the runtime
+                  (<code class="inline">darwin</code> / <code class="inline">win32</code> /
+                  <code class="inline">linux</code> / <code class="inline">browser</code>) and
+                  <code class="inline">client</code> (SDK name/version). Browsers also get
+                  <code class="inline">device_class: "browser"</code>.</td></tr>
+              <tr><td>withDetectedDevice(profile?)</td>
+                <td>Merge detection under a caller profile: your keys win, detection fills
+                  gaps.</td></tr>
+              <tr><td>SDK_CLIENT</td>
+                <td>The client string this build reports:
+                  <code class="inline">sdk-typescript/0.2.0</code>.</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- constants -->
+      <section class="band">
+        <div class="wrap">
+          <p class="kicker">defaults</p>
+          <h2>Tunable constants</h2>
+          <table class="tbl">
+            <thead><tr><th>constant</th><th>default</th></tr></thead>
+            <tbody>
+              <tr><td>DEFAULT_REQUEST_TIMEOUT_MS</td><td>30 000</td></tr>
+              <tr><td>DEFAULT_HEARTBEAT_INTERVAL_MS</td><td>30 000</td></tr>
+              <tr><td>DEFAULT_STREAM_TIMEOUT_MS</td><td>120 000</td></tr>
+              <tr><td>DEFAULT_CHUNK_TIMEOUT_MS</td><td>30 000</td></tr>
+              <tr><td>DEFAULT_MAX_RECONNECT_ATTEMPTS</td><td>10</td></tr>
+              <tr><td>DEFAULT_RECONNECT_TIME_WAIT_MS</td><td>2 000</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- rust parity -->
+      <section class="band">
+        <div class="wrap">
+          <p class="kicker">rust</p>
+          <h2>Rust parity matrix</h2>
+          <p>The Rust crate (<code class="inline">agentmesh</code> 0.2.0, async-nats) mirrors
+            the TypeScript surface in snake_case. Signature fixtures in both repos prove
+            the two implementations produce byte-identical signed envelopes.</p>
+          <table class="tbl">
+            <thead><tr><th>capability</th><th>typescript</th><th>rust</th></tr></thead>
+            <tbody>
+              <tr><td>connect / JWT auth</td><td><span class="ok">●</span> connect</td><td><span class="ok">●</span> connect</td></tr>
+              <tr><td>register</td><td><span class="ok">●</span> register</td><td><span class="ok">●</span> register</td></tr>
+              <tr><td>deregister</td><td><span class="ok">●</span> deregister</td><td>not yet</td></tr>
+              <tr><td>discover</td><td><span class="ok">●</span> discover (with total)</td><td><span class="ok">●</span> discover (list only)</td></tr>
+              <tr><td>manifest by ID</td><td><span class="ok">●</span> getManifest</td><td>not yet</td></tr>
+              <tr><td>request / respond</td><td><span class="ok">●</span> request · onRequest</td><td><span class="ok">●</span> request · on_request</td></tr>
+              <tr><td>streaming</td><td><span class="ok">●</span> requestStream · onStreamRequest</td><td><span class="ok">●</span> request_stream · on_stream_request</td></tr>
+              <tr><td>events</td><td><span class="ok">●</span> emit · subscribe</td><td><span class="ok">●</span> emit · subscribe</td></tr>
+              <tr><td>heartbeat / presence</td><td><span class="ok">●</span></td><td><span class="ok">●</span></td></tr>
+              <tr><td>node hosting</td><td><span class="ok">●</span> MeshNode</td><td><span class="ok">●</span> MeshNode</td></tr>
+              <tr><td>envelope signing + vouching</td><td><span class="ok">●</span></td><td><span class="ok">●</span> (cross-verified)</td></tr>
+              <tr><td>local task tracking</td><td><span class="ok">●</span> getTask</td><td>not yet</td></tr>
+              <tr><td>device profile (EXT-1)</td><td><span class="ok">●</span> auto-detected</td><td>not yet</td></tr>
+            </tbody>
+          </table>
+          <p>The gaps are additive, not architectural: a Rust agent participates in the
+            mesh as a full peer today.</p>
+        </div>
+      </section>
+
+      <footer>
+        <div class="wrap">
+          <span>AgentMesh · open protocol for agent-to-agent communication</span>
+          <a href="https://github.com/jeffrschneider/AgentMesh">GitHub ↗</a>
+        </div>
+      </footer>
+
+    </main>
+  </div>
+</body>
+</html>
