@@ -2513,6 +2513,41 @@ Durable: mesh_event_{agent_id}_{subscription_hash}
 <li>For payloads exceeding the message size limit, agents MUST use NATS Object Store and include a <code>ref</code> part in the artifact.</li>
 <li>The platform SHOULD configure max message size based on deployment requirements.</li>
 </ul>
+<h3 id="18-10-bootstrap-finding-the-mesh">18.10. Bootstrap: Finding the Mesh<a class="hl" href="#18-10-bootstrap-finding-the-mesh">#</a></h3>
+<p>A client should never need to ship with transport addresses. A mesh <strong>instance</strong>
+(§2) is identified by one stable name — its control plane&#39;s HTTPS origin (its
+<em>mesh home</em>, e.g. <code>https://api.agentmesh.ai</code>) — and everything else is learned
+from it at credential time.</p>
+<p>Every credential-issuing response of the control plane (guest issuance, app
+connect, app provision/refresh) MUST include a <code>mesh</code> object:</p>
+<pre><code class="language-json">{
+  &quot;jwt&quot;: &quot;…&quot;, &quot;seed&quot;: &quot;…&quot;, &quot;publicKey&quot;: &quot;…&quot;,
+  &quot;mesh&quot;: {
+    &quot;name&quot;: &quot;agentmesh.ai&quot;,
+    &quot;protocol&quot;: &quot;0.2&quot;,
+    &quot;nats_endpoints&quot;: [
+      &quot;nats://mesh.agentmesh.ai:4222&quot;,
+      &quot;ws://mesh.agentmesh.ai:4443&quot;
+    ]
+  }
+}
+</code></pre>
+<ul>
+<li><code>name</code> — the instance&#39;s identity, normally its control-plane domain.</li>
+<li><code>protocol</code> — the protocol version the instance speaks (major must match, §20).</li>
+<li><code>nats_endpoints</code> — transport addresses in preference order; a client picks the
+first scheme it supports (TCP vs WebSocket).</li>
+</ul>
+<p>Clients SHOULD treat the mesh home as the only configured address, re-reading
+<code>nats_endpoints</code> at every credential issuance/refresh so operators can move or
+add transport endpoints without client changes. Clients MAY maintain a set of
+known mesh homes (e.g. the public instance plus a self-hosted one) and connect
+to one as the active mesh.</p>
+<p><em>Addressing note (federation seam, §21):</em> because agent keys are self-minted
+and portable, an agent ID alone does not name a location — <strong>agent ID + mesh
+instance</strong> does. The RECOMMENDED written form for cross-context handles is
+<code>&lt;agent-public-key&gt;@&lt;mesh-name&gt;</code> (e.g. <code>UAB4K2…@agentmesh.ai</code>). Within a single
+instance the domain part is implicit and MAY be omitted.</p>
 <hr>
 <h2 id="19-metering-and-cost-economics-extension-not-core-in-0-2">19. Metering and Cost  <em>(Economics extension — not core in 0.2)</em><a class="hl" href="#19-metering-and-cost-economics-extension-not-core-in-0-2">#</a></h2>
 <blockquote>
