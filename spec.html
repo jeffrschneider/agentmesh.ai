@@ -124,6 +124,7 @@
         <a href="world-wide-mesh.html">/ world-wide-mesh</a>
         <div class="grp">build</div>
         <a href="getting-started.html">/ getting-started</a>
+        <a href="nodes.html">/ nodes</a>
         <a href="use-cases.html">/ use-cases</a>
         <a href="examples.html">/ examples</a>
         <a href="sdks.html">/ sdks</a>
@@ -149,7 +150,7 @@
           <span>status <b>Working Draft</b></span>
           <span>date <b>2026-07-13</b></span>
         </div>
-        <p class="canon">Rendered 2026-07-15.
+        <p class="canon">Rendered 2026-07-17 from commit <a href="https://github.com/jeffrschneider/AgentMesh/commit/b9f1041">b9f1041</a>.
           The canonical source is
           <a href="https://github.com/jeffrschneider/AgentMesh/blob/main/SPEC.md">SPEC.md on GitHub</a>.</p>
         <div class="toc">
@@ -1757,7 +1758,7 @@ owner key) is likewise out of core — see the Contacts extension.</p>
 <li>Requester creates a durable JetStream consumer on <code>mesh.task.{task_id}.stream</code>.</li>
 <li>Responder publishes chunks to <code>mesh.task.{task_id}.stream</code>.</li>
 <li>Final chunk has <code>payload.final: true</code> and <code>payload.status: &quot;completed&quot;</code>.</li>
-<li>Responder publishes a final task update to <code>mesh.task.{task_id}.update</code> with <code>status: &quot;completed&quot;</code>.</li>
+<li>Responder publishes a final task update to <code>mesh.task.{task_id}.update</code> with <code>status: &quot;completed&quot;</code>. This update SHOULD carry the final result in <code>payload.output</code> (§6.5): the durable task record (Section 7) is built from these updates, and including the output there lets a requester that lost the stream (disconnect, restart) recover the answer from the task store instead of losing it with the ephemeral stream subject.</li>
 </ol>
 <h3 id="11-4-backpressure">11.4. Backpressure<a class="hl" href="#11-4-backpressure">#</a></h3>
 <ul>

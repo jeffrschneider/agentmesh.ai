@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Nodes: run one, or build one: AgentMesh</title>
+  <link rel="icon" type="image/svg+xml" href="favicon.svg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    /* ══════════ THE WIRE : design token system ══════════ */
+    :root{
+      --ink:#0A1417; --panel:#0F1D22; --line:#1C2E33;
+      --paper:#E7EFEC; --dim:#7C918C; --faint:#4A5D5A;
+      --signal:#F2A93B; --verify:#43D6A6; --address:#6BA8FF; --broadcast:#B69CFF;
+      --disp:'Space Grotesk', sans-serif;
+      --body:'IBM Plex Sans', system-ui, sans-serif;
+      --wire:'IBM Plex Mono', ui-monospace, monospace;
+    }
+    *{ box-sizing:border-box; }
+    html,body{ margin:0; }
+    body{ background:var(--ink); color:var(--paper); font-family:var(--body);
+      font-size:16px; line-height:1.6; -webkit-font-smoothing:antialiased;
+      background-image:
+        linear-gradient(var(--line) 1px, transparent 1px),
+        linear-gradient(90deg, var(--line) 1px, transparent 1px);
+      background-size:64px 64px, 64px 64px;
+      background-position:-1px -1px;
+    }
+    body::before{
+      content:""; position:fixed; inset:0; z-index:0; pointer-events:none;
+      background:
+        radial-gradient(80% 45% at 30% 0%, rgba(242,169,59,.10), transparent 60%),
+        radial-gradient(70% 50% at 100% 10%, rgba(67,214,166,.08), transparent 55%),
+        linear-gradient(180deg, rgba(10,20,23,.72), var(--ink) 62%);
+    }
+    a{ color:inherit; }
+
+    .layout{ position:relative; z-index:1; display:grid; grid-template-columns:248px 1fr; min-height:100vh; }
+    .rail{ border-right:1px solid var(--line); padding:26px 22px; position:sticky; top:0; align-self:start; height:100vh; }
+    .brand{ font-family:var(--wire); font-weight:600; font-size:.82rem; letter-spacing:.02em;
+      display:flex; align-items:center; gap:9px; color:var(--paper); text-decoration:none; margin-bottom:30px; }
+    .brand .dot{ width:9px; height:9px; border-radius:2px; background:var(--signal);
+      box-shadow:0 0 0 3px rgba(242,169,59,.15), 8px 0 0 -2px var(--verify), 16px 0 0 -2px var(--address); }
+    .rail .grp{ font-family:var(--wire); font-size:.64rem; letter-spacing:.18em; text-transform:uppercase;
+      color:var(--faint); margin:16px 0 4px; }
+    .rail .grp:first-child{ margin-top:0; }
+    .rail nav a{ display:block; font-family:var(--wire); font-size:.8rem; color:var(--dim);
+      text-decoration:none; padding:6px 0; border-left:2px solid transparent; padding-left:12px; margin-left:-12px; }
+    .rail nav a:hover{ color:var(--paper); }
+    .rail nav a.on{ color:var(--paper); border-left-color:var(--signal); }
+    .rail .foot{ margin-top:26px; padding-top:18px; border-top:1px solid var(--line);
+      font-family:var(--wire); font-size:.72rem; color:var(--faint); }
+
+    .main{ min-width:0; }
+    .wrap{ max-width:980px; margin:0 auto; padding:0 40px; }
+
+    .eyebrow{ font-family:var(--wire); font-size:.76rem; letter-spacing:.04em; color:var(--dim); }
+    .eyebrow .tag{ color:var(--signal); }
+    h1,h2,h3{ font-family:var(--disp); font-weight:700; letter-spacing:-.02em; line-height:1.08; }
+    .lede{ color:var(--dim); font-size:1.12rem; max-width:60ch; }
+
+    .hero{ padding:74px 0 42px; border-bottom:1px solid var(--line); }
+    .hero .eyebrow{ margin-bottom:22px; display:block; }
+    .hero h1{ font-size:clamp(2.2rem,4.6vw,3.2rem); margin:0 0 18px; }
+    .hero h1 .am{ color:var(--signal); }
+
+    section.band{ padding:56px 0; border-bottom:1px solid var(--line); }
+    section.band h2{ font-size:1.8rem; margin:0 0 14px; }
+    section.band h3{ font-size:1.15rem; margin:38px 0 10px; }
+    section.band h3 .n{ color:var(--signal); font-family:var(--wire); font-size:.9rem; margin-right:10px; }
+    section.band p{ color:var(--dim); max-width:66ch; }
+    section.band p b, section.band li b{ color:var(--paper); font-weight:600; }
+    .kicker{ font-family:var(--wire); font-size:.74rem; letter-spacing:.12em; text-transform:uppercase;
+      color:var(--faint); margin:0 0 16px; }
+
+    ul.plain{ margin:18px 0 0; padding-left:20px; color:var(--dim); max-width:70ch; }
+    ul.plain li{ margin:10px 0; }
+    ul.plain b{ color:var(--paper); font-weight:600; }
+
+    .cta{ display:flex; gap:12px; flex-wrap:wrap; margin-top:26px; }
+    .btn{ font-family:var(--wire); font-size:.86rem; font-weight:500; text-decoration:none;
+      padding:12px 20px; border-radius:8px; border:1px solid transparent; display:inline-flex; align-items:center; gap:8px;
+      transition:transform .16s ease, box-shadow .2s ease, border-color .2s ease; }
+    .btn-signal{ background:var(--signal); color:#20140a; font-weight:600;
+      box-shadow:0 12px 30px -14px rgba(242,169,59,.8); }
+    .btn-signal:hover{ transform:translateY(-2px); box-shadow:0 18px 40px -14px rgba(242,169,59,.95); }
+    .btn-ghost{ border-color:var(--line); color:var(--paper); background:rgba(255,255,255,.02); }
+    .btn-ghost:hover{ border-color:var(--dim); transform:translateY(-2px); }
+
+    /* two-path split */
+    .paths{ display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-top:26px; }
+    .path{ border:1px solid var(--line); border-radius:12px; background:var(--panel); padding:22px 20px;
+      border-top:3px solid var(--hue,var(--signal)); }
+    .path .p-tag{ font-family:var(--wire); font-size:.72rem; letter-spacing:.06em; color:var(--hue,var(--signal)); }
+    .path h3{ font-size:1.2rem; margin:8px 0 6px; }
+    .path p{ color:var(--dim); font-size:.94rem; max-width:none; }
+    .path ul{ margin:12px 0 0; padding-left:18px; color:var(--dim); font-size:.9rem; }
+    .path ul li{ margin:7px 0; }
+    .path ul b{ color:var(--paper); font-weight:600; }
+    .path .p-cta{ margin-top:16px; }
+
+    .callout{ border:1px solid var(--line); border-left:3px solid var(--signal); border-radius:10px;
+      background:var(--panel); padding:14px 18px; margin:26px 0 0; max-width:72ch; }
+    .callout .t{ font-family:var(--wire); font-size:.74rem; letter-spacing:.1em; text-transform:uppercase;
+      color:var(--faint); margin-bottom:6px; }
+    .callout p{ margin:6px 0 0; color:var(--dim); }
+    .callout p:first-of-type{ margin-top:0; }
+    .callout p b{ color:var(--paper); }
+    code.inline{ font-family:var(--wire); font-size:.86em; color:var(--verify);
+      background:rgba(67,214,166,.07); border:1px solid rgba(67,214,166,.15); border-radius:5px; padding:1px 5px; }
+
+    footer{ padding:34px 0 60px; }
+    footer .wrap{ font-family:var(--wire); font-size:.78rem; color:var(--faint); display:flex; gap:14px; }
+    footer a{ color:var(--dim); text-decoration:none; }
+
+    @media (max-width:900px){
+      .layout{ grid-template-columns:1fr; }
+      .rail{ position:static; height:auto; border-right:0; border-bottom:1px solid var(--line); }
+      .paths{ grid-template-columns:1fr; }
+    }
+  </style>
+</head>
+<body>
+  <div class="layout">
+
+    <aside class="rail">
+      <a class="brand" href="index.html"><span class="dot"></span>AGENTMESH</a>
+      <nav>
+        <div class="grp">learn</div>
+        <a href="index.html">/ overview</a>
+        <a href="how-it-works.html">/ how-it-works</a>
+        <a href="architecture.html">/ architecture</a>
+        <a href="topologies.html">/ topologies</a>
+        <a href="world-wide-mesh.html">/ world-wide-mesh</a>
+        <div class="grp">build</div>
+        <a href="getting-started.html">/ getting-started</a>
+        <a class="on" href="nodes.html">/ nodes</a>
+        <a href="use-cases.html">/ use-cases</a>
+        <a href="examples.html">/ examples</a>
+        <a href="sdks.html">/ sdks</a>
+        <a href="a2a-bridge.html">/ a2a-bridge</a>
+        <div class="grp">operate</div>
+        <a href="running-a-mesh.html">/ running-a-mesh</a>
+        <a href="run-a-test-node.html">/ run-a-test-node</a>
+        <div class="grp">reference</div>
+        <a href="spec.html">/ specification</a>
+        <a href="faq.html">/ faq</a>
+        <a href="coding-agents.html">/ coding-agents</a>
+      </nav>
+      <div class="foot">v0.2 · the signed interconnect<br>github.com/jeffrschneider/AgentMesh</div>
+    </aside>
+
+    <main class="main">
+
+      <div class="wrap hero">
+        <span class="eyebrow"><span class="tag">agentmesh</span> · nodes</span>
+        <h1>Run a node,<br>or <span class="am">build one</span></h1>
+        <p class="lede">To put an agent on the mesh you need a node: one credentialed
+          connection that carries identity, vouches for the agents it hosts, and stays
+          reachable. You can run a ready-made node, or write your own with an SDK. Both
+          speak the same protocol, and the mesh does not care which you pick.</p>
+      </div>
+
+      <!-- what a node carries -->
+      <section class="band">
+        <div class="wrap">
+          <p class="kicker">the node's job</p>
+          <h2>What a node carries</h2>
+          <p>A node is the always-on host process that sits behind your agents. The site
+            describes it abstractly elsewhere: a host that opens one outbound connection
+            and hosts one or more agents on it. Whatever software plays that role has to
+            do real, ongoing work:</p>
+          <ul class="plain">
+            <li><b>Hold the connection and credential.</b> One per node, not one per
+              agent. The node's key is its address on the mesh.</li>
+            <li><b>Vouch for hosted agents.</b> Sign the operator to node to agent
+              attestation so every agent it hosts can prove who it is.</li>
+            <li><b>Heartbeat presence.</b> Keep the mesh's live view accurate so discovery
+              knows the node's agents are reachable right now.</li>
+            <li><b>Answer inbound requests.</b> Route calls to the right agent, run the
+              task lifecycle, stream results back.</li>
+            <li><b>Keep durable identity.</b> Survive restarts without becoming a new,
+              unrecognized agent each time.</li>
+          </ul>
+          <p style="margin-top:20px">That is the same list whichever path you take. The
+            only question is whether you write it or run it.</p>
+        </div>
+      </section>
+
+      <!-- the two paths -->
+      <section class="band">
+        <div class="wrap">
+          <p class="kicker">two ways onto the mesh</p>
+          <h2>Run one, or build one</h2>
+          <div class="paths">
+            <div class="path" style="--hue:var(--signal)">
+              <div class="p-tag">path a · run one</div>
+              <h3>A ready-made node</h3>
+              <p>Run a node that already exists. You get everything on the list for free
+                and write no protocol code. Point it at a mesh and the agents it hosts are
+                on.</p>
+              <ul>
+                <li>Connection, credential, and durable identity: handled.</li>
+                <li>Vouching, heartbeat, and inbound routing: handled.</li>
+                <li>Configured through a settings surface, not code.</li>
+              </ul>
+              <div class="p-cta"><a class="btn btn-signal" href="#egg-gateway">meet the Egg Gateway ↓</a></div>
+            </div>
+            <div class="path" style="--hue:var(--address)">
+              <div class="p-tag">path b · build one</div>
+              <h3>Write it with an SDK</h3>
+              <p>When the node itself is your product, or you need behavior a ready-made
+                node does not have, build it. The TS and Rust SDKs give you the node's job
+                as primitives; you own the process.</p>
+              <ul>
+                <li>connect, register, request and respond, presence, node vouching.</li>
+                <li>Full control over hosting, storage, and lifecycle.</li>
+                <li>The path the rest of this section already teaches.</li>
+              </ul>
+              <div class="p-cta"><a class="btn btn-ghost" href="getting-started.html">getting started →</a></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- the Egg Gateway -->
+      <section class="band" id="egg-gateway">
+        <div class="wrap">
+          <p class="kicker">path a · the reference node</p>
+          <h2>The Egg Gateway</h2>
+          <p>The Egg Gateway is a standalone, always-on node. It is the first complete
+            node built on AgentMesh and the reference for what a node does: run it, point
+            it at a mesh, and every agent it hosts is on. Connection, credential,
+            vouching, heartbeat, and inbound handling are all done for you. A settings
+            surface covers mesh configuration, discovery, and giving a hosted agent a
+            public name (handle pairing). You write zero protocol code.</p>
+          <p>It runs on its own. The Gateway is decoupled from any browser or app: it is a
+            node you install and run, nothing more required.</p>
+          <div class="callout">
+            <div class="t">what you skip by running it</div>
+            <p>Every item under <b>the node's job</b> above: credential and identity
+              lifecycle, operator to node to agent vouching, presence heartbeats, inbound
+              request routing and task management. That is the code you do not write.</p>
+          </div>
+          <div class="cta">
+            <a class="btn btn-signal" href="https://eggbrowser.com">get the Egg Gateway ↗</a>
+            <a class="btn btn-ghost" href="run-a-test-node.html">get a mesh credential first</a>
+          </div>
+        </div>
+      </section>
+
+      <!-- choosing + neutrality -->
+      <section class="band">
+        <div class="wrap">
+          <p class="kicker">choosing</p>
+          <h2>Which one</h2>
+          <p><b>Run a ready-made node</b> if you want an agent on the mesh without writing
+            infrastructure. That is most people, and especially personal agents, where the
+            node is a means to an end rather than the thing you are building.</p>
+          <p><b>Build your own</b> if the node is your product, if you are embedding the
+            mesh into an existing runtime, or if you need hosting behavior a ready-made
+            node does not offer.</p>
+          <div class="callout">
+            <div class="t">the mesh requires no particular node</div>
+            <p>Nothing in the protocol privileges one host. The Egg Gateway is the first
+              ready-made node and the reference implementation; any always-on host that
+              speaks the protocol is a node, and personal-agent runtimes fit the same
+              shape. Run one, build one, or write a new one. The wire is the only thing
+              that has to match.</p>
+          </div>
+        </div>
+      </section>
+
+      <footer>
+        <div class="wrap">
+          <span>AgentMesh · open protocol for agent-to-agent communication</span>
+          <a href="https://github.com/jeffrschneider/AgentMesh">GitHub ↗</a>
+        </div>
+      </footer>
+
+    </main>
+  </div>
+</body>
+</html>
