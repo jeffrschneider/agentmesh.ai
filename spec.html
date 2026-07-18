@@ -150,9 +150,9 @@
         <div class="metas">
           <span>version <b>0.2.0-draft</b></span>
           <span>status <b>Working Draft</b></span>
-          <span>date <b>2026-07-13</b></span>
+          <span>date <b>2026-07-18</b></span>
         </div>
-        <p class="canon">Rendered 2026-07-18 from commit <a href="https://github.com/jeffrschneider/AgentMesh/commit/7a781fa">7a781fa</a>.
+        <p class="canon">Rendered 2026-07-18 from commit <a href="https://github.com/jeffrschneider/AgentMesh/commit/bf0c3ff">bf0c3ff</a>.
           The canonical source is
           <a href="https://github.com/jeffrschneider/AgentMesh/blob/main/SPEC.md">SPEC.md on GitHub</a>.</p>
         <div class="toc">
@@ -442,9 +442,10 @@ profiles, sandbox enforcement), and a public reference deployment.</p>
   &quot;to&quot;: &quot;&lt;agent-nkey-public | subject-pattern&gt;&quot;,
 
   &quot;trace&quot;: {
-    &quot;trace_id&quot;: &quot;&lt;uuid&gt;&quot;,
-    &quot;span_id&quot;: &quot;&lt;uuid&gt;&quot;,
-    &quot;parent_span_id&quot;: &quot;&lt;uuid | null&gt;&quot;
+    &quot;trace_id&quot;: &quot;&lt;32-hex-char W3C trace-id&gt;&quot;,
+    &quot;span_id&quot;: &quot;&lt;16-hex-char W3C span-id&gt;&quot;,
+    &quot;parent_span_id&quot;: &quot;&lt;16-hex-char span-id | null&gt;&quot;,
+    &quot;tracestate&quot;: &quot;&lt;W3C tracestate | absent&gt;&quot;
   },
 
   &quot;task_id&quot;: &quot;&lt;uuid | null&gt;&quot;,
@@ -519,19 +520,25 @@ profiles, sandbox enforcement), and a public reference deployment.</p>
 <td><code>trace.trace_id</code></td>
 <td>string</td>
 <td>REQUIRED</td>
-<td>Trace identifier. All messages in a causal chain share the same trace_id.</td>
+<td>Trace identifier in W3C Trace Context format: 32 lowercase hex characters. All messages in a causal chain share the same trace_id.</td>
 </tr>
 <tr>
 <td><code>trace.span_id</code></td>
 <td>string</td>
 <td>REQUIRED</td>
-<td>Span identifier for this specific operation.</td>
+<td>Span identifier for this specific operation, in W3C format: 16 lowercase hex characters.</td>
 </tr>
 <tr>
 <td><code>trace.parent_span_id</code></td>
 <td>string</td>
 <td>OPTIONAL</td>
 <td>Span ID of the parent operation. Null for root spans.</td>
+</tr>
+<tr>
+<td><code>trace.tracestate</code></td>
+<td>string</td>
+<td>OPTIONAL</td>
+<td>W3C <code>tracestate</code> value, carried verbatim for vendor-specific trace data.</td>
 </tr>
 <tr>
 <td><code>task_id</code></td>
@@ -1993,18 +2000,19 @@ owner key) is likewise out of core — see the Contacts extension.</p>
 <p><strong>Core vs. optional.</strong> Trace <strong>propagation</strong> — the <code>trace</code> object in every envelope — is core and always on; it costs nothing and is the part with real debugging value. Trace/metric/log <strong>storage</strong> (the <code>MESH_TRACE</code>/<code>MESH_METRICS</code>/<code>MESH_LOG</code> streams and the publishing of span/metric/log events) is <strong>optional</strong> and created only if a deployment wants it (§18.3). A minimal deployment carries trace context in-band and stores nothing.</p>
 </blockquote>
 <h3 id="13-1-distributed-tracing">13.1. Distributed Tracing<a class="hl" href="#13-1-distributed-tracing">#</a></h3>
-<p>Every message envelope includes a <code>trace</code> object. The tracing model follows <a href="https://www.w3.org/TR/trace-context/">W3C Trace Context</a> semantics adapted for NATS.</p>
+<p>Every message envelope includes a <code>trace</code> object. The tracing model is <a href="https://www.w3.org/TR/trace-context/">W3C Trace Context</a> carried in the envelope instead of an HTTP header: <code>trace_id</code> MUST be 32 lowercase hex characters and <code>span_id</code> 16 lowercase hex characters, exactly as in a <code>traceparent</code> header, so a trace context MUST round-trip losslessly between an envelope and a version-<code>00</code> <code>traceparent</code> (<code>00-{trace_id}-{span_id}-{flags}</code>). An agent bridging to or from an HTTP system (an A2A endpoint, a webhook, an LLM API instrumented with OpenTelemetry) copies the ids across unchanged; the mesh hop and the HTTP hop land in the same trace. The optional <code>tracestate</code> field carries the W3C <code>tracestate</code> value verbatim.</p>
 <p><strong>Propagation Rules:</strong></p>
 <ul>
-<li>When an agent initiates a new interaction (e.g., a user triggers a workflow), it generates a new <code>trace_id</code> and <code>span_id</code>. <code>parent_span_id</code> is null.</li>
-<li>When an agent receives a request and makes downstream requests (delegation, tool calls), it:<ul>
-<li>Preserves the <code>trace_id</code>.</li>
-<li>Generates a new <code>span_id</code> for each downstream operation.</li>
-<li>Sets <code>parent_span_id</code> to its own <code>span_id</code>.</li>
+<li>When an agent initiates a new interaction (e.g., a user triggers a workflow), it MUST generate a new <code>trace_id</code> and <code>span_id</code>. <code>parent_span_id</code> is null.</li>
+<li>When an agent receives a request and makes downstream requests (delegation, tool calls), it MUST:<ul>
+<li>Preserve the <code>trace_id</code> (and <code>tracestate</code>, if present).</li>
+<li>Generate a new <code>span_id</code> for each downstream operation.</li>
+<li>Set <code>parent_span_id</code> to its own <code>span_id</code>.</li>
 </ul>
 </li>
-<li>When an agent emits an event as a side-effect of processing a request, it preserves the <code>trace_id</code> and sets <code>parent_span_id</code> to the span that triggered the emit.</li>
+<li>When an agent emits an event as a side-effect of processing a request, it MUST preserve the <code>trace_id</code> and SHOULD set <code>parent_span_id</code> to the span that triggered the emit.</li>
 </ul>
+<p>SDKs MUST apply these rules automatically for calls made from within a skill handler, so that propagation requires no application code. Propagation is the load-bearing half of this section: it cannot be retrofitted after the fact, which is why it is core and always on while everything else in §13 is optional.</p>
 <p><strong>Trace Storage:</strong></p>
 <p>Trace data SHOULD be collected into a dedicated JetStream stream (<code>mesh.trace.&gt;</code>) for analysis. Agents SHOULD publish span completion events:</p>
 <pre><code class="language-json">{
@@ -2014,9 +2022,9 @@ owner key) is likewise out of core — see the Contacts extension.</p>
     &quot;domain&quot;: &quot;trace&quot;,
     &quot;event_type&quot;: &quot;span_completed&quot;,
     &quot;data&quot;: {
-      &quot;trace_id&quot;: &quot;&lt;uuid&gt;&quot;,
-      &quot;span_id&quot;: &quot;&lt;uuid&gt;&quot;,
-      &quot;parent_span_id&quot;: &quot;&lt;uuid&gt;&quot;,
+      &quot;trace_id&quot;: &quot;&lt;32-hex-char W3C trace-id&gt;&quot;,
+      &quot;span_id&quot;: &quot;&lt;16-hex-char W3C span-id&gt;&quot;,
+      &quot;parent_span_id&quot;: &quot;&lt;16-hex-char span-id&gt;&quot;,
       &quot;agent_id&quot;: &quot;&lt;nkey&gt;&quot;,
       &quot;operation&quot;: &quot;request&quot;,
       &quot;skill&quot;: &quot;web-scrape&quot;,
@@ -2052,6 +2060,15 @@ owner key) is likewise out of core — see the Contacts extension.</p>
 <p><strong>Subject:</strong> <code>mesh.log.{agent_id}.{level}</code></p>
 <p>Levels: <code>debug</code>, <code>info</code>, <code>warn</code>, <code>error</code></p>
 <p>Log events MUST include <code>trace_id</code> and <code>span_id</code> when available.</p>
+<h3 id="13-4-relationship-to-opentelemetry">13.4. Relationship to OpenTelemetry<a class="hl" href="#13-4-relationship-to-opentelemetry">#</a></h3>
+<p><em>(Informative.)</em> The division of labor is: <strong>OpenTelemetry describes what happens inside an agent; the mesh carries what happens between agents.</strong> The two compose into a single trace because they share W3C Trace Context.</p>
+<ul>
+<li><strong>Inside an agent</strong>, the <a href="https://opentelemetry.io/docs/specs/semconv/gen-ai/">OpenTelemetry Semantic Conventions for Generative AI</a> apply: <code>invoke_agent</code> spans for agent invocations, <code>chat</code> spans for model calls, <code>execute_tool</code> spans for tool executions, with <code>gen_ai.*</code> attributes for model, token usage, and finish reasons. This specification defines none of that and defers to those conventions.</li>
+<li><strong>Between agents</strong>, a mesh hop corresponds to an OpenTelemetry <strong>messaging span</strong> (the existing messaging semantic conventions), with the envelope&#39;s <code>trace</code> object supplying the context. A runtime that emits interior spans and propagates the envelope&#39;s trace context per §13.1 produces one continuous trace: the caller&#39;s <code>invoke_agent</code> at the root, the mesh hop as an edge, the callee&#39;s <code>invoke_agent</code> as its child.</li>
+<li><strong>Export is a subscriber&#39;s job, not the mesh&#39;s.</strong> The span, metric, and log events of §§13.1–13.3 are ordinary <code>emit</code> traffic. An observer that subscribes to them and exports OTLP connects a mesh to any OpenTelemetry backend; it is an ordinary agent and requires nothing from the broker. The mesh itself operates no collector.</li>
+<li><strong>Attribute mapping.</strong> Where a span or metric attribute has an OpenTelemetry semantic-convention name, implementations SHOULD use it; mesh-specific attributes use the <code>agentmesh.</code> prefix (e.g. <code>agentmesh.task.id</code>, <code>agentmesh.skill</code>, <code>agentmesh.node.id</code>).</li>
+<li><strong>Work-product visibility.</strong> Task artifacts (§7.5) and task status updates (§7) are the between-agents facts that the GenAI conventions do not yet cover. Emitting them as events per §13.1 gives generic tooling (dashboards, visualizers, replayers) a framework-neutral view of what a team of agents is producing and passing around, without payload inspection. A dedicated event vocabulary for artifact and progress rendering may be specified once there is a second independent consumer to validate it against.</li>
+</ul>
 <hr>
 <h2 id="14-subject-namespace">14. Subject Namespace<a class="hl" href="#14-subject-namespace">#</a></h2>
 <p>All AgentMesh subjects follow a hierarchical naming convention under the <code>mesh.</code> prefix.</p>
