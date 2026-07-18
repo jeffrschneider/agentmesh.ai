@@ -70,6 +70,12 @@
       color:var(--faint); margin:0 0 16px; }
     .pull{ border-left:3px solid var(--signal); padding:.2rem 1.1rem; color:var(--paper);
       font-size:1.05rem; max-width:62ch; margin:22px 0 0; }
+    .tier-head{ display:flex; align-items:center; gap:14px; margin:0 0 4px; }
+    .tier-head .kicker{ margin:0; }
+    .tmark{ flex-shrink:0; width:40px; height:40px; border:1px solid var(--hue,var(--signal)); border-radius:10px;
+      display:inline-flex; align-items:center; justify-content:center; color:var(--hue,var(--signal));
+      background:color-mix(in srgb, var(--hue,var(--signal)) 8%, transparent); }
+    .tmark svg{ width:20px; height:20px; }
 
     .alt{ border:1px solid var(--line); border-radius:12px; background:var(--panel); padding:20px 20px;
       margin-top:16px; border-left:3px solid var(--hue,var(--signal)); }
@@ -159,22 +165,25 @@
 
       <div class="wrap hero">
         <span class="eyebrow"><span class="tag">agentmesh</span> · alternatives</span>
-        <h1>You're already building<br>a mesh, the <span class="am">hard way</span></h1>
+        <h1>How agents reach<br>each other <span class="am">today</span></h1>
         <p class="lede">There is no single, purpose-built way for agents to reach each other,
-          so people improvise, from a laptop wiring up a tunnel to an enterprise standing up
-          a message queue. Here is the landscape of how agents connect today, across three
-          tiers: repurposed human tools, direct protocols like A2A, and brokers you run
-          yourself. What each is good for, where it breaks, and where a mesh earns its place.</p>
+          so the field has filled with approaches, from a tunnel on a laptop to A2A between
+          services to an enterprise message queue. This is a map of that landscape, across
+          three tiers: repurposed human tools, direct protocols like A2A, and the broker
+          substrate underneath. What each is good for, where it stops, and where a mesh fits
+          among them.</p>
       </div>
 
       <section class="band">
         <div class="wrap">
           <p class="kicker">before the tiers</p>
           <h2>Two things worth saying up front</h2>
-          <p>First, inconsistent naming is the crack most people notice first, but it is the
-            smallest problem here. A name is its own layer:
-            <a href="https://agentcatalog.com">PAN</a> gives an agent a stable, portable name
-            that resolves to a mesh address. The harder problems are transport: reach,
+          <p>First, inconsistent naming is the crack most people notice first, but it is a
+            small part of this. Naming is its own layer, with its own solutions:
+            <a href="https://agentcatalog.com">PAN</a> for personal agents anchored to an
+            email, and <a href="https://datatracker.ietf.org/doc/draft-narajala-courtney-ansv2/">ANS</a>
+            for domain-anchored, CA-backed identity across organizations. Either can resolve
+            a name to a mesh address. The larger part of this page is transport: reach,
             delivery, presence, and trust.</p>
           <p>Second, watch the difference between a <b>human-to-agent</b> channel and an
             <b>agent-to-agent</b> one. Most chat apps are the former, a front door for a
@@ -185,7 +194,10 @@
 
       <section class="band">
         <div class="wrap">
-          <p class="kicker">tier 1 · the improvisations</p>
+          <div class="tier-head" style="--hue:var(--signal)">
+            <span class="tmark"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a4 4 0 0 0-5.4 5.2L4 16.8 7.2 20l5.3-5.3a4 4 0 0 0 5.2-5.4l-2.5 2.5-2.3-.6-.6-2.3z"/></svg></span>
+            <p class="kicker">tier 1 · the improvisations</p>
+          </div>
           <h2>Human tools, repurposed</h2>
           <p>The consumer stopgaps. Each repurposes a tool people already understand, and
             each quietly implements one layer of agent-to-agent communication, and stops
@@ -195,7 +207,7 @@
             <div class="h"><h3>SSH tunnels · ngrok · cloudflared</h3><span class="layer">layer: reachability</span></div>
             <dl>
               <dt>solves</dt><dd>Getting to an agent that lives on a laptop behind NAT, by exposing its endpoint.</dd>
-              <dt>breaks</dt><dd>One tunnel per relationship, set up by hand and brittle. You become an exposed inbound endpoint. No identity beyond the transport, and nothing at all the moment the laptop sleeps.</dd>
+              <dt>breaks</dt><dd>One tunnel per relationship, set up manually and brittle. You become an exposed inbound endpoint. No identity beyond the transport, and nothing at all the moment the laptop sleeps.</dd>
               <dt class="mesh">mesh</dt><dd class="mesh">Agents dial the mesh <b>outbound</b>. No inbound exposure, no per-pair setup, reachable across NAT by default.</dd>
             </dl>
           </div>
@@ -222,7 +234,10 @@
 
       <section class="band">
         <div class="wrap">
-          <p class="kicker">tier 2 · direct protocols</p>
+          <div class="tier-head" style="--hue:var(--verify)">
+            <span class="tmark"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><circle cx="6" cy="12" r="2.4"/><circle cx="18" cy="12" r="2.4"/><line x1="8.4" y1="12" x2="15.6" y2="12"/></svg></span>
+            <p class="kicker">tier 2 · direct protocols</p>
+          </div>
           <h2>A2A point-to-point, and webhooks</h2>
           <p>These are not hacks, and that is the point. When two agents both have reachable
             endpoints, they can talk directly, no improvisation required. This is the
@@ -250,17 +265,20 @@
 
       <section class="band">
         <div class="wrap">
-          <p class="kicker">tier 3 · diy brokers</p>
-          <h2>The broker you build yourself</h2>
-          <p>What teams and enterprises reach for. A real, durable broker at scale, and the
-            enterprise version of the shared-repo dead-drop.</p>
+          <div class="tier-head" style="--hue:var(--broadcast)">
+            <span class="tmark"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3 3 8l9 5 9-5-9-5z"/><path d="M3 13l9 5 9-5"/></svg></span>
+            <p class="kicker">tier 3 · the substrate</p>
+          </div>
+          <h2>The message queue underneath</h2>
+          <p>A durable message queue is what a broker is made of. This tier is less an
+            alternative to the mesh than the layer the mesh runs on.</p>
 
           <div class="alt" style="--hue:var(--broadcast)">
             <div class="h"><h3>Message queues · cloud pub/sub</h3><span class="layer">Kafka · RabbitMQ · NATS · SNS/SQS · Pub/Sub</span></div>
             <dl>
-              <dt>solves</dt><dd>Durable, async, high-throughput delivery. Agents connect outbound to the broker, so it clears the NAT wall too.</dd>
-              <dt>breaks</dt><dd>You stand it up, secure it, and operate it. It is transport, not an agent fabric: no agent identity, no presence, no naming, and no story the moment a message needs to cross into another organization.</dd>
-              <dt class="mesh">mesh</dt><dd class="mesh">The mesh is a broker built <b>for agents</b>: the same durable, outbound, async delivery, plus signed identity, presence, discovery, and a trust chain that crosses organizations, with nothing for you to run.</dd>
+              <dt>solves</dt><dd>Durable, async, high-throughput delivery, with agents connecting outbound, which clears the NAT wall. Used directly, it moves bytes reliably at scale.</dd>
+              <dt>on its own</dt><dd>Transport, not an agent fabric: no agent identity, no presence, no naming, and no trust chain the moment a message crosses into another organization. And you stand it up, secure it, and operate it.</dd>
+              <dt class="mesh">mesh</dt><dd class="mesh">AgentMesh runs <b>on</b> this layer, not instead of it. Today it binds to <b>NATS</b> (JetStream for the durable inbox) and adds signed agent identity, presence, discovery, and a cross-organization trust chain on top. The binding surface is designed to extend to other substrates over time. Inquiries and reference implementations for new bindings are welcome.</dd>
             </dl>
           </div>
         </div>
@@ -269,16 +287,16 @@
       <section class="band">
         <div class="wrap">
           <p class="kicker">the pattern</p>
-          <h2>You keep reinventing the broker</h2>
-          <p>Look at what the shared repo, the chat channel, and the message queue all have
-            in common: a shared, always-on third party that both agents reach <b>outbound</b>,
-            that holds a message until the recipient wakes up. That is a broker with a durable
-            inbox. From a GitHub repo on a laptop to a Kafka cluster in a data center, people
-            keep building the same thing, because two agents that are not both reachable at
-            once cannot connect directly. This is not a workaround that AgentMesh replaces. It
-            is AgentMesh, hand-rolled, at every scale. The one tier that is not a hand-rolled
-            broker is A2A, and the mesh does not replace that either: it carries it.</p>
-          <p class="pull">The mesh is that broker, built on purpose: outbound connections, a
+          <h2>They converge on a broker</h2>
+          <p>The shared repo, the chat channel, and the message queue share one shape: a
+            shared, always-on third party that both agents reach <b>outbound</b>, that holds
+            a message until the recipient wakes up. That is a broker with a durable inbox.
+            The shape recurs from a GitHub repo on a laptop to a Kafka cluster in a data
+            center, because two agents that are not both reachable at once need a place to
+            meet. AgentMesh is that broker, built for agents rather than assembled from a
+            general-purpose tool. The one tier that is not broker-shaped is A2A, and the mesh
+            does not replace it either: it carries it.</p>
+          <p class="pull">The mesh is that broker, built for agents: outbound connections, a
             node-held inbox, live presence, a signed envelope on every message, and A2A
             semantics on the wire.</p>
         </div>
@@ -324,10 +342,11 @@
             </table>
           </div>
           <div class="callout">
-            <div class="t">the honest read</div>
-            <p>None of these is wrong. They are what you use when there is no purpose-built
-              layer. The moment you find yourself maintaining two of them at once, a tunnel
-              for reach and a repo for delivery, you have started building the mesh by hand.</p>
+            <div class="t">in short</div>
+            <p>None of these is wrong; each is a reasonable choice where no purpose-built
+              layer exists. What the map shows is that they cover different columns. Running
+              two at once, a tunnel for reach and a repo for delivery, is the point where a
+              single agent fabric starts to pay off.</p>
           </div>
           <div class="cta">
             <a class="btn btn-signal" href="run-a-test-node.html">get on the mesh in one command</a>
