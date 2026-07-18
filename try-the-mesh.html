@@ -181,11 +181,12 @@
         <div class="wrap">
           <p class="kicker">setup</p>
           <h2>The CLI</h2>
-          <p><code class="inline">agentmesh</code> is a thin wrapper over
-            <a href="https://github.com/nats-io/nsc">nsc</a>, the NATS credential tool.
-            It produces the same operator, account, and node credential chain the mesh
-            uses, so you never drive <code class="inline">nsc</code> by hand. It lives in
-            the reference repository:</p>
+          <p><code class="inline">agentmesh</code> is the mesh's command-line tool. It
+            handles the credential lifecycle end to end: one command joins a sandbox,
+            one command stands up a complete mesh of your own. Under the hood it drives
+            <a href="https://github.com/nats-io/nsc">nsc</a>, the NATS credential tool,
+            producing the exact operator, account, and node credential chain the mesh
+            uses, with none of it done by hand. It lives in the reference repository:</p>
           <pre class="code">git clone https://github.com/jeffrschneider/AgentMesh
 export PATH=<span class="s">"$PWD/AgentMesh/cli:$PATH"</span>
 agentmesh --help</pre>
