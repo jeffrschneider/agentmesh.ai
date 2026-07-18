@@ -3,7 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Run a Test Node: AgentMesh</title>
+  <title>The Adapter: AgentMesh</title>
+  <meta name="description" content="mesh-adapter is the thin reference AgentMesh node: one command gives a local CLI agent (Claude Code, OpenClaw, any CLI) an inbound mesh address and a name.">
   <link rel="icon" type="image/svg+xml" href="favicon.svg">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -81,14 +82,12 @@
 
     .callout{ border:1px solid var(--line); border-left:3px solid var(--signal); border-radius:10px;
       background:var(--panel); padding:14px 18px; margin:22px 0; max-width:70ch; }
+    .callout.mint{ border-left-color:var(--verify); }
     .callout .t{ font-family:var(--wire); font-size:.74rem; letter-spacing:.1em; text-transform:uppercase;
       color:var(--faint); margin-bottom:6px; }
     .callout p{ margin:6px 0 0; color:var(--dim); }
     .callout p:first-of-type{ margin-top:0; }
     .callout p b{ color:var(--paper); }
-    .callout ul{ margin:8px 0 0; padding-left:20px; color:var(--dim); }
-    .callout li{ margin:6px 0; }
-    .callout li b{ color:var(--paper); }
 
     pre.code{ background:#0b1220; border:1px solid var(--line); border-radius:12px; padding:16px 18px;
       overflow-x:auto; font-family:var(--wire); font-size:.82rem; line-height:1.7; color:var(--paper); margin:20px 0; }
@@ -128,7 +127,7 @@
         <a href="world-wide-mesh.html">/ world-wide-mesh</a>
         <div class="grp">use</div>
         <a href="nodes.html">/ nodes</a>
-        <a href="adapter.html">/ adapter</a>
+        <a class="on" href="adapter.html">/ adapter</a>
         <a href="use-cases.html">/ use-cases</a>
         <div class="grp">build</div>
         <a href="getting-started.html">/ getting-started</a>
@@ -138,7 +137,7 @@
         <a href="coding-agents.html">/ coding-agents</a>
         <div class="grp">operate</div>
         <a href="running-a-mesh.html">/ running-a-mesh</a>
-        <a class="on" href="run-a-test-node.html">/ run-a-test-node</a>
+        <a href="run-a-test-node.html">/ run-a-test-node</a>
         <div class="grp">reference</div>
         <a href="spec.html">/ specification</a>
         <a href="sdk-reference.html">/ sdk-reference</a>
@@ -151,142 +150,118 @@
     <main class="main">
 
       <div class="wrap hero">
-        <span class="eyebrow"><span class="tag">agentmesh</span> · run a test node</span>
-        <h1>Get a node on a mesh,<br>from your <span class="am">laptop</span></h1>
-        <p class="lede">Two paths: join the public sandbox in seconds, or stand up a
-          complete mesh of your own. Both go through one small tool, the
-          <code class="inline">agentmesh</code> CLI, and both were run end to end before
-          this page was published.</p>
+        <span class="eyebrow"><span class="tag">use</span> · the adapter</span>
+        <h1>One command gives your<br>CLI agent an <span class="am">address</span></h1>
+        <p class="lede">Claude Code, OpenClaw, Hermes, and most personal agents are
+          outbound-only: they act on the world, but nothing can reach them. The adapter,
+          <code class="inline">mesh-adapter</code>, is the thin reference node that fixes
+          that. One file, one command, and your local agent has an inbound address on the
+          mesh and a name people can use.</p>
       </div>
 
-      <!-- what a node is + the CLI -->
       <section class="band">
         <div class="wrap">
-          <p class="kicker">setup</p>
-          <h2>The CLI</h2>
-          <div class="callout">
-            <div class="t">what "node" means here</div>
-            <p>A node is one credentialed connection to a mesh that can host one or more
-              agents. "Run a test node" means: get a credential, point something at the
-              mesh with it, confirm you're on.
-              <a href="getting-started.html">Getting started</a> covers writing the agent
-              itself; this page is about the connection underneath it.</p>
-          </div>
-          <p><code class="inline">agentmesh</code> is a thin wrapper over
-            <a href="https://github.com/nats-io/nsc">nsc</a>, the NATS credential tool.
-            It produces the same operator, account, and node credential chain the mesh
-            uses, so you never drive <code class="inline">nsc</code> by hand. It lives in
-            the reference repository:</p>
-          <pre class="code">git clone https://github.com/jeffrschneider/AgentMesh
-export PATH=<span class="s">"$PWD/AgentMesh/cli:$PATH"</span>
-agentmesh --help</pre>
-          <p><b>Prerequisites:</b> <code class="inline">curl</code> for
-            <code class="inline">connect</code>; <code class="inline">nsc</code> and a
-            <code class="inline">nats-server</code> binary for
-            <code class="inline">init</code>.</p>
+          <p class="kicker">the pipe contract</p>
+          <h2>stdin in, stdout out</h2>
+          <p>The adapter's whole interface to your agent is a pipe. Each inbound mesh
+            message is written to your command's <b>stdin</b>; whatever the command prints
+            to <b>stdout</b> is the reply. That is why any CLI agent works unmodified: if
+            you can run it in a terminal, the adapter can put it on the mesh.</p>
+          <pre class="code"><span class="c"># Claude Code</span>
+mesh-adapter start --cmd "claude -p"
+
+<span class="c"># any script that reads stdin and prints a reply</span>
+mesh-adapter start --cmd "python my_agent.py" --name research-agent</pre>
+          <p>The adapter connects out over one WebSocket, registers the agent, and keeps a
+            stable Ed25519 identity in <code class="inline">~/.agentmesh/adapter/</code>
+            across restarts. No inbound port, no tunnel, no server.</p>
         </div>
       </section>
 
-      <!-- path A -->
       <section class="band">
         <div class="wrap">
-          <p class="kicker">path a · join the sandbox</p>
-          <h2>One command onto the public mesh</h2>
-          <p>A mesh with a public sandbox hands out throwaway credentials, no signup. One
-            command fetches one and writes it as a standard
-            <code class="inline">.creds</code> file:</p>
-          <pre class="code">agentmesh connect --sandbox</pre>
-          <p class="outlabel">you'll see</p>
-          <pre class="out"><span class="ok">[agentmesh] requesting sandbox credential from https://api.agentmesh.ai
-[agentmesh] sandbox credential written: ./sandbox.creds
+          <p class="kicker">quickstart</p>
+          <h2>Reachable, then named, in three steps</h2>
 
-Point an agent at the mesh:
-  url:   wss://mesh.agentmesh.ai
-  creds: ./sandbox.creds</span></pre>
-          <p>That file is your address on the mesh: its public key is who you are. Hand
-            the URL and creds file to any AgentMesh SDK and continue with the normal
-            connect, register, discover, request flow. To join a different mesh, pass
-            <code class="inline">--broker</code> and <code class="inline">--url</code>:</p>
-          <pre class="code">agentmesh connect --sandbox \
-  --broker https://sandbox.acme.example \
-  --url wss://mesh.acme.example \
-  --out ./acme.creds</pre>
-          <div class="callout">
-            <div class="t">the sandbox contract</div>
-            <p>A sandbox credential is deliberately throwaway, and the broker enforces it:</p>
-            <ul>
-              <li><b>Ephemeral.</b> Idle credentials are reclaimed. Send a heartbeat to
-                <code class="inline">POST /v1/guest/heartbeat</code> to keep a long
-                session alive, or <code class="inline">POST /v1/guest/release</code> to
-                hand it back.</li>
-              <li><b>Quota-capped.</b> Limits per client and in total.</li>
-              <li><b>Not publicly discoverable.</b> Agents registered under a sandbox
-                credential stay out of open discovery. They're for trying things, not
-                production.</li>
-            </ul>
-            <p>For anything you intend to keep, stand up your own mesh (below).</p>
-          </div>
+          <h3><span class="n">01</span>Start the adapter</h3>
+          <pre class="code">npx https://storage.googleapis.com/agentmesh-releases/mesh-adapter-0.1.0.tgz start --cmd "claude -p"</pre>
+          <p class="outlabel">output</p>
+          <pre class="out">agent    UCS2JDDFAPQ74YLCDWR3KSSGI5G2UGOP7GQVTBYBLPSOZSLDEYJEALLI
+name     cli-agent
+pipe     claude -p   (message on stdin, reply from stdout)
+mesh     wss://mesh.agentmesh.ai
+<span class="ok">listening.</span> pair a handle with:  mesh-adapter pair &lt;handle&gt; &lt;code&gt;</pre>
+
+          <h3><span class="n">02</span>Bind a name to it</h3>
+          <p>Claim a handle at <a href="https://agentcatalog.com/">https://agentcatalog.com/</a>
+            (Personal Agent Naming), request a pairing code under My handles, and let the
+            adapter sign it:</p>
+          <pre class="code">mesh-adapter pair Coder.jeff@gmail.com KX4-92F</pre>
+          <p class="outlabel">output</p>
+          <pre class="out"><span class="ok">✓ bound</span> · Coder.jeff@gmail.com now resolves to agent UCS2JDDF…</pre>
+
+          <h3><span class="n">03</span>Reach it by name, from anywhere</h3>
+          <pre class="code">mesh-adapter send Coder.jeff@gmail.com "review the auth PR and summarize"</pre>
+          <p>The handle resolves to the agent's address, the message crosses the mesh, your
+            local agent runs, and the reply comes back. Other agents do the same thing
+            programmatically with the <a href="sdks.html">SDKs</a>.</p>
         </div>
       </section>
 
-      <!-- path B -->
       <section class="band">
         <div class="wrap">
-          <p class="kicker">path b · stand up your own</p>
-          <h2>A complete mesh, one command</h2>
-          <p>One command produces a self-contained mesh: its own operator root key, its
-            own accounts, JetStream enabled, and a ready-to-run server config. Nothing
-            leaves your machine.</p>
+          <p class="kicker">sharing a machine</p>
+          <h2>Nodes see each other, not fight each other</h2>
+          <p>A machine can host many nodes. So implementations know about each other, the
+            adapter introduces a small convention,
+            <code class="inline">agentmesh-node-discovery/v1</code>: every running node
+            writes a descriptor to <code class="inline">~/.agentmesh/nodes/</code> with its
+            implementation name, pid, node id, and hosted agents, and removes it on exit.
+            On startup, a node reads the directory, prunes descriptors whose process is
+            gone, and reports the ones still alive.</p>
+          <p class="outlabel">what you see if another node is running</p>
+          <pre class="out">another AgentMesh node is already running on this machine:
+  · egg-gateway (pid 8096) · a full node product; it can host this agent too
+that is fine: a machine can host many nodes, each with its own agents.</pre>
+          <p>Finding a neighbor is information, not an error. The adapter tells you what
+            else is running and continues, so you can decide whether the agent belongs in
+            the adapter or in the fuller host. Node products are encouraged to adopt the
+            convention; until they do, the adapter also recognizes known info files, the
+            Egg Gateway's among them.</p>
+        </div>
+      </section>
 
-          <h3><span class="n">01</span>Initialize the instance</h3>
-          <pre class="code">agentmesh init --name acme --dir ./acme-mesh</pre>
-          <p>This generates the operator, a system account, and an
-            <code class="inline">agents</code> account (with JetStream), mints a first
-            node credential, and writes a <code class="inline">nats.conf</code>. It uses
-            an isolated <code class="inline">nsc</code> store inside the instance
-            directory, so it never touches a global setup.</p>
-
-          <h3><span class="n">02</span>Start the server</h3>
-          <pre class="code">nats-server -c ./acme-mesh/nats.conf</pre>
-          <p class="outlabel">you'll see</p>
-          <pre class="out"><span class="ok">[INF] Listening for websocket clients on ws://0.0.0.0:4443
-[INF] Server is ready</span></pre>
-          <p>Your mesh is listening for WebSocket clients. The first node's credential is
-            at <code class="inline">./acme-mesh/creds/node-1.creds</code>.</p>
-
-          <h3><span class="n">03</span>Connect a node</h3>
-          <p>Point an SDK at your local mesh with that credential, exactly as in path A
-            but against your own server: url <code class="inline">ws://localhost:4443</code>,
-            creds <code class="inline">./acme-mesh/creds/node-1.creds</code>.</p>
-
-          <h3><span class="n">04</span>Add more nodes</h3>
-          <pre class="code">nsc -H ./acme-mesh/.nsc add user -a agents -n node-2
-nsc -H ./acme-mesh/.nsc generate creds -a agents -n node-2 \
-  &gt; ./acme-mesh/creds/node-2.creds</pre>
-          <p>Each node gets its own credential. That's the whole lifecycle for a private
-            mesh you control.</p>
-
-          <div class="callout">
-            <div class="t">before production</div>
-            <p><code class="inline">init</code> writes a development config: WebSocket
-              without TLS, and a memory resolver with accounts baked into the file. For a
-              real deployment, terminate TLS (serve <code class="inline">wss://</code>)
-              and move to a NATS account resolver if you need to add accounts without
-              restarting. Connecting independent meshes (federation) is planned
-              separately: <a href="spec.html#21-federation-planned">spec §21</a>.</p>
+      <section class="band">
+        <div class="wrap">
+          <p class="kicker">where it sits</p>
+          <h2>Reference, product, or SDK</h2>
+          <ul class="plain">
+            <li><b>The adapter</b> is the floor: the smallest thing that counts as a
+              node, kept to one readable file so it doubles as documentation. Source in the
+              <a href="https://github.com/jeffrschneider/AgentMesh/tree/main/mesh-adapter">AgentMesh repo</a>.</li>
+            <li><b>Node products</b> extend the same idea into a full host: many agents,
+              skills, queues, a UI. The <a href="nodes.html">Egg Gateway</a> is one example
+              of a product built this way.</li>
+            <li><b>The SDKs</b> are for building your own: frameworks and runtimes embed a
+              node directly with the <a href="sdks.html">TypeScript or Rust SDK</a>.</li>
+          </ul>
+          <div class="callout mint">
+            <div class="t">naming is a separate layer</div>
+            <p>The adapter gives your agent an <b>address</b>; a PAN handle gives it a
+              <b>name</b>. Naming lives at
+              <a href="https://agentcatalog.com/">https://agentcatalog.com/</a> and works
+              with any transport; the adapter is simply the fastest way to have an address
+              worth naming.</p>
           </div>
-
-          <p>From here: <a href="getting-started.html">build your first agent</a> on the
-            connection you just made, or read
-            <a href="running-a-mesh.html">running a mesh</a> for who operates instances
-            and how meshes will interconnect.</p>
         </div>
       </section>
 
       <footer>
         <div class="wrap">
-          <span>AgentMesh · open protocol for agent-to-agent communication</span>
+          <span>AgentMesh</span>
+          <a href="spec.html">specification</a>
           <a href="https://github.com/jeffrschneider/AgentMesh">GitHub ↗</a>
+          <a href="https://agentcatalog.com">PAN ↗</a>
         </div>
       </footer>
 

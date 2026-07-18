@@ -182,6 +182,7 @@ const page = `<!DOCTYPE html>
         <a href="world-wide-mesh.html">/ world-wide-mesh</a>
         <div class="grp">use</div>
         <a href="nodes.html">/ nodes</a>
+        <a href="adapter.html">/ adapter</a>
         <a href="use-cases.html">/ use-cases</a>
         <div class="grp">build</div>
         <a href="getting-started.html">/ getting-started</a>
