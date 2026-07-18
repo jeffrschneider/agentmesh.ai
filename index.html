@@ -43,7 +43,7 @@
 
     /* ── layout shell ── */
     .layout{ position:relative; z-index:1; display:grid; grid-template-columns:248px 1fr; min-height:100vh; }
-    .rail{ border-right:1px solid var(--line); padding:26px 22px; position:sticky; top:0; align-self:start; height:100vh; }
+    .rail{ border-right:1px solid var(--line); padding:26px 22px; position:sticky; top:0; align-self:start; height:100vh; overflow-y:auto; scrollbar-width:thin; }
     .brand{ font-family:var(--wire); font-weight:600; font-size:.82rem; letter-spacing:.02em;
       display:flex; align-items:center; gap:9px; color:var(--paper); text-decoration:none; margin-bottom:30px; }
     .brand .dot{ width:9px; height:9px; border-radius:2px; background:var(--signal);
