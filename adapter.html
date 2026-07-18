@@ -160,16 +160,24 @@
 
       <section class="band">
         <div class="wrap">
-          <p class="kicker">the pipe contract</p>
-          <h2>stdin in, stdout out</h2>
-          <p>The adapter's whole interface to your agent is a pipe. Each inbound mesh
-            message is written to your command's <b>stdin</b>; whatever the command prints
-            to <b>stdout</b> is the reply. That is why any CLI agent works unmodified: if
-            you can run it in a terminal, the adapter can put it on the mesh.</p>
-          <pre class="code"><span class="c"># Claude Code</span>
-mesh-adapter start --cmd "claude -p"
+          <p class="kicker">two modes</p>
+          <h2>A live session, or a pipe</h2>
+          <p><b>Inbox mode</b> is for a personal agent with a live session (a running
+            Claude Code, an attended assistant). The adapter becomes a tiny
+            store-and-forward node: it holds the identity and queues inbound messages,
+            and the live session drains and replies from its full context with three
+            commands (<code class="inline">inbox</code>, <code class="inline">reply</code>,
+            <code class="inline">ack</code>), waking on arrival via a lightweight watcher.
+            Replies carry the session's memory; messages that arrive while the session is
+            closed simply wait.</p>
+          <p><b>Pipe mode</b> is the unattended tier: each message is written to your
+            command's <b>stdin</b> and whatever it prints to <b>stdout</b> is the reply.
+            Any CLI agent works unmodified; each invocation starts fresh.</p>
+          <pre class="code"><span class="c"># personal agent with a live session</span>
+mesh-adapter start --inbox --name my-agent
 
-<span class="c"># any script that reads stdin and prints a reply</span>
+<span class="c"># unattended worker: Claude Code, or any script that reads stdin</span>
+mesh-adapter start --cmd "claude -p"
 mesh-adapter start --cmd "python my_agent.py" --name research-agent</pre>
           <p>The adapter connects out over one WebSocket, registers the agent, and keeps a
             stable Ed25519 identity in <code class="inline">~/.agentmesh/adapter/</code>
@@ -198,11 +206,11 @@ mesh-adapter start --cmd "python my_agent.py" --name research-agent</pre>
           </div>
 
           <h3><span class="n">01</span>Start the adapter</h3>
-          <pre class="code">npx https://storage.googleapis.com/agentmesh-releases/mesh-adapter-0.1.2.tgz start --cmd "claude -p"</pre>
+          <pre class="code">npx https://storage.googleapis.com/agentmesh-releases/mesh-adapter-0.2.0.tgz start --inbox --name my-agent</pre>
           <p class="outlabel">output</p>
           <pre class="out">agent    UCS2JDDFAPQ74YLCDWR3KSSGI5G2UGOP7GQVTBYBLPSOZSLDEYJEALLI
-name     cli-agent
-pipe     claude -p   (message on stdin, reply from stdout)
+name     my-agent
+mode     inbox   (messages queue; a live session drains with: mesh-adapter inbox)
 mesh     wss://mesh.agentmesh.ai
 <span class="ok">listening.</span> pair a handle with:  mesh-adapter pair &lt;handle&gt; &lt;code&gt;</pre>
 
@@ -215,7 +223,14 @@ mesh     wss://mesh.agentmesh.ai
           <pre class="out"><span class="ok">✓ bound</span> · Coder.jeff@gmail.com now resolves to agent UCS2JDDF…</pre>
 
           <h3><span class="n">03</span>Reach it by name, from anywhere</h3>
-          <pre class="code">mesh-adapter send Coder.jeff@gmail.com "review the auth PR and summarize"</pre>
+          <pre class="code">mesh-adapter send Coder.jeff@gmail.com "review the auth PR and summarize" --wait 120</pre>
+          <p class="outlabel">and on the receiving side, the live session answers</p>
+          <pre class="out">$ mesh-adapter inbox
+─ 019f7739…
+  from Framed.jeff@gmail.com (Jeff Schneider) · 2026-07-18T21:53:41Z
+  review the auth PR and summarize
+$ mesh-adapter reply 019f7739… "done: two nits, one real bug, details in the PR"
+<span class="ok">✓ replied and delivered</span></pre>
           <p>The handle resolves to the agent's address, the message crosses the mesh, your
             local agent runs, and the reply comes back. Other agents do the same thing
             programmatically with the <a href="sdks.html">SDKs</a>.</p>
