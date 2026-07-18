@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Coming from tunnels and shared repos: AgentMesh</title>
-  <meta name="description" content="People connect their agents today with SSH tunnels, shared GitHub repos, and Slack. Each solves one layer. Together they are a broker with a durable inbox, hand-rolled. That is what AgentMesh is, built on purpose.">
+  <title>How agents connect today: AgentMesh</title>
+  <meta name="description" content="The landscape of agent-to-agent transport, from a laptop tunnel to A2A point-to-point to an enterprise message queue. What each is good for, where it breaks, and where a mesh earns its place.">
   <link rel="icon" type="image/svg+xml" href="favicon.svg">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -83,7 +83,7 @@
     .alt dd.mesh{ color:var(--paper); }
 
     .cmp-wrap{ overflow-x:auto; margin:22px 0 6px; border:1px solid var(--line); border-radius:12px; }
-    table.mtx{ width:100%; border-collapse:collapse; font-size:.86rem; min-width:660px; }
+    table.mtx{ width:100%; border-collapse:collapse; font-size:.82rem; min-width:820px; }
     table.mtx th, table.mtx td{ padding:12px 14px; border-bottom:1px solid var(--line); text-align:left; }
     table.mtx thead th{ font-family:var(--wire); font-size:.7rem; letter-spacing:.08em; text-transform:uppercase;
       color:var(--faint); background:rgba(255,255,255,.015); }
@@ -160,20 +160,36 @@
       <div class="wrap hero">
         <span class="eyebrow"><span class="tag">agentmesh</span> · alternatives</span>
         <h1>You're already building<br>a mesh, the <span class="am">hard way</span></h1>
-        <p class="lede">People connect their agents today with SSH tunnels, shared GitHub
-          repos, and Slack. Each of these solves exactly one piece of the problem. Put
-          together, what they add up to is a broker with a durable inbox, reinvented by
-          hand. That is what AgentMesh is, built on purpose.</p>
+        <p class="lede">There is no single, purpose-built way for agents to reach each other,
+          so people improvise, from a laptop wiring up a tunnel to an enterprise standing up
+          a message queue. Here is the landscape of how agents connect today, across three
+          tiers: repurposed human tools, direct protocols like A2A, and brokers you run
+          yourself. What each is good for, where it breaks, and where a mesh earns its place.</p>
       </div>
 
       <section class="band">
         <div class="wrap">
-          <p class="kicker">what people do today</p>
-          <h2>Four channels, four half-solutions</h2>
-          <p>There is no purpose-built way for two personal agents to talk, so people
-            repurpose the tool they already understand. Inconsistent naming is the crack you
-            notice first, but it is the smallest problem here. Each channel below quietly
-            implements one layer of agent-to-agent communication, and stops there.</p>
+          <p class="kicker">before the tiers</p>
+          <h2>Two things worth saying up front</h2>
+          <p>First, inconsistent naming is the crack most people notice first, but it is the
+            smallest problem here. A name is its own layer:
+            <a href="https://agentcatalog.com">PAN</a> gives an agent a stable, portable name
+            that resolves to a mesh address. The harder problems are transport: reach,
+            delivery, presence, and trust.</p>
+          <p>Second, watch the difference between a <b>human-to-agent</b> channel and an
+            <b>agent-to-agent</b> one. Most chat apps are the former, a front door for a
+            person to text their agent, and they get stretched into the latter. That stretch
+            is where a lot of the pain below comes from.</p>
+        </div>
+      </section>
+
+      <section class="band">
+        <div class="wrap">
+          <p class="kicker">tier 1 · the improvisations</p>
+          <h2>Human tools, repurposed</h2>
+          <p>The consumer stopgaps. Each repurposes a tool people already understand, and
+            each quietly implements one layer of agent-to-agent communication, and stops
+            there.</p>
 
           <div class="alt" style="--hue:var(--address)">
             <div class="h"><h3>SSH tunnels · ngrok · cloudflared</h3><span class="layer">layer: reachability</span></div>
@@ -194,20 +210,57 @@
           </div>
 
           <div class="alt" style="--hue:var(--broadcast)">
-            <div class="h"><h3>Slack · Discord</h3><span class="layer">layer: presence, identity, visibility</span></div>
+            <div class="h"><h3>Slack · Discord · Signal · Telegram</h3><span class="layer">layer: presence, identity, visibility</span></div>
             <dl>
-              <dt>solves</dt><dd>Who is online, a sender on every message, notifications, and the thing people quietly love: you can watch your agents talk to each other.</dd>
-              <dt>breaks</dt><dd>Identity is a bot token, not the agent's own key, so nothing proves the <b>agent</b> sent a message. The vendor is your trust boundary and your outage. Freeform text with no request or task semantics, rate limits, and one workspace.</dd>
-              <dt class="mesh">mesh</dt><dd class="mesh">Keeps the good parts, live presence and a conversation the owner can watch, but every message is <b>signed by the agent's own key</b>, structured as request / respond / emit, and owned by no chat vendor.</dd>
+              <dt>solves</dt><dd>Who is online, a sender on every message, notifications, and the thing people quietly love: you can watch your agents talk.</dd>
+              <dt>breaks</dt><dd>These are <b>human-to-agent</b> channels stretched to agent-to-agent, and they push back. Telegram bots cannot even message each other; you need a shared group or a relay. Identity is a bot token or a phone number, not the agent's own key, so nothing proves the <b>agent</b> sent a message. The vendor is your trust boundary and your outage. Freeform text, no task semantics, rate limits, one workspace.</dd>
+              <dt class="mesh">mesh</dt><dd class="mesh">Keeps the good parts, live presence and a conversation the owner can watch, but every message is <b>signed by the agent's own key</b>, structured as request / respond / emit, built for machines, and owned by no chat vendor.</dd>
+            </dl>
+          </div>
+        </div>
+      </section>
+
+      <section class="band">
+        <div class="wrap">
+          <p class="kicker">tier 2 · direct protocols</p>
+          <h2>A2A point-to-point, and webhooks</h2>
+          <p>These are not hacks, and that is the point. When two agents both have reachable
+            endpoints, they can talk directly, no improvisation required. This is the
+            legitimate baseline, and the mesh is built to extend it, not replace it.</p>
+
+          <div class="alt" style="--hue:var(--verify)">
+            <div class="h"><h3>A2A point-to-point</h3><span class="layer">the method layer</span></div>
+            <dl>
+              <dt>solves</dt><dd>Fetch the agent card, call <code class="inline">message/send</code> over HTTPS, get a structured task back. Real request, respond, and task semantics, the thing none of the tier-1 hacks have.</dd>
+              <dt>breaks</dt><dd>It assumes both ends are reachable. Behind NAT, on a sleeping laptop, or across a firewall, there is nothing to call. No presence, no delivery while the peer is down, and a connection per pair.</dd>
+              <dt class="mesh">mesh</dt><dd class="mesh">AgentMesh <b>carries A2A</b>. Its task model is wire-compatible with A2A, and it runs those same semantics across firewalls, with an outbound connection, a durable inbox, and presence. A2A when the peer is reachable, the mesh when it is not, same messages either way. See the <a href="a2a-bridge.html">A2A bridge</a>.</dd>
             </dl>
           </div>
 
-          <div class="alt" style="--hue:var(--signal)">
-            <div class="h"><h3>Naming by convention</h3><span class="layer">layer: naming</span></div>
+          <div class="alt" style="--hue:var(--address)">
+            <div class="h"><h3>Webhooks · direct HTTP callbacks</h3><span class="layer">the raw wire</span></div>
             <dl>
-              <dt>solves</dt><dd>A way to refer to an agent: a repo URL, a channel, an IP and port.</dd>
-              <dt>breaks</dt><dd>None of these is a stable, portable, human-handleable name. It is the first crack you hit, and a real one, but the smallest on this page.</dd>
-              <dt class="mesh">mesh</dt><dd class="mesh">Naming is its own layer. <a href="https://agentcatalog.com">PAN</a> gives an agent a name that resolves to a mesh address. The harder problems are the three above it.</dd>
+              <dt>solves</dt><dd>The simplest thing that works: one agent POSTs to another's URL.</dd>
+              <dt>breaks</dt><dd>Same reachability wall as A2A, minus the structure. You invent the payload, the retry logic, the auth, and the delivery guarantees yourself.</dd>
+              <dt class="mesh">mesh</dt><dd class="mesh">The mesh gives you delivery, retries, identity, and presence as the substrate, so you are not rebuilding HTTP plumbing per integration.</dd>
+            </dl>
+          </div>
+        </div>
+      </section>
+
+      <section class="band">
+        <div class="wrap">
+          <p class="kicker">tier 3 · diy brokers</p>
+          <h2>The broker you build yourself</h2>
+          <p>What teams and enterprises reach for. A real, durable broker at scale, and the
+            enterprise version of the shared-repo dead-drop.</p>
+
+          <div class="alt" style="--hue:var(--broadcast)">
+            <div class="h"><h3>Message queues · cloud pub/sub</h3><span class="layer">Kafka · RabbitMQ · NATS · SNS/SQS · Pub/Sub</span></div>
+            <dl>
+              <dt>solves</dt><dd>Durable, async, high-throughput delivery. Agents connect outbound to the broker, so it clears the NAT wall too.</dd>
+              <dt>breaks</dt><dd>You stand it up, secure it, and operate it. It is transport, not an agent fabric: no agent identity, no presence, no naming, and no story the moment a message needs to cross into another organization.</dd>
+              <dt class="mesh">mesh</dt><dd class="mesh">The mesh is a broker built <b>for agents</b>: the same durable, outbound, async delivery, plus signed identity, presence, discovery, and a trust chain that crosses organizations, with nothing for you to run.</dd>
             </dl>
           </div>
         </div>
@@ -217,14 +270,17 @@
         <div class="wrap">
           <p class="kicker">the pattern</p>
           <h2>You keep reinventing the broker</h2>
-          <p>Look at what the repo and the Slack approaches have in common: a shared,
-            always-on third party that both agents reach <b>outbound</b>, that holds a
-            message until the recipient wakes up. That is a broker with a durable inbox. You
-            reach for it because two personal agents on sleeping laptops behind NAT cannot
-            connect directly, and never will. This is not a workaround that AgentMesh
-            replaces. It is AgentMesh, hand-rolled out of a repo or a chat app.</p>
+          <p>Look at what the shared repo, the chat channel, and the message queue all have
+            in common: a shared, always-on third party that both agents reach <b>outbound</b>,
+            that holds a message until the recipient wakes up. That is a broker with a durable
+            inbox. From a GitHub repo on a laptop to a Kafka cluster in a data center, people
+            keep building the same thing, because two agents that are not both reachable at
+            once cannot connect directly. This is not a workaround that AgentMesh replaces. It
+            is AgentMesh, hand-rolled, at every scale. The one tier that is not a hand-rolled
+            broker is A2A, and the mesh does not replace that either: it carries it.</p>
           <p class="pull">The mesh is that broker, built on purpose: outbound connections, a
-            node-held inbox, live presence, and a signed envelope on every message.</p>
+            node-held inbox, live presence, a signed envelope on every message, and A2A
+            semantics on the wire.</p>
         </div>
       </section>
 
@@ -248,21 +304,22 @@
         <div class="wrap">
           <p class="kicker">at a glance</p>
           <h2>The layer each one covers</h2>
-          <p>Every stopgap is strong in one column and empty in the rest. The mesh is the
-            one built to hold all of them at once.</p>
+          <p>Every alternative is strong in a column or two and empty in the rest. A2A owns
+            structure, the queue owns durable reach, the chat app owns presence. The mesh is
+            the one built to hold all of them at once, A2A included.</p>
           <div class="cmp-wrap">
             <table class="mtx">
               <thead>
-                <tr><th>The job</th><th>SSH / tunnel</th><th>Shared repo</th><th>Slack</th><th class="mesh">AgentMesh</th></tr>
+                <tr><th>The job</th><th>Tunnel</th><th>Shared repo</th><th>Chat app</th><th>A2A direct</th><th>Queue / pub-sub</th><th class="mesh">AgentMesh</th></tr>
               </thead>
               <tbody>
-                <tr><td class="job">Reach behind NAT</td><td class="center y">✓</td><td class="center y">✓</td><td class="center y">✓</td><td class="center mesh y">✓</td></tr>
-                <tr><td class="job">Durable, async delivery</td><td class="center n">✕</td><td class="center y">✓</td><td class="center p">~</td><td class="center mesh y">✓</td></tr>
-                <tr><td class="job">Live presence</td><td class="center n">✕</td><td class="center n">✕</td><td class="center y">✓</td><td class="center mesh y">✓</td></tr>
-                <tr><td class="job">Per-message agent identity</td><td class="center n">✕</td><td class="center p">~</td><td class="center n">✕</td><td class="center mesh y">✓</td></tr>
-                <tr><td class="job">Request / respond structure</td><td class="center n">✕</td><td class="center n">✕</td><td class="center n">✕</td><td class="center mesh y">✓</td></tr>
-                <tr><td class="job">Across organizations</td><td class="center p">~</td><td class="center p">~</td><td class="center n">✕</td><td class="center mesh y">✓</td></tr>
-                <tr><td class="job">Stable, portable name</td><td class="center n">✕</td><td class="center n">✕</td><td class="center p">~</td><td class="center mesh y">✓</td></tr>
+                <tr><td class="job">Reach behind NAT</td><td class="center y">✓</td><td class="center y">✓</td><td class="center y">✓</td><td class="center n">✕</td><td class="center y">✓</td><td class="center mesh y">✓</td></tr>
+                <tr><td class="job">Durable, async delivery</td><td class="center n">✕</td><td class="center y">✓</td><td class="center p">~</td><td class="center p">~</td><td class="center y">✓</td><td class="center mesh y">✓</td></tr>
+                <tr><td class="job">Live presence</td><td class="center n">✕</td><td class="center n">✕</td><td class="center y">✓</td><td class="center n">✕</td><td class="center n">✕</td><td class="center mesh y">✓</td></tr>
+                <tr><td class="job">Per-message agent identity</td><td class="center n">✕</td><td class="center p">~</td><td class="center n">✕</td><td class="center p">~</td><td class="center n">✕</td><td class="center mesh y">✓</td></tr>
+                <tr><td class="job">Request / respond structure</td><td class="center n">✕</td><td class="center n">✕</td><td class="center n">✕</td><td class="center y">✓</td><td class="center n">✕</td><td class="center mesh y">✓</td></tr>
+                <tr><td class="job">Across organizations</td><td class="center p">~</td><td class="center p">~</td><td class="center n">✕</td><td class="center p">~</td><td class="center n">✕</td><td class="center mesh y">✓</td></tr>
+                <tr><td class="job">Nothing to stand up or run</td><td class="center p">~</td><td class="center p">~</td><td class="center y">✓</td><td class="center p">~</td><td class="center n">✕</td><td class="center mesh y">✓</td></tr>
               </tbody>
             </table>
           </div>
