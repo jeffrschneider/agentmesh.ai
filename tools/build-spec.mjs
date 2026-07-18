@@ -183,6 +183,7 @@ const page = `<!DOCTYPE html>
         <div class="grp">use</div>
         <a href="nodes.html">/ nodes</a>
         <a href="adapter.html">/ adapter</a>
+        <a href="try-the-mesh.html">/ try-the-mesh</a>
         <a href="use-cases.html">/ use-cases</a>
         <div class="grp">build</div>
         <a href="getting-started.html">/ getting-started</a>
@@ -191,7 +192,6 @@ const page = `<!DOCTYPE html>
         <a href="a2a-bridge.html">/ a2a-bridge</a>
         <div class="grp">operate</div>
         <a href="running-a-mesh.html">/ running-a-mesh</a>
-        <a href="run-a-test-node.html">/ run-a-test-node</a>
         <div class="grp">reference</div>
         <a class="on" href="spec.html">/ specification</a>
         <a href="sdk-reference.html">/ sdk-reference</a>

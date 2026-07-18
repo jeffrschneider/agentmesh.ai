@@ -92,6 +92,17 @@
       color:var(--faint); margin-bottom:6px; }
     .callout p{ margin:0; color:var(--dim); }
     .callout p b{ color:var(--paper); }
+    section.band h3{ font-size:1.15rem; margin:38px 0 10px; }
+    section.band h3 .n{ color:var(--signal); font-family:var(--wire); font-size:.9rem; margin-right:10px; }
+    pre.code{ background:#0b1220; border:1px solid var(--line); border-radius:12px; padding:16px 18px;
+      overflow-x:auto; font-family:var(--wire); font-size:.82rem; line-height:1.7; color:var(--paper); margin:20px 0; }
+    pre.code .s{ color:var(--verify); }
+    pre.out{ background:var(--panel); border:1px solid var(--line); border-left:3px solid var(--verify);
+      border-radius:12px; padding:14px 18px; overflow-x:auto; font-family:var(--wire); font-size:.8rem;
+      line-height:1.7; color:var(--dim); margin:14px 0 6px; }
+    pre.out .ok{ color:var(--verify); }
+    .outlabel{ font-family:var(--wire); font-size:.7rem; letter-spacing:.12em; text-transform:uppercase;
+      color:var(--faint); margin:18px 0 0; }
     code.inline{ font-family:var(--wire); font-size:.86em; color:var(--verify);
       background:rgba(67,214,166,.07); border:1px solid rgba(67,214,166,.15); border-radius:5px; padding:1px 5px; }
 
@@ -122,6 +133,7 @@
         <div class="grp">use</div>
         <a href="nodes.html">/ nodes</a>
         <a href="adapter.html">/ adapter</a>
+        <a href="try-the-mesh.html">/ try-the-mesh</a>
         <a href="use-cases.html">/ use-cases</a>
         <div class="grp">build</div>
         <a href="getting-started.html">/ getting-started</a>
@@ -130,7 +142,6 @@
         <a href="a2a-bridge.html">/ a2a-bridge</a>
         <div class="grp">operate</div>
         <a class="on" href="running-a-mesh.html">/ running-a-mesh</a>
-        <a href="run-a-test-node.html">/ run-a-test-node</a>
         <div class="grp">reference</div>
         <a href="spec.html">/ specification</a>
         <a href="sdk-reference.html">/ sdk-reference</a>
@@ -188,10 +199,63 @@
             <div class="cell">
               <div class="h">personal</div>
               <p>Nothing stops an individual from running a single-node mesh at home
-                (<a href="run-a-test-node.html">one command</a>, in fact). Tenancy,
+                (<a href="#standup">one command</a>, in fact). Tenancy,
                 isolated accounts inside someone else's instance, is the lighter
                 alternative when you don't want to operate anything.</p>
             </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="band" id="standup">
+        <div class="wrap">
+          <p class="kicker">do it now</p>
+          <h2>A complete mesh, one command</h2>
+          <p>The <code class="inline">agentmesh</code> CLI (from the
+            <a href="https://github.com/jeffrschneider/AgentMesh">reference repository</a>;
+            setup on <a href="try-the-mesh.html">try the mesh</a>) produces a
+            self-contained instance: its own operator root key, its own accounts,
+            JetStream enabled, and a ready-to-run server config. Nothing leaves your
+            machine. You'll also need <code class="inline">nsc</code> and a
+            <code class="inline">nats-server</code> binary.</p>
+
+          <h3><span class="n">01</span>Initialize the instance</h3>
+          <pre class="code">agentmesh init --name acme --dir ./acme-mesh</pre>
+          <p>This generates the operator, a system account, and an
+            <code class="inline">agents</code> account (with JetStream), mints a first
+            node credential, and writes a <code class="inline">nats.conf</code>. It uses
+            an isolated <code class="inline">nsc</code> store inside the instance
+            directory, so it never touches a global setup.</p>
+
+          <h3><span class="n">02</span>Start the server</h3>
+          <pre class="code">nats-server -c ./acme-mesh/nats.conf</pre>
+          <p class="outlabel">you'll see</p>
+          <pre class="out"><span class="ok">[INF] Listening for websocket clients on ws://0.0.0.0:4443
+[INF] Server is ready</span></pre>
+          <p>Your mesh is listening for WebSocket clients. The first node's credential is
+            at <code class="inline">./acme-mesh/creds/node-1.creds</code>.</p>
+
+          <h3><span class="n">03</span>Connect a node</h3>
+          <p>Point an SDK at your local mesh with that credential: url
+            <code class="inline">ws://localhost:4443</code>, creds
+            <code class="inline">./acme-mesh/creds/node-1.creds</code>. The same flow as
+            the public sandbox, against your own server.</p>
+
+          <h3><span class="n">04</span>Add more nodes</h3>
+          <pre class="code">nsc -H ./acme-mesh/.nsc add user -a agents -n node-2
+nsc -H ./acme-mesh/.nsc generate creds -a agents -n node-2 \
+  &gt; ./acme-mesh/creds/node-2.creds</pre>
+          <p>Each node gets its own credential. That's the whole lifecycle for a private
+            mesh you control.</p>
+
+          <div class="callout">
+            <div class="t">before production</div>
+            <p><code class="inline">init</code> writes a development config: WebSocket
+              without TLS, and a memory resolver with accounts baked into the file. For a
+              real deployment, terminate TLS (serve <code class="inline">wss://</code>)
+              and move to a NATS account resolver if you need to add accounts without
+              restarting. Connecting independent meshes (federation) is planned
+              separately: <a href="spec.html#21-federation-planned">spec §21</a>.</p>
           </div>
         </div>
       </section>
@@ -238,7 +302,7 @@
             the spec as adoption grows.</p>
           <div class="callout">
             <div class="t">operate one today</div>
-            <p><a href="run-a-test-node.html">Run a test node</a> stands up a complete
+            <p><a href="#standup">The walkthrough above</a> stands up a complete
               self-contained mesh with one command: your own operator key, accounts, and
               server config. That's the private-instance path, minus the production
               hardening.</p>
