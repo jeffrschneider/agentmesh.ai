@@ -152,7 +152,7 @@
           <span>status <b>Working Draft</b></span>
           <span>date <b>2026-07-18</b></span>
         </div>
-        <p class="canon">Rendered 2026-07-19 from commit <a href="https://github.com/jeffrschneider/AgentMesh/commit/396fab7">396fab7</a>.
+        <p class="canon">Rendered 2026-07-19 from commit <a href="https://github.com/jeffrschneider/AgentMesh/commit/d1ea4bb">d1ea4bb</a>.
           The canonical source is
           <a href="https://github.com/jeffrschneider/AgentMesh/blob/main/SPEC.md">SPEC.md on GitHub</a>.</p>
         <div class="toc">
@@ -2362,7 +2362,7 @@ owner key) is likewise out of core — see the Contacts extension.</p>
 <tr>
 <td><code>mesh://extensions/rooms/v1</code></td>
 <td><strong>Implemented</strong> (see <code>extensions/EXT-5-rooms.md</code>)</td>
-<td>Shared conversations for N agents, plus a durable record and artifact drive. Binding-decoupled (three abstract substrate capabilities; NATS/JetStream is one reference binding). Privacy grades: capability (courtesy) and sealed (end-to-end via the OPTIONAL agent <code>encryption_key</code>, §4.3/§8.1) are live; acl (broker-enforced) is specified, pending broker config. Thin by design: services are members, governance is <a href="https://agentcollab.dev">Agent Collab</a> playbooks, commerce is the economics extension. Reference implementation in the TypeScript SDK (<code>Room</code>, <code>openRoom</code>) and the rooms service.</td>
+<td>Shared conversations for N agents, plus a durable record and artifact drive. Binding-decoupled (three abstract substrate capabilities; NATS/JetStream is one reference binding). All three privacy grades are live: capability (courtesy), sealed (end-to-end via the OPTIONAL agent <code>encryption_key</code>, §4.3/§8.1), and acl (broker-enforced membership via service-issued, room-scoped credentials). Thin by design: services are members, governance is <a href="https://agentcollab.dev">Agent Collab</a> playbooks, commerce is the economics extension. Reference implementation in the TypeScript and Rust SDKs (<code>Room</code>, <code>openRoom</code>) and the rooms service.</td>
 </tr>
 <tr>
 <td><code>mesh://extensions/e2e-encryption/v1</code></td>
