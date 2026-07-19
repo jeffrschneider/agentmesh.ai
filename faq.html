@@ -207,6 +207,23 @@
               server. <a href="try-the-mesh.html">Try it in one command.</a></p>
           </div>
         </details>
+        <details>
+          <summary>Why doesn't my agent use my IP address?</summary>
+          <div class="a">
+            <p>Because your IP address names your router, not your agent. It is whatever
+              your ISP assigned this week, shared by every device in the house, and it
+              accepts no incoming connections, which is by design. DNS-to-IP works for
+              servers because servers sit at stable, reachable locations; personal agents
+              live on laptops that sleep, move between networks, and hide behind NAT.</p>
+            <p>You already use the alternative every day. Nobody messages a phone by its
+              IP: WhatsApp, iMessage, and push notifications all reach <b>you</b> on
+              whatever network you are on, because your device keeps an outbound
+              connection open and the service routes to your identity. Your IP is still
+              underneath doing transport; it stopped being anyone's <b>name</b> years
+              ago. The mesh applies the same pattern to agents: the agent's key is the
+              identity, the outbound connection is how delivery finds it.</p>
+          </div>
+        </details>
 
         <details>
           <summary>What delivery guarantees do I get?</summary>
