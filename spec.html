@@ -152,7 +152,7 @@
           <span>status <b>Working Draft</b></span>
           <span>date <b>2026-07-18</b></span>
         </div>
-        <p class="canon">Rendered 2026-07-18 from commit <a href="https://github.com/jeffrschneider/AgentMesh/commit/e47d43b">e47d43b</a>.
+        <p class="canon">Rendered 2026-07-19 from commit <a href="https://github.com/jeffrschneider/AgentMesh/commit/a1b69a7">a1b69a7</a>.
           The canonical source is
           <a href="https://github.com/jeffrschneider/AgentMesh/blob/main/SPEC.md">SPEC.md on GitHub</a>.</p>
         <div class="toc">
@@ -372,6 +372,7 @@ profiles, sandbox enforcement), and a public reference deployment.</p>
 <p>The node presents these at connection time. All of the node&#39;s hosted agents share this one connection. The concrete credential format (a NATS NKey + a User JWT) is defined in the reference binding (§18.2).</p>
 <h3 id="4-3-agent-identity">4.3. Agent Identity<a class="hl" href="#4-3-agent-identity">#</a></h3>
 <p>Every agent MUST possess an Ed25519 keypair generated on (or provisioned to) its host. The public key is the immutable <strong>agent ID</strong>. Agent keys are <strong>not</strong> issued by the account and require no JWT — an agent&#39;s right to speak on the mesh comes entirely from its node&#39;s vouch (§4.4). This makes creating an agent a local, zero-round-trip operation.</p>
+<p><strong>Encryption key (OPTIONAL).</strong> An agent MAY additionally hold an X25519 keypair, distinct from its Ed25519 signing keypair, used only for receiving sealed content (never for signing). Its purpose is end-to-end confidentiality where the transport or its operator is not trusted to read payloads: a sender seals a symmetric key or a message to the agent&#39;s X25519 <strong>public</strong> key, and only the agent can open it. An agent that declares an encryption key publishes the public half in its manifest (§8) as <code>encryption_key</code> and, outside the mesh, on its PAN card. The signing key remains the agent&#39;s identity and address; the encryption key is a capability attached to it, and its absence simply means the agent participates only in cleartext. This field is the sole prerequisite for the <code>sealed</code> privacy grade of the Rooms extension (§17.5); it is declared here in core because identity fields cannot be retrofitted once agents are minted.</p>
 <h3 id="4-4-vouching-node-agent-attestation">4.4. Vouching (Node → Agent Attestation)<a class="hl" href="#4-4-vouching-node-agent-attestation">#</a></h3>
 <p>A node asserts that it hosts an agent by issuing a signed <strong>attestation</strong>:</p>
 <pre><code class="language-json">{
@@ -1065,6 +1066,8 @@ profiles, sandbox enforcement), and a public reference deployment.</p>
 
   &quot;endpoint&quot;: &quot;mesh.agent.&lt;agent-nkey&gt;.inbox&quot;,
 
+  &quot;encryption_key&quot;: &quot;&lt;X25519 public key, OPTIONAL&gt;&quot;,
+
   &quot;node&quot;: {
     &quot;id&quot;: &quot;&lt;node-nkey-public&gt;&quot;,
     &quot;attestation&quot;: {
@@ -1206,6 +1209,11 @@ profiles, sandbox enforcement), and a public reference deployment.</p>
 <td><code>provider</code></td>
 <td>OPTIONAL</td>
 <td>Organization or individual who operates this agent.</td>
+</tr>
+<tr>
+<td><code>encryption_key</code></td>
+<td>OPTIONAL</td>
+<td>The agent&#39;s X25519 encryption public key (§4.3), for receiving sealed content. Present only if the agent supports end-to-end confidentiality (e.g. the Rooms <code>sealed</code> grade).</td>
 </tr>
 <tr>
 <td><code>owner</code></td>
@@ -2352,9 +2360,14 @@ owner key) is likewise out of core — see the Contacts extension.</p>
 <td>Interop with the A2A protocol. A bridge node vouches for external A2A parties as hosted agents, both directions (A2A client -&gt; mesh agent; mesh agent -&gt; external A2A server). The normative method/state/card mappings and trust-boundary rules live in <code>BRIDGE-A2A.md</code>.</td>
 </tr>
 <tr>
+<td><code>mesh://extensions/rooms/v1</code></td>
+<td><strong>Designed; spec publishes with the reference implementation</strong></td>
+<td>Shared, durable, optionally private conversations for N agents, plus an artifact drive. Binding-decoupled (three abstract substrate capabilities; NATS/JetStream is one reference binding). Three privacy grades: capability (courtesy), acl (broker-enforced), sealed (end-to-end via the OPTIONAL agent <code>encryption_key</code>, §4.3/§8.1). Thin by design: services are members, governance is <a href="https://agentcollab.dev">Agent Collab</a> playbooks, commerce is the economics extension. The normative extension document will be published alongside the SDK implementation.</td>
+</tr>
+<tr>
 <td><code>mesh://extensions/e2e-encryption/v1</code></td>
-<td><strong>Planned — deliberately deferred</strong></td>
-<td>End-to-end payload encryption between agents. The core secures the transport (node connection) but not payloads, so the mesh operator can currently read messages. Personal agents will need payload confidentiality; the Node/agent keypairs (§4) are the intended key substrate. <strong>Out of scope for 0.2 by decision (2026-07-09); to be specified after the 0.2 core lands. Do not lose this.</strong></td>
+<td><strong>Substrate landed; superseded in practice by Rooms</strong></td>
+<td>End-to-end payload confidentiality. The core still secures only the transport, not payloads. The key substrate now exists: the OPTIONAL agent X25519 <code>encryption_key</code> (§4.3). The first concrete consumer is the Rooms <code>sealed</code> grade (rooms/v1, above), which specifies sealed key distribution and payload framing for the group case. A general pairwise-encryption profile MAY still be written; the <code>sealed</code> grade already covers the multi-party need that motivated this entry.</td>
 </tr>
 <tr>
 <td><code>mesh://extensions/device-profile/v1</code></td>
