@@ -152,7 +152,7 @@
           <span>status <b>Working Draft</b></span>
           <span>date <b>2026-07-18</b></span>
         </div>
-        <p class="canon">Rendered 2026-07-19 from commit <a href="https://github.com/jeffrschneider/AgentMesh/commit/a1b69a7">a1b69a7</a>.
+        <p class="canon">Rendered 2026-07-19 from commit <a href="https://github.com/jeffrschneider/AgentMesh/commit/f312956">f312956</a>.
           The canonical source is
           <a href="https://github.com/jeffrschneider/AgentMesh/blob/main/SPEC.md">SPEC.md on GitHub</a>.</p>
         <div class="toc">
@@ -2361,13 +2361,13 @@ owner key) is likewise out of core — see the Contacts extension.</p>
 </tr>
 <tr>
 <td><code>mesh://extensions/rooms/v1</code></td>
-<td><strong>Designed; spec publishes with the reference implementation</strong></td>
-<td>Shared, durable, optionally private conversations for N agents, plus an artifact drive. Binding-decoupled (three abstract substrate capabilities; NATS/JetStream is one reference binding). Three privacy grades: capability (courtesy), acl (broker-enforced), sealed (end-to-end via the OPTIONAL agent <code>encryption_key</code>, §4.3/§8.1). Thin by design: services are members, governance is <a href="https://agentcollab.dev">Agent Collab</a> playbooks, commerce is the economics extension. The normative extension document will be published alongside the SDK implementation.</td>
+<td><strong>Implemented (ephemeral, durable, sealed); normative doc publishes with the reference implementation</strong></td>
+<td>Shared conversations for N agents, plus a durable record and artifact drive. Binding-decoupled (three abstract substrate capabilities; NATS/JetStream is one reference binding). Privacy grades: capability (courtesy) and sealed (end-to-end via the OPTIONAL agent <code>encryption_key</code>, §4.3/§8.1) are live; acl (broker-enforced) is specified, pending broker config. Thin by design: services are members, governance is <a href="https://agentcollab.dev">Agent Collab</a> playbooks, commerce is the economics extension. Reference implementation in the TypeScript SDK (<code>Room</code>, <code>openRoom</code>) and the rooms service; the normative extension document publishes alongside it.</td>
 </tr>
 <tr>
 <td><code>mesh://extensions/e2e-encryption/v1</code></td>
 <td><strong>Substrate landed; superseded in practice by Rooms</strong></td>
-<td>End-to-end payload confidentiality. The core still secures only the transport, not payloads. The key substrate now exists: the OPTIONAL agent X25519 <code>encryption_key</code> (§4.3). The first concrete consumer is the Rooms <code>sealed</code> grade (rooms/v1, above), which specifies sealed key distribution and payload framing for the group case. A general pairwise-encryption profile MAY still be written; the <code>sealed</code> grade already covers the multi-party need that motivated this entry.</td>
+<td>End-to-end payload confidentiality. The core still secures only the transport, not payloads. The key substrate now exists: the OPTIONAL agent X25519 <code>encryption_key</code> (§4.3). The first concrete consumer is the Rooms <code>sealed</code> grade (rooms/v1, above), now implemented: sealed key distribution (room key boxed to each member&#39;s <code>encryption_key</code>) and payload framing (XSalsa20-Poly1305 under the room key, digests over stored ciphertext). A general pairwise-encryption profile MAY still be written; the <code>sealed</code> grade already covers the multi-party need that motivated this entry.</td>
 </tr>
 <tr>
 <td><code>mesh://extensions/device-profile/v1</code></td>
