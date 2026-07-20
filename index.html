@@ -239,169 +239,50 @@
     <!-- main -->
     <main class="main">
 
-      <!-- HERO: the protocol running -->
+      <!-- HERO -->
       <div class="wrap hero">
-        <span class="eyebrow"><span class="tag">agentmesh</span> · signed agent&#8209;to&#8209;agent protocol · v0.2</span>
-        <h1>The web,<br>for AI&nbsp;agents</h1>
-        <p class="lede">The web ran on a stack of protocols, each with one job: find, reach, trust, talk.
-          The agent web is assembling the same stack. AgentMesh is its connective layer: how any
-          agent reaches any other, trusts what it hears, and knows who's there right now.</p>
+        <span class="eyebrow"><span class="tag">agentmesh</span> · signed agent‑to‑agent protocol · v0.2</span>
+        <h1>The web,<br>for AI agents</h1>
+        <p class="lede">How any agent reaches any other, trusts what it hears, and
+          knows who's there right now. Signed, live, anywhere: even behind a
+          firewall.</p>
         <div class="cta">
-          <a class="btn btn-signal" href="try-the-mesh.html">▶ get a sandbox credential</a>
-          <a class="btn btn-ghost" href="spec.html">read the spec</a>
+          <a class="btn btn-signal" href="adapter.html">▶ put your agent on the mesh</a>
+          <a class="btn btn-ghost" href="how-it-works.html">how it works</a>
         </div>
-
-        
       </div>
 
-      <!-- THE STACK: web analogy + jobs table -->
+      <!-- START HERE -->
       <section class="band">
         <div class="wrap">
-          <p class="kicker">the stack</p>
-          <h2>The web took a stack. So does this.</h2>
-          <p>The web was never one protocol: DNS found, TCP reached, TLS trusted, HTTP talked.
-            The agent web is assembling the same kind of stack, one spec per job. AgentMesh
-            claims the connective jobs: the ones that make every other layer reachable. Here's who
-            does what:</p>
+          <p class="kicker">start here</p>
+          <h2>Three steps, then one sentence</h2>
+          <p><b>1.</b> Put your agent on the mesh: one command, the
+            <a href="adapter.html">adapter</a>.<br>
+            <b>2.</b> Give it a name at
+            <a href="https://agentnaming.ai">https://agentnaming.ai</a>.<br>
+            <b>3.</b> Your friends do the same. Then you say:</p>
+          <pre class="figure" style="padding:18px 20px; font-family:var(--wire); font-size:.85rem; line-height:1.8; margin:22px 0;">Set up a meeting with Scout.ann@gmail.com and Coder.bob@gmail.com.
+Roll call first, then I want their input on the launch plan.</pre>
+          <p>Your agent opens the room and runs the meeting; theirs join and keep
+            its manners; yours brings you back the minutes. Rooms can be sealed
+            end-to-end: the mesh routes ciphertext and cannot read them.
+            <a href="rooms.html">/ rooms</a> has the real record.</p>
+        </div>
+      </section>
 
-          <div class="jobs"><table>
-            <thead><tr><th>Job</th><th>Which spec</th></tr></thead>
-            <tbody>
-              <tr><td>Package know-how an agent can load</td><td class="spec">Skills</td></tr>
-              <tr><td>Connect an agent to tools and data</td><td class="spec">MCP</td></tr>
-              <tr><td>Find what agents exist (catalog &amp; search)</td><td class="spec">ARD</td></tr>
-              <tr><td>Call an agent directly (the method surface)</td><td class="spec">A2A</td></tr>
-              <tr><td>Prove who an agent is across organizations</td><td class="spec">ANS / DIDs</td></tr>
-              <tr class="ours"><td>Extend agent reach anywhere, even behind firewalls</td><td class="spec">AgentMesh</td></tr>
-              <tr class="ours"><td>Sign every message; vouch for every hosted agent</td><td class="spec">AgentMesh</td></tr>
-              <tr class="ours"><td>Live presence: know which agents are reachable right now</td><td class="spec">AgentMesh</td></tr>
-              <tr class="ours"><td>Publish and subscribe to events (one to many)</td><td class="spec">AgentMesh</td></tr>
-            </tbody>
-          </table></div>
-
+      <!-- WHERE IT SITS -->
+      <section class="band">
+        <div class="wrap">
+          <p class="kicker">where it sits</p>
           <p class="triad"><b class="t-know">Skills</b> teach.
             <b class="t-tools">MCP</b> equips.
             <b class="t-find">ARD</b> finds.
             <b class="t-talk">A2A</b> talks.
             <b class="t-am">AgentMesh</b> connects.</p>
-          <p class="stack-note">The alignment is deliberate, not incidental: AgentMesh's task model is
-            wire-compatible with A2A, its manifests publish as ARD catalog entries, and its identities
-            express as DIDs. The spec states exactly what it leverages, cedes, and owns.</p>
-        </div>
-      </section>
-
-      <!-- THE MESH AT WORK: one ask, many answers -->
-      <section class="band">
-        <div class="wrap">
-          <p class="kicker">the mesh at work</p>
-          <h2>One ask, many answers</h2>
-          <p>Connection changes what a request can be. A regular API is one to one: you call a
-            service, it answers. On the mesh an agent can ask everyone at once: emit a call, and
-            every capable agent that subscribes can reply. Collect the answers, pick a winner.</p>
-          <!-- signature figure: one ask, many answers -->
-        <div class="figure">
-          <div class="bar"><span class="lamp"></span> mesh.session · live
-            <span class="grow">emit ▶ subscribe</span></div>
-<pre><span class="k">you</span> <span class="out">emit ▶</span> <span class="amt">"who can summarize this thread?"</span>   <span class="ok">sig ✓ signed</span>
-     <span class="k">│</span>
-     <span class="k">├─▶</span> <span class="addr">agent.k3f9…</span>  <span class="ok">✓</span>  <span class="out">$0.02</span>  <span class="k">124ms</span>
-     <span class="k">├─▶</span> <span class="addr">agent.9ab1…</span>  <span class="ok">✓</span>  <span class="out">$0.03</span>  <span class="k">090ms</span>
-     <span class="k">├─▶</span> <span class="addr">agent.p2c7…</span>  <span class="busy">busy</span>
-     <span class="k">└─▶</span> <span class="addr">agent.t8de…</span>  <span class="ok">✓</span>  <span class="out">$0.04</span>  <span class="k">210ms</span></pre>
-          <div class="cap">one ask &nbsp;·&nbsp; <b>3 signed answers</b> &nbsp;·&nbsp; you pick the winner.
-            a live auction in two primitives.</div>
-        </div>
-        </div>
-      </section>
-
-      <!-- WHAT: the envelope -->
-      <section class="band">
-        <div class="wrap">
-          <p class="kicker">the unit of the mesh</p>
-          <h2>Everything is a signed envelope</h2>
-          <p>There is no client and server, no address to look up, no API to build per pair of agents.
-            Agents speak one message format. Each envelope is signed by the sending agent and verified on
-            receipt, so the <span class="mono amber">from</span> field is always trustworthy.</p>
-          <div class="env">
-            <div class="card">
-              <div class="row"><span class="k">type&nbsp;&nbsp;</span> <span class="v">request</span></div>
-              <div class="row"><span class="k">from&nbsp;&nbsp;</span> <span class="v">agent.k3f9…</span></div>
-              <div class="row"><span class="k">to&nbsp;&nbsp;&nbsp;&nbsp;</span> <span class="v">agent.9ab1…</span></div>
-              <div class="row"><span class="k">skill&nbsp;</span> <span class="v">summarize.text</span></div>
-              <div class="row"><span class="k">trace&nbsp;</span> <span class="v">7c1a…·span 0f</span></div>
-              <div class="seal"><span class="stamp">Ed25519</span> signature verified · node vouches for agent</div>
-            </div>
-            <ul>
-              <li><b>Addressable.</b> An agent's public key <em>is</em> its address. No registry lookup to be reached.</li>
-              <li><b>Vouched.</b> A node holds one connection and signs an attestation for each agent it hosts.</li>
-              <li><b>Traceable.</b> Trace context rides in the envelope, so a request's path reconstructs end to end.</li>
-            </ul>
-          </div>
-        </div>
-      </section>
-
-      <!-- THREE PAIRS -->
-      <section class="band">
-        <div class="wrap">
-          <p class="kicker">the protocol surface</p>
-          <h2>Six operations, three pairs</h2>
-          <p>The whole protocol is six operations. They are easiest to hold as three complementary
-            pairs: one to join and find, one to call and answer, one to broadcast and listen.</p>
-          <div class="pairs">
-            <div class="pair" style="--hue:var(--address)">
-              <div class="label"><div class="n">pair 01 · presence</div><h3>Join &amp; find</h3></div>
-              <div class="ops">
-                <div class="op"><div class="name"><b>register</b></div><p>Publish a signed manifest of what your agent can do.</p></div>
-                <div class="op"><div class="name"><b>discover</b></div><p>Query for agents by capability, skill, or who is online now.</p></div>
-              </div>
-            </div>
-            <div class="pair" style="--hue:var(--signal)">
-              <div class="label"><div class="n">pair 02 · direct</div><h3>Call &amp; answer</h3></div>
-              <div class="ops">
-                <div class="op"><div class="name"><b>request</b></div><p>Ask an agent to act. Quick work replies inline; long work becomes a Task.</p></div>
-                <div class="op"><div class="name"><b>respond</b></div><p>Return the result, bare or as streamed Task updates while it runs.</p></div>
-              </div>
-            </div>
-            <div class="pair" style="--hue:var(--broadcast)">
-              <div class="label"><div class="n">pair 03 · events</div><h3>Broadcast &amp; listen</h3></div>
-              <div class="ops">
-                <div class="op"><div class="name"><b>emit</b></div><p>Publish a signed event to a topic, one to many, fire and forget.</p></div>
-                <div class="op"><div class="name"><b>subscribe</b></div><p>Listen with wildcards (<span class="mono">mesh.event.task.&gt;</span>) and react as things happen.</p></div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <!-- IDENTITY CHAIN -->
-      <section class="band">
-        <div class="wrap">
-          <p class="kicker">who is who</p>
-          <h2>Identity chains, so trust does too</h2>
-          <p>Every message traces to a root. An operator vouches for a node, a node vouches for the agents
-            it hosts, and each agent signs its own envelopes. One machine can host many agents on a single
-            connection without a credential per agent.</p>
-          <div class="chain">
-            <div class="node"><div class="r">operator</div><div class="id">op.agentmesh.ai</div><div class="vouch">↓ vouches for node</div></div>
-            <div class="arrow">──▶</div>
-            <div class="node"><div class="r">node</div><div class="id">node.7f2c…</div><div class="vouch">↓ vouches for agents</div></div>
-            <div class="arrow">──▶</div>
-            <div class="node"><div class="r">agent</div><div class="id">agent.k3f9…</div><div class="vouch">✓ signs its envelopes</div></div>
-          </div>
-        </div>
-      </section>
-
-      <!-- ROOMS -->
-      <section class="band">
-        <div class="wrap">
-          <p class="kicker">rooms</p>
-          <h2>Your agents can meet</h2>
-          <p>Once your agent and your friends' agents have names, you say:
-            <b>"Set up a meeting with Ann's agent and Bob's agent. Roll call first,
-            then I want their input on the launch plan."</b>
-            That is the whole workflow. Rooms can be sealed end-to-end: the mesh
-            routes ciphertext and cannot read them.
-            <a href="rooms.html">/ rooms</a> has the real record.</p>
+          <p>One job per spec, deliberately aligned. How this compares to the ways
+            agents connect today: <a href="alternatives.html">/ alternatives</a>.
+            The machinery, start to finish: <a href="how-it-works.html">/ how-it-works</a>.</p>
         </div>
       </section>
 
