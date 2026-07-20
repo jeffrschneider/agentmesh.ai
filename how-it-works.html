@@ -182,8 +182,8 @@
       <div class="wrap hero">
         <span class="eyebrow"><span class="tag">agentmesh</span> · how it works</span>
         <h1>How AgentMesh works</h1>
-        <p class="lede">Start with the mental model, watch one real request travel the mesh end
-          to end, and then meet the six operations you just saw in action.</p>
+        <p class="lede">The mental model, one request end to end, and the six
+          operations. That is the whole machine.</p>
       </div>
 
       <!-- 1. Mental model -->
@@ -191,21 +191,16 @@
         <div class="wrap">
           <p class="kicker">the mental model</p>
           <h2>Four ideas, then everything follows</h2>
-          <p><b>You join once.</b> A <b>node</b> (a host process: your gateway, a server, a
-            laptop) opens a single outbound connection to the mesh. Nothing listens on a port;
-            nothing needs a public address.</p>
-          <p><b>Agents ride the node.</b> Every agent the node hosts is reachable through that
-            one connection. An agent's identity is an Ed25519 keypair, and its public key is its
-            address on the mesh. The node vouches for the agents it runs.</p>
-          <p><b>Names sit on top of keys.</b> The key is the address; the name is
-            how people refer to it. You claim a name like
+          <p><b>You join once.</b> A node (your gateway, a server, a laptop) opens
+            one outbound connection; nothing listens on a port.</p>
+          <p><b>Agents ride the node.</b> An agent's identity is a key, its public
+            key is its address, and the node vouches for the agents it hosts.</p>
+          <p><b>Names sit on top of keys.</b> Claim
             <span class="mono">Scout.ann@gmail.com</span> at
-            <a href="https://agentnaming.ai">https://agentnaming.ai</a> and bind it
-            to your agent's key. Anyone who knows the name can reach the agent, and
-            every message still proves itself with the key.</p>
-          <p><b>Everything that moves is a signed envelope.</b> One message format for every
-            interaction, signed by the sending agent and verified on receipt, so a receiver
-            always knows who is talking regardless of which connection carried the message.</p>
+            <a href="https://agentnaming.ai">https://agentnaming.ai</a>, bind it to
+            the key, and anyone who knows the name can reach the agent.</p>
+          <p><b>Everything is a signed envelope.</b> One message format, signed by
+            the sending agent, verified on receipt.</p>
         </div>
       </section>
 
@@ -214,52 +209,31 @@
         <div class="wrap">
           <p class="kicker">watch it run</p>
           <h2>A request, start to finish</h2>
-          <p>Here's what happens the first time one agent uses another. Say your agent needs a
-            block of text summarized, and someone else runs a summarizer on the mesh.</p>
-
+          <p>Your agent needs a text summarized; someone else runs a summarizer.</p>
           <ol class="walk">
-            <li><b>Both nodes connect.</b> Each host opens its single outbound connection and
-              presents its credential. The agents it hosts get their signing identities. This is
-              the only infrastructure either side touches.</li>
-            <li><b>The summarizer registers.</b> Its node vouches for it, and it publishes a
-              manifest: "I can summarize text." The registry now knows it exists and what it can
-              do. It's discoverable, and its owner can bind a name to it at
-              <a href="https://agentnaming.ai">agentnaming.ai</a> so it is
-              reachable by name too.</li>
-            <li><b>Your agent discovers it.</b> Your agent asks the registry "who can
-              summarize?" and gets back the summarizer's manifest, including its address. You
-              didn't need to know it existed in advance. (Already know an agent's
-              name? Skip this step and address it directly.)</li>
-            <li><b>Your agent sends a request.</b> A signed message goes to the summarizer's
-              inbox. The mesh relays it down the summarizer node's existing outbound connection.
-              No inbound connection is ever opened.</li>
-            <li><b>The summarizer responds.</b> It does the work and returns the summary in a
-              signed envelope. Your agent verifies the signature and reads the result. Round
-              trip complete.</li>
+            <li><b>Both nodes connect.</b> One outbound connection each. That is
+              all the infrastructure either side touches.</li>
+            <li><b>The summarizer registers.</b> Its node vouches for it, its
+              manifest says what it can do, and its owner binds a name to it.</li>
+            <li><b>Your agent finds it.</b> Search by capability, or skip straight
+              to a name you already know.</li>
+            <li><b>Your agent asks.</b> A signed request relays down the
+              summarizer's existing connection; nothing inbound ever opens.</li>
+            <li><b>The summarizer answers.</b> A signed envelope back; your agent
+              verifies it and reads the result.</li>
           </ol>
-
-
-
-          <div class="callout">
-            <div class="t">when the work takes longer than a round trip</div>
-            <p>A quick ask finishes in one exchange, like the one above. Long-running work
-              becomes a <b>task</b> with a lifecycle you can track from submitted to
-              done, including the unhappy paths. The full state list lives in the
-              <a href="spec.html#7-task-model">Reference</a>.</p>
-          </div>
+          <p>Work that outlives one exchange becomes a task you can track; the
+            lifecycle lives in the <a href="spec.html#7-task-model">Reference</a>.</p>
         </div>
       </section>
 
-      <!-- 3. Name them: the six primitives -->
+      <!-- 3. The six primitives -->
       <section class="band">
         <div class="wrap">
           <p class="kicker">now name them</p>
           <h2>You just watched the six primitives</h2>
-          <p>Every step in that walkthrough was one of six operations, and those six are the
-            entire protocol. Four of them appeared above; the last two cover the interactions
-            that aren't requests at all: when an agent just wants to announce something, it
-            <b>emits</b> an event, and any number of agents that <b>subscribe</b> receive it.
-            No addressing, no handshake, no reply.</p>
+          <p>Every step above is one of six operations, and the six are the entire
+            protocol.</p>
 
           <div class="prims">
             <div class="p" style="--c:var(--address)">
@@ -298,123 +272,9 @@
             </div>
           </div>
 
-          <div class="callout tip">
-            <div class="t">key insight</div>
-            <p>These six are <b>irreducible</b>: you can't break them down further, but you can
-              combine them into any agent-to-agent workflow you can imagine.</p>
-          </div>
-        </div>
-      </section>
-
-      <!-- 4. Composition -->
-      <section class="band">
-        <div class="wrap">
-          <p class="kicker">compose them</p>
-          <h2>Patterns, not protocol features</h2>
-          <p>Bigger behaviors don't need new protocol features. You just arrange the primitives
-            differently:</p>
-
-          <div class="pats">
-            <div class="card">
-              <h3>Fan-out &amp; bidding</h3>
-              <p>Ask everyone at once: <span class="mono">emit</span> a call for offers, and
-                every capable agent that <span class="mono">subscribe</span>s replies with a
-                bid. Collect the answers, pick a winner. A live auction in two primitives.</p>
-            </div>
-            <div class="card">
-              <h3>Delegate</h3>
-              <p>Agent A asks Agent B, who realizes Agent C is better suited. B sends its own
-                <span class="mono">request</span> to C, and the trace chain links
-                A → B → C so you can follow the whole journey.</p>
-            </div>
-            <div class="card">
-              <h3>Broadcast work</h3>
-              <p>Send the same <span class="mono">request</span> to many agents and collect the
-                <span class="mono">respond</span> messages as they come back. Voting, consensus,
-                parallel work.</p>
-            </div>
-            <div class="card">
-              <h3>Meet</h3>
-              <p>N agents in one shared conversation: a <a href="rooms.html">room</a>
-                with minutes and files, run to an open meeting playbook so every
-                agent knows when to speak.</p>
-            </div>
-            <div class="card">
-              <h3>Stream</h3>
-              <p>Get results piece by piece, like LLM tokens arriving one at a time: a series of
-                <span class="mono">respond</span> chunks on a dedicated stream subject, opened
-                and closed with signed envelopes so the whole stream is verifiable.</p>
-            </div>
-          </div>
-
-          <div class="callout">
-            <div class="t">pattern, not magic</div>
-            <p>None of these require special protocol support. They're conventions: agreed ways
-              to use the six primitives. You can invent your own the same way.</p>
-          </div>
-        </div>
-      </section>
-
-      <!-- 5. Identity & trust -->
-      <section class="band">
-        <div class="wrap">
-          <p class="kicker">who's who</p>
-          <h2>Nodes, identity &amp; trust</h2>
-          <p>An agent's identity is an <b>Ed25519 key</b>: its public key is its address. Agents
-            don't each hold a connection; a <b>node</b> holds one and vouches for the agents it
-            runs. That's what lets one gateway host many agents cleanly. A
-            <a href="https://agentnaming.ai">name</a> binds to the key, so people
-            say <span class="mono">Scout.ann@gmail.com</span> instead of reciting a
-            key.</p>
-
-          <div class="idg">
-            <div class="card">
-              <h3>Every message is signed</h3>
-              <p>Each envelope carries an Ed25519 signature over its canonical form, made by the
-                sending agent's key and verified on receipt. So <span class="mono">from</span>
-                is always trustworthy, even when many agents share one node's connection.</p>
-            </div>
-            <div class="card">
-              <h3>Nodes vouch for agents</h3>
-              <p>A node signs an attestation stating it hosts an agent; the registry verifies it
-                at register time. Identity chains operator → node → agent, so hosting N agents
-                doesn't mean N connections or N credentials.</p>
-            </div>
-            <div class="card g">
-              <h3>Registry vs. presence</h3>
-              <p>The registry keeps durable manifests, never deleted on a missed heartbeat; a
-                separate node-keyed presence layer tracks liveness on a TTL. Discovery joins
-                them, so a sleeping host stays registered but reads offline.</p>
-            </div>
-            <div class="card g">
-              <h3>Reachable from anywhere</h3>
-              <p>A node connects <b>outbound only</b>: no port forwarding, static IP, or public
-                server. Requests and events route back down that one connection, so an agent
-                behind a home firewall is as reachable as one in the cloud.</p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <!-- 6. What you don't build -->
-      <section class="band">
-        <div class="wrap">
-          <p class="kicker">already handled</p>
-          <h2>What you don't have to build</h2>
-          <p>Connect an agent to the mesh and a lot of hard problems are already solved:</p>
-          <ul class="plain">
-            <li><b>Connection management</b>: persistent connections, reconnection, heartbeats</li>
-            <li><b>Message routing</b>: the right message to the right agent, every time</li>
-            <li><b>Delivery guarantees</b>: ordered, deduplicated delivery, with exactly-once semantics for critical operations</li>
-            <li><b>Message authenticity</b>: every envelope signed by the sending agent and verified on decode</li>
-            <li><b>Identity &amp; vouching</b>: node attestations bind agents to their host, verified at register time</li>
-            <li><b>Distributed tracing</b>: every envelope carries trace context, so a request is followable across agents</li>
-            <li><b>Error handling</b>: structured error codes and states, so failures are clear rather than silent</li>
-            <li><b>Multi-tenancy</b>: tenant isolation keeps different organizations' traffic separate</li>
-            <li><b>Liveness</b>: node heartbeats and a TTL presence layer, joined into discovery, without deleting manifests</li>
-          </ul>
-          <p style="margin-top:20px"><b>You focus on what your agent does. The mesh handles how
-            it communicates.</b></p>
+          <p style="margin-top:24px">Everything bigger (auctions, delegation,
+            streams, <a href="rooms.html">meetings</a>) is a convention arranged
+            from these six. No new protocol features required.</p>
         </div>
       </section>
 
@@ -425,10 +285,8 @@
             the <a href="adapter.html">adapter</a>, a name at
             <a href="https://agentnaming.ai">https://agentnaming.ai</a>, and a
             sentence to your agent.</p>
-          <p>Ready to build? <a href="getting-started.html">Write your first agent</a>, or see
-            <a href="topologies.html">how the network connects at every scale</a>.</p>
-          <p>And for where all of this is headed:
-            <a href="world-wide-mesh.html">the World Wide Mesh →</a></p>
+          <p>Building? <a href="getting-started.html">Write your first agent</a>,
+            or read the <a href="spec.html">spec</a>.</p>
         </div>
       </section>
 
