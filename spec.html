@@ -153,7 +153,7 @@
           <span>status <b>Working Draft</b></span>
           <span>date <b>2026-07-18</b></span>
         </div>
-        <p class="canon">Rendered 2026-07-20 from commit <a href="https://github.com/jeffrschneider/AgentMesh/commit/59caa66">59caa66</a>.
+        <p class="canon">Rendered 2026-07-20 from commit <a href="https://github.com/jeffrschneider/AgentMesh/commit/1aff52d">1aff52d</a>.
           The canonical source is
           <a href="https://github.com/jeffrschneider/AgentMesh/blob/main/SPEC.md">SPEC.md on GitHub</a>.</p>
         <div class="toc">
@@ -430,6 +430,18 @@ profiles, sandbox enforcement), and a public reference deployment.</p>
 <li>Node credential rotation MUST be achievable without downtime.</li>
 <li>A node MUST protect the agent private keys it holds at rest (host-appropriate key storage).</li>
 </ul>
+<h3 id="4-9-owners-and-authority">4.9. Owners and Authority<a class="hl" href="#4-9-owners-and-authority">#</a></h3>
+<p>The <strong>owner</strong> is the principal — a person or an organization — that holds an account (§4.1). Where the account is the tenancy and isolation boundary, the owner is who controls it: who registers the nodes and agents under it, and who sets the <strong>policy</strong> that governs them (for example, who may reach an agent&#39;s inbox, or who is admitted to a room). An agent has an identity (§4.3); an owner has <strong>authority</strong> over agents. The two are distinct: identity is who is speaking, authority is who may change the rules.</p>
+<p>An owner authenticates to a mesh instance through that instance&#39;s account control plane (the reference binding uses email-verified account sessions; §18). A successful authentication establishes an <strong>account session</strong>: proof that a request is made by the account&#39;s owner.</p>
+<p><strong>Owner policy</strong> is any owner-controlled configuration the mesh or its agents act on — contact rosters, admission policy, room membership. A change to owner policy is authorized in one of two ways. An implementation MUST support the first; the second is OPTIONAL and exists for portability and for reduced trust in the operator.</p>
+<ul>
+<li><p><strong>Account-session authority (primary).</strong> The owner authenticates an account session and the mesh authorizes the write directly. This is the default path for owner-facing management: the owner signs in, edits policy, and the mesh stores and enforces it. It is the natural model for a hosted management surface such as a web console, and it assumes what mesh-side enforcement already assumes — that the owner trusts the operator to store and enforce policy faithfully, since the operator is the party enforcing it.</p>
+</li>
+<li><p><strong>Owner-key authority (secondary, OPTIONAL).</strong> The owner holds an <strong>owner key</strong>: an account-level Ed25519 keypair, distinct from any node or agent key, whose public half is recorded on the account. The owner signs a policy artifact with this key, and any party — including a client that does not trust the storing operator — verifies the signature and treats the signature, not the storage location, as the authority. This makes a policy artifact <strong>portable</strong>: it can be carried between meshes, held on untrusted storage, and enforced by a client with no server involvement. It is the right path for a headless client that authors its own policy and for an owner who does not trust a given operator.</p>
+</li>
+</ul>
+<p>The two paths are not exclusive: a policy MAY be authored under an account session and additionally signed for portability, and a signed artifact MAY be uploaded to a mesh that stores it under account-session control. An extension that defines owner policy MUST state which path or paths it uses and what trust each assumes, and MUST reference this section rather than redefine the model.</p>
+<p>Account-session authority trusts the operator; it is appropriate wherever the operator is already trusted to enforce. Owner-key authority trusts only the owner&#39;s signature; it is appropriate wherever the operator or the storage is not trusted. Neither affects agent identity (§4.5): every message an agent sends is signed by the agent key regardless of how owner policy was authorized.</p>
 <hr>
 <h2 id="5-message-envelope">5. Message Envelope<a class="hl" href="#5-message-envelope">#</a></h2>
 <p>All AgentMesh protocol messages use a standard envelope format. The envelope is the wire format for every primitive operation.</p>
