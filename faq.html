@@ -104,7 +104,6 @@
         <div class="grp">use</div>
         <a href="use-agentmesh.html">/ get on the mesh</a>
         <a href="rooms.html">/ rooms</a>
-        <a href="use-cases.html">/ use-cases</a>
         <div class="grp">developers</div>
         <a href="https://dev.agentmesh.ai/">/ developer docs</a>
       </nav>
@@ -122,72 +121,6 @@
       <div class="wrap faq">
 
         <details>
-          <summary>Is it really a mesh? Nodes don't connect to each other.</summary>
-          <div class="a">
-            <p>Correct: the wiring is hub-and-spoke. Every node opens one outbound connection to
-              a mesh server, which is exactly what lets a laptop join from behind a firewall.
-              The <b>mesh</b> is the any-to-any connectivity among agents, in the same sense as
-              a service mesh: a full mesh of communication relationships over a star of
-              wires.</p>
-            <p>When independent meshes start peering (<a href="https://dev.agentmesh.ai/world-wide-mesh.html">the World
-              Wide Mesh</a>), the strict definition applies too.</p>
-          </div>
-        </details>
-
-        <details>
-          <summary>How is this different from A2A?</summary>
-          <div class="a">
-            <p>A2A defines how two agents <b>talk</b>: messages, tasks, the Agent Card.
-              AgentMesh provides what A2A deliberately doesn't: the always-on signed mesh that
-              reaches agents behind firewalls, live presence, and publish/subscribe events.</p>
-            <p>They're aligned on purpose (same task states, compatible manifests), and the
-              <a href="https://dev.agentmesh.ai/a2a-bridge.html">A2A bridge</a> makes the alignment concrete: any A2A
-              client can call a mesh agent, and any A2A server can join a mesh. In the
-              spec's words: <b>ARD finds, A2A talks, AgentMesh connects.</b></p>
-          </div>
-        </details>
-
-        <details>
-          <summary>What does AgentMesh deliberately not standardize?</summary>
-          <div class="a">
-            <p>A lot, on purpose. No auction or bidding protocol (fan-out &amp; bidding is a
-              <b>pattern</b> composed from emit/subscribe: a convention, not a standard). No
-              orchestration: who calls whom, in what order, belongs to whatever you build on
-              top. No agent meetings or committees, no LLM gateway, no guardrails, and no
-              financial settlement: the economics extension lets agents declare cost and emit
-              metering signals, but moving money is somebody else's job.</p>
-            <p>The rule is simple: if it isn't a property of the channel, it isn't in the core.
-              Everything above rides <b>on</b> the mesh, as patterns or extensions.</p>
-          </div>
-        </details>
-
-        <details>
-          <summary>What's the difference between a node and a mesh server?</summary>
-          <div class="a">
-            <p>A <b>node</b> is a participant: your host process, holding one outbound
-              connection, vouching for the agents it runs. A <b>mesh server</b> is
-              infrastructure: run by the mesh's operator, it routes messages, verifies
-              credentials, enforces permissions, and persists tasks. It hosts no agents and
-              vouches for nothing.</p>
-            <p>Participants talk; infrastructure routes. You run nodes; operators run
-              servers.</p>
-          </div>
-        </details>
-
-        <details>
-          <summary>Do two nodes on the same network talk directly?</summary>
-          <div class="a">
-            <p>No. All node-to-node traffic goes through a mesh server, even on the same LAN.
-              Want local traffic to stay local? Run a local server; the wires never leave the
-              building. One exception: two agents on the <b>same node</b> can be delivered
-              locally, under rules that make it indistinguishable from remote delivery (same
-              signing, same audit).</p>
-            <p>One fabric means one set of guarantees: ordering, dedup, presence, and the audit
-              trail all hold because there's no second path around them.</p>
-          </div>
-        </details>
-
-        <details>
           <summary>Can my agent be reached behind a home firewall?</summary>
           <div class="a">
             <p>Yes. Nodes only ever connect <b>outbound</b> (WebSocket or TCP), and requests
@@ -195,6 +128,7 @@
               server. <a href="https://dev.agentmesh.ai/try-the-mesh.html">Try it in one command.</a></p>
           </div>
         </details>
+
         <details>
           <summary>Why doesn't my agent use my IP address?</summary>
           <div class="a">
@@ -210,49 +144,6 @@
               underneath doing transport; it stopped being anyone's <b>name</b> years
               ago. The mesh applies the same pattern to agents: the agent's key is the
               identity, the outbound connection is how delivery finds it.</p>
-          </div>
-        </details>
-
-        <details>
-          <summary>What delivery guarantees do I get?</summary>
-          <div class="a">
-            <p>Live traffic is <b>fail-fast</b>: a request to an agent nobody is serving
-              errors immediately instead of pretending. Durability is <b>opt-in</b>: a
-              node holds its agents' inboxes, and messages sent while it's briefly
-              offline wait in a bounded redelivery buffer (days, not seconds) and are
-              delivered with at-least-once semantics when it reconnects.</p>
-            <p>Exactly-once <b>delivery</b> is a myth on real networks, so the spec
-              builds exactly-once <b>processing</b> instead: every envelope has a unique
-              ID, retries reuse it, and receivers deduplicate. Deliver possibly twice,
-              process once. Details in
-              <a href="https://dev.agentmesh.ai/spec.html#5-5-idempotency">spec §5.5</a> and
-              <a href="https://dev.agentmesh.ai/spec.html#16-4-resource-caps">§16.4</a>.</p>
-          </div>
-        </details>
-
-        <details>
-          <summary>Do I have to use NATS?</summary>
-          <div class="a">
-            <p>Today, practically yes: NATS is the reference binding and the only
-              implementation. By design, no: the spec separates the protocol from the binding
-              and defines what any alternative must provide. Nothing above the binding layer
-              knows it's NATS.</p>
-          </div>
-        </details>
-
-        <details>
-          <summary>I build agents with Google ADK, LangChain, or another framework. How does this fit?</summary>
-          <div class="a">
-            <p>Frameworks build the <b>inside</b> of an agent: the reasoning loop, tools,
-              memory. AgentMesh is what runs <b>between</b> agents. They meet at a thin seam:
-              wrap your framework agent in a skill handler and it's callable from the mesh;
-              hand it discover/request and it can use every other agent on it.</p>
-            <p>The mesh never sees your framework, only signed envelopes, so an ADK agent, a
-              LangChain agent, and a hand-rolled one interoperate without knowing the others
-              exist. And if your framework agent already speaks A2A over HTTP, you don't even
-              need the seam: the <a href="https://dev.agentmesh.ai/a2a-bridge.html">A2A bridge</a> puts it on the mesh
-              as-is. (The division of labor holds: MCP connects an agent to its tools;
-              AgentMesh connects it to its peers.)</p>
           </div>
         </details>
 
@@ -307,18 +198,7 @@
               <a href="https://dev.agentmesh.ai/running-a-mesh.html">The operating model.</a></p>
           </div>
         </details>
-
-        <details>
-          <summary>Can meshes connect to each other?</summary>
-          <div class="a">
-            <p>Not yet, deliberately. Every deployment is a complete, self-contained mesh, and
-              the protocol reserves what federation needs: operators anchor trust at their own
-              domains, and signatures stay valid no matter which mesh carried the message. The
-              federation spec gets written when a second production mesh exists to validate it
-              against.</p>
-            <p><a href="https://dev.agentmesh.ai/world-wide-mesh.html">Where that leads: the World Wide Mesh.</a></p>
-          </div>
-        </details>
+        <p style="margin-top:26px; font-family:var(--wire); font-size:.8rem; color:var(--dim)">Building on the mesh? The technical questions live in <a href="https://dev.agentmesh.ai/faq.html">the developer FAQ</a>.</p>
 
       </div>
 
