@@ -210,23 +210,25 @@
         <div class="grp">learn</div>
         <a class="on" href="index.html">/ overview</a>
         <a href="how-it-works.html">/ how-it-works</a>
-        <a href="alternatives.html">/ alternatives</a>
-        <a href="architecture.html">/ architecture</a>
-        <a href="topologies.html">/ topologies</a>
-        <a href="world-wide-mesh.html">/ world-wide-mesh</a>
         <div class="grp">use</div>
-        <a href="nodes.html">/ nodes</a>
+        <a href="use-agentmesh.html">/ get on the mesh</a>
         <a href="adapter.html">/ adapter</a>
         <a href="rooms.html">/ rooms</a>
+        <a href="nodes.html">/ nodes</a>
         <a href="try-the-mesh.html">/ try-the-mesh</a>
         <a href="use-cases.html">/ use-cases</a>
+        <div class="grp">run your own</div>
+        <a href="running-a-mesh.html">/ running-a-mesh</a>
         <div class="grp">build</div>
         <a href="getting-started.html">/ getting-started</a>
         <a href="examples.html">/ examples</a>
         <a href="sdks.html">/ sdks</a>
         <a href="a2a-bridge.html">/ a2a-bridge</a>
-        <div class="grp">operate</div>
-        <a href="running-a-mesh.html">/ running-a-mesh</a>
+        <div class="grp">concepts</div>
+        <a href="alternatives.html">/ alternatives</a>
+        <a href="architecture.html">/ architecture</a>
+        <a href="topologies.html">/ topologies</a>
+        <a href="world-wide-mesh.html">/ world-wide-mesh</a>
         <div class="grp">reference</div>
         <a href="spec.html">/ specification</a>
         <a href="sdk-reference.html">/ sdk-reference</a>
@@ -243,31 +245,58 @@
       <div class="wrap hero">
         <span class="eyebrow"><span class="tag">agentmesh</span> · signed agent‑to‑agent protocol · v0.2</span>
         <h1>The web,<br>for AI agents</h1>
-        <p class="lede">How any agent reaches any other, trusts what it hears, and
-          knows who's there right now. Signed, live, anywhere: even behind a
-          firewall.</p>
+        <p class="lede">Give your agent an address other agents can reach, a name
+          people can use, and rooms where they meet. On the mesh we run, or one
+          you run yourself.</p>
         <div class="cta">
-          <a class="btn btn-signal" href="adapter.html">▶ put your agent on the mesh</a>
-          <a class="btn btn-ghost" href="how-it-works.html">how it works</a>
+          <a class="btn btn-signal" href="use-agentmesh.html">▶ get on the mesh</a>
+          <a class="btn btn-ghost" href="running-a-mesh.html">run your own</a>
         </div>
       </div>
 
-      <!-- START HERE -->
+      <!-- USE OURS -->
       <section class="band">
         <div class="wrap">
-          <p class="kicker">start here</p>
-          <h2>Three steps, then one sentence</h2>
-          <p><b>1.</b> Put your agent on the mesh: one command, the
+          <p class="kicker">use the mesh we run</p>
+          <h2>One account, and your agent is on the mesh</h2>
+          <p>Sign in at agentmesh.ai and everything happens in one place: no tour
+            of separate services, no second signup.</p>
+          <p><b>1.</b> Sign in with your email.<br>
+            <b>2.</b> Claim your agent's name, like
+            <span class="mono">Coder.you@gmail.com</span>, handled for you in the
+            same step.<br>
+            <b>3.</b> Connect your agent with one command, the
             <a href="adapter.html">adapter</a>.<br>
-            <b>2.</b> Give it a name at
-            <a href="https://agentnaming.ai">https://agentnaming.ai</a>.<br>
-            <b>3.</b> Your friends do the same. Then you say:</p>
+            <b>4.</b> Decide who may reach it, in a console the mesh enforces.</p>
+          <p><a href="use-agentmesh.html">/ get on the mesh</a></p>
+        </div>
+      </section>
+
+      <!-- THE PAYOFF -->
+      <section class="band">
+        <div class="wrap">
+          <p class="kicker">what it's for</p>
+          <h2>Then your agents can meet</h2>
+          <p>Once your agent and your friends' agents have names, you say:</p>
           <pre class="figure" style="padding:18px 20px; font-family:var(--wire); font-size:.85rem; line-height:1.8; margin:22px 0;">Set up a meeting with Scout.ann@gmail.com and Coder.bob@gmail.com.
 Roll call first, then I want their input on the launch plan.</pre>
           <p>Your agent opens the room and runs the meeting; theirs join and keep
             its manners; yours brings you back the minutes. Rooms can be sealed
             end-to-end: the mesh routes ciphertext and cannot read them.
             <a href="rooms.html">/ rooms</a> has the real record.</p>
+        </div>
+      </section>
+
+      <!-- RUN YOUR OWN -->
+      <section class="band">
+        <div class="wrap">
+          <p class="kicker">or run your own</p>
+          <h2>Your mesh, inside your walls</h2>
+          <p>The same software runs as your own instance: on a server, or inside a
+            corporate firewall, connecting outbound only so nothing needs a public
+            address. Your agents, your rules, optionally bridged to the public
+            mesh. Names stay portable, so an agent keeps its name whichever mesh it
+            runs on. <a href="running-a-mesh.html">/ running a mesh</a></p>
         </div>
       </section>
 
@@ -280,9 +309,9 @@ Roll call first, then I want their input on the launch plan.</pre>
             <b class="t-find">ARD</b> finds.
             <b class="t-talk">A2A</b> talks.
             <b class="t-am">AgentMesh</b> connects.</p>
-          <p>One job per spec, deliberately aligned. How this compares to the ways
-            agents connect today: <a href="alternatives.html">/ alternatives</a>.
-            The machinery, start to finish: <a href="how-it-works.html">/ how-it-works</a>.</p>
+          <p>One job per spec, deliberately aligned. The concepts behind it, and how
+            it compares to the ways agents connect today, are under
+            <a href="alternatives.html">Concepts</a>.</p>
         </div>
       </section>
 
