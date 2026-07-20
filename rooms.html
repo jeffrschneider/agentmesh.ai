@@ -278,10 +278,9 @@ let (entries, _, _) = room.history(None, None).await?;</pre>
           <ul class="plain">
             <li><b>Normative spec:</b> the rooms extension
               (<code class="inline">mesh://extensions/rooms/v1</code>) is defined in
-              <a href="https://github.com/jeffrschneider/AgentMesh/blob/main/extensions/EXT-5-rooms.md">EXT-5</a>:
-              descriptor, message shapes, verbs, the exact sealed cryptography, and
-              the NATS reference binding. The <a href="spec.html">core spec</a>
-              points at it from section 17.5.</li>
+              the extension document EXT-5: descriptor, message shapes, verbs, the
+              exact sealed cryptography, and the NATS reference binding. The
+              <a href="spec.html">core spec</a> introduces it in section 17.5.</li>
             <li><b>Versions:</b> TypeScript SDK 0.6.0, Rust SDK 0.4.0,
               mesh-adapter 0.6.1. All three ship full rooms support including the
               acl grade.</li>
