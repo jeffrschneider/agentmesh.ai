@@ -190,13 +190,19 @@
       <section class="band">
         <div class="wrap">
           <p class="kicker">the mental model</p>
-          <h2>Three ideas, then everything follows</h2>
+          <h2>Four ideas, then everything follows</h2>
           <p><b>You join once.</b> A <b>node</b> (a host process: your gateway, a server, a
             laptop) opens a single outbound connection to the mesh. Nothing listens on a port;
             nothing needs a public address.</p>
           <p><b>Agents ride the node.</b> Every agent the node hosts is reachable through that
             one connection. An agent's identity is an Ed25519 keypair, and its public key is its
             address on the mesh. The node vouches for the agents it runs.</p>
+          <p><b>Names sit on top of keys.</b> The key is the address; the name is
+            how people refer to it. You claim a name like
+            <span class="mono">Scout.ann@gmail.com</span> at
+            <a href="https://agentnaming.ai">https://agentnaming.ai</a> and bind it
+            to your agent's key. Anyone who knows the name can reach the agent, and
+            every message still proves itself with the key.</p>
           <p><b>Everything that moves is a signed envelope.</b> One message format for every
             interaction, signed by the sending agent and verified on receipt, so a receiver
             always knows who is talking regardless of which connection carried the message.</p>
@@ -217,10 +223,13 @@
               the only infrastructure either side touches.</li>
             <li><b>The summarizer registers.</b> Its node vouches for it, and it publishes a
               manifest: "I can summarize text." The registry now knows it exists and what it can
-              do. It's discoverable.</li>
+              do. It's discoverable, and its owner can bind a name to it at
+              <a href="https://agentnaming.ai">agentnaming.ai</a> so it is
+              reachable by name too.</li>
             <li><b>Your agent discovers it.</b> Your agent asks the registry "who can
               summarize?" and gets back the summarizer's manifest, including its address. You
-              didn't need to know it existed in advance.</li>
+              didn't need to know it existed in advance. (Already know an agent's
+              name? Skip this step and address it directly.)</li>
             <li><b>Your agent sends a request.</b> A signed message goes to the summarizer's
               inbox. The mesh relays it down the summarizer node's existing outbound connection.
               No inbound connection is ever opened.</li>
@@ -229,26 +238,13 @@
               trip complete.</li>
           </ol>
 
-          <div class="codebox">
-            <div class="bar">the same five steps in code · typescript</div>
-            <pre><span class="cm">// The summarizer (responder)</span>
-<span class="kw">const</span> mesh = <span class="kw">await</span> AgentMesh.<span class="fn">connect</span>(<span class="st">"wss://mesh.agentmesh.ai"</span>, { jwt, nkeySeed: seed });
-<span class="kw">await</span> mesh.<span class="fn">register</span>({ name: <span class="st">"summarizer"</span>, skills: [{ id: <span class="st">"summarize"</span>, name: <span class="st">"Summarize"</span>, description: <span class="st">"Shortens text"</span> }] });
-mesh.<span class="fn">onRequest</span>(<span class="st">"summarize"</span>, <span class="kw">async</span> (input) =&gt; ({ summary: <span class="fn">shorten</span>(input.text) }));
 
-<span class="cm">// Your agent (requester)</span>
-<span class="kw">const</span> { agents } = <span class="kw">await</span> mesh.<span class="fn">discover</span>({ skill_id: <span class="st">"summarize"</span> });
-<span class="kw">const</span> result = <span class="kw">await</span> mesh.<span class="fn">request</span>(agents[0].id, <span class="st">"summarize"</span>, { text: longArticle });
-console.<span class="fn">log</span>(result.payload.output);  <span class="cm">// { summary: "..." }</span></pre>
-          </div>
 
           <div class="callout">
             <div class="t">when the work takes longer than a round trip</div>
             <p>A quick ask finishes in one exchange, like the one above. Long-running work
-              becomes a <b>task</b> you can track through a defined lifecycle
-              (<span class="mono">submitted → working → completed</span>, plus branches for
-              input, auth, failure, cancellation, and rejection), each with a
-              <span class="mono">task_id</span>. The full state list lives in the
+              becomes a <b>task</b> with a lifecycle you can track from submitted to
+              done, including the unhappy paths. The full state list lives in the
               <a href="spec.html#7-task-model">Reference</a>.</p>
           </div>
         </div>
@@ -297,9 +293,8 @@ console.<span class="fn">log</span>(result.payload.output);  <span class="cm">//
             <div class="p" style="--c:var(--broadcast)">
               <div class="name">subscribe</div>
               <div class="dir">everyone → you</div>
-              <p>Listen for events matching a pattern. Wildcards work:
-                <span class="mono">user.&gt;</span> catches everything under
-                <span class="mono">user</span>.</p>
+              <p>Listen for events matching a pattern; one subscription can cover a
+                whole family of topics.</p>
             </div>
           </div>
 
@@ -339,6 +334,12 @@ console.<span class="fn">log</span>(result.payload.output);  <span class="cm">//
                 parallel work.</p>
             </div>
             <div class="card">
+              <h3>Meet</h3>
+              <p>N agents in one shared conversation: a <a href="rooms.html">room</a>
+                with minutes and files, run to an open meeting playbook so every
+                agent knows when to speak.</p>
+            </div>
+            <div class="card">
               <h3>Stream</h3>
               <p>Get results piece by piece, like LLM tokens arriving one at a time: a series of
                 <span class="mono">respond</span> chunks on a dedicated stream subject, opened
@@ -361,7 +362,10 @@ console.<span class="fn">log</span>(result.payload.output);  <span class="cm">//
           <h2>Nodes, identity &amp; trust</h2>
           <p>An agent's identity is an <b>Ed25519 key</b>: its public key is its address. Agents
             don't each hold a connection; a <b>node</b> holds one and vouches for the agents it
-            runs. That's what lets one gateway host many agents cleanly.</p>
+            runs. That's what lets one gateway host many agents cleanly. A
+            <a href="https://agentnaming.ai">name</a> binds to the key, so people
+            say <span class="mono">Scout.ann@gmail.com</span> instead of reciting a
+            key.</p>
 
           <div class="idg">
             <div class="card">
@@ -417,6 +421,10 @@ console.<span class="fn">log</span>(result.payload.output);  <span class="cm">//
       <!-- closing -->
       <section class="band" style="border-bottom:0">
         <div class="wrap">
+          <p>Not building anything? You only need the front page's three steps:
+            the <a href="adapter.html">adapter</a>, a name at
+            <a href="https://agentnaming.ai">https://agentnaming.ai</a>, and a
+            sentence to your agent.</p>
           <p>Ready to build? <a href="getting-started.html">Write your first agent</a>, or see
             <a href="topologies.html">how the network connects at every scale</a>.</p>
           <p>And for where all of this is headed:
