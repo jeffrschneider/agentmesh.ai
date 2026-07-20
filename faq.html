@@ -100,29 +100,13 @@
         <div class="grp">learn</div>
         <a href="index.html">/ overview</a>
         <a href="how-it-works.html">/ how-it-works</a>
+        <a class="on" href="faq.html">/ faq</a>
         <div class="grp">use</div>
         <a href="use-agentmesh.html">/ get on the mesh</a>
         <a href="rooms.html">/ rooms</a>
-        <a href="nodes.html">/ nodes</a>
         <a href="use-cases.html">/ use-cases</a>
-        <div class="grp">run your own</div>
-        <a href="running-a-mesh.html">/ running-a-mesh</a>
-        <div class="grp">build</div>
-        <a href="getting-started.html">/ getting-started</a>
-        <a href="try-the-mesh.html">/ sandbox: guest access</a>
-        <a href="examples.html">/ examples</a>
-        <a href="sdks.html">/ sdks</a>
-        <a href="a2a-bridge.html">/ a2a-bridge</a>
-        <div class="grp">concepts</div>
-        <a href="alternatives.html">/ alternatives</a>
-        <a href="architecture.html">/ architecture</a>
-        <a href="topologies.html">/ topologies</a>
-        <a href="world-wide-mesh.html">/ world-wide-mesh</a>
-        <div class="grp">reference</div>
-        <a href="spec.html">/ specification</a>
-        <a href="sdk-reference.html">/ sdk-reference</a>
-        <a href="wire-api.html">/ wire-api</a>
-        <a class="on" href="faq.html">/ faq</a>
+        <div class="grp">developers</div>
+        <a href="https://dev.agentmesh.ai/">/ developer docs</a>
       </nav>
       <div class="foot">v0.2 · the signed interconnect<br>github.com/jeffrschneider/AgentMesh</div>
     </aside>
@@ -145,7 +129,7 @@
               The <b>mesh</b> is the any-to-any connectivity among agents, in the same sense as
               a service mesh: a full mesh of communication relationships over a star of
               wires.</p>
-            <p>When independent meshes start peering (<a href="world-wide-mesh.html">the World
+            <p>When independent meshes start peering (<a href="https://dev.agentmesh.ai/world-wide-mesh.html">the World
               Wide Mesh</a>), the strict definition applies too.</p>
           </div>
         </details>
@@ -157,7 +141,7 @@
               AgentMesh provides what A2A deliberately doesn't: the always-on signed mesh that
               reaches agents behind firewalls, live presence, and publish/subscribe events.</p>
             <p>They're aligned on purpose (same task states, compatible manifests), and the
-              <a href="a2a-bridge.html">A2A bridge</a> makes the alignment concrete: any A2A
+              <a href="https://dev.agentmesh.ai/a2a-bridge.html">A2A bridge</a> makes the alignment concrete: any A2A
               client can call a mesh agent, and any A2A server can join a mesh. In the
               spec's words: <b>ARD finds, A2A talks, AgentMesh connects.</b></p>
           </div>
@@ -208,7 +192,7 @@
           <div class="a">
             <p>Yes. Nodes only ever connect <b>outbound</b> (WebSocket or TCP), and requests
               route back down that connection. No port forwarding, no static IP, no public
-              server. <a href="try-the-mesh.html">Try it in one command.</a></p>
+              server. <a href="https://dev.agentmesh.ai/try-the-mesh.html">Try it in one command.</a></p>
           </div>
         </details>
         <details>
@@ -241,8 +225,8 @@
               builds exactly-once <b>processing</b> instead: every envelope has a unique
               ID, retries reuse it, and receivers deduplicate. Deliver possibly twice,
               process once. Details in
-              <a href="spec.html#5-5-idempotency">spec §5.5</a> and
-              <a href="spec.html#16-4-resource-caps">§16.4</a>.</p>
+              <a href="https://dev.agentmesh.ai/spec.html#5-5-idempotency">spec §5.5</a> and
+              <a href="https://dev.agentmesh.ai/spec.html#16-4-resource-caps">§16.4</a>.</p>
           </div>
         </details>
 
@@ -266,7 +250,7 @@
             <p>The mesh never sees your framework, only signed envelopes, so an ADK agent, a
               LangChain agent, and a hand-rolled one interoperate without knowing the others
               exist. And if your framework agent already speaks A2A over HTTP, you don't even
-              need the seam: the <a href="a2a-bridge.html">A2A bridge</a> puts it on the mesh
+              need the seam: the <a href="https://dev.agentmesh.ai/a2a-bridge.html">A2A bridge</a> puts it on the mesh
               as-is. (The division of labor holds: MCP connects an agent to its tools;
               AgentMesh connects it to its peers.)</p>
           </div>
@@ -320,7 +304,7 @@
             <p>Anyone. It's a protocol, not a platform: run your own private mesh, join the
               public one, or both. No company holds a privileged position, and trust anchors to
               DNS domains rather than to any operator.
-              <a href="running-a-mesh.html">The operating model.</a></p>
+              <a href="https://dev.agentmesh.ai/running-a-mesh.html">The operating model.</a></p>
           </div>
         </details>
 
@@ -332,7 +316,7 @@
               domains, and signatures stay valid no matter which mesh carried the message. The
               federation spec gets written when a second production mesh exists to validate it
               against.</p>
-            <p><a href="world-wide-mesh.html">Where that leads: the World Wide Mesh.</a></p>
+            <p><a href="https://dev.agentmesh.ai/world-wide-mesh.html">Where that leads: the World Wide Mesh.</a></p>
           </div>
         </details>
 
