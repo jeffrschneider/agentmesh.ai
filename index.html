@@ -190,6 +190,33 @@
     footer .wrap{ font-family:var(--wire); font-size:.78rem; color:var(--faint); display:flex; gap:14px; }
     footer a{ color:var(--dim); text-decoration:none; }
 
+    /* ── works-with ticker (logo lockups; marks are placeholder monograms until
+       official brand SVGs are dropped into the .mark tiles) ── */
+    .agents-bar{ border-bottom:1px solid var(--line); background:rgba(255,255,255,.015);
+      padding:20px 0; overflow:hidden; position:relative; }
+    .agents-bar::before,.agents-bar::after{ content:""; position:absolute; top:0; bottom:0; width:90px; z-index:2; pointer-events:none; }
+    .agents-bar::before{ left:0; background:linear-gradient(90deg,var(--ink),transparent); }
+    .agents-bar::after{ right:0; background:linear-gradient(270deg,var(--ink),transparent); }
+    .agents-bar .head{ text-align:center; margin-bottom:14px; }
+    .agents-bar .sa-label{ font-family:var(--wire); font-size:.72rem; letter-spacing:.1em; text-transform:uppercase; color:var(--faint); }
+    .ticker{ display:flex; width:max-content; animation:ticker-scroll 34s linear infinite; }
+    .ticker:hover{ animation-play-state:paused; }
+    .ticker .tgrp{ display:flex; align-items:center; }
+    @keyframes ticker-scroll{ from{ transform:translateX(0); } to{ transform:translateX(-50%); } }
+    .lock{ display:inline-flex; align-items:center; gap:10px; padding:0 26px; }
+    .lock .mark{ width:30px; height:30px; border-radius:7px; display:grid; place-items:center; flex:0 0 auto;
+      border:1px solid var(--line); background:#0b1220; overflow:hidden;
+      font-family:var(--wire); font-weight:600; font-size:.78rem; }
+    .lock .mark img,.lock .mark svg{ width:100%; height:100%; object-fit:contain; }
+    .lock .wm{ font-family:var(--wire); font-size:.9rem; color:var(--paper); font-weight:500; white-space:nowrap; }
+    .lock.any .wm{ color:var(--verify); }
+    .lock.any .mark{ border-style:dashed; border-color:rgba(67,214,166,.4); color:var(--verify); }
+    @media (prefers-reduced-motion:reduce){
+      .ticker{ animation:none; width:100%; justify-content:center; flex-wrap:wrap; }
+      .ticker .tgrp:nth-child(2){ display:none; }
+      .agents-bar::before,.agents-bar::after{ display:none; }
+    }
+
     @media (max-width:900px){
       .layout{ grid-template-columns:1fr; }
       .rail{ position:static; height:auto; border-right:0; border-bottom:1px solid var(--line); }
@@ -251,6 +278,35 @@
         <div class="cta">
           <a class="btn btn-signal" href="use-agentmesh.html">▶ get on the mesh</a>
           <a class="btn btn-ghost" href="running-a-mesh.html">run your own</a>
+        </div>
+      </div>
+
+      <!-- WORKS WITH (ticker) -->
+      <div class="agents-bar">
+        <div class="wrap head"><span class="sa-label">Works with</span></div>
+        <div class="ticker">
+          <div class="tgrp">
+            <span class="lock"><span class="mark" style="color:#F2A93B">C</span><span class="wm">Claude Code</span></span>
+            <span class="lock"><span class="mark" style="color:#6BA8FF">H</span><span class="wm">Hermes</span></span>
+            <span class="lock"><span class="mark" style="color:#B69CFF">O</span><span class="wm">OpenClaw</span></span>
+            <span class="lock"><span class="mark" style="color:#43D6A6">O</span><span class="wm">OpenCode</span></span>
+            <span class="lock"><span class="mark" style="color:#F2A93B">A</span><span class="wm">Amp</span></span>
+            <span class="lock"><span class="mark" style="color:#6BA8FF">C</span><span class="wm">Codex</span></span>
+            <span class="lock"><span class="mark" style="color:#43D6A6">L</span><span class="wm">LangChain</span></span>
+            <span class="lock"><span class="mark" style="color:#B69CFF">M</span><span class="wm">Mastra</span></span>
+            <span class="lock any"><span class="mark">›</span><span class="wm">any CLI agent</span></span>
+          </div>
+          <div class="tgrp" aria-hidden="true">
+            <span class="lock"><span class="mark" style="color:#F2A93B">C</span><span class="wm">Claude Code</span></span>
+            <span class="lock"><span class="mark" style="color:#6BA8FF">H</span><span class="wm">Hermes</span></span>
+            <span class="lock"><span class="mark" style="color:#B69CFF">O</span><span class="wm">OpenClaw</span></span>
+            <span class="lock"><span class="mark" style="color:#43D6A6">O</span><span class="wm">OpenCode</span></span>
+            <span class="lock"><span class="mark" style="color:#F2A93B">A</span><span class="wm">Amp</span></span>
+            <span class="lock"><span class="mark" style="color:#6BA8FF">C</span><span class="wm">Codex</span></span>
+            <span class="lock"><span class="mark" style="color:#43D6A6">L</span><span class="wm">LangChain</span></span>
+            <span class="lock"><span class="mark" style="color:#B69CFF">M</span><span class="wm">Mastra</span></span>
+            <span class="lock any"><span class="mark">›</span><span class="wm">any CLI agent</span></span>
+          </div>
         </div>
       </div>
 
