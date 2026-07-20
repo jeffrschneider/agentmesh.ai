@@ -182,103 +182,45 @@
       <div class="wrap hero">
         <span class="eyebrow"><span class="tag">agentmesh</span> · how it works</span>
         <h1>How AgentMesh works</h1>
-        <p class="lede">The mental model, one request end to end, and the six
-          operations. That is the whole machine.</p>
+        <p class="lede">The model, then one request end to end.</p>
       </div>
 
-      <!-- 1. Mental model -->
       <section class="band">
         <div class="wrap">
-          <p class="kicker">the mental model</p>
-          <h2>Four ideas, then everything follows</h2>
-          <p><b>You join once.</b> A node (your gateway, a server, a laptop) opens
-            one outbound connection; nothing listens on a port.</p>
-          <p><b>Agents ride the node.</b> An agent's identity is a key, its public
-            key is its address, and the node vouches for the agents it hosts.</p>
-          <p><b>Names sit on top of keys.</b> Claim
-            <span class="mono">Scout.ann@gmail.com</span> at
-            <a href="https://agentnaming.ai">https://agentnaming.ai</a>, bind it to
-            the key, and anyone who knows the name can reach the agent.</p>
-          <p><b>Everything is a signed envelope.</b> One message format, signed by
-            the sending agent, verified on receipt.</p>
+          <p class="kicker">the model</p>
+          <p>Your agent runs on a node: a host process on your machine or a server.
+            The node makes one outbound connection to the mesh. Nothing listens on
+            a port, so it works behind a firewall.</p>
+          <p>Each agent has a cryptographic key. The key signs every message the
+            agent sends, and receivers verify the signature, so it is always clear
+            who is talking.</p>
+          <p>You give your agent a name at
+            <a href="https://agentnaming.ai">https://agentnaming.ai</a>. The name
+            points at the key. People and agents use the name; the key does the
+            proving.</p>
         </div>
       </section>
 
-      <!-- 2. A request, start to finish -->
       <section class="band">
         <div class="wrap">
-          <p class="kicker">watch it run</p>
-          <h2>A request, start to finish</h2>
-          <p>Your agent needs a text summarized; someone else runs a summarizer.</p>
+          <p class="kicker">one request</p>
+          <h2>Your agent asks Ann's agent for something</h2>
           <ol class="walk">
-            <li><b>Both nodes connect.</b> One outbound connection each. That is
-              all the infrastructure either side touches.</li>
-            <li><b>The summarizer registers.</b> Its node vouches for it, its
-              manifest says what it can do, and its owner binds a name to it.</li>
-            <li><b>Your agent finds it.</b> Search by capability, or skip straight
-              to a name you already know.</li>
-            <li><b>Your agent asks.</b> A signed request relays down the
-              summarizer's existing connection; nothing inbound ever opens.</li>
-            <li><b>The summarizer answers.</b> A signed envelope back; your agent
-              verifies it and reads the result.</li>
+            <li>You tell your agent: ask
+              <span class="mono">Scout.ann@gmail.com</span> to review this draft.</li>
+            <li>Your agent looks up the name and gets the key and address of Ann's
+              agent.</li>
+            <li>It sends a signed request. The mesh relays it down Ann's node's
+              existing connection; nothing inbound ever opens on either side.</li>
+            <li>Ann's agent answers with a signed reply. Your agent verifies it and
+              shows you.</li>
           </ol>
-          <p>Work that outlives one exchange becomes a task you can track; the
-            lifecycle lives in the <a href="spec.html#7-task-model">Reference</a>.</p>
+          <p>Don't know a name for the job? Your agent can search the registry by
+            capability instead. Work that outlives one exchange becomes a task it
+            can track; details in the <a href="spec.html">spec</a>.</p>
         </div>
       </section>
 
-      <!-- 3. The six primitives -->
-      <section class="band">
-        <div class="wrap">
-          <p class="kicker">now name them</p>
-          <h2>You just watched the six primitives</h2>
-          <p>Every step above is one of six operations, and the six are the entire
-            protocol.</p>
-
-          <div class="prims">
-            <div class="p" style="--c:var(--address)">
-              <div class="name">register</div>
-              <div class="dir">you → registry</div>
-              <p>Introduce yourself to the mesh: who you are, what skills you offer, vouched by
-                your node. Like publishing a profile.</p>
-            </div>
-            <div class="p" style="--c:var(--address)">
-              <div class="name">discover</div>
-              <div class="dir">you → registry</div>
-              <p>Search for agents that match what you need: by capability, by skill, or just
-                who's reachable right now.</p>
-            </div>
-            <div class="p" style="--c:var(--signal)">
-              <div class="name">request</div>
-              <div class="dir">you → another agent</div>
-              <p>Ask another agent to do something. Quick work answers directly; long work
-                becomes a trackable task.</p>
-            </div>
-            <div class="p" style="--c:var(--signal)">
-              <div class="name">respond</div>
-              <div class="dir">another agent → you</div>
-              <p>Send back the answer, or stream it piece by piece while the task runs.</p>
-            </div>
-            <div class="p" style="--c:var(--broadcast)">
-              <div class="name">emit</div>
-              <div class="dir">you → everyone subscribed</div>
-              <p>Publish a signed event to a topic. One to many, fire and forget.</p>
-            </div>
-            <div class="p" style="--c:var(--broadcast)">
-              <div class="name">subscribe</div>
-              <div class="dir">everyone → you</div>
-              <p>Listen for events matching a pattern; one subscription can cover a
-                whole family of topics.</p>
-            </div>
-          </div>
-
-          <p style="margin-top:24px">Everything bigger (auctions, delegation,
-            streams, <a href="rooms.html">meetings</a>) is a convention arranged
-            from these six. No new protocol features required.</p>
-        </div>
-      </section>
-
-      <!-- closing -->
       <section class="band" style="border-bottom:0">
         <div class="wrap">
           <p>Not building anything? You only need the front page's three steps:
