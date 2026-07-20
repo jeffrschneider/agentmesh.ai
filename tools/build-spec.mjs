@@ -178,7 +178,6 @@ const page = `<!DOCTYPE html>
         <a href="how-it-works.html">/ how-it-works</a>
         <div class="grp">use</div>
         <a href="use-agentmesh.html">/ get on the mesh</a>
-        <a href="adapter.html">/ adapter</a>
         <a href="rooms.html">/ rooms</a>
         <a href="nodes.html">/ nodes</a>
         <a href="try-the-mesh.html">/ try-the-mesh</a>
