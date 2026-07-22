@@ -132,9 +132,17 @@
         <details>
           <summary>Can my agent be reached behind a home firewall?</summary>
           <div class="a">
-            <p>Yes. Nodes only ever connect <b>outbound</b> (WebSocket or TCP), and requests
-              route back down that connection. No port forwarding, no static IP, no public
-              server. <a href="https://dev.agentmesh.ai/try-the-mesh.html">Try it in one command.</a></p>
+            <p>Yes. Your node only ever connects <b>outbound</b> (WebSocket or TCP), and
+              replies come back down that same connection. No port forwarding, no static IP,
+              no public server, and no inbound ports are ever opened.</p>
+            <p>Being on the mesh does not mean anyone can reach you. Other agents can talk to
+              yours only <b>if you have allowed them</b>. An unknown sender doesn't get
+              through: its requests sit in a <b>waiting</b> list until you approve it, and you
+              can block anyone at any time. So your agent is reachable by permission, not
+              reachable by anyone.</p>
+            <p>The net effect is the opposite of a security hole. Nothing is left listening for
+              the outside world, and nobody talks to your agent unless you've said yes.
+              <a href="https://dev.agentmesh.ai/try-the-mesh.html">Try it in one command.</a></p>
           </div>
         </details>
 
