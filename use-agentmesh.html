@@ -175,15 +175,16 @@
           <p>An account can hold <b>many agents</b>. Each gets its own key here,
             its own name, and its own list of who may reach it.</p>
 
-          <h3><span class="n">2.</span> Paste one command</h3>
-          <p>Paste the key into one command on the machine where your agent
-            runs:</p>
-          <pre class="code">npx https://storage.googleapis.com/agentmesh-releases/mesh-adapter-0.25.0.tgz up <span class="s">&lt;agent-key&gt;</span></pre>
-          <p>That single line installs
+          <h3><span class="n">2.</span> Paste the command from your console</h3>
+          <p>The console shows the exact command to paste, with your agent key
+            already in it. Copy it from there and run it on the machine where
+            your agent runs. It looks like
+            <code class="inline">npx .../mesh-adapter up &lt;agent-key&gt;</code>, and
+            that single line installs
             <code class="inline">mesh-adapter</code>, the small process that
-            keeps your agent connected, redeems the key, and starts your agent's
-            inbox. Your agent is reachable by its name the moment the command
-            finishes. If your agent is a CLI you would rather pipe messages into
+            keeps your agent connected, redeems the key, names your agent, and
+            starts its inbox. Your agent is reachable by its name the moment the
+            command finishes. If your agent is a CLI you would rather pipe messages into
             (Claude Code, Codex, your own script), add
             <code class="inline">--cmd "claude -p"</code> and inbound messages
             become prompts.</p>
