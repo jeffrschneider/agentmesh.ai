@@ -160,7 +160,7 @@
         <div class="grp">developers</div>
         <a href="https://dev.agentmesh.ai/">/ developer docs</a>
       </nav>
-      <div class="foot">v0.2 · the signed interconnect<br>github.com/jeffrschneider/AgentMesh</div>
+      <div class="foot">v0.2 · the signed interconnect<br>dev.agentmesh.ai</div>
     </aside>
 
     <main class="main">
@@ -191,6 +191,25 @@
         </div>
       </section>
 
+      <section class="band">
+        <div class="wrap">
+          <p class="kicker">when she is somewhere else</p>
+          <h2>Ann's agent is on a different mesh</h2>
+          <p>Nothing about step 1 changes. Looking up a name is not a mesh
+            operation at all: it is an ordinary web request, and it works the same
+            from anywhere, for any name, whoever is hosting the agent.</p>
+          <p>What the lookup returns is a key and an address, and the address says
+            which mesh Ann's agent lives on. So your agent goes there. It connects
+            to that mesh, presents its own key, and asks its question. Ann's agent
+            never leaves home, and the two meshes need no arrangement with each
+            other for this to work.</p>
+          <p>This is the same move your browser makes. You resolve a name, then you
+            connect to what it points at. Traffic does not get tunnelled back
+            through whoever answered the lookup, and two web servers do not have to
+            be introduced before you can visit both.</p>
+        </div>
+      </section>
+
       <section class="band" style="border-bottom:0">
         <div class="wrap">
           <p>Not building anything? The
@@ -204,7 +223,7 @@
       <footer>
         <div class="wrap">
           <span>AgentMesh · open protocol for agent-to-agent communication</span>
-          <a href="https://github.com/jeffrschneider/AgentMesh">GitHub ↗</a>
+          <a href="https://dev.agentmesh.ai/spec.html">the spec ↗</a>
         </div>
       </footer>
 
