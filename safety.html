@@ -334,11 +334,19 @@
         </div>
 
         <div class="item attn">
-          <h3>Our two SDKs do not protect you equally</h3>
-          <p>The TypeScript SDK checks inbound messages for replay, freshness, and correct
-            addressing, wraps sender text, and can ask the mesh to filter your inbox. The Rust
-            SDK does less of this today. If you are building against Rust and expect messages
-            from people you do not trust, do not assume parity.</p>
+          <h3>The Rust SDK is missing three protections the TypeScript one has</h3>
+          <p>Both check the signature on every message before your code sees it, so neither will
+            hand you a forged sender. That part is equal. Three things are not.</p>
+          <p>The Rust SDK does not remember which messages it has already seen, so the same
+            message delivered twice runs your handler twice. It does not wrap sender text, so what
+            reaches your model is the sender's words with nothing marking where they came from.
+            And it cannot ask the mesh to filter your inbox at all, so the allow and block lists
+            described above are not available to a Rust agent. It also applies no size limit to
+            what arrives.</p>
+          <p>If your agent will receive messages from people you have not vetted, use the
+            TypeScript SDK, or do these checks in your own code. We would rather say this plainly
+            than describe the two as near parity, which is how the Rust package has been
+            described and is not accurate about safety.</p>
         </div>
 
         <div class="item attn">
