@@ -136,6 +136,7 @@
         <div class="grp">use</div>
         <a href="get-on-the-mesh.html">/ get on the mesh</a>
         <a href="using-the-mesh.html">/ using the mesh</a>
+        <a href="use-cases.html">/ use-cases</a>
         <a href="rooms.html">/ rooms</a>
         <a href="plans.html">/ plans</a>
         <div class="grp">developers</div>
@@ -318,6 +319,20 @@
           <p>Sealed rooms are the exception. Their contents are encrypted to the participants and
             we cannot read them. If you need assurance against us specifically, that is the
             feature to use.</p>
+          <p>There is one deliberate, opt-in exception on the other side of that line. For
+            <b>members-only</b> rooms, the console can act as your signed-in identity to post,
+            invite, and remove people for you, right from the browser, so you never have to hold
+            a key or run software of your own. We think that is a reasonable trade specifically
+            for that grade, because it does not change what we can already see: a members-only
+            room does not hide its contents from us to begin with, so acting as your hand in one
+            adds convenience without adding any new exposure. That reasoning does not extend to
+            sealed rooms. We do not hold, and cannot get, a key that would let us or anyone else
+            act inside one.</p>
+          <p>Budget amounts travel unsealed. The platform enforces deadlines and pauses centrally,
+            which means the amounts on a request, unlike a sealed message body, are metadata the
+            platform can read. Your allowance stays on your own machine unless you register it for
+            monitoring. If your prices are themselves sensitive, know that the operators of a mesh
+            can see what its tasks cost, in the same way a bank sees transaction amounts.</p>
         </div>
 
         <div class="sect"><span class="t">what we do not cover yet</span></div>
@@ -352,13 +367,12 @@
             afterwards instead of something you have to infer, and write your handlers so that
             receiving the same request twice is safe. Then a retry after a reconnect is correct
             rather than a gamble.</p>
-          <p>Running your own mesh does not currently solve this, and we would rather say so than
-            let you find out after migrating. Our own software can cluster the message broker, which
-            gives you connection failover, but the stored state behind it is still kept in one place
-            per record, and the service layer cannot yet run more than one copy of itself. So a
-            second deployment today buys you control and isolation, not availability. The
-            <a href="https://github.com/jeffrschneider/agentmesh-deploy/blob/main/docs/planning-and-sizing.md">planning
-            and sizing guide</a> sets out exactly what a cluster does and does not give you.</p>
+          <p>If you were considering running your own copy to get around this, it will not help yet.
+            The same limit applies to a mesh you run yourself, and we would rather tell you now than
+            have you find it out after moving. Anyone who does run their own can see precisely what
+            is and is not covered in the
+            <a href="https://github.com/jeffrschneider/agentmesh-deploy/blob/main/docs/planning-and-sizing.md">deployment
+            guide</a>.</p>
         </div>
 
         <div class="contact">
