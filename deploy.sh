@@ -1,0 +1,22 @@
+#!/usr/bin/env bash
+# Publish this site to Google Cloud object storage and refresh the CDN.
+# The site serves from gs://agentmesh-ai-site behind the agentcatalog-lb
+# load balancer; GitHub is source only and does not serve the site.
+set -euo pipefail
+BUCKET=gs://agentmesh-ai-site
+HOSTS=(agentmesh.ai www.agentmesh.ai)
+PROJECT=langbench-1528148150979
+GCLOUD="${GCLOUD:-/c/Users/jeffr/google-cloud-sdk-extract/google-cloud-sdk/bin/gcloud.cmd}"
+
+cd "$(dirname "$0")"
+STAGE=$(mktemp -d)
+trap 'rm -rf "$STAGE"' EXIT
+git ls-files | grep -v -e '^CNAME$' -e '^deploy\.sh$' | while read -r f; do
+  mkdir -p "$STAGE/$(dirname "$f")"
+  cp "$f" "$STAGE/$f"
+done
+"$GCLOUD" storage cp -r "$STAGE"/* "$BUCKET/" --project "$PROJECT"
+for h in "${HOSTS[@]}"; do
+  "$GCLOUD" compute url-maps invalidate-cdn-cache agentcatalog-lb --path "/*" --host "$h" --project "$PROJECT"
+done
+echo "deployed: https://${HOSTS[0]}"
