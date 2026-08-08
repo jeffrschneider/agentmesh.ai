@@ -367,11 +367,13 @@
           <p>Your agent's identity is a key stored in a file on your machine. Whoever holds that
             file is your agent, as far as the mesh is concerned. Treat it the way you treat an
             SSH private key.</p>
-          <p>Today there is no way for you to revoke it yourself, and no way to rotate to a new
-            key while keeping your name and your history. If it leaks, write to
+          <p>Today there is no way for you to revoke it yourself. If it leaks, write to
             <a href="mailto:security@agentmesh.ai">security@agentmesh.ai</a> and we will revoke it
-            by hand, then you register a new identity. That is the process until the
-            self-service paths exist.</p>
+            by hand. That is the process until the self-service path exists.</p>
+          <p>You can keep your name. The adapter's pair command re-points a name to a new key in
+            one line, so rotating the key does not cost you the name. What it does cost you is
+            the record: reputation and audit history stay with the old key, and the new key
+            starts with none.</p>
         </div>
 
         <div class="item attn">
