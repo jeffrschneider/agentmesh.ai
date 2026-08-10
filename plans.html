@@ -114,7 +114,42 @@
       .layout{ grid-template-columns:1fr; }
       .rail{ position:static; height:auto; border-right:0; border-bottom:1px solid var(--line); }
     }
-  </style>
+  
+    /* ══════════ mobile ══════════
+       Measured at 390px, which is where most phones actually land.
+       Two defects this fixes, neither of which shows up as horizontal
+       overflow, so neither was visible from a desktop browser:
+
+       1. The rail stacked above the content as a 650px vertical list, so
+          every page opened with a wall of navigation and the headline sat
+          more than a full screen down. It becomes one scrollable row of
+          tabs, so the page says something immediately and every link is
+          still reachable.
+       2. `.hero` sets `padding:74px 0 30px`, and that shorthand zeroes the
+          side padding `.wrap` provides. Once the rail stops taking up the
+          left margin, hero text sits flush against both screen edges.
+          index.html had the fix; the other thirteen pages did not. */
+    @media (max-width:900px){
+      .rail{ padding:14px 20px; }
+      .brand{ margin-bottom:10px; }
+      .rail nav{ display:flex; gap:2px; overflow-x:auto; scrollbar-width:none; -webkit-overflow-scrolling:touch; }
+      .rail nav::-webkit-scrollbar{ display:none; }
+      .rail .grp{ display:none; }
+      .rail nav a{ white-space:nowrap; padding:11px 12px; margin:0;
+        border-left:0; border-bottom:2px solid transparent; }
+      .rail nav a.on{ border-left-color:transparent; border-bottom-color:var(--signal); }
+      .rail .foot{ display:none; }
+      .hero{ padding-left:40px; padding-right:40px; }
+      /* three columns of prose is unreadable on a phone; two is not much better */
+      .prims,.docs,.plans,.idg,.pats{ grid-template-columns:1fr; }
+    }
+    @media (max-width:620px){
+      /* 40px of gutter each side leaves 310px of text on a 390px screen */
+      .wrap{ padding:0 22px; }
+      .hero{ padding-left:22px; padding-right:22px; }
+      .hero h1 br.brk{ display:none; }
+    }
+</style>
 </head>
 <body>
   <div class="layout">
@@ -256,5 +291,17 @@
 
     </main>
   </div>
+  <script>
+    /* The nav is a horizontal scroller on a phone. Without this, the marker
+       for the page you are on sits off the right edge and you arrive with no
+       idea where you are. block:'nearest' keeps it from scrolling the page
+       vertically as a side effect. */
+    (function () {
+      var a = document.querySelector('.rail nav a.on');
+      if (a && window.matchMedia('(max-width:900px)').matches) {
+        a.scrollIntoView({ inline: 'center', block: 'nearest' });
+      }
+    })();
+  </script>
 </body>
 </html>
