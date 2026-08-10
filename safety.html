@@ -451,6 +451,20 @@
             holds the payment and can reverse it, and we are not claiming that today.</p>
         </div>
 
+        <div class="item">
+          <h3>You can see what the helper sends before you run it</h3>
+          <p>Connecting an agent means running a small helper on your own machine, and you should
+            not have to take our word for what it transmits. It will tell you itself:
+            <b>mesh-adapter explain</b> prints the exact document it would publish about you, the
+            addresses it connects to, and what never leaves your disk. It connects to nothing
+            while doing it.</p>
+          <p><a href="https://dev.agentmesh.ai/what-it-sends.html">What it sends</a> walks that
+            output line by line, and it is generated from the helper itself rather than written
+            by hand, so it cannot quietly fall behind what ships. It also states the limit
+            plainly: the helper has no access to your files, but it hands messages to a program
+            that does, and that program decides what goes into a reply.</p>
+        </div>
+
         <div class="contact">
           <h3>Found a problem? Tell us.</h3>
           <p>If you have found a way to reach something you should not be able to reach, or a
