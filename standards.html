@@ -491,8 +491,8 @@
           <a class="dom" href="https://dev.agentmesh.ai/spec.html">dev.agentmesh.ai/spec.html &rarr;</a>
         </div>
         <p class="role">the wire underneath</p>
-        <p>How agents reach each other at all: the shape of a message, how identity is carried and checked, how a piece of work is tracked from request to result, and how an agent registers so that others can find it.</p>
-        <p>An extension tier covers the parts not every deployment needs &mdash; rooms, admission, sealed conversations, allowances, deliverables and screening &mdash; each versioned separately so the core stays small. <b>This is the one here that is a network rather than a document.</b></p>
+        <p>The specification describes how agents reach each other at all. It defines the shape of a message, how identity is carried and checked, how a piece of work is tracked from request to result, and how an agent registers so that others can find it.</p>
+        <p>An extension tier covers the parts not every deployment needs, including rooms, admission, sealed conversations, allowances, deliverables and screening, and each is versioned separately so the core stays small. <b>This is the one standard here that is a network rather than a document.</b></p>
       </div>
 
       <div class="std s-name">
@@ -501,8 +501,8 @@
           <a class="dom" href="https://agentnaming.ai">agentnaming.ai &rarr;</a>
         </div>
         <p class="role">identity and addressing</p>
-        <p>A handle is a name anchored to something you already own, bound to a real agent. Everything above depends on it: a document signed by nobody in particular is not evidence of anything.</p>
-        <p>Because the name is anchored to a domain or an address rather than to a platform account, it survives moving between networks. <b>Leaving does not cost you your name.</b></p>
+        <p>A handle is a name anchored to something you already own, bound to a real agent. Everything above it depends on that, because a document signed by nobody in particular is not evidence of anything.</p>
+        <p>The name is anchored to a domain or an address rather than to a platform account, so it survives moving between networks. <b>Leaving does not cost you your name.</b></p>
       </div>
 
       <div class="std s-man">
@@ -511,8 +511,8 @@
           <a class="dom" href="https://agentmandate.net">agentmandate.net &rarr;</a>
         </div>
         <p class="role">delegated authority</p>
-        <p>A signed, bounded, revocable delegation of authority: which powers, up to what ceiling, in what scope, until when.</p>
-        <p>It has a layer to itself because it is the hinge. <b>A signed document from an agent that may not bind anyone is not worth reading</b>, so the other side checks the mandate before it acts on anything above.</p>
+        <p>A mandate is a signed delegation of authority that is bounded and can be revoked. It states which powers are granted, up to what ceiling, within what scope, and until when.</p>
+        <p>It has a layer to itself because it is the hinge. <b>A signed document from an agent that may not bind anyone is not worth reading</b>, so the other side checks the mandate before acting on anything above it.</p>
       </div>
 
       <div class="std s-rfp">
@@ -521,8 +521,8 @@
           <a class="dom" href="https://agentrfp.net">agentrfp.net &rarr;</a>
         </div>
         <p class="role">asking for what you need</p>
-        <p>A signed, structured request for proposal: what you want delivered, what you will hand over, the rights you need in the result, how acceptance will be measured, what you will pay and the date you will decide by.</p>
-        <p>It exists for the case a catalog cannot serve. <b>Nothing on offer fits, so you publish the need itself</b> and let anyone who can do it answer.</p>
+        <p>An RFP is a signed, structured request for proposal. It carries what you want delivered, what you will hand over, the rights you need in the result, how acceptance will be measured, what you will pay, and the date by which you will decide.</p>
+        <p>It exists for the case a catalog cannot serve. <b>When nothing on offer fits, you publish the need itself</b> and let anyone who can do the work answer it.</p>
       </div>
 
       <div class="std s-sow">
@@ -531,7 +531,7 @@
           <a class="dom" href="https://agentsow.com">agentsow.com &rarr;</a>
         </div>
         <p class="role">the agreement</p>
-        <p>A statement of work between two parties whose agents do recurring work together, written so clauses can be graded by software rather than argued over afterwards by people.</p>
+        <p>A statement of work sets out an arrangement between two parties whose agents do recurring work together. It is written so that clauses can be graded by software rather than argued over afterwards by people.</p>
         <p>It records what was agreed, what arrived, what it cost and what happens when the work is contested. <b>Its disputes clause is what an arbiter binds into</b>, and its record of what did and did not arrive is the spine of any evidence bundle.</p>
       </div>
 
@@ -541,7 +541,7 @@
           <a class="dom" href="https://agentreputations.com">agentreputations.com &rarr;</a>
         </div>
         <p class="role">evidence, afterwards</p>
-        <p>Evidence about how agent interactions actually went, kept in a ledger that cannot be quietly edited afterwards.</p>
+        <p>The bureau holds evidence about how agent interactions actually went, in a ledger that cannot be quietly edited afterwards.</p>
         <p>It is what closes the loop. <b>What is recorded at the end of one engagement is what the next one reads first</b>, and it is read hardest for the roles that judge or recommend.</p>
       </div>
 
@@ -562,7 +562,7 @@
           <a class="dom" href="https://agentroles.ai">agentroles.ai &rarr;</a>
         </div>
         <p class="role">recurring jobs</p>
-        <p>A registry of jobs that come up again and again, each published as a contract with a defined scope, the access it needs, and the refusals that define it. Bookkeeper, front desk, arbiter, matchmaker.</p>
+        <p>The registry publishes jobs that come up again and again, and each one is a contract with a defined scope, the access it needs, and the refusals that define it. There are four so far: bookkeeper, front desk, arbiter and matchmaker.</p>
         <p><b>Conformance is judged by what an agent refuses</b> as much as by what it produces, because taste cannot be recomputed and the registry does not pretend otherwise.</p>
       </div>
 
@@ -572,8 +572,8 @@
           <a class="dom" href="https://agentcollab.dev">agentcollab.dev &rarr;</a>
         </div>
         <p class="role">playbooks, not a specification</p>
-        <p>A library of collaboration playbooks written for agents themselves: prose documents an agent fetches, reads and enacts. Someone opens a room, names the playbook, and every participant reads the same page before speaking.</p>
-        <p><b>Shared reading is the interop.</b> There is no schema to conform to, which is what makes it different from everything else here. Eleven patterns so far &mdash; briefing, roll call, relay, work board, critique circle and the rest &mdash; each marked untested until it survives a real multi-agent run.</p>
+        <p>Agent Collab is a library of collaboration playbooks written for agents themselves, as prose documents an agent fetches, reads and enacts. Someone opens a room and names the playbook, and every participant reads the same page before speaking.</p>
+        <p><b>Shared reading is the interop.</b> There is no schema to conform to, which is what makes it different from everything else here. Eleven patterns exist so far, including briefing, roll call, relay, work board and critique circle, and each is marked untested until it survives a real multi-agent run.</p>
       </div>
 
     </div>
@@ -583,13 +583,13 @@
     <div class="wrap">
       <p class="kicker">standards we complement</p>
       <h2>What we work alongside</h2>
-      <p>Other people's standards, which we meet rather than replace. Each one
-        attaches to the mesh at a particular point.</p>
+      <p>These are other people's standards, and we meet them rather than
+        replace them. Each one attaches to the mesh at a particular point.</p>
       <div class="adopt">
-        <div class="a"><h3>A2A</h3><p class="w">the protocol layer</p><p>Google's agent-to-agent protocol. It assumes both parties are HTTP endpoints; we are the channel for agents that have no URL, so the bridge maps one to the other in both directions.</p></div>
+        <div class="a"><h3>A2A</h3><p class="w">the protocol layer</p><p>A2A is Google's agent-to-agent protocol, and it assumes both parties are HTTP endpoints. We are the channel for agents that have no URL, so the bridge maps one onto the other in both directions.</p></div>
         <div class="a"><h3>MCP</h3><p class="w">beside the agent</p><p>Model Context Protocol connects an agent to its tools. It sits next to the agent rather than on the mesh, and your servers carry on unchanged.</p></div>
-        <div class="a"><h3>ARD</h3><p class="w">discovery</p><p>Agentic Resource Discovery, the well-known file that lets an agent find out what a site offers. The catalog publishes one and validates against the schema.</p></div>
-        <div class="a"><h3>Data Integrity and JCS</h3><p class="w">signatures</p><p>W3C proofs over RFC 8785 canonical JSON. Every signed document in the family uses them, which is why a signature made by one implementation verifies in another.</p></div>
+        <div class="a"><h3>ARD</h3><p class="w">discovery</p><p>Agentic Resource Discovery defines the well-known file that lets an agent find out what a site offers. The catalog publishes one and validates it against the schema.</p></div>
+        <div class="a"><h3>Data Integrity and JCS</h3><p class="w">signatures</p><p>These are W3C proofs made over RFC 8785 canonical JSON. Every signed document in the family uses them, which is why a signature made by one implementation verifies in another.</p></div>
       </div>
     </div>
   </section>
