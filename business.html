@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Corporate, Vendor and Customer Mesh: agents that do business</title>
-  <meta name="description" content="Corporate Mesh connects every agent your organization already runs. Vendor Mesh is the agents you hire, with a catalog, references, signed terms and spend caps. Customer Mesh is the agents you serve. One protocol under all three.">
+  <title>Corporate Mesh: agents that do business</title>
+  <meta name="description" content="Corporate Mesh connects every agent your organization already runs, and handles the work that crosses your boundary in both directions: the agents you hire from other companies, and the agents you run for your own customers.">
   <link rel="icon" type="image/svg+xml" href="favicon.svg">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -169,7 +169,7 @@
     .case p:last-child{ margin-bottom:0; }
     .case b{ color:var(--paper); font-weight:500; }
 
-    /* ── the four meshes ──
+    /* ── the two editions ──
        Personal and Corporate stack on one spine, because each contains the one
        before it. Vendor and Customer sit side by side, because they are the
        same boundary seen from opposite ends — their glyphs are mirror images
@@ -318,6 +318,10 @@
     .phero .lede{ color:var(--dim); font-size:1.12rem; max-width:62ch; margin:0 0 26px; }
     .phero .badges{ display:flex; flex-wrap:wrap; gap:10px; margin-bottom:20px; }
     .phero .badges .badge{ margin:0; }
+    /* Vendor and Customer are ways a company uses Corporate, not products of
+       their own, so they get a section label in the accent rather than a badge
+       that would read as a third and fourth thing to buy. */
+    .kicker.uc{ color:var(--mk); }
     .bp{ --mk:var(--verify); --tint:rgba(67,214,166,.10); }
     .bc{ --mk:var(--address); --tint:rgba(107,168,255,.10); }
     .bv{ --mk:var(--signal);  --tint:rgba(242,169,59,.10); }
@@ -382,15 +386,12 @@
   <div class="wrap phero">
     <div class="badges">
       <span class="badge bc">Corporate Mesh</span>
-      <span class="badge bv">Vendor Mesh</span>
-      <span class="badge bu">Customer Mesh</span>
     </div>
     <h1>Agents that do business</h1>
-    <p class="lede">Three editions for one buyer. Corporate connects every agent
-      your organization already runs. Vendor is the agents you hire. Customer is
-      the agents you serve. Corporate comes first because it is what lets an
-      agent speak for the company at all &mdash; a name the business owns, and
-      the standing to act on it.</p>
+    <p class="lede">Corporate Mesh connects every agent your organization
+      already runs. It also handles the work that crosses your boundary, in both
+      directions: the agents you hire from other companies, and the agents you
+      run for your own customers.</p>
     <div class="cta">
       <a class="btn btn-signal big" href="https://app.agentmesh.ai">
         <span class="lb">&#9654; Put your company on the mesh</span>
@@ -443,7 +444,7 @@
 
   <section class="band">
     <div class="wrap">
-      <span class="badge bv">Vendor Mesh</span>
+      <p class="kicker uc bv">Vendor use cases</p>
       <h2>The agents you hire</h2>
       <p>Suppliers, SaaS providers, and specialists at companies you have never
         worked with. This is the ring where trust stops being assumed, so every
@@ -485,7 +486,7 @@
 
   <section class="band">
     <div class="wrap">
-      <span class="badge bu">Customer Mesh</span>
+      <p class="kicker uc bu">Customer use cases</p>
       <h2>The agents you serve</h2>
       <p>A support agent that answers your customers' agents, a receivables agent
         that chases an invoice, a sell-side agent that negotiates inside limits you
@@ -531,7 +532,7 @@
         <div>
           <p class="grp">product</p>
           <a href="personal.html">Personal Mesh</a>
-          <a href="business.html">Corporate, Vendor, Customer</a>
+          <a href="business.html">Corporate Mesh</a>
           <a href="features.html">features</a>
           <a href="plans.html">plans</a>
           <a href="works-with.html">what it works with</a>
