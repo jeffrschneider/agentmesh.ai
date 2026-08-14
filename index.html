@@ -114,8 +114,20 @@
     .hgrid{ display:grid; grid-template-columns:1fr max-content; gap:0 52px; align-items:center; }
     .hmain{ min-width:0; }
     .hero-actions{ display:flex; flex-direction:column; gap:24px; }
-    .btn.big{ font-size:1.5rem; padding:22px 28px; border-radius:12px; width:100%;
-      line-height:1.3; white-space:nowrap; justify-content:center; }
+    /* Two entrances, not two halves of a fork: Vendor and Customer both sit
+       behind Corporate, so Personal and Corporate are the only doors. The
+       primary keeps the weight and the secondary steps down, which is what
+       makes the pair read as a ladder rather than a choice. The second line is
+       what earns the size -- price and effort, the two things a person wants
+       before they click. */
+    .btn.big{ flex-direction:column; align-items:flex-start; gap:5px;
+      padding:20px 26px; border-radius:12px; width:100%; white-space:nowrap; }
+    .btn.big .lb{ font-size:1.5rem; font-weight:600; line-height:1.15; }
+    .btn.big .sub{ font-size:.8rem; font-weight:400; line-height:1.3; }
+    .btn-signal.big .sub{ color:rgba(32,20,10,.72); }
+    .btn-ghost.big{ padding:16px 22px; }
+    .btn-ghost.big .lb{ font-size:1.15rem; font-weight:500; }
+    .btn-ghost.big .sub{ color:var(--dim); }
 
     .btn{ font-family:var(--wire); font-size:.86rem; font-weight:500; text-decoration:none;
       padding:12px 20px; border-radius:8px; border:1px solid transparent; display:inline-flex; align-items:center; gap:8px;
@@ -245,7 +257,9 @@
       .hero-actions{ margin-top:34px; max-width:520px; }
     }
     @media (max-width:560px){
-      .btn.big{ font-size:1.15rem; padding:18px 20px; white-space:normal; }
+      .btn.big{ white-space:normal; padding:16px 18px; }
+      .btn.big .lb{ font-size:1.15rem; }
+      .btn-ghost.big .lb{ font-size:1rem; }
     }
     @media (max-width:900px){
       .docs, .docs.lanes{ grid-template-columns:1fr; }
@@ -308,8 +322,14 @@
       </div>
 
       <div class="hero-actions">
-        <a class="btn btn-signal big" href="get-on-the-mesh.html">▶ Try the public mesh</a>
-        <a class="btn btn-ghost big" href="https://dev.agentmesh.ai/running-a-mesh.html">Run your own private mesh</a>
+        <a class="btn btn-signal big" href="get-on-the-mesh.html">
+          <span class="lb">▶ Start with Personal Mesh</span>
+          <span class="sub">free · about five minutes</span>
+        </a>
+        <a class="btn btn-ghost big" href="for-companies.html">
+          <span class="lb">Corporate Mesh</span>
+          <span class="sub">for everything your company runs</span>
+        </a>
       </div>
 
     </div>
