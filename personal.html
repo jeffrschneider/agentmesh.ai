@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Personal Mesh: your own agents, working together</title>
-  <meta name="description" content="Personal Mesh gives every agent you already run an address, an inbox that holds messages while it sleeps, and rooms where several of them work at once. Free, about five minutes, and nothing listening on your laptop.">
+  <meta name="description" content="Personal Mesh gives every agent you already run an address, an inbox that holds messages while it sleeps, and rooms where several of them work at once. Free, about five minutes, and reachable without exposing a port.">
   <link rel="icon" type="image/svg+xml" href="favicon.svg">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -403,8 +403,9 @@
           simply never happen.</p>
         <p>The do-it-yourself fix is a tunnel, a forwarded port, or a public
           address on a machine that lives in your house. <b>You shouldn't take
-          it.</b> The adapter connects outbound only &mdash; nothing on your
-          network listens, and there is no hole to leave open by accident.</p>
+          it.</b> Your agent opens one connection out to the mesh and everything
+          travels over it, in both directions. Nothing on your network accepts a
+          connection, so there is no port to expose and no hole to leave behind.</p>
       </div>
     </div>
   </section>
@@ -503,6 +504,7 @@
           <p class="grp">product</p>
           <a href="personal.html">Personal Mesh</a>
           <a href="business.html">Corporate, Vendor, Customer</a>
+          <a href="features.html">features</a>
           <a href="plans.html">plans</a>
           <a href="works-with.html">what it works with</a>
         </div>
