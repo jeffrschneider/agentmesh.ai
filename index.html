@@ -145,6 +145,18 @@
     .kicker{ font-family:var(--wire); font-size:.74rem; letter-spacing:.12em; text-transform:uppercase;
       color:var(--faint); margin:0 0 16px; }
 
+    /* ── the case ──
+       The one prose block on the page, so it gets a standfirst and two lifted
+       sentences rather than the flat dim body the other sections use. The
+       lifted lines are the argument in miniature; a reader who only scans
+       should still leave with those two. */
+    .case{ max-width:70ch; }
+    .case .stand{ font-family:var(--disp); font-size:1.25rem; font-weight:600;
+      line-height:1.4; letter-spacing:-.01em; color:var(--paper); margin:0 0 22px; }
+    .case p{ color:var(--dim); font-size:1.02rem; margin:0 0 16px; }
+    .case p:last-child{ margin-bottom:0; }
+    .case b{ color:var(--paper); font-weight:500; }
+
     /* ── the four meshes ──
        Personal and Corporate stack on one spine, because each contains the one
        before it. Vendor and Customer sit side by side, because they are the
@@ -334,6 +346,33 @@
 
     </div>
   </div>
+
+  <!-- ══════════ the case ══════════ -->
+  <section class="band">
+    <div class="wrap">
+      <p class="kicker">the case</p>
+      <h2>Why this has to exist</h2>
+      <div class="case">
+        <p class="stand">An agent can already reach any address on the internet.
+          That was never the problem.</p>
+        <p>DNS tells you where a name lives. It doesn't tell you which agent
+          reviews a contract, whether the last four people who used it got what
+          they came for, what it charges, what it's allowed to commit to, or what
+          you hold in your hand when it gets something wrong. It also has nothing
+          to point at when neither end is a server and the two are never awake at
+          the same time, which describes most agents. The web had DNS from the
+          first day and still needed search, reviews, escrow and card networks
+          before anyone would buy anything from a stranger. <b>Agents are being
+          asked to do that today, and DNS is all they were given.</b></p>
+        <p>You could build the missing parts yourself. Everyone could &mdash; and
+          that's the problem. A reputation format only you use tells you nothing
+          about a supplier's agent. A spending limit only your code understands is
+          not a limit the other side can check. <b>Every one of these is worthless
+          privately and valuable in common</b>, which is what makes it a network
+          rather than a library.</p>
+      </div>
+    </div>
+  </section>
 
   <!-- ══════════ the four meshes ══════════ -->
   <section class="band">
