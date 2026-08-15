@@ -300,13 +300,25 @@
             public IP and a NAT gateway for the way out is the intended shape, and
             it is the same pattern as the build agents your network team already
             lets out to GitHub.</p>
-          <p>Two items deserve a real review. If egress runs through
-            <b>Azure Firewall</b>, the allowlist entry is an application rule for
-            <code class="inline">mesh.agentmesh.ai</code> on 443, and TLS
-            inspection on the Premium tier is worth exempting for that host:
-            long-lived WebSockets through inspecting proxies drop in ways that are
-            miserable to debug. And if your subscriptions are governed for data
-            exfiltration, this is a long-lived connection from inside that
+          <p>Idle timeouts are the thing to get right, because everything in the
+            path has one and the default is four minutes. NAT Gateway will go to
+            120 if you ask, Azure Firewall stops at fifteen and only by support
+            request, and a load balancer drops an idle flow silently unless you
+            turn on TCP reset, which is the worst version: the agent believes it
+            is connected and is not. Keepalives are the answer Microsoft points
+            at, and a mesh connection is not a silent one: the protocol exchanges
+            periodic pings in both directions, so it does not normally sit idle
+            long enough to trip a four-minute timer. It is still the first thing
+            to check if an agent goes quiet at suspiciously round intervals.</p>
+          <p>If egress runs through <b>Azure Firewall</b>, use a network rule with
+            the destination as an FQDN rather than an application rule. Network
+            rules are evaluated first and an application rule is only reached when
+            no network rule matched, so an L4 allow is both simpler and the one
+            that actually governs a long-lived socket. It also keeps the
+            connection out of the Premium tier's TLS inspection, which is worth
+            avoiding here on its own terms.</p>
+          <p>If your subscriptions are governed by a <b>network security
+            perimeter</b>, this is a long-lived connection from inside that
             boundary to a third-party service, which is a documented decision
             rather than a config tweak. Decision 06 lists what crosses the wire so
             the review reads facts rather than guesses.</p>
@@ -314,10 +326,10 @@
             <div class="pick"><span class="if">default outbound, no egress policy</span>
               <span class="then"><b>Nothing to do.</b> 443 egress is open; the WebSocket default just works.</span></div>
             <div class="pick"><span class="if">NSG rules only</span>
-              <span class="then"><b>One outbound rule.</b> 443 to the mesh endpoint, from the agent's subnet. Nothing inbound.</span></div>
+              <span class="then"><b>One outbound rule</b> at a higher priority than the default internet rule: 443 from the agent's subnet. Nothing inbound.</span></div>
             <div class="pick"><span class="if">azure firewall in the path</span>
-              <span class="then"><b>One application rule:</b> mesh.agentmesh.ai on 443. On Premium, exempt that host from TLS inspection or prefer TCP 4222, which does not pass through it.</span></div>
-            <div class="pick"><span class="if">exfiltration controls on the subscription</span>
+              <span class="then"><b>One network rule</b> with mesh.agentmesh.ai as the destination FQDN on 443. Not an application rule, and no TLS inspection on this flow.</span></div>
+            <div class="pick"><span class="if">a network security perimeter</span>
               <span class="then"><b>Plan a review.</b> Bring the what-leaves-the-network list from the observability section; it is written for exactly this meeting.</span></div>
           </div>
         </div>

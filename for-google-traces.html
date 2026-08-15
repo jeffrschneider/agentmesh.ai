@@ -327,7 +327,7 @@
             <div class="pick"><span class="if">you run an opentelemetry collector</span>
               <span class="then"><b>Point the exporter at it</b> instead, and fan out wherever it already sends everything else.</span></div>
             <div class="pick"><span class="if">third-party APM on GCP</span>
-              <span class="then"><b>Same exporter, their OTLP endpoint.</b> We test both OTLP encodings against the reference collector and Honeycomb.</span></div>
+              <span class="then"><b>Same exporter, their OTLP endpoint.</b> Both OTLP encodings are supported, JSON and protobuf.</span></div>
             <div class="pick"><span class="if">not ready to decide</span>
               <span class="then"><b>Do nothing.</b> Trace context still propagates on every message; emission stays off until an operator turns it on.</span></div>
           </div>

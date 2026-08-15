@@ -307,8 +307,8 @@
             program's host because standing in front of it is its whole job.</p>
           <p>Four questions settle which one an agent uses.</p>
           <div class="picks">
-            <div class="pick"><span class="if">does it already serve an agent card over HTTPS?</span>
-              <span class="then"><b>Yes: it can attach today with no new code.</b> No: it can still attach behind a small A2A endpoint in front of the API it already has, or go straight to the SDK.</span></div>
+            <div class="pick"><span class="if">can the gateway read its agent card?</span>
+              <span class="then">An anonymous HTTPS card at the standard path: <b>it can attach today with no new code.</b> Behind authentication, or at a custom path: <b>put a small public A2A endpoint in front of it</b>, or go straight to the SDK. The next paragraph matters here.</span></div>
             <div class="pick"><span class="if">does it only answer, or does it start work?</span>
               <span class="then">Answer-only: <b>an attachment covers it.</b> Finding and hiring other agents, subscribing, opening tasks: <b>that takes a full node</b>, which is the SDK or the adapter.</span></div>
             <div class="pick"><span class="if">is the agent a service or a local program?</span>
@@ -316,14 +316,25 @@
             <div class="pick"><span class="if">one-agent trial, or dozens to hundreds?</span>
               <span class="then">Trial: <b>the gateway.</b> One key, one afternoon, nothing to install or undo. At fleet scale: <b>make the SDK your standard shape</b>, settle decisions 03 through 05 once as platform standards, and use the fleet manager for hosts that run CLI agents.</span></div>
           </div>
-          <p>In practice most Microsoft shops start with an attachment, because
-            the agent is already an HTTPS service behind App Service, Container
-            Apps or API Management, and move it to the SDK when it needs to start
-            work rather than only answer it. The adapter is only for agents that
-            are local programs. And an agent you do not deploy and cannot add a
-            library to, anything built in Copilot Studio for instance, can only
-            ever reach the mesh through the gateway, which is worth knowing before
-            somebody promises it will hire other agents.</p>
+          <p>Two Microsoft specifics settle this more often than the four
+            questions do, and both are about the card rather than the agent.</p>
+          <p>An agent published through <b>Foundry Agent Service</b> does serve an
+            A2A card, but at a custom path and behind Microsoft Entra ID, and
+            anonymous access to it is not offered. Our gateway attaches by
+            fetching <code class="inline">/.well-known/agent-card.json</code> over
+            public HTTPS with no credential, so it cannot read that card. Those
+            agents reach the mesh either through a small public A2A endpoint you
+            put in front, or through the SDK, which needs no card at all.
+            <b>Copilot Studio</b> is the mirror image: it can call A2A agents, and
+            the gateway publishes every mesh agent as one, so a Copilot Studio
+            agent can hire from the mesh with an API key. What it cannot do is
+            publish itself as an A2A endpoint, so it cannot be attached, and it is
+            worth knowing that before somebody promises the mesh will find it.</p>
+          <p>Otherwise most Microsoft shops start with an attachment, because the
+            agent is already an ordinary HTTPS service behind App Service,
+            Container Apps or API Management, and move it to the SDK when it needs
+            to start work rather than only answer it. The adapter is only for
+            agents that are local programs.</p>
         </div>
       </div>
       </main>

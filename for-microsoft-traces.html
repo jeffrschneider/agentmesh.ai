@@ -298,18 +298,21 @@
             counterparty's, as ordinary OTLP spans carrying W3C Trace Context, so
             they join the traces your services already produce.</p>
           <p>For an Azure shop the destination is <b>Application Insights</b>, and
-            the road there is the one your platform team most likely already
-            built: an <b>OpenTelemetry Collector</b> with the Azure Monitor
-            exporter. Our exporter speaks OTLP over HTTP to any collector, so it
-            points at yours and the collector decides where everything lands.</p>
+            the road there is an <b>OpenTelemetry Collector</b> you run. Azure
+            Monitor ingests OTLP natively now, but through a data collection
+            endpoint that authenticates with Microsoft Entra ID, and our exporter
+            carries a mesh credential rather than an Azure one. So the collector
+            is what holds the Entra side, which is also where your platform team
+            would want that credential to live. Our exporter posts OTLP over HTTP
+            to it and the collector decides where everything lands:</p>
           <pre class="code">agentmesh trace export \
   --otlp http://otel-collector.observability.svc:4318 \
   --resource service.namespace=<span class="s">renwick-agents</span></pre>
-          <p>If you would rather not run a collector, the same exporter posts to
-            any OTLP endpoint that will take it, including the OTLP front door of
-            whichever APM your team actually opens. Use
-            <code class="inline">--header</code> for a static ingestion key and
-            <code class="inline">--encoding</code> to choose JSON or protobuf.</p>
+          <p>The same exporter posts to any other OTLP endpoint that will take it,
+            including the front door of whichever APM your team actually opens.
+            Use <code class="inline">--header</code> for a static ingestion key
+            and <code class="inline">--encoding</code> to choose JSON or
+            protobuf.</p>
           <p>For the security review, what a span carries: agent names, the
             primitive, the outcome, timing, and task and trace identifiers.
             <b>No message content, no artifact contents, no amounts</b>: the span
@@ -321,7 +324,7 @@
             platform.</p>
           <div class="picks">
             <div class="pick"><span class="if">application insights shop</span>
-              <span class="then"><b>A collector with the Azure Monitor exporter.</b> The waterfall you already open now crosses company boundaries.</span></div>
+              <span class="then"><b>A collector in front of Azure Monitor.</b> It holds the Entra credential and forwards; the waterfall you already open now crosses company boundaries.</span></div>
             <div class="pick"><span class="if">you already run a collector</span>
               <span class="then"><b>Point the exporter at it</b> and fan out wherever it already sends everything else. Nothing new to operate.</span></div>
             <div class="pick"><span class="if">third-party APM on Azure</span>

@@ -301,36 +301,54 @@
             credential are one agent fighting itself over its own inbox.</p>
           <p><b>AKS</b> is the right answer when Kubernetes is where your platform
             team already lives. An SDK agent is its own Deployment; an adapter and
-            its CLI agent share a Pod so the pair shares a lifecycle. Three
-            Kubernetes habits to unlearn: <code class="inline">replicas: 1</code>
-            and no HPA, for the reason above; a PodDisruptionBudget if the agent
-            holds long-running work, because a rescheduled agent briefly drops off
-            the mesh; and if the cluster autoscaler is on, annotate the Pod
+            its CLI agent share a Pod so the pair shares a lifecycle. Four
+            Kubernetes habits to unlearn. <code class="inline">replicas: 1</code>
+            and no HPA, for the reason above. Then
+            <code class="inline">strategy: Recreate</code>, which is the one most
+            teams miss: a rolling update at one replica still surges to two by
+            default, so every deploy briefly runs two copies of an agent that is
+            only allowed to be one. If the cluster autoscaler is on, annotate the
+            Pod
             <code class="inline">cluster-autoscaler.kubernetes.io/safe-to-evict:
-            "false"</code> so a node consolidation does not move an agent that is
-            mid-task.</p>
+            "false"</code>, and on a node auto-provisioning cluster the annotation
+            is <code class="inline">karpenter.sh/do-not-disrupt: "true"</code>
+            instead. A PodDisruptionBudget is the fourth, and it is a trade rather
+            than a free win: at one replica a budget that forbids eviction will
+            block node drains outright, so pair it with a drain timeout and decide
+            deliberately which you would rather have stall.</p>
           <p><b>Azure Container Apps</b> suits a team that wants containers
-            without a cluster. Two things have to be true there. The revision
-            never scales away, which is minimum and maximum replicas both 1. And
-            the container keeps its CPU when no HTTP request is in flight, because
-            a mesh node earns its keep between requests, not during them: it is
-            listening on its own inbox the whole time. Scale rules and workload
-            profiles both bear on that second point, so settle it before you
-            commit rather than after an agent starts answering late.</p>
+            without a cluster, and it has one trap that is specific to this
+            workload. An agent that only connects outbound has no ingress, and a
+            container app with no ingress and no scale rule scales to zero with
+            nothing left to wake it. Set minimum and maximum replicas to 1 and the
+            revision stays up.</p>
           <p><b>App Service</b> works for an agent that is already there. Turn on
-            Always On so the app is not unloaded when nothing calls it, and keep
-            it to a single instance.</p>
+            Always On, which is what stops the app being unloaded after twenty
+            idle minutes, and keep it to a single instance. Note that the idle
+            timer is reset by inbound requests, not by your own outbound traffic,
+            which is exactly what Always On is supplying.</p>
           <p>A plain <b>virtual machine</b> is the answer when nothing else claims
             the decision. One small VM comfortably runs several agents under
             systemd, with no public address and a NAT gateway for the way out. If
             one VM ends up hosting a handful of CLI agents behind adapters, our
             fleet manager handles inventory, installs, updates and health for all
             of them from one file.</p>
+          <p>One thing is true of all four, and it is better to design for it than
+            to discover it. Azure resets long-lived connections on purpose and
+            says so: AKS reimages nodes on a weekly node-image channel by default,
+            Container Apps restarts a revision when a Key Vault reference picks up
+            a rotated secret, App Service recycles on any app-setting change, and
+            Azure Firewall sends a reset during planned maintenance, during
+            scale-in, and whenever a rule change narrows what was allowed. None of
+            that is a fault to be engineered away. The SDK reconnects on its own
+            and drains what arrived during the gap, so the practical requirement
+            is that your agent tolerates a restart rather than that your platform
+            avoids one.</p>
           <div class="picks">
             <div class="pick"><span class="if">kubernetes is home</span>
-              <span class="then"><b>AKS.</b> SDK agents as single-replica Deployments; adapter and CLI agent as one Pod. No HPA, a PodDisruptionBudget on agents holding long tasks.</span></div>
+              <span class="then"><b>AKS.</b> SDK agents as single-replica Deployments with the Recreate strategy; adapter and CLI agent as one Pod. No HPA.</span></div>
             <div class="pick"><span class="if">containers, but no cluster to run</span>
-              <span class="then"><b>Container Apps, pinned.</b> Min and max replicas both 1, on a workload profile whose CPU stays allocated while nothing is calling it.</span></div>
+              <span class="then"><b>Container Apps, pinned.</b> Min and max replicas both 1, which is what keeps a no-ingress app from scaling to zero with nothing left to wake it.</span></div>
             <div class="pick"><span class="if">the agent already lives on App Service</span>
               <span class="then"><b>Leave it there.</b> Always On, one instance. Smallest change available; move it later if the always-on rent grates.</span></div>
             <div class="pick"><span class="if">no strong platform opinion</span>

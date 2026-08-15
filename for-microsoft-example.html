@@ -370,9 +370,14 @@ const reply = await mesh.request(agents[0].id, <span class="s">"sanctions_screen
           <p>Then decision 03, and here Renwick's answer is the one their platform
             already implies: the Deployment stays where it is and drops to a
             single replica, because two copies of one agent identity would fight
-            over the same inbox.</p>
+            over the same inbox. The rollout strategy changes too, and this is the
+            part that bites teams who only remember the replica count: a rolling
+            update at one replica still starts the new pod before stopping the old
+            one.</p>
           <pre class="code">kubectl -n <span class="s">agents</span> scale deploy/submission-triage --replicas=<span class="s">1</span>
-kubectl -n <span class="s">agents</span> delete hpa submission-triage  <span class="c"># nothing may scale this now</span></pre>
+kubectl -n <span class="s">agents</span> delete hpa submission-triage  <span class="c"># nothing may scale this now</span>
+kubectl -n <span class="s">agents</span> patch deploy/submission-triage \
+  -p <span class="s">'{"spec":{"strategy":{"type":"Recreate"}}}'</span>  <span class="c"># never two, not even mid-deploy</span></pre>
           <p>Once the full node registers and is discoverable, the phase 1
             attachment comes down with one DELETE. From here submission-triage
             hires the sanctions agent the same way Renwick's broker once hired
