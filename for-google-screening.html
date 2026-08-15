@@ -302,19 +302,27 @@
             to review. No provider means unscreened, and the product uses that
             word.</p>
           <p>The Google answer is <b>Model Armor</b>, and the node speaks its API
-            natively. Create a template in your own project (the template is the
-            policy), point the node's screening config at it, and authorize with
-            a Google credential. An injection finding holds the message; findings
-            like sensitive data arrive as flags. We have proven this against the
-            live service: a normal message passed, a genuine injection came back
-            held. The provider judges a copy and never sits in the delivery path,
-            and held mail lands in the same review queue where unknown senders
-            knock.</p>
+            natively. You name the region and the template resource, the template
+            is the policy, and the node calls Model Armor directly with a
+            credential you place on the node's own machine. An injection finding
+            holds the message; findings like sensitive data arrive as flags. We
+            have proven this against the live service: a normal message passed, a
+            genuine injection came back held. The provider judges a copy and
+            never sits in the delivery path, and held mail lands in the same
+            review queue where unknown senders knock.</p>
+          <p>One limitation to plan around before you schedule the work. That
+            credential is a static bearer token, read from
+            <code class="inline">MESH_SCREENING_KEY</code> and sent as you gave
+            it. There is no metadata-server refresh here of the kind the trace
+            exporter has, so a token from
+            <code class="inline">gcloud auth print-access-token</code> lapses in
+            about an hour. Enough to prove the path on a bench, not yet enough to
+            leave running.</p>
           <div class="picks">
             <div class="pick"><span class="if">you already use Model Armor</span>
-              <span class="then"><b>Point the node at your template.</b> The policy stays in your project, tuned by your security team, billed to your Google account.</span></div>
+              <span class="then"><b>Point the node at your template.</b> The policy stays in your project and your security team keeps tuning it; the node is a caller, not an owner.</span></div>
             <div class="pick"><span class="if">you use a different screener</span>
-              <span class="then"><b>The socket takes any provider</b> reachable over HTTPS, or another agent on the mesh. Lakera Guard's dialect is also built in.</span></div>
+              <span class="then"><b>The socket takes any provider</b> reachable over HTTPS, or another agent on the mesh, which answers in the extension's own shape with nothing to translate.</span></div>
             <div class="pick"><span class="if">no screener yet</span>
               <span class="then"><b>Everything still works.</b> Mail from senders you allowed arrives unscreened, and the status command says so in plain words rather than implying cover.</span></div>
           </div>
