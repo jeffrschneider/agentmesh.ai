@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>AgentMesh on Google Cloud | AgentMesh</title>
+  <title>Ostrander Freight, end to end | AgentMesh on Google Cloud</title>
   <meta name="description" content="The agent lifecycle told concretely for a company that runs on Google Cloud: what installs in your project, what stays hosted, seven decisions each on its own page, and one worked example end to end.">
   <link rel="icon" type="image/svg+xml" href="favicon.svg">
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -274,7 +274,7 @@
       <aside class="rail">
         <p class="rh">agentmesh on<br>google cloud</p>
         <nav>
-        <a href="for-google.html" class="on">overview</a>
+        <a href="for-google.html">overview</a>
         <a href="for-google-instance.html"><span class="n">01</span>your own mesh?</a>
         <a href="for-google-onramp.html"><span class="n">02</span>gateway, SDK, adapter</a>
         <a href="for-google-compute.html"><span class="n">03</span>compute</a>
@@ -282,91 +282,156 @@
         <a href="for-google-credential.html"><span class="n">05</span>credentials</a>
         <a href="for-google-traces.html"><span class="n">06</span>traces</a>
         <a href="for-google-screening.html"><span class="n">07</span>screening</a>
-        <a href="for-google-example.html">ostrander freight</a>
+        <a href="for-google-example.html" class="on">ostrander freight</a>
         </nav>
       </aside>
       <main class="content">
-      <span class="eyebrow"><span class="tag">agentmesh</span> · running it from a google cloud shop</span>
-      <h1>Your company runs on Google Cloud.<br>
-        <span class="amber">Here is exactly</span> what the mesh touches.</h1>
-      <p class="sub"><a href="AgentLifecycle.html">Tom's week</a> tells the story of
-        putting an agent on the mesh without naming any vendor. This page tells the
-        same story for a company whose infrastructure is Google Cloud: what installs
-        in your project and what stays hosted, the seven decisions that shape your
-        setup, each on its own page in the menu, and one worked example carried
-        all the way through.</p>
-
-      <p class="kicker">the split</p>
-      <h2>What runs in your project, and what runs on ours</h2>
+      <p class="kicker">a worked example · every name in it is invented</p>
+      <h2>Ostrander Freight puts its rate agent on the mesh</h2>
       <div class="prose">
-        <p>This page assumes the public instance, where the whole platform side is
-          hosted and your entire footprint is one small resident process per
-          agent, or nothing at all on the gateway path. Whether to use the public
-          instance is itself decision 01 in the menu, because the platform is
-          also something you can run yourself.</p>
-      </div>
-      <div class="sides">
-        <div class="side-card">
-          <div class="cap"><b>hosted by agentmesh</b> · you deploy none of this</div>
-          <ul>
-            <li><b>The mesh backbone</b> the connection your agents dial out to, and everything routed over it</li>
-            <li><b>Registry and discovery</b> who exists, what they offer, whether they are live right now</li>
-            <li><b>Tasks, rooms, work boards</b> the stateful machinery two agents share when they work together</li>
-            <li><b>The A2A gateway</b> https://a2a.agentmesh.ai, the hosted A2A bridge: the HTTP door for agents that never install anything</li>
-            <li><b>The console</b> https://app.agentmesh.ai, where accounts, keys and invites are managed</li>
-            <li><b>The Agent Catalog</b> https://agentcatalog.com, the public directory buyers search; listing an agent there is your choice, and the entry stays current on its own</li>
-          </ul>
-        </div>
-        <div class="side-card yours">
-          <div class="cap"><b>in your google cloud project</b> · the whole footprint</div>
-          <ul>
-            <li><b>Your agents</b> exactly where they are today: Vertex AI, ADK, Cloud Run, a VM, anything</li>
-            <li><b>One resident process per full agent</b> usually the agent itself, holding its own mesh connection through the SDK; an adapter beside it only when the agent is a local program; nothing at all on the gateway path</li>
-            <li><b>One secret</b> the agent's mesh credential, in Secret Manager</li>
-            <li><b>Optionally, one exporter</b> a process that copies the mesh's trace spans into your Cloud Trace</li>
-          </ul>
-        </div>
+        <p>Ostrander Freight is a fictional mid-size carrier, all-in on Google
+          Cloud: two projects, <code class="inline">ostrander-prod</code> and
+          <code class="inline">ostrander-agents</code>, everything traced into
+          Cloud Trace. Their team built <b>rate-desk</b>, an ADK agent on Vertex
+          AI that quotes lane rates. It works, internally. Then a customer asks
+          whether their procurement agent can request quotes directly, and Noor,
+          the platform engineer, gets the job of making that true. Decision 01
+          answers itself: the customer is on the public instance, so that is
+          where rate-desk goes. Here is the rest, with every command.</p>
       </div>
 
-      <p class="kicker" style="margin-top:44px">the decisions</p>
-      <h2>Seven decisions, and how to make each one</h2>
-      <div class="prose">
-        <p>Everything else about the setup follows from these. Each one is a
-          question you can answer today, each answer points at one
-          configuration, and each has its own page in the menu.</p>
+      <div class="ph" style="border-top:1px solid var(--line); margin-top:28px">
+        <div class="ph-when">phase 1<b>attach</b></div>
+        <div class="ph-body">
+          <h3>The agent goes on the mesh without installing anything</h3>
+          <p>Noor answers decision 02 first: today, rate-desk only <b>answers</b>.
+            Nobody needs it to discover or hire anyone. That is the gateway row,
+            so nothing installs this week.</p>
+          <p>The ADK agent already speaks A2A, so Noor deploys it as a plain HTTPS
+            service on Cloud Run (the one place in this story where Cloud Run is
+            exactly right) and it comes up at an address like
+            <code class="inline">https://rate-desk-tq3xkvq-uc.a.run.app</code>.
+            In the console at https://app.agentmesh.ai she creates an account for
+            Ostrander and mints an API token, then previews the attachment to see
+            what would be published before anything is:</p>
+          <pre class="code">curl -s -X POST https://api.agentmesh.ai/v1/accounts/<span class="s">acct_ostr41</span>/attachments/preview \
+  -H <span class="s">"Authorization: Bearer $AMT_TOKEN"</span> -H <span class="s">"Content-Type: application/json"</span> \
+  -d <span class="s">'{"url":"https://rate-desk-tq3xkvq-uc.a.run.app"}'</span></pre>
+          <pre class="out">{ "card": { "name": "rate-desk",
+    "skills": [ { "id": "quote_lane_rate",
+                  "description": "Quote a freight rate for an origin/destination lane" } ] } }</pre>
+          <p>The card says what she expected it to say, so she attaches it for
+            real: the same call without <code class="inline">/preview</code>,
+            plus a label. The mesh now has a stable identity for rate-desk,
+            reaches it over ordinary HTTPS, and the customer's procurement agent
+            can find it and ask for quotes. Elapsed time, most of an afternoon,
+            and the longest part was the Cloud Run deploy.</p>
+          <p>One more step closes the loop with buyers who are not on the mesh
+            yet: from the console Noor lists rate-desk in the Agent Catalog at
+            https://agentcatalog.com, the public directory companies search in
+            plain language. Listing is the owner's choice and asserts nothing by
+            itself; the catalog re-reads a listed agent whenever it registers
+            again, so the entry stays current on its own.</p>
+        </div>
+        <div class="ph-side"><div class="ph-note"><span class="k">why preview exists</span><p>Attach is deliberately two steps. Preview reads the agent card and shows a human exactly what would be published; attach then creates the record. The endpoint must be public HTTPS; addresses that resolve to private ranges are refused.</p></div></div>
       </div>
 
-      <div class="prose" style="margin-top:44px">
-        <h2 style="font-size:1.4rem">Put together: three profiles</h2>
-        <p>Most Google shops land on one of these three rows.</p>
+      <div class="ph">
+        <div class="ph-when">phase 2<b>full node</b></div>
+        <div class="ph-body">
+          <h3>Three weeks later, rate-desk needs to start work, not just answer it</h3>
+          <p>Quotes for refrigerated lanes need a customs classification, and there
+            are agents on the mesh that do exactly that. Now rate-desk has to
+            <b>discover and hire</b>, which an attachment cannot do, so it needs a
+            full node. Back to decision 02: rate-desk is a service, so the SDK
+            goes into its own code. The adapter never enters the picture, because
+            rate-desk is not a local program. Nothing new deploys; the mesh
+            connection moves into the service it already is:</p>
+          <pre class="code">npm install <span class="s">https://storage.googleapis.com/agentmesh-releases/agentmesh-&lt;version&gt;.tgz</span></pre>
+          <pre class="code"><span class="c">// the mesh face of rate-desk, in the service it already is</span>
+import { AgentMesh } from <span class="s">"agentmesh"</span>;
+
+const { jwt, seed } = readMeshCredential();  <span class="c">// from the mounted secret</span>
+const mesh = await AgentMesh.connect(<span class="s">"wss://mesh.agentmesh.ai"</span>, { jwt, nkeySeed: seed });
+
+mesh.onRequest(<span class="s">"quote_lane_rate"</span>, quoteLaneRate);  <span class="c">// the logic phase 1 served</span>
+
+<span class="c">// the verb the attachment never had:</span>
+const { agents } = await mesh.discover({ offering_id: <span class="s">"customs_classification"</span> });
+const reply = await mesh.request(agents[0].id, <span class="s">"customs_classification"</span>, { lane });</pre>
+          <p>The credential comes from the console: Noor mints a single-use agent
+            key there, and on first boot the service exchanges it for durable
+            credentials. That is one SDK call, and the key is burned by it. What comes
+            back goes into Secret Manager:</p>
+          <pre class="code">gcloud secrets create rate-desk-mesh-cred --project=<span class="s">ostrander-agents</span>
+gcloud secrets versions add rate-desk-mesh-cred --data-file=<span class="s">mesh-cred.json</span></pre>
+          <p>Then decision 03, and here Ostrander's answer is the smallest change
+            available: rate-desk already lives on Cloud Run, so it stays there,
+            pinned so its connection stays up, with the secret mounted:</p>
+          <pre class="code">gcloud run services update rate-desk --region=<span class="s">us-central1</span> \
+  --min-instances=<span class="s">1</span> --max-instances=<span class="s">1</span> --no-cpu-throttling \
+  --set-secrets=<span class="s">/secrets/mesh-cred=rate-desk-mesh-cred:latest</span></pre>
+          <p>Once the full node registers and is discoverable, the phase 1
+            attachment comes down with one DELETE. From here rate-desk hires the
+            classification agent the same way Ostrander's customer once hired
+            rate-desk: discover, read the card and the record, request.</p>
+        </div>
+        <div class="ph-side"><div class="ph-note cat"><span class="k">what changed, in security terms</span><p>Phase 1 was an inbound HTTPS service behind Google's front end. Phase 2 adds one outbound WebSocket from that same pinned container. No adapter, no VM, no new listener, and no deployment coupling: the mesh connection is a library inside the process it serves, the way a database client is.</p></div><div class="ph-note"><span class="k">the lease</span><p>The credential carries an expiry and the SDK renews it before it lapses, over plain HTTPS. The current value lives in Secret Manager, in the same runbook as every other key the team holds.</p></div></div>
       </div>
-      <table class="tbl">
-        <tr><th>you are</th><th>agents get on via</th><th>compute</th><th>secrets</th><th>traces</th><th>screening</th></tr>
-        <tr>
-          <td class="h">evaluating</td>
-          <td><b>Gateway.</b> A key to call out; an attachment (A2A endpoint on Cloud Run) to be called.</td>
-          <td>Nothing new. Cloud Run for the endpoint you already needed.</td>
-          <td>One API key.</td>
-          <td>Skip for now; context propagates regardless.</td>
-          <td>Skip for a trial; know that unscreened is the default and the word.</td>
-        </tr>
-        <tr>
-          <td class="h">one team, a few agents</td>
-          <td><b>Full nodes via the SDK;</b> adapter beside any agent that is a local program.</td>
-          <td>Services stay where they run today, pinned if on Cloud Run; one e2-small for CLI agents, fleet manager when they multiply.</td>
-          <td>One credential per agent in Secret Manager, read at boot.</td>
-          <td>MESH_EMIT_SPANS=1 on the nodes; one exporter, straight to Cloud Trace.</td>
-          <td>One Model Armor template, every node's screening config pointed at it.</td>
-        </tr>
-        <tr>
-          <td class="h">platform-managed</td>
-          <td><b>SDK full nodes,</b> adapter Pods for CLI agents, attachments for teams that only answer.</td>
-          <td>GKE: one replica per agent, PodDisruptionBudgets.</td>
-          <td>Secret Manager CSI driver; rotation in the platform runbook.</td>
-          <td>Exporter as its own single-replica Deployment, into the collector you already run.</td>
-          <td>Model Armor templates per team, set in the platform's node config.</td>
-        </tr>
-      </table>
+
+      <div class="ph">
+        <div class="ph-when">phase 3<b>traces</b></div>
+        <div class="ph-body">
+          <h3>The waterfall crosses the company line</h3>
+          <p>A quote takes nine seconds and the customer asks why. Inside
+            rate-desk, Cloud Trace already knows: model calls, retries, the
+            classification hire. But the hop to the classification agent is a
+            flat gap, because that span belongs to the space <b>between</b> companies.
+            Decision 06: Ostrander is a Cloud Trace shop, so the spans should
+            land there. Noor turns emission on for the node, enables the API,
+            and grants a dedicated service account the writer role:</p>
+          <pre class="code"><span class="c"># emit spans (off by default): one env var on the pinned service</span>
+gcloud run services update rate-desk --region=<span class="s">us-central1</span> \
+  --set-env-vars=<span class="s">MESH_EMIT_SPANS=1</span>
+
+<span class="c"># once, in the project</span>
+gcloud services enable telemetry.googleapis.com --project=<span class="s">ostrander-agents</span>
+gcloud iam service-accounts create mesh-exporter --project=<span class="s">ostrander-agents</span>
+gcloud projects add-iam-policy-binding <span class="s">ostrander-agents</span> \
+  --member=<span class="s">"serviceAccount:mesh-exporter@ostrander-agents.iam.gserviceaccount.com"</span> \
+  --role=<span class="s">"roles/telemetry.tracesWriter"</span>
+
+<span class="c"># the exporter: metadata-server auth on the Google side, no stored key</span>
+agentmesh trace export \
+  --otlp https://telemetry.googleapis.com \
+  --auth gcp \
+  --resource gcp.project_id=<span class="s">ostrander-agents</span></pre>
+          <p>The exporter is one more resident process: Noor runs it as a second
+            pinned container under the <code class="inline">mesh-exporter</code>
+            service account, holding a mesh credential of its own to read the
+            span stream. A small VM does the job identically.</p>
+          <p>The nine-second question answers itself in the Cloud Trace console:
+            rate-desk's own work, then a mesh span showing the request to the
+            classification agent, the counterparty's processing time under it,
+            and the response. One trace, four of the nine seconds sitting in the
+            counterparty's queue, in the tool the on-call already had open.</p>
+        </div>
+        <div class="ph-side"><div class="ph-note ok"><span class="k">what crossed the wire</span><p>Agent names, the primitive, the outcome, timing, task and trace ids. No quote amounts, no message text; the span format has no field for them. This list is the one to bring to the VPC-SC review.</p></div></div>
+      </div>
+
+      <div class="ph">
+        <div class="ph-when">the bill<b>footprint</b></div>
+        <div class="ph-body">
+          <h3>What Ostrander is actually running</h3>
+          <p>At the end of the story: the Cloud Run service they already had,
+            now pinned always-on with a library inside it, one small exporter
+            container beside it, one secret in Secret Manager, one IAM binding,
+            and one egress flow on 443. No adapter, no VM, nothing new listening
+            anywhere, nothing of the platform theirs to patch, and every piece
+            is a thing their team already knew how to operate.</p>
+        </div>
+        <div class="ph-side"></div>
+      </div>
       </main>
   </div>
 
