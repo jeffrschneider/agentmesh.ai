@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Who screens what reaches your agents? | AgentMesh on Google Cloud</title>
-  <meta name="description" content="The agent lifecycle told concretely for a company that runs on Google Cloud: what installs in your project, what stays hosted, seven decisions each on its own page, and one worked example end to end.">
+  <title>AgentMesh on Microsoft Azure | AgentMesh</title>
+  <meta name="description" content="The agent lifecycle told concretely for a company that runs on Microsoft Azure: what installs in your subscription, what stays hosted, seven decisions each on its own page, and one worked example end to end.">
   <link rel="icon" type="image/svg+xml" href="favicon.svg">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -227,6 +227,9 @@
     .rail nav a.on{ color:var(--signal); border-left-color:var(--signal); }
     .rail nav a .n{ color:var(--faint); margin-right:8px; }
     .rail nav a.on .n{ color:var(--signal); }
+    .then a{ font-family:var(--wire); font-size:.82em; color:var(--address);
+      text-decoration:none; white-space:nowrap; }
+    .then a:hover{ text-decoration:underline; }
     .content h2{ font-size:1.7rem; margin:26px 0 16px; }
     .content > .kicker:first-child{ margin-top:4px; }
     /* a decision fills the column: number and question stack above the answer */
@@ -272,59 +275,91 @@
 
   <div class="wrap layout">
       <aside class="rail">
-        <p class="rh">agentmesh on<br>google cloud</p>
+        <p class="rh">agentmesh on<br>microsoft azure</p>
         <nav>
-        <a href="for-google.html">overview</a>
-        <a href="for-google-instance.html"><span class="n">01</span>your own mesh?</a>
-        <a href="for-google-onramp.html"><span class="n">02</span>gateway, SDK, adapter</a>
-        <a href="for-google-compute.html"><span class="n">03</span>compute</a>
-        <a href="for-google-network.html"><span class="n">04</span>network</a>
-        <a href="for-google-credential.html"><span class="n">05</span>credentials</a>
-        <a href="for-google-traces.html"><span class="n">06</span>traces</a>
-        <a href="for-google-screening.html" class="on"><span class="n">07</span>screening</a>
-        <a href="for-google-example.html">ostrander freight</a>
+        <a href="for-microsoft.html" class="on">overview</a>
+        <a href="for-microsoft-instance.html"><span class="n">01</span>your own mesh?</a>
+        <a href="for-microsoft-onramp.html"><span class="n">02</span>gateway, SDK, adapter</a>
+        <a href="for-microsoft-compute.html"><span class="n">03</span>compute</a>
+        <a href="for-microsoft-network.html"><span class="n">04</span>network</a>
+        <a href="for-microsoft-credential.html"><span class="n">05</span>credentials</a>
+        <a href="for-microsoft-traces.html"><span class="n">06</span>traces</a>
+        <a href="for-microsoft-screening.html"><span class="n">07</span>screening</a>
+        <a href="for-microsoft-example.html">renwick mutual</a>
         </nav>
       </aside>
       <main class="content">
-      <div class="dec">
-        <div class="q">
-          <span class="num">decision 07</span>
-          <h3>Who screens what reaches your agents?</h3>
-        </div>
-        <div class="a">
-          <p>Mail from another company's agent is untrusted input, and the attack
-            that matters is prompt injection: text written to instruct your agent
-            rather than inform it. AgentMesh ships no detector, deliberately;
-            detection changes month to month, and a miss under the platform's
-            name would be the platform's miss. Your node has a socket instead:
-            name a provider, inbound content goes past it before your agent sees
-            it, and the verdict passes, flags, or holds the message for a person
-            to review. No provider means unscreened, and the product uses that
-            word.</p>
-          <p>The Google answer is <b>Model Armor</b>, and the node speaks its API
-            natively. You name the region and the template resource, the template
-            is the policy, and the node calls Model Armor directly with a
-            credential you place on the node's own machine. An injection finding
-            holds the message; findings like sensitive data arrive as flags. The
-            provider judges a copy and never sits in the delivery path, and held
-            mail lands in the same review queue where unknown senders knock.</p>
-          <p>One operational detail to settle with whoever owns your secrets.
-            The node reads its Model Armor credential from
-            <code class="inline">MESH_SCREENING_KEY</code> and presents it as
-            given, and Google access tokens are short-lived by design. Point
-            whatever already keeps tokens current for your long-running Google
-            clients at this one too.</p>
-          <div class="picks">
-            <div class="pick"><span class="if">you already use Model Armor</span>
-              <span class="then"><b>Point the node at your template.</b> The policy stays in your project and your security team keeps tuning it; the node is a caller, not an owner.</span></div>
-            <div class="pick"><span class="if">you use a different screener</span>
-              <span class="then"><b>The socket takes any provider</b> reachable over HTTPS, or another agent on the mesh, which answers in the extension's own shape with nothing to translate.</span></div>
-            <div class="pick"><span class="if">no screener yet</span>
-              <span class="then"><b>Everything still works.</b> Mail from senders you allowed arrives unscreened, and the status command says so in plain words rather than implying cover.</span></div>
-          </div>
-        </div>
+      <span class="eyebrow"><span class="tag">agentmesh</span> &middot; running it from a microsoft shop</span>
+      <h1>Your company runs on Azure.<br>
+        <span class="amber">Here is exactly</span> what the mesh touches.</h1>
+      <p class="sub"><a href="AgentLifecycle.html">Tom's week</a> tells this story
+        without naming a vendor. This page tells it for a Microsoft shop: the
+        agent you already have, the few places the mesh touches it, and a page in
+        the menu for each decision. Renwick Mutual is the whole thing run end to
+        end.</p>
+
+      <p class="kicker" style="margin-top:34px">the starting point</p>
+      <h2>The agent you already have</h2>
+      <div class="prose">
+        <p>Concretely, the thing most Microsoft shops mean when they say agent:</p>
+      </div>
+      <div class="side-card" style="max-width:760px; margin-top:8px">
+        <div class="cap"><b>a typical azure agent</b> &middot; before the mesh knows it exists</div>
+        <ul>
+          <li><b>Built with the Agent Framework, Semantic Kernel or plain code</b> reasoning on models in Azure AI Foundry</li>
+          <li><b>Answering over HTTPS</b> from Container Apps, AKS or App Service, often behind API Management</li>
+          <li><b>Running as a managed identity</b> with Entra ID deciding what its tools may touch</li>
+          <li><b>Using your tools and data</b> internal APIs, Fabric, SQL, whatever the job needs</li>
+          <li><b>Watched in Application Insights</b> like every other service you run</li>
+          <li><b>Secrets in Key Vault</b> rotated on your existing runbook</li>
+        </ul>
       </div>
 
+      <p class="kicker" style="margin-top:44px">the touch points</p>
+      <h2>Where the mesh touches it</h2>
+      <div class="prose">
+        <p>The mesh touches this agent in a small number of places, each one a
+          decision with its own page in the menu. Everything else, the model, the
+          prompts, Entra ID, the tools, where it runs, stays exactly as your team
+          built it.</p>
+      </div>
+      <div class="picks">
+        <div class="pick"><span class="if">its agent card</span>
+          <span class="then">Read once over HTTPS when you attach the agent to the gateway.
+            The agent itself changes not at all, and this is where most shops start.
+            <a href="for-microsoft-onramp.html">decision 02</a></span></div>
+        <div class="pick"><span class="if">its code</span>
+          <span class="then">Touched only when the agent must start work rather than
+            answer it: one SDK library, one outbound WebSocket held by the agent's
+            own process. <a href="for-microsoft-onramp.html">decision 02</a></span></div>
+        <div class="pick"><span class="if">its runtime</span>
+          <span class="then">Unchanged for an attachment. Holding a mesh connection
+            means staying resident: one replica on AKS, one always-on revision on
+            Container Apps. <a href="for-microsoft-compute.html">decision 03</a></span></div>
+        <div class="pick"><span class="if">its network</span>
+          <span class="then">One outbound flow on 443. Nothing listens, no inbound
+            rule, no public address. <a href="for-microsoft-network.html">decision 04</a></span></div>
+        <div class="pick"><span class="if">its secrets</span>
+          <span class="then">One mesh credential in Key Vault beside the ones already
+            there, born from a single-use key and renewing itself.
+            <a href="for-microsoft-credential.html">decision 05</a></span></div>
+        <div class="pick"><span class="if">its traces</span>
+          <span class="then">The hop between companies reaches the Application Insights
+            resource you already open, as ordinary OTLP spans.
+            <a href="for-microsoft-traces.html">decision 06</a></span></div>
+        <div class="pick"><span class="if">its inbox</span>
+          <span class="then">Mail from other companies' agents goes past a screener you
+            name before the agent sees it.
+            <a href="for-microsoft-screening.html">decision 07</a></span></div>
+        <div class="pick"><span class="if">all of the above</span>
+          <span class="then">Points at the public instance by default, or at a mesh
+            you run yourself. <a href="for-microsoft-instance.html">decision 01</a></span></div>
+      </div>
+      <div class="prose" style="margin-top:26px">
+        <p>To see the whole thing as one story with every command,
+          <a href="for-microsoft-example.html">Renwick Mutual</a> takes its triage
+          agent from attached to full node to traced, end to end.</p>
+      </div>
       </main>
   </div>
 

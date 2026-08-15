@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Who screens what reaches your agents? | AgentMesh on Google Cloud</title>
-  <meta name="description" content="The agent lifecycle told concretely for a company that runs on Google Cloud: what installs in your project, what stays hosted, seven decisions each on its own page, and one worked example end to end.">
+  <title>How does it leave your network? | AgentMesh on Azure</title>
+  <meta name="description" content="The agent lifecycle told concretely for a company that runs on Microsoft Azure: what installs in your subscription, what stays hosted, seven decisions each on its own page, and one worked example end to end.">
   <link rel="icon" type="image/svg+xml" href="favicon.svg">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -272,59 +272,56 @@
 
   <div class="wrap layout">
       <aside class="rail">
-        <p class="rh">agentmesh on<br>google cloud</p>
+        <p class="rh">agentmesh on<br>microsoft azure</p>
         <nav>
-        <a href="for-google.html">overview</a>
-        <a href="for-google-instance.html"><span class="n">01</span>your own mesh?</a>
-        <a href="for-google-onramp.html"><span class="n">02</span>gateway, SDK, adapter</a>
-        <a href="for-google-compute.html"><span class="n">03</span>compute</a>
-        <a href="for-google-network.html"><span class="n">04</span>network</a>
-        <a href="for-google-credential.html"><span class="n">05</span>credentials</a>
-        <a href="for-google-traces.html"><span class="n">06</span>traces</a>
-        <a href="for-google-screening.html" class="on"><span class="n">07</span>screening</a>
-        <a href="for-google-example.html">ostrander freight</a>
+        <a href="for-microsoft.html">overview</a>
+        <a href="for-microsoft-instance.html"><span class="n">01</span>your own mesh?</a>
+        <a href="for-microsoft-onramp.html"><span class="n">02</span>gateway, SDK, adapter</a>
+        <a href="for-microsoft-compute.html"><span class="n">03</span>compute</a>
+        <a href="for-microsoft-network.html" class="on"><span class="n">04</span>network</a>
+        <a href="for-microsoft-credential.html"><span class="n">05</span>credentials</a>
+        <a href="for-microsoft-traces.html"><span class="n">06</span>traces</a>
+        <a href="for-microsoft-screening.html"><span class="n">07</span>screening</a>
+        <a href="for-microsoft-example.html">renwick mutual</a>
         </nav>
       </aside>
       <main class="content">
       <div class="dec">
         <div class="q">
-          <span class="num">decision 07</span>
-          <h3>Who screens what reaches your agents?</h3>
+          <span class="num">decision 04</span>
+          <h3>How does it leave your network?</h3>
         </div>
         <div class="a">
-          <p>Mail from another company's agent is untrusted input, and the attack
-            that matters is prompt injection: text written to instruct your agent
-            rather than inform it. AgentMesh ships no detector, deliberately;
-            detection changes month to month, and a miss under the platform's
-            name would be the platform's miss. Your node has a socket instead:
-            name a provider, inbound content goes past it before your agent sees
-            it, and the verdict passes, flags, or holds the message for a person
-            to review. No provider means unscreened, and the product uses that
-            word.</p>
-          <p>The Google answer is <b>Model Armor</b>, and the node speaks its API
-            natively. You name the region and the template resource, the template
-            is the policy, and the node calls Model Armor directly with a
-            credential you place on the node's own machine. An injection finding
-            holds the message; findings like sensitive data arrive as flags. The
-            provider judges a copy and never sits in the delivery path, and held
-            mail lands in the same review queue where unknown senders knock.</p>
-          <p>One operational detail to settle with whoever owns your secrets.
-            The node reads its Model Armor credential from
-            <code class="inline">MESH_SCREENING_KEY</code> and presents it as
-            given, and Google access tokens are short-lived by design. Point
-            whatever already keeps tokens current for your long-running Google
-            clients at this one too.</p>
+          <p>A full node connects <b>outbound only</b>, to
+            <code class="inline">wss://mesh.agentmesh.ai</code> (WebSocket over
+            443, the default) or raw NATS on TCP 4222 if you prefer the native
+            protocol. Nothing listens. There is no inbound rule, no load balancer,
+            no public address and nothing for a scanner to find; a subnet with no
+            public IP and a NAT gateway for the way out is the intended shape, and
+            it is the same pattern as the build agents your network team already
+            lets out to GitHub.</p>
+          <p>Two items deserve a real review. If egress runs through
+            <b>Azure Firewall</b>, the allowlist entry is an application rule for
+            <code class="inline">mesh.agentmesh.ai</code> on 443, and TLS
+            inspection on the Premium tier is worth exempting for that host:
+            long-lived WebSockets through inspecting proxies drop in ways that are
+            miserable to debug. And if your subscriptions are governed for data
+            exfiltration, this is a long-lived connection from inside that
+            boundary to a third-party service, which is a documented decision
+            rather than a config tweak. Decision 06 lists what crosses the wire so
+            the review reads facts rather than guesses.</p>
           <div class="picks">
-            <div class="pick"><span class="if">you already use Model Armor</span>
-              <span class="then"><b>Point the node at your template.</b> The policy stays in your project and your security team keeps tuning it; the node is a caller, not an owner.</span></div>
-            <div class="pick"><span class="if">you use a different screener</span>
-              <span class="then"><b>The socket takes any provider</b> reachable over HTTPS, or another agent on the mesh, which answers in the extension's own shape with nothing to translate.</span></div>
-            <div class="pick"><span class="if">no screener yet</span>
-              <span class="then"><b>Everything still works.</b> Mail from senders you allowed arrives unscreened, and the status command says so in plain words rather than implying cover.</span></div>
+            <div class="pick"><span class="if">default outbound, no egress policy</span>
+              <span class="then"><b>Nothing to do.</b> 443 egress is open; the WebSocket default just works.</span></div>
+            <div class="pick"><span class="if">NSG rules only</span>
+              <span class="then"><b>One outbound rule.</b> 443 to the mesh endpoint, from the agent's subnet. Nothing inbound.</span></div>
+            <div class="pick"><span class="if">azure firewall in the path</span>
+              <span class="then"><b>One application rule:</b> mesh.agentmesh.ai on 443. On Premium, exempt that host from TLS inspection or prefer TCP 4222, which does not pass through it.</span></div>
+            <div class="pick"><span class="if">exfiltration controls on the subscription</span>
+              <span class="then"><b>Plan a review.</b> Bring the what-leaves-the-network list from the observability section; it is written for exactly this meeting.</span></div>
           </div>
         </div>
       </div>
-
       </main>
   </div>
 

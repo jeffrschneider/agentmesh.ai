@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Who screens what reaches your agents? | AgentMesh on Google Cloud</title>
-  <meta name="description" content="The agent lifecycle told concretely for a company that runs on Google Cloud: what installs in your project, what stays hosted, seven decisions each on its own page, and one worked example end to end.">
+  <title>Where do the traces go? | AgentMesh on Azure</title>
+  <meta name="description" content="The agent lifecycle told concretely for a company that runs on Microsoft Azure: what installs in your subscription, what stays hosted, seven decisions each on its own page, and one worked example end to end.">
   <link rel="icon" type="image/svg+xml" href="favicon.svg">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -272,59 +272,65 @@
 
   <div class="wrap layout">
       <aside class="rail">
-        <p class="rh">agentmesh on<br>google cloud</p>
+        <p class="rh">agentmesh on<br>microsoft azure</p>
         <nav>
-        <a href="for-google.html">overview</a>
-        <a href="for-google-instance.html"><span class="n">01</span>your own mesh?</a>
-        <a href="for-google-onramp.html"><span class="n">02</span>gateway, SDK, adapter</a>
-        <a href="for-google-compute.html"><span class="n">03</span>compute</a>
-        <a href="for-google-network.html"><span class="n">04</span>network</a>
-        <a href="for-google-credential.html"><span class="n">05</span>credentials</a>
-        <a href="for-google-traces.html"><span class="n">06</span>traces</a>
-        <a href="for-google-screening.html" class="on"><span class="n">07</span>screening</a>
-        <a href="for-google-example.html">ostrander freight</a>
+        <a href="for-microsoft.html">overview</a>
+        <a href="for-microsoft-instance.html"><span class="n">01</span>your own mesh?</a>
+        <a href="for-microsoft-onramp.html"><span class="n">02</span>gateway, SDK, adapter</a>
+        <a href="for-microsoft-compute.html"><span class="n">03</span>compute</a>
+        <a href="for-microsoft-network.html"><span class="n">04</span>network</a>
+        <a href="for-microsoft-credential.html"><span class="n">05</span>credentials</a>
+        <a href="for-microsoft-traces.html" class="on"><span class="n">06</span>traces</a>
+        <a href="for-microsoft-screening.html"><span class="n">07</span>screening</a>
+        <a href="for-microsoft-example.html">renwick mutual</a>
         </nav>
       </aside>
       <main class="content">
       <div class="dec">
         <div class="q">
-          <span class="num">decision 07</span>
-          <h3>Who screens what reaches your agents?</h3>
+          <span class="num">decision 06</span>
+          <h3>Where do the traces go?</h3>
         </div>
         <div class="a">
-          <p>Mail from another company's agent is untrusted input, and the attack
-            that matters is prompt injection: text written to instruct your agent
-            rather than inform it. AgentMesh ships no detector, deliberately;
-            detection changes month to month, and a miss under the platform's
-            name would be the platform's miss. Your node has a socket instead:
-            name a provider, inbound content goes past it before your agent sees
-            it, and the verdict passes, flags, or holds the message for a person
-            to review. No provider means unscreened, and the product uses that
-            word.</p>
-          <p>The Google answer is <b>Model Armor</b>, and the node speaks its API
-            natively. You name the region and the template resource, the template
-            is the policy, and the node calls Model Armor directly with a
-            credential you place on the node's own machine. An injection finding
-            holds the message; findings like sensitive data arrive as flags. The
-            provider judges a copy and never sits in the delivery path, and held
-            mail lands in the same review queue where unknown senders knock.</p>
-          <p>One operational detail to settle with whoever owns your secrets.
-            The node reads its Model Armor credential from
-            <code class="inline">MESH_SCREENING_KEY</code> and presents it as
-            given, and Google access tokens are short-lived by design. Point
-            whatever already keeps tokens current for your long-running Google
-            clients at this one too.</p>
+          <p>Everything inside your agent is already in your observability stack
+            and stays there; that half was never our business. What the mesh adds
+            is the half nothing could see: the hop <b>between</b> your agent and a
+            counterparty's, as ordinary OTLP spans carrying W3C Trace Context, so
+            they join the traces your services already produce.</p>
+          <p>For an Azure shop the destination is <b>Application Insights</b>, and
+            the road there is the one your platform team most likely already
+            built: an <b>OpenTelemetry Collector</b> with the Azure Monitor
+            exporter. Our exporter speaks OTLP over HTTP to any collector, so it
+            points at yours and the collector decides where everything lands.</p>
+          <pre class="code">agentmesh trace export \
+  --otlp http://otel-collector.observability.svc:4318 \
+  --resource service.namespace=<span class="s">renwick-agents</span></pre>
+          <p>If you would rather not run a collector, the same exporter posts to
+            any OTLP endpoint that will take it, including the OTLP front door of
+            whichever APM your team actually opens. Use
+            <code class="inline">--header</code> for a static ingestion key and
+            <code class="inline">--encoding</code> to choose JSON or protobuf.</p>
+          <p>For the security review, what a span carries: agent names, the
+            primitive, the outcome, timing, and task and trace identifiers.
+            <b>No message content, no artifact contents, no amounts</b>: the span
+            format has no field to put them in. And nothing is emitted until you
+            turn it on: span emission is off by default and enabled per host with
+            <code class="inline">MESH_EMIT_SPANS=1</code>, and the exporter is a
+            process you choose to run, in your subscription, pushing to your
+            endpoint. The exporter's destination and credentials never reach the
+            platform.</p>
           <div class="picks">
-            <div class="pick"><span class="if">you already use Model Armor</span>
-              <span class="then"><b>Point the node at your template.</b> The policy stays in your project and your security team keeps tuning it; the node is a caller, not an owner.</span></div>
-            <div class="pick"><span class="if">you use a different screener</span>
-              <span class="then"><b>The socket takes any provider</b> reachable over HTTPS, or another agent on the mesh, which answers in the extension's own shape with nothing to translate.</span></div>
-            <div class="pick"><span class="if">no screener yet</span>
-              <span class="then"><b>Everything still works.</b> Mail from senders you allowed arrives unscreened, and the status command says so in plain words rather than implying cover.</span></div>
+            <div class="pick"><span class="if">application insights shop</span>
+              <span class="then"><b>A collector with the Azure Monitor exporter.</b> The waterfall you already open now crosses company boundaries.</span></div>
+            <div class="pick"><span class="if">you already run a collector</span>
+              <span class="then"><b>Point the exporter at it</b> and fan out wherever it already sends everything else. Nothing new to operate.</span></div>
+            <div class="pick"><span class="if">third-party APM on Azure</span>
+              <span class="then"><b>Same exporter, their OTLP endpoint.</b> Both OTLP encodings are supported, JSON and protobuf.</span></div>
+            <div class="pick"><span class="if">not ready to decide</span>
+              <span class="then"><b>Do nothing.</b> Trace context still propagates on every message; emission stays off until an operator turns it on.</span></div>
           </div>
         </div>
       </div>
-
       </main>
   </div>
 

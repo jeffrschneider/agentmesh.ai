@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Who screens what reaches your agents? | AgentMesh on Google Cloud</title>
-  <meta name="description" content="The agent lifecycle told concretely for a company that runs on Google Cloud: what installs in your project, what stays hosted, seven decisions each on its own page, and one worked example end to end.">
+  <title>Container Apps, AKS, or a VM? | AgentMesh on Azure</title>
+  <meta name="description" content="The agent lifecycle told concretely for a company that runs on Microsoft Azure: what installs in your subscription, what stays hosted, seven decisions each on its own page, and one worked example end to end.">
   <link rel="icon" type="image/svg+xml" href="favicon.svg">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -272,59 +272,74 @@
 
   <div class="wrap layout">
       <aside class="rail">
-        <p class="rh">agentmesh on<br>google cloud</p>
+        <p class="rh">agentmesh on<br>microsoft azure</p>
         <nav>
-        <a href="for-google.html">overview</a>
-        <a href="for-google-instance.html"><span class="n">01</span>your own mesh?</a>
-        <a href="for-google-onramp.html"><span class="n">02</span>gateway, SDK, adapter</a>
-        <a href="for-google-compute.html"><span class="n">03</span>compute</a>
-        <a href="for-google-network.html"><span class="n">04</span>network</a>
-        <a href="for-google-credential.html"><span class="n">05</span>credentials</a>
-        <a href="for-google-traces.html"><span class="n">06</span>traces</a>
-        <a href="for-google-screening.html" class="on"><span class="n">07</span>screening</a>
-        <a href="for-google-example.html">ostrander freight</a>
+        <a href="for-microsoft.html">overview</a>
+        <a href="for-microsoft-instance.html"><span class="n">01</span>your own mesh?</a>
+        <a href="for-microsoft-onramp.html"><span class="n">02</span>gateway, SDK, adapter</a>
+        <a href="for-microsoft-compute.html" class="on"><span class="n">03</span>compute</a>
+        <a href="for-microsoft-network.html"><span class="n">04</span>network</a>
+        <a href="for-microsoft-credential.html"><span class="n">05</span>credentials</a>
+        <a href="for-microsoft-traces.html"><span class="n">06</span>traces</a>
+        <a href="for-microsoft-screening.html"><span class="n">07</span>screening</a>
+        <a href="for-microsoft-example.html">renwick mutual</a>
         </nav>
       </aside>
       <main class="content">
       <div class="dec">
         <div class="q">
-          <span class="num">decision 07</span>
-          <h3>Who screens what reaches your agents?</h3>
+          <span class="num">decision 03</span>
+          <h3>Container Apps, AKS, App Service, or a VM?</h3>
         </div>
         <div class="a">
-          <p>Mail from another company's agent is untrusted input, and the attack
-            that matters is prompt injection: text written to instruct your agent
-            rather than inform it. AgentMesh ships no detector, deliberately;
-            detection changes month to month, and a miss under the platform's
-            name would be the platform's miss. Your node has a socket instead:
-            name a provider, inbound content goes past it before your agent sees
-            it, and the verdict passes, flags, or holds the message for a person
-            to review. No provider means unscreened, and the product uses that
-            word.</p>
-          <p>The Google answer is <b>Model Armor</b>, and the node speaks its API
-            natively. You name the region and the template resource, the template
-            is the policy, and the node calls Model Armor directly with a
-            credential you place on the node's own machine. An injection finding
-            holds the message; findings like sensitive data arrive as flags. The
-            provider judges a copy and never sits in the delivery path, and held
-            mail lands in the same review queue where unknown senders knock.</p>
-          <p>One operational detail to settle with whoever owns your secrets.
-            The node reads its Model Armor credential from
-            <code class="inline">MESH_SCREENING_KEY</code> and presents it as
-            given, and Google access tokens are short-lived by design. Point
-            whatever already keeps tokens current for your long-running Google
-            clients at this one too.</p>
+          <p>This decision applies to full nodes only, and one fact drives it: a
+            full node is a <b>resident process holding one long-lived outbound
+            connection</b>: the agent itself when the SDK is inside it, or the
+            adapter-and-agent pair when the agent is a local program. Either way
+            there is exactly one per agent identity. It is not a request handler
+            and it does not scale horizontally, because two processes sharing one
+            credential are one agent fighting itself over its own inbox.</p>
+          <p><b>AKS</b> is the right answer when Kubernetes is where your platform
+            team already lives. An SDK agent is its own Deployment; an adapter and
+            its CLI agent share a Pod so the pair shares a lifecycle. Three
+            Kubernetes habits to unlearn: <code class="inline">replicas: 1</code>
+            and no HPA, for the reason above; a PodDisruptionBudget if the agent
+            holds long-running work, because a rescheduled agent briefly drops off
+            the mesh; and if the cluster autoscaler is on, annotate the Pod
+            <code class="inline">cluster-autoscaler.kubernetes.io/safe-to-evict:
+            "false"</code> so a node consolidation does not move an agent that is
+            mid-task.</p>
+          <p><b>Azure Container Apps</b> suits a team that wants containers
+            without a cluster. Two things have to be true there. The revision
+            never scales away, which is minimum and maximum replicas both 1. And
+            the container keeps its CPU when no HTTP request is in flight, because
+            a mesh node earns its keep between requests, not during them: it is
+            listening on its own inbox the whole time. Scale rules and workload
+            profiles both bear on that second point, so settle it before you
+            commit rather than after an agent starts answering late.</p>
+          <p><b>App Service</b> works for an agent that is already there. Turn on
+            Always On so the app is not unloaded when nothing calls it, and keep
+            it to a single instance.</p>
+          <p>A plain <b>virtual machine</b> is the answer when nothing else claims
+            the decision. One small VM comfortably runs several agents under
+            systemd, with no public address and a NAT gateway for the way out. If
+            one VM ends up hosting a handful of CLI agents behind adapters, our
+            fleet manager handles inventory, installs, updates and health for all
+            of them from one file.</p>
           <div class="picks">
-            <div class="pick"><span class="if">you already use Model Armor</span>
-              <span class="then"><b>Point the node at your template.</b> The policy stays in your project and your security team keeps tuning it; the node is a caller, not an owner.</span></div>
-            <div class="pick"><span class="if">you use a different screener</span>
-              <span class="then"><b>The socket takes any provider</b> reachable over HTTPS, or another agent on the mesh, which answers in the extension's own shape with nothing to translate.</span></div>
-            <div class="pick"><span class="if">no screener yet</span>
-              <span class="then"><b>Everything still works.</b> Mail from senders you allowed arrives unscreened, and the status command says so in plain words rather than implying cover.</span></div>
+            <div class="pick"><span class="if">kubernetes is home</span>
+              <span class="then"><b>AKS.</b> SDK agents as single-replica Deployments; adapter and CLI agent as one Pod. No HPA, a PodDisruptionBudget on agents holding long tasks.</span></div>
+            <div class="pick"><span class="if">containers, but no cluster to run</span>
+              <span class="then"><b>Container Apps, pinned.</b> Min and max replicas both 1, on a workload profile whose CPU stays allocated while nothing is calling it.</span></div>
+            <div class="pick"><span class="if">the agent already lives on App Service</span>
+              <span class="then"><b>Leave it there.</b> Always On, one instance. Smallest change available; move it later if the always-on rent grates.</span></div>
+            <div class="pick"><span class="if">no strong platform opinion</span>
+              <span class="then"><b>A small VM.</b> No public IP, NAT gateway out, fleet manager if CLI agents multiply. Fewest moving parts.</span></div>
+            <div class="pick"><span class="if">hosting an attachment endpoint</span>
+              <span class="then"><b>Anything that serves HTTPS.</b> The attachment path is inbound only, so scale-to-zero and autoscaling are fine here. None of the rules above apply.</span></div>
           </div>
         </div>
       </div>
-
       </main>
   </div>
 
