@@ -231,6 +231,10 @@
     .content > .kicker:first-child{ margin-top:4px; }
     /* a decision fills the column: number and question stack above the answer */
     .content .dec{ grid-template-columns:1fr; gap:16px 0; padding:0; border-top:0; }
+    /* Grid items default to min-width:auto, so a wide code block or table
+       would push the page sideways instead of scrolling in its own frame. */
+    .content .dec .a{ min-width:0; }
+    .content .ph-body{ min-width:0; }
     .content .dec .q h3{ font-size:1.7rem; }
     /* the example's margin notes drop below each phase at this column width */
     .content .ph{ grid-template-columns:96px minmax(0,1fr); }
@@ -239,7 +243,7 @@
     .content .ph-note{ margin-top:0; }
     @media (max-width:900px){
       .layout{ grid-template-columns:1fr; gap:0; }
-      .rail{ position:static; margin-bottom:18px; }
+      .rail{ position:static; margin-bottom:18px; min-width:0; }
       .rail nav{ display:flex; overflow-x:auto; gap:2px; scrollbar-width:none; }
       .rail nav::-webkit-scrollbar{ display:none; }
       .rail nav a{ white-space:nowrap; border-left:0; border-bottom:2px solid var(--line);
@@ -343,8 +347,8 @@
           <h3>Three weeks later, triage needs to start work, not just answer it</h3>
           <p>Marine risks need a sanctions check on the counterparty, and there
             are agents on the mesh that do exactly that. Now submission-triage has
-            to <b>discover and hire</b>, which an attachment cannot do, so it
-            needs a full node. Back to decision 02: it is a service, so the SDK
+            to <b>discover and hire</b>, which the gateway cannot do on its
+            behalf, so it needs a full node. Back to decision 02: it is a service, so the SDK
             goes into its own code. The adapter never enters the picture, because
             submission-triage is not a local program. Nothing new deploys; the
             mesh connection moves into the workload it already is:</p>
@@ -357,7 +361,7 @@ const mesh = await AgentMesh.connect(<span class="s">"wss://mesh.agentmesh.ai"</
 
 mesh.onRequest(<span class="s">"appetite_check"</span>, appetiteCheck);  <span class="c">// the logic phase 1 served</span>
 
-<span class="c">// the verb the attachment never had:</span>
+<span class="c">// the verb the gateway never had:</span>
 const { agents } = await mesh.discover({ offering_id: <span class="s">"sanctions_screening"</span> });
 const reply = await mesh.request(agents[0].id, <span class="s">"sanctions_screening"</span>, { party });</pre>
           <p>The credential comes from the console: Devlin mints a single-use
@@ -378,8 +382,8 @@ const reply = await mesh.request(agents[0].id, <span class="s">"sanctions_screen
 kubectl -n <span class="s">agents</span> delete hpa submission-triage  <span class="c"># nothing may scale this now</span>
 kubectl -n <span class="s">agents</span> patch deploy/submission-triage \
   -p <span class="s">'{"spec":{"strategy":{"type":"Recreate"}}}'</span>  <span class="c"># never two, not even mid-deploy</span></pre>
-          <p>Once the full node registers and is discoverable, the phase 1
-            attachment comes down with one DELETE. From here submission-triage
+          <p>Once the full node registers and is discoverable, the gateway stops
+            standing in front of it, with one DELETE. From here submission-triage
             hires the sanctions agent the same way Renwick's broker once hired
             submission-triage: discover, read the card and the record, request.</p>
         </div>

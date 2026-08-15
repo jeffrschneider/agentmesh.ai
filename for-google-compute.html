@@ -231,6 +231,10 @@
     .content > .kicker:first-child{ margin-top:4px; }
     /* a decision fills the column: number and question stack above the answer */
     .content .dec{ grid-template-columns:1fr; gap:16px 0; padding:0; border-top:0; }
+    /* Grid items default to min-width:auto, so a wide code block or table
+       would push the page sideways instead of scrolling in its own frame. */
+    .content .dec .a{ min-width:0; }
+    .content .ph-body{ min-width:0; }
     .content .dec .q h3{ font-size:1.7rem; }
     /* the example's margin notes drop below each phase at this column width */
     .content .ph{ grid-template-columns:96px minmax(0,1fr); }
@@ -239,7 +243,7 @@
     .content .ph-note{ margin-top:0; }
     @media (max-width:900px){
       .layout{ grid-template-columns:1fr; gap:0; }
-      .rail{ position:static; margin-bottom:18px; }
+      .rail{ position:static; margin-bottom:18px; min-width:0; }
       .rail nav{ display:flex; overflow-x:auto; gap:2px; scrollbar-width:none; }
       .rail nav::-webkit-scrollbar{ display:none; }
       .rail nav a{ white-space:nowrap; border-left:0; border-bottom:2px solid var(--line);
@@ -329,8 +333,8 @@
               <span class="then"><b>GKE.</b> SDK agents as single-replica Deployments; adapter + CLI agent as one Pod. No HPA, PodDisruptionBudget on agents holding long tasks.</span></div>
             <div class="pick"><span class="if">agent already lives on Cloud Run</span>
               <span class="then"><b>Pin it where it is.</b> min-instances 1, max-instances 1, CPU always allocated. Smallest change; move it to a VM later if the always-on rent grates.</span></div>
-            <div class="pick"><span class="if">hosting an attachment endpoint</span>
-              <span class="then"><b>Cloud Run, unpinned.</b> The attachment path is inbound HTTPS, which is Cloud Run's native shape. Scale to zero is fine here.</span></div>
+            <div class="pick"><span class="if">hosting the endpoint the gateway calls</span>
+              <span class="then"><b>Cloud Run, unpinned.</b> That path is inbound HTTPS, which is Cloud Run's native shape. Scale to zero is fine here.</span></div>
           </div>
         </div>
       </div>

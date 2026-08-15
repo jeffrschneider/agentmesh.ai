@@ -231,6 +231,10 @@
     .content > .kicker:first-child{ margin-top:4px; }
     /* a decision fills the column: number and question stack above the answer */
     .content .dec{ grid-template-columns:1fr; gap:16px 0; padding:0; border-top:0; }
+    /* Grid items default to min-width:auto, so a wide code block or table
+       would push the page sideways instead of scrolling in its own frame. */
+    .content .dec .a{ min-width:0; }
+    .content .ph-body{ min-width:0; }
     .content .dec .q h3{ font-size:1.7rem; }
     /* the example's margin notes drop below each phase at this column width */
     .content .ph{ grid-template-columns:96px minmax(0,1fr); }
@@ -239,7 +243,7 @@
     .content .ph-note{ margin-top:0; }
     @media (max-width:900px){
       .layout{ grid-template-columns:1fr; gap:0; }
-      .rail{ position:static; margin-bottom:18px; }
+      .rail{ position:static; margin-bottom:18px; min-width:0; }
       .rail nav{ display:flex; overflow-x:auto; gap:2px; scrollbar-width:none; }
       .rail nav::-webkit-scrollbar{ display:none; }
       .rail nav a{ white-space:nowrap; border-left:0; border-bottom:2px solid var(--line);
@@ -251,6 +255,16 @@
       .content .ph-side{ grid-column:1; }
     }
 
+    /* The support table reuses this guide's own table.tbl component, which
+       already carries the panel, the border and its own sideways scroll. All it
+       needs is a verdict colour and a second line under each cell. */
+    .tbl .yes{ color:var(--verify); font-family:var(--wire); font-size:.86rem; }
+    .tbl .no{ color:var(--faint); font-family:var(--wire); font-size:.86rem; }
+    .tbl .ext{ color:var(--signal); font-family:var(--wire); font-size:.86rem; }
+    table.tbl td .who, table.tbl td .note{ display:block; color:var(--faint);
+      font-size:.78rem; line-height:1.45; margin-top:5px; }
+    table.tbl td .who{ color:var(--dim); }
+    table.tbl th:first-child, table.tbl td:first-child{ min-width:230px; }
   </style>
 </head>
 <body>
@@ -292,49 +306,85 @@
           <h3>Gateway, SDK, or adapter?</h3>
         </div>
         <div class="a">
-          <p>There are three ways onto the mesh. The <b>gateway</b> is the hosted
-            deployment of our A2A bridge, at https://a2a.agentmesh.ai: an HTTP
-            door in both directions, where any code can call mesh agents with one
-            bearer key and an agent you host can be <b>attached</b>, meaning the
-            gateway reads its agent card, shows you what would be published, and
-            puts it on the mesh under a stable identity while reaching it over
-            ordinary HTTPS. The <b>SDK</b> is a library you add to your own
-            agent's code; its process then holds its own mesh connection and gets
-            the full verb set: discover, hire, subscribe, open tasks. No second
-            process, no second deployment. The <b>adapter</b> is a separate
-            process that gives a local program (a CLI agent in a session, a
-            script answering on stdin) a mesh inbox, and it runs on that
-            program's host because standing in front of it is its whole job.</p>
+          <p>There are three ways onto the mesh, and they differ in how much of
+            your agent has to change.</p>
+          <p>The <b>gateway</b> is the hosted deployment of our A2A bridge, at
+            https://a2a.agentmesh.ai, and it is a door in both directions.
+            Outward, any code you write can call mesh agents with one bearer key.
+            Inward, you hand it the URL of an agent you already run: it reads that
+            agent's card, shows you exactly what would be published, and then
+            stands in front of the agent on the mesh, forwarding anything that
+            arrives over ordinary HTTPS. Your agent is not moved, wrapped or
+            redeployed, and it never learns the mesh exists. Putting an agent
+            behind the gateway this way is what the rest of these pages call
+            <b>attaching</b>, and it is the only shape where nothing gets
+            installed anywhere.</p>
+          <p>The <b>SDK</b> is a library you add to your own agent's code. Its
+            process then holds its own mesh connection and gets the full verb set:
+            discover, hire, subscribe, open tasks. No second process and no second
+            deployment. The <b>adapter</b> is a separate process that gives a
+            local program a mesh inbox, a CLI agent in a session or a script
+            answering on stdin, and it runs on that program's host because
+            standing in front of it is its whole job.</p>
           <p>Four questions settle which one an agent uses.</p>
           <div class="picks">
             <div class="pick"><span class="if">can the gateway read its agent card?</span>
               <span class="then">An anonymous HTTPS card at the standard path: <b>it can attach today with no new code.</b> Behind authentication, or at a custom path: <b>put a small public A2A endpoint in front of it</b>, or go straight to the SDK. The next paragraph matters here.</span></div>
             <div class="pick"><span class="if">does it only answer, or does it start work?</span>
-              <span class="then">Answer-only: <b>an attachment covers it.</b> Finding and hiring other agents, subscribing, opening tasks: <b>that takes a full node</b>, which is the SDK or the adapter.</span></div>
+              <span class="then">Answer-only: <b>the gateway covers it.</b> Finding and hiring other agents, subscribing, opening tasks: <b>that takes a full node</b>, which is the SDK or the adapter.</span></div>
             <div class="pick"><span class="if">is the agent a service or a local program?</span>
               <span class="then">A service: <b>the SDK goes in its code.</b> A local program on a box: <b>the adapter runs next to it</b> on the same host.</span></div>
             <div class="pick"><span class="if">one-agent trial, or dozens to hundreds?</span>
               <span class="then">Trial: <b>the gateway.</b> One key, one afternoon, nothing to install or undo. At fleet scale: <b>make the SDK your standard shape</b>, settle decisions 03 through 05 once as platform standards, and use the fleet manager for hosts that run CLI agents.</span></div>
           </div>
-          <p>Two Microsoft specifics settle this more often than the four
-            questions do, and both are about the card rather than the agent.</p>
-          <p>An agent published through <b>Foundry Agent Service</b> does serve an
-            A2A card, but at a custom path and behind Microsoft Entra ID, and
-            anonymous access to it is not offered. Our gateway attaches by
-            fetching <code class="inline">/.well-known/agent-card.json</code> over
-            public HTTPS with no credential, so it cannot read that card. Those
-            agents reach the mesh either through a small public A2A endpoint you
-            put in front, or through the SDK, which needs no card at all.
-            <b>Copilot Studio</b> is the mirror image: it can call A2A agents, and
-            the gateway publishes every mesh agent as one, so a Copilot Studio
-            agent can hire from the mesh with an API key. What it cannot do is
-            publish itself as an A2A endpoint, so it cannot be attached, and it is
-            worth knowing that before somebody promises the mesh will find it.</p>
-          <p>Otherwise most Microsoft shops start with an attachment, because the
-            agent is already an ordinary HTTPS service behind App Service,
-            Container Apps or API Management, and move it to the SDK when it needs
-            to start work rather than only answer it. The adapter is only for
-            agents that are local programs.</p>
+          <p>Which of those questions you can even answer depends on how the
+            agent was built, and on Microsoft that is the thing that settles it.
+            Four surfaces cover almost every agent a Microsoft shop has, and they
+            do not reach the mesh equally.</p>
+          <table class="tbl">
+            <thead>
+              <tr>
+                <th>how the agent was built</th>
+                <th>others can call it</th>
+                <th>it can call others</th>
+                <th>it can be a full node</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><b>Agent Builder</b><span class="who">inside Microsoft 365 Copilot, made by whoever needs it</span></td>
+                <td><span class="no">no</span><span class="note">it has no address outside Copilot</span></td>
+                <td><span class="no">no</span><span class="note">nothing to point at a mesh agent</span></td>
+                <td><span class="no">no</span><span class="note">none of it is your code</span></td>
+              </tr>
+              <tr>
+                <td><b>Copilot Studio</b><span class="who">low code, made by a maker</span></td>
+                <td><span class="no">no</span><span class="note">it consumes A2A, it does not publish it</span></td>
+                <td><span class="yes">yes</span><span class="note">add a mesh agent as an A2A connection, with an API key</span></td>
+                <td><span class="no">no</span><span class="note">no code of yours to add a library to</span></td>
+              </tr>
+              <tr>
+                <td><b>Microsoft Foundry Agent Service</b><span class="who">hosted, built by a developer</span></td>
+                <td><span class="ext">one step first</span><span class="note">its card sits behind Entra, so publish a small public one in front</span></td>
+                <td><span class="yes">yes</span><span class="note">its A2A tool, currently in preview</span></td>
+                <td><span class="no">no</span><span class="note">a hosted agent holds no connection of its own</span></td>
+              </tr>
+              <tr>
+                <td><b>Agent Framework, or your own code</b><span class="who">hosted by you, on any of the four runtimes on the next page</span></td>
+                <td><span class="yes">yes</span><span class="note">the gateway reads its card as it stands</span></td>
+                <td><span class="yes">yes</span><span class="note">through the gateway, or directly once the SDK is in</span></td>
+                <td><span class="yes">yes</span><span class="note">the only row where this is possible</span></td>
+              </tr>
+            </tbody>
+          </table>
+          <p>The pattern in that table is the whole decision. An agent you host is
+            the only one that can go looking for work; everything Microsoft hosts
+            for you can answer, and at most call out. So most Microsoft shops
+            start by pointing the gateway at an agent they already run, because it
+            is already an ordinary HTTPS service behind App Service, Container
+            Apps or API Management, and they move it to the SDK on the day it
+            needs to start work rather than only answer it. The adapter stays out
+            of this entirely unless the agent is a local program.</p>
         </div>
       </div>
       </main>

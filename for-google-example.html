@@ -231,6 +231,10 @@
     .content > .kicker:first-child{ margin-top:4px; }
     /* a decision fills the column: number and question stack above the answer */
     .content .dec{ grid-template-columns:1fr; gap:16px 0; padding:0; border-top:0; }
+    /* Grid items default to min-width:auto, so a wide code block or table
+       would push the page sideways instead of scrolling in its own frame. */
+    .content .dec .a{ min-width:0; }
+    .content .ph-body{ min-width:0; }
     .content .dec .q h3{ font-size:1.7rem; }
     /* the example's margin notes drop below each phase at this column width */
     .content .ph{ grid-template-columns:96px minmax(0,1fr); }
@@ -239,7 +243,7 @@
     .content .ph-note{ margin-top:0; }
     @media (max-width:900px){
       .layout{ grid-template-columns:1fr; gap:0; }
-      .rail{ position:static; margin-bottom:18px; }
+      .rail{ position:static; margin-bottom:18px; min-width:0; }
       .rail nav{ display:flex; overflow-x:auto; gap:2px; scrollbar-width:none; }
       .rail nav::-webkit-scrollbar{ display:none; }
       .rail nav a{ white-space:nowrap; border-left:0; border-bottom:2px solid var(--line);
@@ -342,8 +346,8 @@
           <h3>Three weeks later, rate-desk needs to start work, not just answer it</h3>
           <p>Quotes for refrigerated lanes need a customs classification, and there
             are agents on the mesh that do exactly that. Now rate-desk has to
-            <b>discover and hire</b>, which an attachment cannot do, so it needs a
-            full node. Back to decision 02: rate-desk is a service, so the SDK
+            <b>discover and hire</b>, which the gateway cannot do on its behalf, so it
+            needs a full node. Back to decision 02: rate-desk is a service, so the SDK
             goes into its own code. The adapter never enters the picture, because
             rate-desk is not a local program. Nothing new deploys; the mesh
             connection moves into the service it already is:</p>
@@ -356,7 +360,7 @@ const mesh = await AgentMesh.connect(<span class="s">"wss://mesh.agentmesh.ai"</
 
 mesh.onRequest(<span class="s">"quote_lane_rate"</span>, quoteLaneRate);  <span class="c">// the logic phase 1 served</span>
 
-<span class="c">// the verb the attachment never had:</span>
+<span class="c">// the verb the gateway never had:</span>
 const { agents } = await mesh.discover({ offering_id: <span class="s">"customs_classification"</span> });
 const reply = await mesh.request(agents[0].id, <span class="s">"customs_classification"</span>, { lane });</pre>
           <p>The credential comes from the console: Noor mints a single-use agent
@@ -371,8 +375,8 @@ gcloud secrets versions add rate-desk-mesh-cred --data-file=<span class="s">mesh
           <pre class="code">gcloud run services update rate-desk --region=<span class="s">us-central1</span> \
   --min-instances=<span class="s">1</span> --max-instances=<span class="s">1</span> --no-cpu-throttling \
   --set-secrets=<span class="s">/secrets/mesh-cred=rate-desk-mesh-cred:latest</span></pre>
-          <p>Once the full node registers and is discoverable, the phase 1
-            attachment comes down with one DELETE. From here rate-desk hires the
+          <p>Once the full node registers and is discoverable, the gateway stops
+            standing in front of it, with one DELETE. From here rate-desk hires the
             classification agent the same way Ostrander's customer once hired
             rate-desk: discover, read the card and the record, request.</p>
         </div>

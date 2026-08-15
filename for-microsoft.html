@@ -234,6 +234,10 @@
     .content > .kicker:first-child{ margin-top:4px; }
     /* a decision fills the column: number and question stack above the answer */
     .content .dec{ grid-template-columns:1fr; gap:16px 0; padding:0; border-top:0; }
+    /* Grid items default to min-width:auto, so a wide code block or table
+       would push the page sideways instead of scrolling in its own frame. */
+    .content .dec .a{ min-width:0; }
+    .content .ph-body{ min-width:0; }
     .content .dec .q h3{ font-size:1.7rem; }
     /* the example's margin notes drop below each phase at this column width */
     .content .ph{ grid-template-columns:96px minmax(0,1fr); }
@@ -242,7 +246,7 @@
     .content .ph-note{ margin-top:0; }
     @media (max-width:900px){
       .layout{ grid-template-columns:1fr; gap:0; }
-      .rail{ position:static; margin-bottom:18px; }
+      .rail{ position:static; margin-bottom:18px; min-width:0; }
       .rail nav{ display:flex; overflow-x:auto; gap:2px; scrollbar-width:none; }
       .rail nav::-webkit-scrollbar{ display:none; }
       .rail nav a{ white-space:nowrap; border-left:0; border-bottom:2px solid var(--line);
@@ -329,17 +333,18 @@
       </div>
       <div class="picks">
         <div class="pick"><span class="if">its agent card</span>
-          <span class="then">Read once over HTTPS when you attach the agent to the gateway.
-            The agent itself changes not at all, and this is where most shops start.
+          <span class="then">Read once over HTTPS, when the gateway starts standing in
+            front of the agent. The agent itself changes not at all, and this is
+            where most shops start.
             <a href="for-microsoft-onramp.html">decision 02</a></span></div>
         <div class="pick"><span class="if">its code</span>
           <span class="then">Touched only when the agent must start work rather than
             answer it: one SDK library, one outbound WebSocket held by the agent's
             own process. <a href="for-microsoft-onramp.html">decision 02</a></span></div>
         <div class="pick"><span class="if">its runtime</span>
-          <span class="then">Unchanged for an attachment. Holding a mesh connection
-            means staying resident: one replica on AKS, one always-on revision on
-            Container Apps. <a href="for-microsoft-compute.html">decision 03</a></span></div>
+          <span class="then">Unchanged while the gateway is fronting it. Holding a mesh
+            connection of its own means staying resident: one replica on AKS, one
+            always-on revision on Container Apps. <a href="for-microsoft-compute.html">decision 03</a></span></div>
         <div class="pick"><span class="if">its network</span>
           <span class="then">One outbound flow on 443. Nothing listens, no inbound
             rule, no public address. <a href="for-microsoft-network.html">decision 04</a></span></div>
