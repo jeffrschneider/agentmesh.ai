@@ -329,9 +329,9 @@
           <p>Four questions settle which one an agent uses.</p>
           <div class="picks">
             <div class="pick"><span class="if">can the gateway read its agent card?</span>
-              <span class="then">An anonymous HTTPS card at the standard path: <b>it can attach today with no new code.</b> Behind authentication, or at a custom path: <b>put a small public A2A endpoint in front of it</b>, or go straight to the SDK. The next paragraph matters here.</span></div>
+              <span class="then">An anonymous HTTPS card at the standard path: <b>point the gateway at it today, with no new code.</b> Behind authentication, or at a custom path: <b>put a small public A2A endpoint in front of it</b>, or go straight to the SDK.</span></div>
             <div class="pick"><span class="if">does it only answer, or does it start work?</span>
-              <span class="then">Answer-only: <b>the gateway covers it.</b> Finding and hiring other agents, subscribing, opening tasks: <b>that takes a full node</b>, which is the SDK or the adapter.</span></div>
+              <span class="then">Answer-only: <b>the gateway is enough.</b> It takes the message and passes it to your agent. Finding and hiring another agent, subscribing, opening a task: <b>the agent needs its own connection</b>, which means the SDK or the adapter.</span></div>
             <div class="pick"><span class="if">is the agent a service or a local program?</span>
               <span class="then">A service: <b>the SDK goes in its code.</b> A local program on a box: <b>the adapter runs next to it</b> on the same host.</span></div>
             <div class="pick"><span class="if">one-agent trial, or dozens to hundreds?</span>
