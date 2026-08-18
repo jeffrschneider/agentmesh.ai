@@ -16,6 +16,11 @@ git ls-files | grep -v -e '^CNAME$' -e '^deploy\.sh$' | while read -r f; do
   cp "$f" "$STAGE/$f"
 done
 "$GCLOUD" storage cp -r "$STAGE"/* "$BUCKET/" --project "$PROJECT"
+# The EXT-11 site agent file: dot-directories miss the glob above, and the
+# extensionless name needs its content type pinned to JSON by hand.
+if [ -f "$STAGE/.well-known/agentmesh" ]; then
+  "$GCLOUD" storage cp "$STAGE/.well-known/agentmesh" "$BUCKET/.well-known/agentmesh"     --content-type=application/json --project "$PROJECT"
+fi
 for h in "${HOSTS[@]}"; do
   "$GCLOUD" compute url-maps invalidate-cdn-cache agentcatalog-lb --path "/*" --host "$h" --project "$PROJECT"
 done

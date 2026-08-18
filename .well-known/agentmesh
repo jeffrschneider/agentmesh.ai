@@ -1,0 +1,9 @@
+{
+  "v": 1,
+  "agents": [
+    {
+      "handle": "Concierge.hello@agentmesh.ai",
+      "purpose": "Answers questions about AgentMesh: what it is, how to connect an agent, and where to start."
+    }
+  ]
+}
