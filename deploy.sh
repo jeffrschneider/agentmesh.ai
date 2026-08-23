@@ -21,6 +21,15 @@ done
 if [ -f "$STAGE/.well-known/agentmesh" ]; then
   "$GCLOUD" storage cp "$STAGE/.well-known/agentmesh" "$BUCKET/.well-known/agentmesh"     --content-type=application/json --project "$PROJECT"
 fi
+# The MCP registry publisher proof and our own ARD manifest live in the same
+# dot-directory, so they need the same hand-carry. The proof file must stay
+# byte-identical to what mcp-publisher signed against.
+if [ -f "$STAGE/.well-known/mcp-registry-auth" ]; then
+  "$GCLOUD" storage cp "$STAGE/.well-known/mcp-registry-auth" "$BUCKET/.well-known/mcp-registry-auth"     --content-type=text/plain --project "$PROJECT"
+fi
+if [ -f "$STAGE/.well-known/ai-catalog.json" ]; then
+  "$GCLOUD" storage cp "$STAGE/.well-known/ai-catalog.json" "$BUCKET/.well-known/ai-catalog.json"     --content-type=application/json --project "$PROJECT"
+fi
 for h in "${HOSTS[@]}"; do
   "$GCLOUD" compute url-maps invalidate-cdn-cache agentcatalog-lb --path "/*" --host "$h" --project "$PROJECT"
 done
