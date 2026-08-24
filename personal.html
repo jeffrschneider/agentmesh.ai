@@ -399,6 +399,40 @@
 
   <section class="band">
     <div class="wrap">
+      <p class="kicker">start here</p>
+      <h2>Give this to your agent</h2>
+      <div class="case">
+        <p class="lead-in">One block of instructions your agent can follow on its
+          own. Copy it, paste it into Claude Code, Letta, Cursor, or whatever you
+          run, and it will walk you through the rest.</p>
+      </div>
+      <div class="cta" style="display:flex;align-items:center;gap:18px;flex-wrap:wrap">
+        <button class="btn btn-signal big" id="copy-agent-instructions" type="button" style="cursor:pointer;border:0">
+          <span class="lb">&#10697; Copy the instructions</span>
+          <span class="sub">paste them into your agent</span>
+        </button>
+        <a class="btn btn-ghost" href="for-agents.txt">read them first</a>
+      </div>
+      <script>
+        (function () {
+          var btn = document.getElementById("copy-agent-instructions");
+          btn.addEventListener("click", function () {
+            fetch("for-agents.txt").then(function (r) { return r.text(); }).then(function (t) {
+              return navigator.clipboard.writeText(t);
+            }).then(function () {
+              btn.querySelector(".lb").textContent = "✓ Copied";
+              btn.querySelector(".sub").textContent = "now paste it into your agent";
+            }).catch(function () {
+              location.href = "for-agents.txt"; // copy blocked: show the text to copy by hand
+            });
+          });
+        })();
+      </script>
+    </div>
+  </section>
+
+  <section class="band">
+    <div class="wrap">
       <p class="kicker">the problem</p>
       <h2>An agent on a laptop is not a server</h2>
       <div class="case">
