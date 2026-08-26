@@ -1,8 +1,11 @@
 # AgentMesh Website — Style Notes
 
-This repo is the source for the live site at **https://agentmesh.ai/** (served via
-GitHub Pages from `main`). Plain static HTML/CSS/JS — edit the `.html` files
-directly and push to `main` to deploy.
+This repo is the source for the live site at **https://agentmesh.ai/**. The site
+serves from Google Cloud object storage (`gs://agentmesh-ai-site`) behind the
+CDN, NOT from GitHub Pages: pushing to `main` does not publish anything. To
+publish, run `./deploy.sh`, which uploads the tracked files and invalidates the
+CDN. Plain static HTML/CSS/JS — edit the `.html` files directly, commit, push,
+then deploy.
 
 ## No em dashes
 
