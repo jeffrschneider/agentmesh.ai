@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>How agents take hold · AgentMesh</title>
-<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
 <meta name="robots" content="noindex">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -135,6 +135,10 @@
     transform:rotate(40deg) scale(.85); border-radius:1px; }
   .cap .cap-name{ font-size:.86rem; font-weight:500; color:var(--paper); }
   .cap .cap-why{ font-size:.76rem; color:var(--dim); display:block; margin-top:1px; }
+  /* the security spine: shielded items glow together on the security beat */
+  .cap .shield{ color:var(--faint); margin-left:6px; position:relative; top:1px; }
+  .panel.security .cap .shield{ color:var(--signal);
+    filter:drop-shadow(0 0 4px rgba(242,169,59,.55)); }
   .panel.complete{ border-color:rgba(67,214,166,.45);
     box-shadow:0 0 0 1px rgba(67,214,166,.15), 0 0 40px rgba(67,214,166,.06) inset; }
 
@@ -146,6 +150,11 @@
   .band .bt{ flex:1; min-width:0; }
   .band h1{ font-size:1.3rem; margin:0 0 4px; }
   .band p{ margin:0; color:var(--dim); font-size:.92rem; max-width:64ch; }
+  .band .cta{ display:inline-block; margin-top:10px; font-family:var(--wire); font-size:.85rem;
+    font-weight:600; color:var(--ink); background:var(--signal); border-radius:8px;
+    padding:9px 16px; text-decoration:none; }
+  .band .cta:hover{ background:#f7bb5e; }
+  .band .cta[hidden]{ display:none; }
   .controls{ flex:none; display:flex; gap:10px; align-items:center; padding-top:4px; }
   .controls .beatno{ font-family:var(--wire); font-size:.72rem; color:var(--faint); margin-right:4px; }
   .controls button{ font-family:var(--wire); font-size:.82rem; font-weight:600; cursor:pointer;
@@ -168,7 +177,7 @@
 <body>
 
 <header class="topbar"><div class="bar">
-  <a class="brand" href="index.html"><span class="dot"></span><span class="wm">AGENTMESH</span></a>
+  <a class="brand" href="/"><span class="dot"></span><span class="wm">AGENTMESH</span></a>
   <nav class="scrub" id="scrub" aria-label="Stages">
     <button data-stage="0">1 · Personal</button>
     <button data-stage="1">2 · Task</button>
@@ -201,7 +210,7 @@
       <g class="el" data-el="person2">
         <circle cx="86" cy="442" r="15" fill="none" stroke="var(--paper)" stroke-width="2"/>
         <path d="M 62 492 Q 86 462 110 492" fill="none" stroke="var(--paper)" stroke-width="2" stroke-linecap="round"/>
-        <text x="86" y="518" text-anchor="middle" class="node-sub">a friend</text>
+        <text x="86" y="518" text-anchor="middle" class="node-sub">a colleague</text>
       </g>
       <g class="el" data-el="pa2-link">
         <line x1="118" y1="470" x2="158" y2="470" stroke="var(--verify)" stroke-width="1.6" stroke-dasharray="2 5" stroke-linecap="round"/>
@@ -302,6 +311,16 @@
         <text x="700" y="416" class="wire-label">their ask</text>
         <text x="686" y="480" class="wire-label mint">your work</text>
       </g>
+
+      <!-- the closing zoom-out: this mesh is one corner of a bigger one -->
+      <g class="el" data-el="meshwide" opacity="0.75">
+        <rect x="64" y="70" width="176" height="60" rx="10" fill="none" stroke="var(--faint)" stroke-width="1" stroke-dasharray="4 6"/>
+        <text x="152" y="104" text-anchor="middle" class="frame-label">ANOTHER COMPANY</text>
+        <rect x="64" y="152" width="176" height="60" rx="10" fill="none" stroke="var(--faint)" stroke-width="1" stroke-dasharray="4 6"/>
+        <text x="152" y="186" text-anchor="middle" class="frame-label">ANOTHER PROVIDER</text>
+        <path d="M 240 100 C 280 110, 300 130, 326 150" fill="none" stroke="var(--faint)" stroke-width="1.2" stroke-dasharray="3 6"/>
+        <path d="M 240 182 C 280 190, 300 210, 326 224" fill="none" stroke="var(--faint)" stroke-width="1.2" stroke-dasharray="3 6"/>
+      </g>
     </svg>
 
     <div class="callout" id="callout" role="status">
@@ -335,11 +354,11 @@
     <div class="capgroup" data-group="2">
       <button class="cg-head" type="button"><span class="cg-label">3 · AGENT ↔ AGENT, INTERNAL</span><span class="cg-count"></span><span class="chev"></span></button>
       <div class="cg-body">
-      <div class="cap" data-cap="identity"><span class="box"></span><span><span class="cap-name">Identity &amp; credentials</span><span class="cap-why">every ask signed by a nameable agent</span></span></div>
+      <div class="cap" data-cap="identity"><span class="box"></span><span><span class="cap-name">Identity &amp; credentials</span><span class="shield" title="part of the security spine"><svg viewBox="0 0 12 14" width="11" height="13" aria-hidden="true"><path d="M6 1.2 L10.8 3.1 V6.8 C10.8 10.2 8.7 12.4 6 13.2 C3.3 12.4 1.2 10.2 1.2 6.8 V3.1 Z" fill="none" stroke="currentColor" stroke-width="1.3"/></svg></span><span class="cap-why">every ask signed by a nameable agent</span></span></div>
       <div class="cap" data-cap="async"><span class="box"></span><span><span class="cap-name">Reliable async messaging</span><span class="cap-why">delivery guaranteed, no one waits online</span></span></div>
       <div class="cap" data-cap="discovery"><span class="box"></span><span><span class="cap-name">Discovery &amp; catalogs</span><span class="cap-why">"who can do X?" without a meeting</span></span></div>
-      <div class="cap" data-cap="audit"><span class="box"></span><span><span class="cap-name">Delegation &amp; audit trail</span><span class="cap-why">who asked, on whose behalf, what happened</span></span></div>
-      <div class="cap" data-cap="screening"><span class="box"></span><span><span class="cap-name">Approvals &amp; screening</span><span class="cap-why">a person in the loop where it matters</span></span></div>
+      <div class="cap" data-cap="audit"><span class="box"></span><span><span class="cap-name">Delegation &amp; audit trail</span><span class="shield" title="part of the security spine"><svg viewBox="0 0 12 14" width="11" height="13" aria-hidden="true"><path d="M6 1.2 L10.8 3.1 V6.8 C10.8 10.2 8.7 12.4 6 13.2 C3.3 12.4 1.2 10.2 1.2 6.8 V3.1 Z" fill="none" stroke="currentColor" stroke-width="1.3"/></svg></span><span class="cap-why">who asked, on whose behalf, what happened</span></span></div>
+      <div class="cap" data-cap="screening"><span class="box"></span><span><span class="cap-name">Approvals &amp; screening</span><span class="shield" title="part of the security spine"><svg viewBox="0 0 12 14" width="11" height="13" aria-hidden="true"><path d="M6 1.2 L10.8 3.1 V6.8 C10.8 10.2 8.7 12.4 6 13.2 C3.3 12.4 1.2 10.2 1.2 6.8 V3.1 Z" fill="none" stroke="currentColor" stroke-width="1.3"/></svg></span><span class="cap-why">a person in the loop where it matters</span></span></div>
       </div>
     </div>
 
@@ -348,8 +367,9 @@
       <div class="cg-body">
       <div class="cap" data-cap="federation"><span class="box"></span><span><span class="cap-name">Federation</span><span class="cap-why">the same wire, across company lines</span></span></div>
       <div class="cap" data-cap="reputation"><span class="box"></span><span><span class="cap-name">Reputation</span><span class="cap-why">who vouches for the agent you just hired</span></span></div>
-      <div class="cap" data-cap="mandates"><span class="box"></span><span><span class="cap-name">Mandates &amp; scope of work</span><span class="cap-why">what it may do, in writing, enforceable</span></span></div>
-      <div class="cap" data-cap="metering"><span class="box"></span><span><span class="cap-name">Metering &amp; payment</span><span class="cap-why">work costed, capped, and settled</span></span></div>
+      <div class="cap" data-cap="mandates"><span class="box"></span><span><span class="cap-name">Mandates &amp; scope of work</span><span class="shield" title="part of the security spine"><svg viewBox="0 0 12 14" width="11" height="13" aria-hidden="true"><path d="M6 1.2 L10.8 3.1 V6.8 C10.8 10.2 8.7 12.4 6 13.2 C3.3 12.4 1.2 10.2 1.2 6.8 V3.1 Z" fill="none" stroke="currentColor" stroke-width="1.3"/></svg></span><span class="cap-why">what it may do, in writing, enforceable</span></span></div>
+      <div class="cap" data-cap="metering"><span class="box"></span><span><span class="cap-name">Metering &amp; payment</span><span class="cap-why">work costed, settled, on the record</span></span></div>
+      <div class="cap" data-cap="budgets"><span class="box"></span><span><span class="cap-name">Budgets &amp; caps</span><span class="cap-why">spend bounded before it happens</span></span></div>
       </div>
     </div>
 
@@ -360,6 +380,7 @@
     <div class="bt">
       <h1 id="b-title"></h1>
       <p id="b-desc"></p>
+      <a class="cta" id="cta" href="https://agentmesh.ai/business.html#demo" hidden>See it running · get a demo →</a>
     </div>
     <div class="controls">
       <span class="beatno" id="beatno"></span>
@@ -377,15 +398,15 @@
   //    pause on a problem (callout), or answer it (caps). Rendering replays
   //    beats 0..i, so Back and the scrubber are free.
   const BEATS = [
-    // ═══ Stage 1 · Personal agents ═══
+    // ═══ Stage 1 · Personal agents (compressed: premise, not tutorial) ═══
     { stage:0, show:["person","pa-link","pagent"],
       title:"Personal agents",
-      desc:"It starts with one person and one agent that works for them: drafting, digging, remembering, acting on their behalf. The gain is personal. Nothing is shared yet, and nothing needs to be." },
-    { stage:0, callout:{ x:33, y:24, text:"You can't reach what you can't name. For this agent to act in the world it needs an address people and software can find, a way to trade messages with its person, and hands, tools to act through." } },
-    { stage:0, caps:["naming","pmsg","tools"],
-      desc:"So the first capabilities land: the agent gets a name, a line to its person, and tools. Small stack, but every later stage stands on it." },
+      desc:"Start where the market already is: everyone gets an agent. It drafts, digs, remembers, and acts on its owner's behalf. Useful, but so far it's one person and one assistant." },
     { stage:0, show:["person2","pa2-link","pagent2","w-pp"],
-      desc:"Then a friend shows up with an agent of their own, and the two agents start talking: a dinner to schedule, a document to trade, an introduction to make. The first agent-to-agent conversation happens between people, not companies." },
+      desc:"The first agent-to-agent conversation isn't between companies. It's two professionals whose agents settle a meeting, trade a draft, and make an introduction while their owners spend the hour on something better." },
+    { stage:0, caps:["naming","pmsg","tools"],
+      callout:{ x:33, y:20, text:"Even this small world needs plumbing: an address people and software can find, a message line that works while its person is away, and tools to act through." },
+      desc:"So the first capabilities land: a name, a line to its person, and tools. A small stack that every later stage stands on." },
 
     // ═══ Stage 2 · Task agents ═══
     { stage:1, show:["companyframe","t-triage","t-drafts","t-review"],
@@ -401,24 +422,34 @@
       desc:"The silos start calling each other: Sales asks Pricing, Pricing asks Finance. And people stop operating each agent by hand; their own agent becomes the way they steer the company's." },
     { stage:2, callout:{ x:74, y:16, w:250, text:"Every pair of agents is its own integration, and point-to-point collapses as the count grows. And the moment one agent asks another, both sides need identity, guaranteed delivery, and a record of who asked for what on whose behalf." } },
     { stage:2, caps:["identity","async","discovery","audit","screening"],
-      desc:"This is where a mesh stops being a nice idea and becomes infrastructure: signed identity, reliable async messaging, discovery, an audit trail, and a person in the loop where it matters." },
+      desc:"This is where a mesh becomes infrastructure: signed identity, reliable async messaging, discovery, an audit trail, and a person in the loop where it matters. The shields mark the start of the security spine." },
 
-    // ═══ Stage 4 · External A2A ═══
+    // ═══ Stage 4 · External A2A: trust, security, economics, the close ═══
     { stage:3, show:["providerframe","p-research","w-buy"],
       title:"Across company lines: buying",
       desc:"The wire leaves the building. Your agents hire capability from a provider's agent: research, data, specialist work, bought the way your team buys software today. That's the customer side." },
     { stage:3, callout:{ x:74, y:46, w:250, text:"The agent on the other end isn't yours. What is it allowed to do? What will it cost? Who vouches for it, and what happens when it's wrong?" } },
-    { stage:3, caps:["federation","reputation","mandates","metering"],
-      desc:"Trust machinery answers: federation carries the wire across the boundary, reputation says who to believe, mandates bound what's allowed, and metering settles the bill." },
+    { stage:3, caps:["federation","reputation","mandates"],
+      desc:"Trust machinery answers: federation carries the wire across the boundary, reputation says who to believe, and mandates put what an agent may do in writing." },
+    { stage:3, security:true, openAll:true,
+      title:"Security is the spine",
+      callout:{ x:68, y:54, w:290, eyebrow:"THE SECURITY QUESTION",
+        text:"Security isn't a stage, it's the spine. Identity is proven at the transport, screening filters what comes in, mandates bound what an agent may do, and the audit trail sits under all of it. Each stage added a layer; nothing is bolted on at the end." },
+      desc:"Every shielded item in the list arrived in an earlier stage. By the time strangers are on the wire, the security answer is already built, layer by layer." },
     { stage:3, show:["customerframe","c-agent","w-sell"],
       title:"Across company lines: selling",
       desc:"Then the camera flips: your agent is the one being hired. A customer's ask comes in, your agent's work goes out, metered, bounded, on the record. Same wire, both directions. That's the vendor side." },
-    { stage:3, callout:{ x:38, y:72, mint:true, eyebrow:"THE POINT",
-        text:"Nothing was thrown away. The name from stage one signs the invoice in stage four. It's one platform, assembled in the order adoption actually happens." },
-      complete:true },
+    { stage:3, caps:["metering","budgets"],
+      title:"The agent economy",
+      desc:"Then the economics turn on: work is metered, budgets cap spend before it happens, and settlement lands on the record. Agents stop being a cost line and start being a revenue line." },
+    { stage:3, show:["meshwide"], cta:true, complete:true,
+      title:"One platform",
+      callout:{ x:32, y:68, w:380, mint:true, eyebrow:"WHERE THIS GOES",
+        text:"Every company will run agents. The ones whose agents can find, trust, and pay each other are the ones that compound. Nothing was thrown away: the name from stage one signs the invoice in stage four." },
+      desc:"One platform, assembled in the order adoption actually happens. The next step is seeing it run on your own agents." },
   ];
 
-  const stageFirstBeat = [0, 4, 7, 10];
+  const stageFirstBeat = [0, 3, 6, 9];
   const els = {};
   document.querySelectorAll("[data-el]").forEach(g => els[g.dataset.el] = g);
   const caps = {};
@@ -483,12 +514,16 @@
     groups.forEach(g => {
       const id = g.dataset.group;
       g.classList.toggle("on", litGroups.has(id));
-      const open = manualOpen[id] !== undefined ? manualOpen[id] : id === latestGroup;
+      // The security beat unfolds every group so the shields read as one spine.
+      const open = cur.openAll ? litGroups.has(id)
+        : manualOpen[id] !== undefined ? manualOpen[id] : id === latestGroup;
       g.classList.toggle("open", open);
       const n = g.querySelectorAll(".cap.on").length;
       g.querySelector(".cg-count").textContent = n ? `${n} ✓` : "";
     });
     panel.classList.toggle("complete", complete);
+    panel.classList.toggle("security", !!cur.security);
+    document.getElementById("cta").hidden = !cur.cta;
 
     if (cur.callout){
       coEyebrow.textContent = cur.callout.eyebrow || "THE NEW PROBLEM";
