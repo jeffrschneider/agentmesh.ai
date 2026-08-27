@@ -1,0 +1,554 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>How agents take hold · AgentMesh</title>
+<meta name="robots" content="noindex">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+<style>
+  /* Same token system as business.html so this page can join the funnel unchanged. */
+  :root{
+    --ink:#0A1417; --panel:#0F1D22; --panel-2:#12242A; --line:#1C2E33;
+    --paper:#E7EFEC; --dim:#7C918C; --faint:#4A5D5A;
+    --signal:#F2A93B;   /* amber: the ask, the new problem */
+    --verify:#43D6A6;   /* mint: the answer, verified */
+    --address:#6BA8FF;  /* blue: company task agents */
+    --broadcast:#B69CFF;/* violet: the outside world */
+    --disp:'Space Grotesk', sans-serif;
+    --body:'IBM Plex Sans', system-ui, sans-serif;
+    --wire:'IBM Plex Mono', ui-monospace, monospace;
+  }
+  *{ box-sizing:border-box; }
+  html,body{ margin:0; height:100%; }
+  body{ background:var(--ink); color:var(--paper); font-family:var(--body);
+    font-size:16px; line-height:1.55; -webkit-font-smoothing:antialiased;
+    background-image:
+      linear-gradient(var(--line) 1px, transparent 1px),
+      linear-gradient(90deg, var(--line) 1px, transparent 1px);
+    background-size:64px 64px; background-position:-1px -1px;
+    display:flex; flex-direction:column; }
+  body::before{ content:""; position:fixed; inset:0; z-index:0; pointer-events:none;
+    background:
+      radial-gradient(80% 45% at 30% 0%, rgba(242,169,59,.08), transparent 60%),
+      linear-gradient(180deg, rgba(10,20,23,.72), var(--ink) 62%); }
+
+  /* ── frame ── */
+  .topbar{ position:relative; z-index:5; border-bottom:1px solid var(--line);
+    background:rgba(10,20,23,.9); }
+  .topbar .bar{ max-width:1360px; margin:0 auto; padding:0 32px; height:60px;
+    display:flex; align-items:center; gap:26px; }
+  .brand{ font-family:var(--wire); font-weight:600; font-size:.82rem; letter-spacing:.02em;
+    display:flex; align-items:center; gap:9px; color:var(--paper); text-decoration:none; }
+  .brand .dot{ width:9px; height:9px; border-radius:2px; background:var(--signal);
+    box-shadow:0 0 0 3px rgba(242,169,59,.15), 8px 0 0 -2px var(--verify), 16px 0 0 -2px var(--address); }
+  .brand span.wm{ margin-left:14px; }
+
+  /* stage scrubber, centered in the bar */
+  .topbar .bar{ position:relative; }
+  .scrub{ position:absolute; left:50%; transform:translateX(-50%); display:flex; gap:8px; }
+  .scrub button{ font-family:var(--wire); font-size:.74rem; letter-spacing:.02em;
+    color:var(--dim); background:none; border:1px solid var(--line); border-radius:999px;
+    padding:6px 14px; cursor:pointer; transition:color .18s, border-color .18s, background .18s; }
+  .scrub button:hover{ color:var(--paper); }
+  .scrub button.on{ color:var(--ink); background:var(--signal); border-color:var(--signal); font-weight:600; }
+  .scrub button.done{ color:var(--verify); border-color:rgba(67,214,166,.4); }
+
+  .stagegrid{ position:relative; z-index:1; flex:1; max-width:1360px; width:100%;
+    margin:0 auto; padding:22px 32px 26px; display:grid;
+    grid-template-columns:1fr 320px; grid-template-rows:1fr auto; gap:18px; min-height:0; }
+
+  /* ── canvas ── */
+  .canvas{ grid-row:1; grid-column:1; position:relative; border:1px solid var(--line);
+    border-radius:12px; background:linear-gradient(180deg, rgba(15,29,34,.6), rgba(10,20,23,.3));
+    overflow:hidden; min-height:420px; }
+  .canvas svg{ position:absolute; inset:0; width:100%; height:100%; }
+
+  /* every scene element starts hidden and rises in */
+  .el{ opacity:0; transition:opacity .5s ease, transform .5s ease; transform:translateY(8px); }
+  .el.on{ opacity:1; transform:none; }
+  .el.instant{ transition:none; }
+
+  /* wires draw themselves */
+  .wire-ask{ stroke:var(--signal); stroke-width:1.8; fill:none; }
+  .wire-reply{ stroke:var(--verify); stroke-width:1.6; fill:none; stroke-dasharray:5 5; }
+  .wire-steer{ stroke:var(--verify); stroke-width:1.6; fill:none; stroke-dasharray:2 5; stroke-linecap:round; }
+  g.el path.draw{ stroke-dashoffset:0; }
+  @media (prefers-reduced-motion: no-preference){
+    g.el:not(.on) path.draw{ stroke-dashoffset:var(--len, 300); }
+    g.el.on path.draw{ transition:stroke-dashoffset .9s ease .15s; }
+  }
+
+  .node-label{ font-family:var(--wire); font-size:12.5px; font-weight:600; fill:var(--paper); }
+  .node-sub{ font-family:var(--wire); font-size:10px; fill:var(--dim); }
+  .frame-label{ font-family:var(--wire); font-size:10.5px; font-weight:600;
+    letter-spacing:.14em; fill:var(--faint); }
+  .wire-label{ font-family:var(--wire); font-size:9.5px; fill:var(--signal); }
+  .wire-label.mint{ fill:var(--verify); }
+
+  /* ── callout ── */
+  .callout{ position:absolute; z-index:4; max-width:330px; padding:14px 16px 15px;
+    background:var(--panel-2); border:1px solid rgba(242,169,59,.5); border-left:3px solid var(--signal);
+    border-radius:8px; box-shadow:0 14px 40px rgba(0,0,0,.5);
+    opacity:0; transform:translateY(10px); pointer-events:none;
+    transition:opacity .45s ease, transform .45s ease; }
+  .callout.on{ opacity:1; transform:none; }
+  .callout .co-eyebrow{ font-family:var(--wire); font-size:.68rem; letter-spacing:.14em;
+    color:var(--signal); margin-bottom:6px; }
+  .callout p{ margin:0; font-size:.92rem; line-height:1.5; color:var(--paper); }
+  .callout.mint{ border-color:rgba(67,214,166,.5); border-left-color:var(--verify); }
+  .callout.mint .co-eyebrow{ color:var(--verify); }
+
+  /* ── right panel: the growing checklist ── */
+  .panel{ grid-row:1 / span 2; grid-column:2; border:1px solid var(--line); border-radius:12px;
+    background:var(--panel); padding:20px 20px 16px; overflow-y:auto; min-height:0; }
+  .panel h2{ font-family:var(--wire); font-size:.72rem; font-weight:600; letter-spacing:.16em;
+    color:var(--dim); margin:0 0 4px; }
+  .panel .panel-sub{ font-size:.8rem; color:var(--faint); margin:0 0 14px; }
+  .capgroup{ display:none; }
+  .capgroup.on{ display:block; }
+  .cg-head{ width:100%; display:flex; align-items:center; gap:10px; cursor:pointer;
+    background:none; border:none; border-top:1px solid var(--line); padding:11px 0 9px;
+    text-align:left; }
+  .capgroup:first-of-type .cg-head{ border-top:none; padding-top:2px; }
+  .cg-head:focus-visible{ outline:2px solid var(--signal); outline-offset:2px; border-radius:4px; }
+  .cg-label{ font-family:var(--wire); font-size:.68rem; letter-spacing:.12em; color:var(--faint); }
+  .capgroup.open .cg-label{ color:var(--dim); }
+  .cg-count{ margin-left:auto; font-family:var(--wire); font-size:.68rem; color:var(--verify); }
+  .chev{ flex:none; width:7px; height:7px; margin-top:-3px;
+    border-right:1.5px solid var(--dim); border-bottom:1.5px solid var(--dim);
+    transform:rotate(45deg); transition:transform .2s ease; }
+  .capgroup.open .chev{ transform:rotate(-135deg); margin-top:3px; }
+  .cg-body{ display:none; padding-bottom:10px; }
+  .capgroup.open .cg-body{ display:block; }
+  .cap{ display:flex; align-items:baseline; gap:10px; padding:4px 0;
+    opacity:0; transform:translateX(8px); transition:opacity .4s ease, transform .4s ease; }
+  .cap.on{ opacity:1; transform:none; }
+  .cap .box{ flex:none; width:13px; height:13px; border:1.5px solid var(--faint); border-radius:3px;
+    position:relative; top:2px; transition:border-color .3s, background .3s; }
+  .cap.on .box{ border-color:var(--verify); background:rgba(67,214,166,.12); }
+  .cap.on .box::after{ content:""; position:absolute; inset:2px 2px 3px;
+    border-right:2px solid var(--verify); border-bottom:2px solid var(--verify);
+    transform:rotate(40deg) scale(.85); border-radius:1px; }
+  .cap .cap-name{ font-size:.86rem; font-weight:500; color:var(--paper); }
+  .cap .cap-why{ font-size:.76rem; color:var(--dim); display:block; margin-top:1px; }
+  .panel.complete{ border-color:rgba(67,214,166,.45);
+    box-shadow:0 0 0 1px rgba(67,214,166,.15), 0 0 40px rgba(67,214,166,.06) inset; }
+
+  /* ── bottom band: title + narration + controls ── */
+  .band{ grid-row:2; grid-column:1; border:1px solid var(--line); border-radius:12px;
+    background:var(--panel); padding:18px 22px; display:flex; gap:22px; align-items:flex-start; }
+  .band .stageno{ font-family:var(--wire); font-size:.72rem; letter-spacing:.14em;
+    color:var(--signal); white-space:nowrap; padding-top:6px; }
+  .band .bt{ flex:1; min-width:0; }
+  .band h1{ font-size:1.3rem; margin:0 0 4px; }
+  .band p{ margin:0; color:var(--dim); font-size:.92rem; max-width:64ch; }
+  .controls{ flex:none; display:flex; gap:10px; align-items:center; padding-top:4px; }
+  .controls .beatno{ font-family:var(--wire); font-size:.72rem; color:var(--faint); margin-right:4px; }
+  .controls button{ font-family:var(--wire); font-size:.82rem; font-weight:600; cursor:pointer;
+    border-radius:8px; padding:9px 18px; border:1px solid var(--line);
+    background:var(--panel-2); color:var(--paper); transition:background .18s, border-color .18s; }
+  .controls button:hover{ border-color:var(--dim); }
+  .controls button.primary{ background:var(--signal); border-color:var(--signal); color:var(--ink); }
+  .controls button.primary:hover{ background:#f7bb5e; }
+  .controls button:disabled{ opacity:.35; cursor:default; }
+  .controls button:focus-visible{ outline:2px solid var(--signal); outline-offset:3px; }
+
+  @media (max-width: 1000px){
+    .stagegrid{ grid-template-columns:1fr; grid-template-rows:auto auto auto; padding:16px; }
+    .panel{ grid-row:3; grid-column:1; max-height:340px; }
+    .band{ grid-row:2; flex-wrap:wrap; }
+    .canvas{ min-height:360px; }
+  }
+</style>
+</head>
+<body>
+
+<header class="topbar"><div class="bar">
+  <a class="brand" href="index.html"><span class="dot"></span><span class="wm">AGENTMESH</span></a>
+  <nav class="scrub" id="scrub" aria-label="Stages">
+    <button data-stage="0">1 · Personal</button>
+    <button data-stage="1">2 · Task</button>
+    <button data-stage="2">3 · Internal A2A</button>
+    <button data-stage="3">4 · External A2A</button>
+  </nav>
+</div></header>
+
+<div class="stagegrid">
+
+  <div class="canvas" id="canvas">
+    <svg viewBox="0 0 980 620" preserveAspectRatio="xMidYMid meet" aria-label="The growing mesh of agents">
+
+      <!-- ═══ stage 1: a person and their agent ═══ -->
+      <g class="el" data-el="person">
+        <circle cx="86" cy="272" r="15" fill="none" stroke="var(--paper)" stroke-width="2"/>
+        <path d="M 62 322 Q 86 292 110 322" fill="none" stroke="var(--paper)" stroke-width="2" stroke-linecap="round"/>
+        <text x="86" y="348" text-anchor="middle" class="node-sub">a person</text>
+      </g>
+      <g class="el" data-el="pa-link">
+        <line x1="118" y1="300" x2="158" y2="300" stroke="var(--verify)" stroke-width="1.6" stroke-dasharray="2 5" stroke-linecap="round"/>
+      </g>
+      <g class="el" data-el="pagent">
+        <rect x="158" y="276" width="118" height="48" rx="9" fill="var(--panel-2)" stroke="var(--verify)" stroke-width="1.6"/>
+        <text x="217" y="297" text-anchor="middle" class="node-label">Their agent</text>
+        <text x="217" y="313" text-anchor="middle" class="node-sub">personal · works for them</text>
+      </g>
+
+      <!-- a second person, and the first agent-to-agent conversation -->
+      <g class="el" data-el="person2">
+        <circle cx="86" cy="442" r="15" fill="none" stroke="var(--paper)" stroke-width="2"/>
+        <path d="M 62 492 Q 86 462 110 492" fill="none" stroke="var(--paper)" stroke-width="2" stroke-linecap="round"/>
+        <text x="86" y="518" text-anchor="middle" class="node-sub">a friend</text>
+      </g>
+      <g class="el" data-el="pa2-link">
+        <line x1="118" y1="470" x2="158" y2="470" stroke="var(--verify)" stroke-width="1.6" stroke-dasharray="2 5" stroke-linecap="round"/>
+      </g>
+      <g class="el" data-el="pagent2">
+        <rect x="158" y="446" width="118" height="48" rx="9" fill="var(--panel-2)" stroke="var(--verify)" stroke-width="1.6"/>
+        <text x="217" y="467" text-anchor="middle" class="node-label">Their agent</text>
+        <text x="217" y="483" text-anchor="middle" class="node-sub">personal · theirs</text>
+      </g>
+      <g class="el" data-el="w-pp">
+        <path class="wire-ask draw" style="--len:130" stroke-dasharray="130" d="M 207 324 C 207 360, 207 405, 207 442"/>
+        <path class="wire-reply draw" style="--len:130" d="M 227 442 C 227 405, 227 360, 227 328"/>
+        <text x="168" y="388" class="wire-label">ask</text>
+        <text x="236" y="388" class="wire-label mint">reply</text>
+      </g>
+
+      <!-- ═══ stage 2: the company and its task agents ═══ -->
+      <g class="el" data-el="companyframe">
+        <rect x="330" y="82" width="360" height="470" rx="12" fill="rgba(107,168,255,.03)"
+          stroke="var(--faint)" stroke-width="1.2" stroke-dasharray="6 6"/>
+        <text x="350" y="114" class="frame-label" font-size="16">COMPANY AGENTS</text>
+      </g>
+      <g class="el" data-el="t-triage">
+        <rect x="368" y="140" width="126" height="48" rx="9" fill="var(--panel-2)" stroke="var(--address)" stroke-width="1.5"/>
+        <text x="431" y="161" text-anchor="middle" class="node-label">Triage</text>
+        <text x="431" y="177" text-anchor="middle" class="node-sub">support tickets</text>
+      </g>
+      <g class="el" data-el="t-drafts">
+        <rect x="368" y="266" width="126" height="48" rx="9" fill="var(--panel-2)" stroke="var(--address)" stroke-width="1.5"/>
+        <text x="431" y="287" text-anchor="middle" class="node-label">Drafts</text>
+        <text x="431" y="303" text-anchor="middle" class="node-sub">customer email</text>
+      </g>
+      <g class="el" data-el="t-review">
+        <rect x="368" y="392" width="126" height="48" rx="9" fill="var(--panel-2)" stroke="var(--address)" stroke-width="1.5"/>
+        <text x="431" y="413" text-anchor="middle" class="node-label">Review</text>
+        <text x="431" y="429" text-anchor="middle" class="node-sub">code &amp; contracts</text>
+      </g>
+
+      <!-- ═══ stage 3: more agents, and wires between them ═══ -->
+      <g class="el" data-el="t-sales">
+        <rect x="536" y="140" width="126" height="48" rx="9" fill="var(--panel-2)" stroke="var(--address)" stroke-width="1.5"/>
+        <text x="599" y="161" text-anchor="middle" class="node-label">Sales</text>
+        <text x="599" y="177" text-anchor="middle" class="node-sub">quotes &amp; deals</text>
+      </g>
+      <g class="el" data-el="t-pricing">
+        <rect x="536" y="266" width="126" height="48" rx="9" fill="var(--panel-2)" stroke="var(--address)" stroke-width="1.5"/>
+        <text x="599" y="287" text-anchor="middle" class="node-label">Pricing</text>
+        <text x="599" y="303" text-anchor="middle" class="node-sub">margin rules</text>
+      </g>
+      <g class="el" data-el="t-finance">
+        <rect x="536" y="392" width="126" height="48" rx="9" fill="var(--panel-2)" stroke="var(--address)" stroke-width="1.5"/>
+        <text x="599" y="413" text-anchor="middle" class="node-label">Finance</text>
+        <text x="599" y="429" text-anchor="middle" class="node-sub">the ledger</text>
+      </g>
+      <g class="el" data-el="w-internal">
+        <path class="wire-ask draw" style="--len:120" stroke-dasharray="120" d="M 599 188 C 599 210, 599 240, 599 262"/>
+        <path class="wire-ask draw" style="--len:120" stroke-dasharray="120" d="M 599 314 C 599 336, 599 366, 599 388"/>
+        <path class="wire-reply draw" style="--len:150" d="M 585 388 C 570 350, 570 330, 585 318"/>
+        <path class="wire-ask draw" style="--len:130" stroke-dasharray="130" d="M 494 164 C 512 164, 518 164, 532 164"/>
+        <text x="620" y="230" class="wire-label">ask</text>
+        <text x="548" y="356" class="wire-label mint">reply</text>
+      </g>
+      <g class="el" data-el="w-steer">
+        <path class="wire-steer draw" style="--len:170" d="M 276 300 C 310 300, 330 292, 364 290"/>
+        <text x="290" y="284" class="wire-label mint">steers</text>
+      </g>
+
+      <!-- ═══ stage 4: the outside world ═══ -->
+      <g class="el" data-el="providerframe">
+        <rect x="742" y="82" width="212" height="180" rx="12" fill="rgba(182,156,255,.04)"
+          stroke="var(--faint)" stroke-width="1.2" stroke-dasharray="6 6"/>
+        <text x="760" y="110" class="frame-label">A PROVIDER</text>
+      </g>
+      <g class="el" data-el="p-research">
+        <rect x="774" y="140" width="148" height="48" rx="9" fill="var(--panel-2)" stroke="var(--broadcast)" stroke-width="1.5"/>
+        <text x="848" y="161" text-anchor="middle" class="node-label">Research</text>
+        <text x="848" y="177" text-anchor="middle" class="node-sub">theirs · for hire</text>
+      </g>
+      <g class="el" data-el="w-buy">
+        <path class="wire-ask draw" style="--len:130" stroke-dasharray="130" d="M 662 158 C 700 156, 730 158, 770 160"/>
+        <path class="wire-reply draw" style="--len:140" d="M 770 176 C 730 180, 700 180, 662 176"/>
+        <text x="694" y="146" class="wire-label">hire</text>
+        <text x="694" y="198" class="wire-label mint">deliver</text>
+      </g>
+      <g class="el" data-el="customerframe">
+        <rect x="742" y="372" width="212" height="180" rx="12" fill="rgba(182,156,255,.04)"
+          stroke="var(--faint)" stroke-width="1.2" stroke-dasharray="6 6"/>
+        <text x="760" y="400" class="frame-label">A CUSTOMER</text>
+      </g>
+      <g class="el" data-el="c-agent">
+        <rect x="774" y="430" width="148" height="48" rx="9" fill="var(--panel-2)" stroke="var(--broadcast)" stroke-width="1.5"/>
+        <text x="848" y="451" text-anchor="middle" class="node-label">Their agent</text>
+        <text x="848" y="467" text-anchor="middle" class="node-sub">buying from you</text>
+      </g>
+      <g class="el" data-el="w-sell">
+        <path class="wire-ask draw" style="--len:140" stroke-dasharray="140" d="M 770 448 C 730 446, 700 430, 666 424"/>
+        <path class="wire-reply draw" style="--len:150" d="M 666 440 C 700 450, 730 462, 770 464"/>
+        <text x="700" y="416" class="wire-label">their ask</text>
+        <text x="686" y="480" class="wire-label mint">your work</text>
+      </g>
+    </svg>
+
+    <div class="callout" id="callout" role="status">
+      <div class="co-eyebrow" id="co-eyebrow">THE NEW PROBLEM</div>
+      <p id="co-text"></p>
+    </div>
+  </div>
+
+  <aside class="panel" id="panel" aria-label="Capabilities this stage needs">
+    <h2>WHAT IT TAKES</h2>
+    <p class="panel-sub">Each stage adds capabilities. Nothing gets retired.</p>
+
+    <div class="capgroup" data-group="0">
+      <button class="cg-head" type="button"><span class="cg-label">1 · PERSONAL AGENTS</span><span class="cg-count"></span><span class="chev"></span></button>
+      <div class="cg-body">
+      <div class="cap" data-cap="naming"><span class="box"></span><span><span class="cap-name">Naming &amp; handles</span><span class="cap-why">an address people and software can find</span></span></div>
+      <div class="cap" data-cap="pmsg"><span class="box"></span><span><span class="cap-name">Person ↔ agent messaging</span><span class="cap-why">reach it, and hear from it, while you're away</span></span></div>
+      <div class="cap" data-cap="tools"><span class="box"></span><span><span class="cap-name">Tools (MCP)</span><span class="cap-why">hands: the things an agent acts through</span></span></div>
+      </div>
+    </div>
+
+    <div class="capgroup" data-group="1">
+      <button class="cg-head" type="button"><span class="cg-label">2 · TASK AGENTS</span><span class="cg-count"></span><span class="chev"></span></button>
+      <div class="cg-body">
+      <div class="cap" data-cap="tasks"><span class="box"></span><span><span class="cap-name">Task lifecycle</span><span class="cap-why">submitted → working → done, on the record</span></span></div>
+      <div class="cap" data-cap="registries"><span class="box"></span><span><span class="cap-name">Tool &amp; agent registries</span><span class="cap-why">what exists, what it does, who runs it</span></span></div>
+      <div class="cap" data-cap="health"><span class="box"></span><span><span class="cap-name">Health &amp; monitoring</span><span class="cap-why">is it up, is it stuck, who gets paged</span></span></div>
+      </div>
+    </div>
+
+    <div class="capgroup" data-group="2">
+      <button class="cg-head" type="button"><span class="cg-label">3 · AGENT ↔ AGENT, INTERNAL</span><span class="cg-count"></span><span class="chev"></span></button>
+      <div class="cg-body">
+      <div class="cap" data-cap="identity"><span class="box"></span><span><span class="cap-name">Identity &amp; credentials</span><span class="cap-why">every ask signed by a nameable agent</span></span></div>
+      <div class="cap" data-cap="async"><span class="box"></span><span><span class="cap-name">Reliable async messaging</span><span class="cap-why">delivery guaranteed, no one waits online</span></span></div>
+      <div class="cap" data-cap="discovery"><span class="box"></span><span><span class="cap-name">Discovery &amp; catalogs</span><span class="cap-why">"who can do X?" without a meeting</span></span></div>
+      <div class="cap" data-cap="audit"><span class="box"></span><span><span class="cap-name">Delegation &amp; audit trail</span><span class="cap-why">who asked, on whose behalf, what happened</span></span></div>
+      <div class="cap" data-cap="screening"><span class="box"></span><span><span class="cap-name">Approvals &amp; screening</span><span class="cap-why">a person in the loop where it matters</span></span></div>
+      </div>
+    </div>
+
+    <div class="capgroup" data-group="3">
+      <button class="cg-head" type="button"><span class="cg-label">4 · AGENT ↔ AGENT, EXTERNAL</span><span class="cg-count"></span><span class="chev"></span></button>
+      <div class="cg-body">
+      <div class="cap" data-cap="federation"><span class="box"></span><span><span class="cap-name">Federation</span><span class="cap-why">the same wire, across company lines</span></span></div>
+      <div class="cap" data-cap="reputation"><span class="box"></span><span><span class="cap-name">Reputation</span><span class="cap-why">who vouches for the agent you just hired</span></span></div>
+      <div class="cap" data-cap="mandates"><span class="box"></span><span><span class="cap-name">Mandates &amp; scope of work</span><span class="cap-why">what it may do, in writing, enforceable</span></span></div>
+      <div class="cap" data-cap="metering"><span class="box"></span><span><span class="cap-name">Metering &amp; payment</span><span class="cap-why">work costed, capped, and settled</span></span></div>
+      </div>
+    </div>
+
+  </aside>
+
+  <div class="band">
+    <span class="stageno" id="stageno">STAGE 1 OF 4</span>
+    <div class="bt">
+      <h1 id="b-title"></h1>
+      <p id="b-desc"></p>
+    </div>
+    <div class="controls">
+      <span class="beatno" id="beatno"></span>
+      <button id="playall" aria-label="Play the whole sequence">▶ Play</button>
+      <button id="back" aria-label="Previous step">← Back</button>
+      <button id="next" class="primary" aria-label="Next step">Next →</button>
+    </div>
+  </div>
+
+</div>
+
+<script>
+(() => {
+  // ── The story is a list of beats. Each beat may grow the scene (show),
+  //    pause on a problem (callout), or answer it (caps). Rendering replays
+  //    beats 0..i, so Back and the scrubber are free.
+  const BEATS = [
+    // ═══ Stage 1 · Personal agents ═══
+    { stage:0, show:["person","pa-link","pagent"],
+      title:"Personal agents",
+      desc:"It starts with one person and one agent that works for them: drafting, digging, remembering, acting on their behalf. The gain is personal. Nothing is shared yet, and nothing needs to be." },
+    { stage:0, callout:{ x:33, y:24, text:"You can't reach what you can't name. For this agent to act in the world it needs an address people and software can find, a way to trade messages with its person, and hands, tools to act through." } },
+    { stage:0, caps:["naming","pmsg","tools"],
+      desc:"So the first capabilities land: the agent gets a name, a line to its person, and tools. Small stack, but every later stage stands on it." },
+    { stage:0, show:["person2","pa2-link","pagent2","w-pp"],
+      desc:"Then a friend shows up with an agent of their own, and the two agents start talking: a dinner to schedule, a document to trade, an introduction to make. The first agent-to-agent conversation happens between people, not companies." },
+
+    // ═══ Stage 2 · Task agents ═══
+    { stage:1, show:["companyframe","t-triage","t-drafts","t-review"],
+      title:"Task agents",
+      desc:"The company deploys agents of its own: single-purpose workers wired into a process. Each one is owned by a team, lives in its silo, and talks to exactly one system." },
+    { stage:1, callout:{ x:52, y:36, text:"Work now outlives the conversation. Someone asked for that triage three hours ago. Did it finish? Did it fail? Is the agent even running? A chat transcript is not an operational record." } },
+    { stage:1, caps:["tasks","registries","health"],
+      desc:"Work becomes a first-class thing: tasks with a lifecycle, registries that say what exists, and monitoring that notices when an agent goes quiet." },
+
+    // ═══ Stage 3 · Internal A2A ═══
+    { stage:2, show:["t-sales","t-pricing","t-finance","w-internal","w-steer"],
+      title:"Agents talking to agents",
+      desc:"The silos start calling each other: Sales asks Pricing, Pricing asks Finance. And people stop operating each agent by hand; their own agent becomes the way they steer the company's." },
+    { stage:2, callout:{ x:74, y:16, w:250, text:"Every pair of agents is its own integration, and point-to-point collapses as the count grows. And the moment one agent asks another, both sides need identity, guaranteed delivery, and a record of who asked for what on whose behalf." } },
+    { stage:2, caps:["identity","async","discovery","audit","screening"],
+      desc:"This is where a mesh stops being a nice idea and becomes infrastructure: signed identity, reliable async messaging, discovery, an audit trail, and a person in the loop where it matters." },
+
+    // ═══ Stage 4 · External A2A ═══
+    { stage:3, show:["providerframe","p-research","w-buy"],
+      title:"Across company lines: buying",
+      desc:"The wire leaves the building. Your agents hire capability from a provider's agent: research, data, specialist work, bought the way your team buys software today. That's the customer side." },
+    { stage:3, callout:{ x:74, y:46, w:250, text:"The agent on the other end isn't yours. What is it allowed to do? What will it cost? Who vouches for it, and what happens when it's wrong?" } },
+    { stage:3, caps:["federation","reputation","mandates","metering"],
+      desc:"Trust machinery answers: federation carries the wire across the boundary, reputation says who to believe, mandates bound what's allowed, and metering settles the bill." },
+    { stage:3, show:["customerframe","c-agent","w-sell"],
+      title:"Across company lines: selling",
+      desc:"Then the camera flips: your agent is the one being hired. A customer's ask comes in, your agent's work goes out, metered, bounded, on the record. Same wire, both directions. That's the vendor side." },
+    { stage:3, callout:{ x:38, y:72, mint:true, eyebrow:"THE POINT",
+        text:"Nothing was thrown away. The name from stage one signs the invoice in stage four. It's one platform, assembled in the order adoption actually happens." },
+      complete:true },
+  ];
+
+  const stageFirstBeat = [0, 4, 7, 10];
+  const els = {};
+  document.querySelectorAll("[data-el]").forEach(g => els[g.dataset.el] = g);
+  const caps = {};
+  document.querySelectorAll("[data-cap]").forEach(c => caps[c.dataset.cap] = c);
+  const groups = document.querySelectorAll(".capgroup");
+  const callout = document.getElementById("callout");
+  const coText = document.getElementById("co-text");
+  const coEyebrow = document.getElementById("co-eyebrow");
+  const panel = document.getElementById("panel");
+  const scrubBtns = document.querySelectorAll("#scrub button");
+  const backBtn = document.getElementById("back");
+  const nextBtn = document.getElementById("next");
+  const playBtn = document.getElementById("playall");
+
+  // ── narration: one clip per beat, spoken on every step change ──
+  const voice = new Audio();
+  voice.preload = "auto";
+  let playingAll = false;
+  const clip = (i) => `adoption-audio/beat-${String(i + 1).padStart(2, "0")}.mp3`;
+  function playBeat(){
+    voice.src = clip(beat);
+    // Autoplay may be blocked before the first user gesture; that's fine.
+    voice.play().catch(() => {});
+  }
+  function stopAll(){
+    playingAll = false;
+    playBtn.textContent = "▶ Play";
+  }
+  voice.addEventListener("ended", () => {
+    if (!playingAll) return;
+    if (beat < BEATS.length - 1) go(beat + 1);
+    else stopAll();
+  });
+
+  let beat = 0;
+  // Manual open/close choices on the checklist accordion; reset on every beat
+  // change so each new group arrives with the earlier ones folded away.
+  let manualOpen = {};
+
+  function render(jumped){
+    // replay beats 0..beat into accumulated state
+    const shown = new Set(), lit = new Set(), litGroups = new Set();
+    let title = "", desc = "", stage = 0, complete = false, latestGroup = null;
+    for (let i = 0; i <= beat; i++){
+      const b = BEATS[i];
+      (b.show || []).forEach(id => shown.add(id));
+      (b.caps || []).forEach(id => lit.add(id));
+      if (b.caps){ litGroups.add(String(b.stage)); latestGroup = String(b.stage); }
+      if (b.title) title = b.title;
+      if (b.desc) desc = b.desc;
+      stage = b.stage;
+      if (b.complete) complete = true;
+    }
+    const cur = BEATS[beat];
+
+    for (const [id, g] of Object.entries(els)){
+      // On a scrubber jump, past elements snap in without the entrance dance.
+      g.classList.toggle("instant", !!jumped && shown.has(id) && !(cur.show || []).includes(id));
+      g.classList.toggle("on", shown.has(id));
+    }
+    for (const [id, c] of Object.entries(caps)) c.classList.toggle("on", lit.has(id));
+    groups.forEach(g => {
+      const id = g.dataset.group;
+      g.classList.toggle("on", litGroups.has(id));
+      const open = manualOpen[id] !== undefined ? manualOpen[id] : id === latestGroup;
+      g.classList.toggle("open", open);
+      const n = g.querySelectorAll(".cap.on").length;
+      g.querySelector(".cg-count").textContent = n ? `${n} ✓` : "";
+    });
+    panel.classList.toggle("complete", complete);
+
+    if (cur.callout){
+      coEyebrow.textContent = cur.callout.eyebrow || "THE NEW PROBLEM";
+      coText.textContent = cur.callout.text;
+      callout.style.left = cur.callout.x + "%";
+      callout.style.top = cur.callout.y + "%";
+      callout.style.maxWidth = (cur.callout.w || 330) + "px";
+      callout.classList.toggle("mint", !!cur.callout.mint);
+      callout.classList.add("on");
+    } else {
+      callout.classList.remove("on");
+    }
+
+    document.getElementById("b-title").textContent = title;
+    document.getElementById("b-desc").textContent = desc;
+    document.getElementById("stageno").textContent = `STAGE ${stage + 1} OF 4`;
+    document.getElementById("beatno").textContent = `${beat + 1} / ${BEATS.length}`;
+    scrubBtns.forEach(b => {
+      const s = Number(b.dataset.stage);
+      b.classList.toggle("on", s === stage);
+      b.classList.toggle("done", s < stage);
+    });
+    backBtn.disabled = beat === 0;
+    nextBtn.disabled = beat === BEATS.length - 1;
+  }
+
+  function go(n, jumped){
+    beat = Math.max(0, Math.min(BEATS.length - 1, n));
+    manualOpen = {};
+    render(jumped);
+    playBeat();
+  }
+
+  playBtn.addEventListener("click", () => {
+    if (playingAll){
+      stopAll();
+      voice.pause();
+      return;
+    }
+    playingAll = true;
+    playBtn.textContent = "■ Stop";
+    if (beat === BEATS.length - 1) go(0, true);
+    else playBeat();
+  });
+
+  groups.forEach(g => g.querySelector(".cg-head").addEventListener("click", () => {
+    manualOpen[g.dataset.group] = !g.classList.contains("open");
+    render();
+  }));
+
+  nextBtn.addEventListener("click", () => go(beat + 1));
+  backBtn.addEventListener("click", () => go(beat - 1));
+  scrubBtns.forEach(b => b.addEventListener("click", () =>
+    go(stageFirstBeat[Number(b.dataset.stage)], true)));
+  window.addEventListener("keydown", (e) => {
+    if (e.key === "ArrowRight" || e.key === " ") { e.preventDefault(); go(beat + 1); }
+    if (e.key === "ArrowLeft") { e.preventDefault(); go(beat - 1); }
+  });
+
+  render();
+})();
+</script>
+</body>
+</html>
