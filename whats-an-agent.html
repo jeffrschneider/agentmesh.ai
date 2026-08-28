@@ -1,0 +1,712 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>What's an agent? · AgentMesh</title>
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<meta name="robots" content="noindex">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+<style>
+  /* Same token system as adoption.html / anatomy.html; this page's chrome leads violet. */
+  :root{
+    --ink:#0A1417; --panel:#0F1D22; --panel-2:#12242A; --line:#1C2E33;
+    --paper:#E7EFEC; --dim:#7C918C; --faint:#4A5D5A;
+    --signal:#F2A93B;   --verify:#43D6A6;
+    --address:#6BA8FF;  --broadcast:#B69CFF;
+    --accent:#B69CFF;   --accent-soft:rgba(182,156,255,.15);
+    --disp:'Space Grotesk', sans-serif;
+    --body:'IBM Plex Sans', system-ui, sans-serif;
+    --wire:'IBM Plex Mono', ui-monospace, monospace;
+  }
+  *{ box-sizing:border-box; }
+  html,body{ margin:0; height:100%; }
+  body{ background:var(--ink); color:var(--paper); font-family:var(--body);
+    font-size:16px; line-height:1.55; -webkit-font-smoothing:antialiased;
+    background-image:
+      linear-gradient(var(--line) 1px, transparent 1px),
+      linear-gradient(90deg, var(--line) 1px, transparent 1px);
+    background-size:64px 64px; background-position:-1px -1px;
+    display:flex; flex-direction:column; }
+  body::before{ content:""; position:fixed; inset:0; z-index:0; pointer-events:none;
+    background:
+      radial-gradient(80% 45% at 30% 0%, rgba(182,156,255,.09), transparent 60%),
+      linear-gradient(180deg, rgba(10,20,23,.72), var(--ink) 62%); }
+
+  .topbar{ position:relative; z-index:5; border-bottom:1px solid var(--line);
+    background:rgba(10,20,23,.9); }
+  .topbar .bar{ max-width:1360px; margin:0 auto; padding:0 32px; height:60px;
+    display:flex; align-items:center; gap:26px; position:relative; }
+  .brand{ font-family:var(--wire); font-weight:600; font-size:.82rem; letter-spacing:.02em;
+    display:flex; align-items:center; gap:9px; color:var(--paper); text-decoration:none; }
+  .brand .dot{ width:9px; height:9px; border-radius:2px; background:var(--accent);
+    box-shadow:0 0 0 3px var(--accent-soft), 8px 0 0 -2px var(--verify), 16px 0 0 -2px var(--signal); }
+  .brand span.wm{ margin-left:14px; }
+
+  .scrub{ position:absolute; left:50%; transform:translateX(-50%); display:flex; gap:8px; }
+  .scrub button{ font-family:var(--wire); font-size:.74rem; letter-spacing:.02em;
+    color:var(--dim); background:none; border:1px solid var(--line); border-radius:999px;
+    padding:6px 14px; cursor:pointer; transition:color .18s, border-color .18s, background .18s; }
+  .scrub button:hover{ color:var(--paper); }
+  .scrub button.on{ color:var(--ink); background:var(--accent); border-color:var(--accent); font-weight:600; }
+  .scrub button.done{ color:var(--verify); border-color:rgba(67,214,166,.4); }
+
+  .stagegrid{ position:relative; z-index:1; flex:1; max-width:1360px; width:100%;
+    margin:0 auto; padding:22px 32px 26px; display:grid;
+    grid-template-columns:1fr 320px; grid-template-rows:1fr auto; gap:18px; min-height:0; }
+
+  .canvas{ grid-row:1; grid-column:1; position:relative; border:1px solid var(--line);
+    border-radius:12px; background:linear-gradient(180deg, rgba(15,29,34,.6), rgba(10,20,23,.3));
+    overflow:hidden; min-height:420px; }
+  .canvas svg{ position:absolute; inset:0; width:100%; height:100%; }
+
+  .el{ opacity:0; transition:opacity .5s ease, transform .5s ease; transform:translateY(8px); }
+  .el.on{ opacity:1; transform:none; }
+  .el.instant{ transition:none; }
+
+  .wire-ask{ stroke:var(--signal); stroke-width:1.8; fill:none; }
+  .wire-reply{ stroke:var(--verify); stroke-width:1.6; fill:none; stroke-dasharray:5 5; }
+  g.el path.draw{ stroke-dashoffset:0; }
+  @media (prefers-reduced-motion: no-preference){
+    g.el:not(.on) path.draw{ stroke-dashoffset:var(--len, 300); }
+    g.el.on path.draw{ transition:stroke-dashoffset .9s ease .15s; }
+  }
+
+  .title-big{ font-family:var(--disp); font-size:60px; font-weight:700; fill:var(--paper); letter-spacing:.01em; }
+  .title-sub{ font-family:var(--wire); font-size:17px; fill:var(--dim); letter-spacing:.14em; }
+  .syn-head{ font-family:var(--disp); font-size:34px; font-weight:700; fill:var(--paper); }
+  .syn-line{ font-family:var(--body); font-size:19px; fill:var(--paper); }
+  .ans-big{ font-family:var(--disp); font-size:27px; font-weight:700; fill:var(--paper); }
+  .node-label{ font-family:var(--wire); font-size:17px; font-weight:600; fill:var(--paper); }
+  .node-sub{ font-family:var(--wire); font-size:14px; fill:var(--dim); }
+  .frame-label{ font-family:var(--wire); font-size:13px; font-weight:600;
+    letter-spacing:.14em; fill:var(--faint); }
+  .wire-label{ font-family:var(--wire); font-size:12.5px; fill:var(--signal); }
+  .wire-label.mint{ fill:var(--verify); }
+
+  .callout{ position:absolute; z-index:4; max-width:330px; padding:14px 16px 15px;
+    background:var(--panel-2); border:1px solid rgba(242,169,59,.5); border-left:3px solid var(--signal);
+    border-radius:8px; box-shadow:0 14px 40px rgba(0,0,0,.5);
+    opacity:0; transform:translateY(10px); pointer-events:none;
+    transition:opacity .45s ease, transform .45s ease; }
+  .callout.on{ opacity:1; transform:none; }
+  .callout .co-eyebrow{ font-family:var(--wire); font-size:.68rem; letter-spacing:.14em;
+    color:var(--signal); margin-bottom:6px; }
+  .callout p{ margin:0; font-size:.92rem; line-height:1.5; color:var(--paper); }
+  .callout.mint{ border-color:rgba(67,214,166,.5); border-left-color:var(--verify); }
+  .callout.mint .co-eyebrow{ color:var(--verify); }
+
+  .panel{ grid-row:1 / span 2; grid-column:2; border:1px solid var(--line); border-radius:12px;
+    background:var(--panel); padding:20px 20px 16px; overflow-y:auto; min-height:0; }
+  .panel h2{ font-family:var(--wire); font-size:.72rem; font-weight:600; letter-spacing:.16em;
+    color:var(--dim); margin:0 0 4px; }
+  .panel .panel-sub{ font-size:.8rem; color:var(--faint); margin:0 0 14px; }
+  .capgroup{ display:none; }
+  .capgroup.on{ display:block; }
+  .cg-head{ width:100%; display:flex; align-items:center; gap:10px; cursor:pointer;
+    background:none; border:none; border-top:1px solid var(--line); padding:11px 0 9px;
+    text-align:left; }
+  .capgroup:first-of-type .cg-head{ border-top:none; padding-top:2px; }
+  .cg-head:focus-visible{ outline:2px solid var(--accent); outline-offset:2px; border-radius:4px; }
+  .cg-label{ font-family:var(--wire); font-size:.68rem; letter-spacing:.12em; color:var(--faint); }
+  .capgroup.open .cg-label{ color:var(--dim); }
+  .cg-count{ margin-left:auto; font-family:var(--wire); font-size:.68rem; color:var(--verify); }
+  .chev{ flex:none; width:7px; height:7px; margin-top:-3px;
+    border-right:1.5px solid var(--dim); border-bottom:1.5px solid var(--dim);
+    transform:rotate(45deg); transition:transform .2s ease; }
+  .capgroup.open .chev{ transform:rotate(-135deg); margin-top:3px; }
+  .cg-body{ display:none; padding-bottom:10px; }
+  .capgroup.open .cg-body{ display:block; }
+  .cap{ display:flex; align-items:baseline; gap:10px; padding:4px 0;
+    opacity:0; transform:translateX(8px); transition:opacity .4s ease, transform .4s ease; }
+  .cap.on{ opacity:1; transform:none; }
+  .cap .box{ flex:none; width:13px; height:13px; border:1.5px solid var(--faint); border-radius:3px;
+    position:relative; top:2px; transition:border-color .3s, background .3s; }
+  .cap.on .box{ border-color:var(--verify); background:rgba(67,214,166,.12); }
+  .cap.on .box::after{ content:""; position:absolute; inset:2px 2px 3px;
+    border-right:2px solid var(--verify); border-bottom:2px solid var(--verify);
+    transform:rotate(40deg) scale(.85); border-radius:1px; }
+  .cap .cap-name{ font-size:.9rem; font-weight:500; color:var(--paper); }
+  .cap .cap-why{ font-size:.8rem; color:var(--dim); display:block; margin-top:1px; }
+  .panel.complete{ border-color:rgba(67,214,166,.45);
+    box-shadow:0 0 0 1px rgba(67,214,166,.15), 0 0 40px rgba(67,214,166,.06) inset; }
+
+  .band{ grid-row:2; grid-column:1; border:1px solid var(--line); border-radius:12px;
+    background:var(--panel); padding:18px 22px; display:flex; gap:22px; align-items:flex-start; }
+  .band .stageno{ font-family:var(--wire); font-size:.72rem; letter-spacing:.14em;
+    color:var(--accent); white-space:nowrap; padding-top:6px; }
+  .band .bt{ flex:1; min-width:0; }
+  .band h1{ font-size:1.3rem; margin:0 0 4px; }
+  .band p{ margin:0; color:var(--dim); font-size:.95rem; max-width:64ch; }
+  .band .cta{ display:inline-block; margin-top:10px; font-family:var(--wire); font-size:.85rem;
+    font-weight:600; color:var(--ink); background:var(--accent); border-radius:8px;
+    padding:9px 16px; text-decoration:none; }
+  .band .cta:hover{ background:#c9b6ff; }
+  .band .cta[hidden]{ display:none; }
+  .controls{ flex:none; display:flex; gap:10px; align-items:center; padding-top:4px; }
+  .controls .beatno{ font-family:var(--wire); font-size:.72rem; color:var(--faint); margin-right:4px; }
+  .controls button{ font-family:var(--wire); font-size:.82rem; font-weight:600; cursor:pointer;
+    border-radius:8px; padding:9px 18px; border:1px solid var(--line);
+    background:var(--panel-2); color:var(--paper); transition:background .18s, border-color .18s; }
+  .controls button:hover{ border-color:var(--dim); }
+  .controls button.primary{ background:var(--accent); border-color:var(--accent); color:var(--ink); }
+  .controls button.primary:hover{ background:#c9b6ff; }
+  .controls button:disabled{ opacity:.35; cursor:default; }
+  .controls button:focus-visible{ outline:2px solid var(--accent); outline-offset:3px; }
+
+  @media (max-width: 1000px){
+    .stagegrid{ grid-template-columns:1fr; grid-template-rows:auto auto auto; padding:16px; }
+    .panel{ grid-row:3; grid-column:1; max-height:340px; }
+    .band{ grid-row:2; flex-wrap:wrap; }
+    .canvas{ min-height:360px; }
+  }
+</style>
+</head>
+<body>
+
+<header class="topbar"><div class="bar">
+  <a class="brand" href="/"><span class="dot"></span><span class="wm">AGENTMESH</span></a>
+  <nav class="scrub" id="scrub" aria-label="Stages">
+    <button data-stage="0">1 · The line</button>
+    <button data-stage="1">2 · Abilities</button>
+    <button data-stage="2">3 · The kinds</button>
+    <button data-stage="3">4 · Living with them</button>
+  </nav>
+</div></header>
+
+<div class="stagegrid">
+
+  <div class="canvas" id="canvas">
+    <svg viewBox="50 70 880 500" preserveAspectRatio="xMidYMid meet" aria-label="What's an agent, explained">
+
+      <!-- ═══ title card ═══ -->
+      <g class="el" data-el="titlecard">
+        <text x="490" y="280" text-anchor="middle" class="title-big">What's an Agent?</text>
+        <text x="490" y="322" text-anchor="middle" class="title-sub">FROM CHATBOT TO COWORKER</text>
+        <rect x="420" y="348" width="140" height="3" rx="1.5" fill="var(--accent)"/>
+      </g>
+
+      <!-- ═══ scene 1: the line ═══ -->
+      <g class="el" data-el="ln-person">
+        <circle cx="130" cy="208" r="15" fill="none" stroke="var(--paper)" stroke-width="2"/>
+        <path d="M 104 258 Q 130 230 156 258" fill="none" stroke="var(--paper)" stroke-width="2" stroke-linecap="round"/>
+        <text x="130" y="284" text-anchor="middle" class="node-sub">you</text>
+      </g>
+      <g class="el" data-el="ln-chatbot">
+        <line x1="162" y1="222" x2="206" y2="222" stroke="var(--faint)" stroke-dasharray="2 4"/>
+        <rect x="210" y="128" width="320" height="240" rx="12" fill="var(--panel-2)" stroke="var(--address)" stroke-width="1.6"/>
+        <text x="228" y="154" class="frame-label">CHATBOT</text>
+        <rect x="350" y="168" width="162" height="32" rx="9" fill="rgba(107,168,255,.12)" stroke="var(--faint)" stroke-width="1"/>
+        <text x="431" y="188" text-anchor="middle" class="node-sub" font-size="11.5" fill="var(--paper)">Renew a passport?</text>
+        <rect x="228" y="216" width="244" height="86" rx="9" fill="var(--ink)" stroke="var(--faint)" stroke-width="1"/>
+        <line x1="244" y1="240" x2="452" y2="240" stroke="var(--faint)"/>
+        <line x1="244" y1="258" x2="430" y2="258" stroke="var(--faint)"/>
+        <line x1="244" y1="276" x2="446" y2="276" stroke="var(--faint)"/>
+        <text x="244" y="296" class="node-sub" font-size="11">here's how, in twelve steps...</text>
+        <text x="370" y="394" text-anchor="middle" class="node-sub" font-size="12.5">answers · a talking encyclopedia</text>
+      </g>
+      <g class="el" data-el="ln-agent">
+        <text x="545" y="254" text-anchor="middle" class="node-sub">vs</text>
+        <rect x="560" y="128" width="320" height="240" rx="12" fill="var(--panel-2)" stroke="var(--broadcast)" stroke-width="1.6"/>
+        <text x="578" y="154" class="frame-label">AGENT</text>
+        <rect x="686" y="168" width="180" height="32" rx="9" fill="rgba(182,156,255,.12)" stroke="var(--faint)" stroke-width="1"/>
+        <text x="776" y="188" text-anchor="middle" class="node-sub" font-size="11.5" fill="var(--paper)">Book us a table Friday</text>
+        <path d="M 584 228 l 6 7 l 10 -13" fill="none" stroke="var(--verify)" stroke-width="2.2" stroke-linecap="round"/>
+        <text x="612" y="234" class="node-sub" font-size="12.5" fill="var(--paper)">found a table for four</text>
+        <path d="M 584 262 l 6 7 l 10 -13" fill="none" stroke="var(--verify)" stroke-width="2.2" stroke-linecap="round"/>
+        <text x="612" y="268" class="node-sub" font-size="12.5" fill="var(--paper)">checked your calendar</text>
+        <path d="M 584 296 l 6 7 l 10 -13" fill="none" stroke="var(--verify)" stroke-width="2.2" stroke-linecap="round"/>
+        <text x="612" y="302" class="node-sub" font-size="12.5" fill="var(--paper)">booked · Friday, 7pm</text>
+        <text x="720" y="394" text-anchor="middle" class="node-sub" font-size="12.5">acts · a digital intern</text>
+      </g>
+
+      <!-- ═══ scene 2: the abilities ═══ -->
+      <g class="el" data-el="ab-agent">
+        <rect x="400" y="265" width="180" height="80" rx="14" fill="var(--panel-2)" stroke="var(--signal)" stroke-width="2"/>
+        <text x="490" y="300" text-anchor="middle" class="node-label">YOUR AGENT</text>
+        <text x="490" y="322" text-anchor="middle" class="node-sub" font-size="12.5">one brain, five abilities</text>
+      </g>
+      <g class="el" data-el="ab-intent">
+        <rect x="100" y="120" width="250" height="110" rx="10" fill="var(--panel-2)" stroke="var(--broadcast)" stroke-width="1.5"/>
+        <text x="114" y="144" class="frame-label" font-size="11.5">UNDERSTANDS</text>
+        <rect x="120" y="156" width="210" height="30" rx="9" fill="var(--ink)" stroke="var(--faint)" stroke-width="1"/>
+        <text x="225" y="175" text-anchor="middle" class="node-sub" font-size="11.5" fill="var(--paper)">"plan our family vacation"</text>
+        <text x="225" y="212" text-anchor="middle" class="node-sub" font-size="11">what you meant, not what you typed</text>
+        <line x1="330" y1="232" x2="412" y2="266" stroke="var(--faint)" stroke-dasharray="2 3"/>
+      </g>
+      <g class="el" data-el="ab-tools">
+        <rect x="630" y="120" width="250" height="110" rx="10" fill="var(--panel-2)" stroke="var(--verify)" stroke-width="1.5"/>
+        <text x="644" y="144" class="frame-label" font-size="11.5">HAS HANDS</text>
+        <circle cx="692" cy="182" r="17" fill="none" stroke="var(--verify)" stroke-width="1.5"/>
+        <line x1="675" y1="182" x2="709" y2="182" stroke="var(--verify)" stroke-width="1.2"/>
+        <ellipse cx="692" cy="182" rx="7.5" ry="17" fill="none" stroke="var(--verify)" stroke-width="1.2"/>
+        <rect x="740" y="166" width="33" height="33" rx="5" fill="none" stroke="var(--verify)" stroke-width="1.5"/>
+        <line x1="740" y1="177" x2="773" y2="177" stroke="var(--verify)" stroke-width="1.2"/>
+        <circle cx="750" cy="188" r="1.8" fill="var(--verify)"/>
+        <circle cx="762" cy="188" r="1.8" fill="var(--verify)"/>
+        <rect x="800" y="169" width="36" height="27" rx="5" fill="none" stroke="var(--verify)" stroke-width="1.5"/>
+        <path d="M 801 172 l 17 12 l 17 -12" fill="none" stroke="var(--verify)" stroke-width="1.2"/>
+        <text x="755" y="220" text-anchor="middle" class="node-sub" font-size="11.5">web · calendar · inbox</text>
+        <line x1="650" y1="232" x2="568" y2="266" stroke="var(--faint)" stroke-dasharray="2 3"/>
+      </g>
+      <g class="el" data-el="ab-plan">
+        <rect x="630" y="330" width="250" height="140" rx="10" fill="var(--panel-2)" stroke="var(--address)" stroke-width="1.5"/>
+        <text x="644" y="354" class="frame-label" font-size="11.5">MAKES A PLAN</text>
+        <path d="M 652 372 l 5 6 l 9 -11" fill="none" stroke="var(--verify)" stroke-width="2" stroke-linecap="round"/>
+        <text x="676" y="380" class="node-sub" font-size="12" fill="var(--paper)">pick the dates</text>
+        <path d="M 652 396 l 5 6 l 9 -11" fill="none" stroke="var(--verify)" stroke-width="2" stroke-linecap="round"/>
+        <text x="676" y="404" class="node-sub" font-size="12" fill="var(--paper)">compare the flights</text>
+        <rect x="652" y="414" width="10" height="10" rx="2" fill="none" stroke="var(--faint)" stroke-width="1.3"/>
+        <text x="676" y="428" class="node-sub" font-size="12">hold the hotel</text>
+        <rect x="652" y="438" width="10" height="10" rx="2" fill="none" stroke="var(--faint)" stroke-width="1.3"/>
+        <text x="676" y="452" class="node-sub" font-size="12">tell grandma</text>
+        <line x1="650" y1="340" x2="572" y2="336" stroke="var(--faint)" stroke-dasharray="2 3"/>
+      </g>
+      <g class="el" data-el="ab-memory">
+        <rect x="100" y="330" width="250" height="140" rx="10" fill="var(--panel-2)" stroke="var(--broadcast)" stroke-width="1.5"/>
+        <text x="114" y="354" class="frame-label" font-size="11.5">REMEMBERS</text>
+        <text x="118" y="388" class="node-sub" font-size="11.5">· window seat, never layovers</text>
+        <text x="118" y="412" class="node-sub" font-size="11.5">· what you said ten minutes ago</text>
+        <text x="118" y="436" class="node-sub" font-size="11.5">· no red-eyes, ever</text>
+        <line x1="330" y1="340" x2="408" y2="336" stroke="var(--faint)" stroke-dasharray="2 3"/>
+      </g>
+      <g class="el" data-el="ab-checks">
+        <path class="wire-reply draw" style="--len:180" d="M 415 248 C 440 220, 540 220, 565 248"/>
+        <polygon points="558,240 570,252 554,254" fill="var(--verify)"/>
+        <path class="wire-reply draw" style="--len:180" d="M 565 362 C 540 390, 440 390, 415 362"/>
+        <polygon points="422,370 410,358 426,356" fill="var(--verify)"/>
+        <rect x="368" y="478" width="244" height="32" rx="16" fill="rgba(67,214,166,.05)" stroke="var(--verify)" stroke-width="1.2" stroke-dasharray="4 4"/>
+        <text x="490" y="498" text-anchor="middle" class="node-sub" font-size="11.5" fill="var(--verify)">price changed, so it rebooked</text>
+      </g>
+
+      <!-- ═══ scene 3: the kinds ═══ -->
+      <g class="el" data-el="kd-personal">
+        <rect x="80" y="120" width="390" height="150" rx="12" fill="var(--panel-2)" stroke="var(--paper)" stroke-width="1.4" opacity=".95"/>
+        <text x="98" y="146" class="frame-label">PERSONAL AGENT</text>
+        <circle cx="145" cy="196" r="12" fill="none" stroke="var(--paper)" stroke-width="1.8"/>
+        <path d="M 125 236 Q 145 214 165 236" fill="none" stroke="var(--paper)" stroke-width="1.8" stroke-linecap="round"/>
+        <rect x="205" y="176" width="120" height="26" rx="8" fill="var(--ink)" stroke="var(--faint)" stroke-width="1"/>
+        <rect x="235" y="210" width="150" height="26" rx="8" fill="var(--ink)" stroke="var(--faint)" stroke-width="1"/>
+        <text x="275" y="256" text-anchor="middle" class="node-sub" font-size="12">like an assistant · at your side, turn by turn</text>
+      </g>
+      <g class="el" data-el="kd-task">
+        <rect x="510" y="120" width="390" height="150" rx="12" fill="var(--panel-2)" stroke="var(--paper)" stroke-width="1.4" opacity=".95"/>
+        <text x="528" y="146" class="frame-label">TASK AGENT</text>
+        <circle cx="580" cy="200" r="22" fill="none" stroke="var(--paper)" stroke-width="1.8"/>
+        <line x1="580" y1="200" x2="580" y2="186" stroke="var(--paper)" stroke-width="1.6"/>
+        <line x1="580" y1="200" x2="591" y2="206" stroke="var(--paper)" stroke-width="1.6"/>
+        <rect x="630" y="190" width="220" height="18" rx="9" fill="rgba(182,156,255,.08)" stroke="var(--faint)" stroke-width="1"/>
+        <rect x="632" y="192" width="130" height="14" rx="7" fill="rgba(182,156,255,.4)"/>
+        <text x="740" y="230" text-anchor="middle" class="node-sub" font-size="11.5">hour 3 of 5</text>
+        <text x="705" y="256" text-anchor="middle" class="node-sub" font-size="12">like an employee · works while you're away</text>
+      </g>
+      <g class="el" data-el="kd-faces">
+        <rect x="90" y="330" width="110" height="84" rx="10" fill="var(--panel-2)" stroke="var(--address)" stroke-width="1.4"/>
+        <rect x="117" y="348" width="48" height="30" rx="7" fill="none" stroke="var(--address)" stroke-width="1.4"/>
+        <path d="M 128 378 l 0 8 l 10 -8" fill="none" stroke="var(--address)" stroke-width="1.4"/>
+        <text x="145" y="404" text-anchor="middle" class="node-sub" font-size="12.5">text</text>
+        <rect x="220" y="330" width="110" height="84" rx="10" fill="var(--panel-2)" stroke="var(--address)" stroke-width="1.4"/>
+        <line x1="253" y1="358" x2="253" y2="372" stroke="var(--address)" stroke-width="2.4" stroke-linecap="round"/>
+        <line x1="264" y1="350" x2="264" y2="380" stroke="var(--address)" stroke-width="2.4" stroke-linecap="round"/>
+        <line x1="275" y1="344" x2="275" y2="386" stroke="var(--address)" stroke-width="2.4" stroke-linecap="round"/>
+        <line x1="286" y1="350" x2="286" y2="380" stroke="var(--address)" stroke-width="2.4" stroke-linecap="round"/>
+        <line x1="297" y1="358" x2="297" y2="372" stroke="var(--address)" stroke-width="2.4" stroke-linecap="round"/>
+        <text x="275" y="404" text-anchor="middle" class="node-sub" font-size="12.5">voice</text>
+        <rect x="350" y="330" width="110" height="84" rx="10" fill="var(--panel-2)" stroke="var(--address)" stroke-width="1.4"/>
+        <rect x="376" y="346" width="58" height="36" rx="7" fill="none" stroke="var(--address)" stroke-width="1.4"/>
+        <circle cx="405" cy="360" r="7" fill="none" stroke="var(--address)" stroke-width="1.3"/>
+        <path d="M 396 378 Q 405 370 414 378" fill="none" stroke="var(--address)" stroke-width="1.3"/>
+        <text x="405" y="404" text-anchor="middle" class="node-sub" font-size="12.5">video</text>
+        <line x1="145" y1="418" x2="252" y2="452" stroke="var(--faint)" stroke-dasharray="2 3"/>
+        <line x1="275" y1="418" x2="275" y2="450" stroke="var(--faint)" stroke-dasharray="2 3"/>
+        <line x1="405" y1="418" x2="298" y2="452" stroke="var(--faint)" stroke-dasharray="2 3"/>
+        <rect x="200" y="452" width="150" height="32" rx="16" fill="var(--ink)" stroke="var(--address)" stroke-width="1.3"/>
+        <text x="275" y="472" text-anchor="middle" class="node-sub" font-size="12" fill="var(--paper)">the same agent</text>
+      </g>
+      <g class="el" data-el="kd-team">
+        <rect x="530" y="315" width="370" height="185" rx="12" fill="rgba(67,214,166,.02)" stroke="var(--faint)" stroke-width="1.2" stroke-dasharray="6 6"/>
+        <text x="548" y="341" class="frame-label">THE DIGITAL OFFICE</text>
+        <rect x="555" y="362" width="100" height="34" rx="9" fill="var(--panel-2)" stroke="var(--verify)" stroke-width="1.4"/>
+        <text x="605" y="383" text-anchor="middle" class="node-sub" font-size="12" fill="var(--paper)">writer</text>
+        <rect x="672" y="362" width="116" height="34" rx="9" fill="var(--panel-2)" stroke="var(--verify)" stroke-width="1.4"/>
+        <text x="730" y="383" text-anchor="middle" class="node-sub" font-size="12" fill="var(--paper)">accountant</text>
+        <rect x="805" y="362" width="88" height="34" rx="9" fill="var(--panel-2)" stroke="var(--verify)" stroke-width="1.4"/>
+        <text x="849" y="383" text-anchor="middle" class="node-sub" font-size="11" fill="var(--paper)">researcher</text>
+        <line x1="657" y1="379" x2="670" y2="379" stroke="var(--verify)" stroke-width="1.4" stroke-dasharray="3 3"/>
+        <line x1="790" y1="379" x2="803" y2="379" stroke="var(--verify)" stroke-width="1.4" stroke-dasharray="3 3"/>
+        <path class="wire-reply draw" style="--len:300" d="M 849 400 C 849 448, 620 460, 605 402"/>
+        <polygon points="598,410 606,396 612,412" fill="var(--verify)"/>
+        <text x="715" y="482" text-anchor="middle" class="node-sub" font-size="12">they debate, then hand off</text>
+      </g>
+
+      <!-- ═══ scene 3b: who builds them ═══ -->
+      <g class="el" data-el="kb-stack">
+        <rect x="250" y="130" width="480" height="84" rx="12" fill="var(--panel-2)" stroke="var(--signal)" stroke-width="1.6"/>
+        <text x="490" y="166" text-anchor="middle" class="node-label">AI labs</text>
+        <text x="490" y="190" text-anchor="middle" class="node-sub" font-size="12.5">build the brains</text>
+        <line x1="490" y1="218" x2="490" y2="232" stroke="var(--faint)" stroke-width="1.4"/>
+        <polygon points="484,232 490,240 496,232" fill="var(--faint)"/>
+        <rect x="250" y="244" width="480" height="84" rx="12" fill="var(--panel-2)" stroke="var(--address)" stroke-width="1.6"/>
+        <text x="490" y="280" text-anchor="middle" class="node-label">Software companies</text>
+        <text x="490" y="304" text-anchor="middle" class="node-sub" font-size="12.5">wrap them into the products you use</text>
+        <line x1="490" y1="332" x2="490" y2="346" stroke="var(--faint)" stroke-width="1.4"/>
+        <polygon points="484,346 490,354 496,346" fill="var(--faint)"/>
+        <rect x="250" y="358" width="480" height="84" rx="12" fill="var(--panel-2)" stroke="var(--verify)" stroke-width="1.6"/>
+        <text x="490" y="394" text-anchor="middle" class="node-label">Your company · or you</text>
+        <text x="490" y="418" text-anchor="middle" class="node-sub" font-size="12.5">assemble agents for your own work</text>
+      </g>
+      <g class="el" data-el="kb-note">
+        <rect x="250" y="466" width="480" height="40" rx="20" fill="rgba(242,169,59,.05)" stroke="var(--signal)" stroke-width="1.3" stroke-dasharray="4 4"/>
+        <text x="490" y="491" text-anchor="middle" class="node-sub" font-size="11.5" fill="var(--signal)">staffed, not shipped · someone keeps it connected, current, watched</text>
+      </g>
+
+      <!-- ═══ scene 4: guardrails ═══ -->
+      <g class="el" data-el="gr-scene">
+        <rect x="100" y="200" width="180" height="80" rx="12" fill="var(--panel-2)" stroke="var(--signal)" stroke-width="1.8"/>
+        <text x="190" y="236" text-anchor="middle" class="node-label" font-size="15">YOUR AGENT</text>
+        <text x="190" y="258" text-anchor="middle" class="node-sub" font-size="12.5">wants to act</text>
+        <line x1="284" y1="226" x2="344" y2="204" stroke="var(--faint)" stroke-dasharray="2 3"/>
+        <line x1="284" y1="252" x2="344" y2="256" stroke="var(--faint)" stroke-dasharray="2 3"/>
+        <rect x="350" y="182" width="190" height="36" rx="10" fill="var(--panel-2)" stroke="var(--dim)" stroke-width="1.3"/>
+        <text x="445" y="204" text-anchor="middle" class="node-sub" font-size="12.5" fill="var(--paper)">send the email?</text>
+        <rect x="350" y="238" width="190" height="36" rx="10" fill="var(--panel-2)" stroke="var(--dim)" stroke-width="1.3"/>
+        <text x="445" y="260" text-anchor="middle" class="node-sub" font-size="12.5" fill="var(--paper)">spend $240?</text>
+        <line x1="590" y1="160" x2="590" y2="300" stroke="var(--signal)" stroke-width="1.4" stroke-dasharray="6 5"/>
+        <rect x="580" y="136" width="7" height="20" fill="var(--signal)"/>
+        <rect x="593" y="136" width="7" height="20" fill="var(--signal)"/>
+        <text x="590" y="324" text-anchor="middle" class="wire-label">pauses here</text>
+        <line x1="600" y1="230" x2="666" y2="228" stroke="var(--verify)" stroke-width="1.4" stroke-dasharray="3 4"/>
+        <circle cx="706" cy="205" r="15" fill="none" stroke="var(--paper)" stroke-width="2"/>
+        <path d="M 680 255 Q 706 227 732 255" fill="none" stroke="var(--paper)" stroke-width="2" stroke-linecap="round"/>
+        <circle cx="756" cy="192" r="15" fill="none" stroke="var(--verify)" stroke-width="1.8"/>
+        <path d="M 749 192 l 5 6 l 9 -11" fill="none" stroke="var(--verify)" stroke-width="2" stroke-linecap="round"/>
+        <text x="716" y="288" text-anchor="middle" class="node-sub" font-size="12.5">your thumbs-up</text>
+      </g>
+      <g class="el" data-el="gr-rules">
+        <rect x="280" y="360" width="420" height="100" rx="10" fill="rgba(242,169,59,.04)" stroke="var(--signal)" stroke-width="1.3" stroke-dasharray="5 4"/>
+        <text x="298" y="388" class="frame-label" fill="var(--signal)">HOUSE RULES</text>
+        <text x="300" y="416" class="node-sub" font-size="12" fill="var(--paper)">· never spend over $100 without asking</text>
+        <text x="300" y="440" class="node-sub" font-size="12" fill="var(--paper)">· email drafts wait for your OK</text>
+      </g>
+
+      <!-- ═══ scene 4b: everyday uses ═══ -->
+      <g class="el" data-el="us-grid">
+        <rect x="170" y="150" width="280" height="84" rx="16" fill="var(--panel-2)" stroke="var(--address)" stroke-width="1.6"/>
+        <text x="310" y="199" text-anchor="middle" class="node-label" font-size="15">tame the inbox</text>
+        <rect x="530" y="150" width="280" height="84" rx="16" fill="var(--panel-2)" stroke="var(--verify)" stroke-width="1.6"/>
+        <text x="670" y="199" text-anchor="middle" class="node-label" font-size="15">plan the trip</text>
+        <rect x="170" y="262" width="280" height="84" rx="16" fill="var(--panel-2)" stroke="var(--signal)" stroke-width="1.6"/>
+        <text x="310" y="311" text-anchor="middle" class="node-label" font-size="15">watch the calendar</text>
+        <rect x="530" y="262" width="280" height="84" rx="16" fill="var(--panel-2)" stroke="var(--broadcast)" stroke-width="1.6"/>
+        <text x="670" y="311" text-anchor="middle" class="node-label" font-size="15">do the research</text>
+        <rect x="350" y="374" width="280" height="84" rx="16" fill="var(--panel-2)" stroke="var(--paper)" stroke-width="1.4"/>
+        <text x="490" y="423" text-anchor="middle" class="node-label" font-size="15">chase the paperwork</text>
+        <text x="490" y="510" text-anchor="middle" class="node-sub">start with a chore you dread</text>
+      </g>
+
+      <!-- ═══ the answer ═══ -->
+      <g class="el" data-el="ans">
+        <text x="490" y="215" text-anchor="middle" class="frame-label" font-size="15" fill="var(--broadcast)">SO, WHAT'S AN AGENT?</text>
+        <text x="490" y="272" text-anchor="middle" class="ans-big">An AI that's been given hands, a memory, and a job,</text>
+        <text x="490" y="312" text-anchor="middle" class="ans-big">working for you under rules you set.</text>
+        <rect x="420" y="348" width="140" height="3" rx="1.5" fill="var(--accent)"/>
+      </g>
+
+      <!-- ═══ the synopsis ═══ -->
+      <g class="el" data-el="synopsis">
+        <text x="230" y="160" class="syn-head">In short</text>
+        <rect x="230" y="206" width="13" height="13" rx="3" fill="var(--paper)"/>
+        <text x="258" y="219" class="syn-line">A chatbot answers. An agent acts.</text>
+        <rect x="230" y="266" width="13" height="13" rx="3" fill="var(--address)"/>
+        <text x="258" y="279" class="syn-line">Agents understand what you meant, plan, remember, and check their work.</text>
+        <rect x="230" y="326" width="13" height="13" rx="3" fill="var(--signal)"/>
+        <text x="258" y="339" class="syn-line">They come personal or task-shaped, in text, voice, or video.</text>
+        <rect x="230" y="386" width="13" height="13" rx="3" fill="var(--verify)"/>
+        <text x="258" y="399" class="syn-line">Specialists work as a team, and someone keeps them staffed.</text>
+        <rect x="230" y="446" width="13" height="13" rx="3" fill="var(--broadcast)"/>
+        <text x="258" y="459" class="syn-line">You set the rules. The agent does the work.</text>
+      </g>
+    </svg>
+
+    <div class="callout" id="callout" role="status">
+      <div class="co-eyebrow" id="co-eyebrow">TAKE NOTE</div>
+      <p id="co-text"></p>
+    </div>
+  </div>
+
+  <aside class="panel" id="panel" aria-label="What makes it an agent">
+    <h2>WHAT MAKES IT AN AGENT</h2>
+    <p class="panel-sub">The abilities collect as we meet them.</p>
+
+    <div class="capgroup" data-group="0">
+      <button class="cg-head" type="button"><span class="cg-label">1 · THE LINE</span><span class="cg-count"></span><span class="chev"></span></button>
+      <div class="cg-body">
+      <div class="cap" data-cap="action"><span class="box"></span><span><span class="cap-name">It takes action</span><span class="cap-why">does the thing, instead of telling you how</span></span></div>
+      </div>
+    </div>
+
+    <div class="capgroup" data-group="1">
+      <button class="cg-head" type="button"><span class="cg-label">2 · THE ABILITIES</span><span class="cg-count"></span><span class="chev"></span></button>
+      <div class="cg-body">
+      <div class="cap" data-cap="intent"><span class="box"></span><span><span class="cap-name">Understands what you meant</span><span class="cap-why">plain English in, actual intent out</span></span></div>
+      <div class="cap" data-cap="tools"><span class="box"></span><span><span class="cap-name">Has hands</span><span class="cap-why">a browser, a calendar, your inbox</span></span></div>
+      <div class="cap" data-cap="plan"><span class="box"></span><span><span class="cap-name">Makes a plan</span><span class="cap-why">a big messy goal becomes a step-by-step list</span></span></div>
+      <div class="cap" data-cap="memory"><span class="box"></span><span><span class="cap-name">Remembers</span><span class="cap-why">ten minutes ago, and your preferences</span></span></div>
+      <div class="cap" data-cap="checks"><span class="box"></span><span><span class="cap-name">Checks its own work</span><span class="cap-why">spots mistakes, tries another way</span></span></div>
+      </div>
+    </div>
+
+    <div class="capgroup" data-group="2">
+      <button class="cg-head" type="button"><span class="cg-label">3 · THE KINDS</span><span class="cg-count"></span><span class="chev"></span></button>
+      <div class="cg-body">
+      <div class="cap" data-cap="personal"><span class="box"></span><span><span class="cap-name">Personal or task-shaped</span><span class="cap-why">at your side, or off working for hours</span></span></div>
+      <div class="cap" data-cap="faces"><span class="box"></span><span><span class="cap-name">Text, voice, or video</span><span class="cap-why">different faces, same agent</span></span></div>
+      <div class="cap" data-cap="team"><span class="box"></span><span><span class="cap-name">Works on a team</span><span class="cap-why">specialists that hand off to each other</span></span></div>
+      <div class="cap" data-cap="staffed"><span class="box"></span><span><span class="cap-name">Staffed, not shipped</span><span class="cap-why">someone keeps it connected and current</span></span></div>
+      </div>
+    </div>
+
+    <div class="capgroup" data-group="3">
+      <button class="cg-head" type="button"><span class="cg-label">4 · UNDER YOUR CONTROL</span><span class="cg-count"></span><span class="chev"></span></button>
+      <div class="cg-body">
+      <div class="cap" data-cap="guardrails"><span class="box"></span><span><span class="cap-name">Asks before it matters</span><span class="cap-why">your thumbs-up for money and email</span></span></div>
+      <div class="cap" data-cap="useful"><span class="box"></span><span><span class="cap-name">Useful today</span><span class="cap-why">inbox, chores, schedule, research</span></span></div>
+      </div>
+    </div>
+
+  </aside>
+
+  <div class="band">
+    <span class="stageno" id="stageno">THE LINE</span>
+    <div class="bt">
+      <h1 id="b-title"></h1>
+      <p id="b-desc"></p>
+      <a class="cta" id="cta" href="anatomy.html" hidden>See what's inside an agent →</a>
+    </div>
+    <div class="controls">
+      <span class="beatno" id="beatno"></span>
+      <button id="playall" aria-label="Play the whole sequence">▶ Play</button>
+      <button id="back" aria-label="Previous step">← Back</button>
+      <button id="next" class="primary" aria-label="Next step">Next →</button>
+    </div>
+  </div>
+
+</div>
+
+<script>
+(() => {
+  // Same beat machine as anatomy.html: clear resets the scene (never the list),
+  // silent+hold plays a shown-not-spoken card, clip URLs carry a cache version.
+  const BEATS = [
+    { stage:0, silent:true, hold:2500, show:["titlecard"],
+      title:"What's an agent?",
+      desc:"The plain-English tour: what an agent is, what it isn't, and how to live with one." },
+
+    // ═══ Stage 1 · The line ═══
+    { stage:0, clear:true, show:["ln-person","ln-chatbot"],
+      title:"You already know chatbots",
+      desc:"ChatGPT, Gemini, Claude: ask a question, get a remarkably good answer. An encyclopedia you can talk to, and that's where the conversation ends: with you, holding the instructions." },
+    { stage:0, show:["ln-agent"],
+      title:"The test: ask it to do something",
+      callout:{ x:28, y:70, w:360, eyebrow:"THE LINE",
+        text:"A chatbot tells you how. An agent goes and does it. The line between them isn't intelligence; it's action." },
+      desc:"Ask a chatbot how to book the restaurant and it gives you advice. Ask an agent, and it finds a table, checks your calendar, and makes the reservation." },
+    { stage:0, caps:["action"],
+      title:"So, is ChatGPT an agent?",
+      callout:{ x:24, y:68, w:460, mint:true, eyebrow:"THE VERDICT",
+        text:"Out of the box, no: it's a brilliant answerer. But the same brain crosses the line once it's given hands, a memory, and permission to act. Agent isn't a product; it's a set of abilities." },
+      desc:"The new agent modes are exactly this: the same brain, given hands. The list on the right will collect the abilities as we meet them." },
+
+    // ═══ Stage 2 · The abilities ═══
+    { stage:1, clear:true, show:["ab-agent","ab-intent"], caps:["intent"],
+      title:"It understands what you meant",
+      desc:"Tell it to plan the family vacation and it doesn't need spreadsheets or code. It reads plain English and works out the actual intent: a week away, in the school holidays, grandma included." },
+    { stage:1, show:["ab-tools"], caps:["tools"],
+      title:"It has hands",
+      desc:"An agent can step outside the chat window: browse the web, read the calendar, use a calculator, open the inbox. Every tool it's given becomes something it does for you instead of describing to you." },
+    { stage:1, show:["ab-plan"], caps:["plan"],
+      title:"It makes a plan",
+      desc:"A big, messy goal becomes a step-by-step list: pick the dates, compare the flights, hold the hotel, tell grandma. Then it works the list in order, checking things off." },
+    { stage:1, show:["ab-memory"], caps:["memory"],
+      title:"It remembers",
+      desc:"It keeps what you said ten minutes ago, and it learns the standing things: window seat, never layovers, no red-eyes. The more you work together, the less you repeat yourself." },
+    { stage:1, show:["ab-checks"], caps:["checks"],
+      title:"It checks its own work",
+      desc:"Judgment is the fifth ability: spot the problem, adjust, and try again." },
+
+    // ═══ Stage 3 · The kinds ═══
+    { stage:2, clear:true, show:["kd-personal","kd-task"], caps:["personal"],
+      title:"Assistant, or employee",
+      desc:"A personal agent sits with you and acts at your side, turn by turn. A task agent is handed a job in the morning and works for hours while you're away, reporting back when it's done." },
+    { stage:2, show:["kd-faces"], caps:["faces"],
+      title:"Text, voice, or video",
+      desc:"The same agent can be a chat window, a voice on a phone call, or a face on a screen. Those are faces, not different agents; the one underneath doesn't change." },
+    { stage:2, show:["kd-team"], caps:["team"],
+      title:"Specialists, working together",
+      callout:{ x:54, y:10, w:330, eyebrow:"WHY NOT ONE DO-IT-ALL?",
+        text:"A creative writer and a strict accountant make different kinds of mistakes, and that's true for agents too. A team of specialists that talk to each other beats a jack-of-all-trades." },
+      desc:"They debate, they hand off, and the work moves through a small digital office." },
+    { stage:2, clear:true, show:["kb-stack","kb-note"], caps:["staffed"],
+      title:"Who builds them, who keeps them",
+      desc:"AI labs build the brains, software companies wrap them into products, and increasingly companies and individuals assemble their own. And an agent is staffed, not shipped: someone keeps its tools connected, its instructions current, and an eye on its work." },
+
+    // ═══ Stage 4 · Living with them ═══
+    { stage:3, clear:true, show:["gr-scene","gr-rules"], caps:["guardrails"],
+      title:"You stay the boss",
+      desc:"Good agents pause at the important moments. You set the house rules: what it may spend, what it may send, and what always needs your thumbs-up first." },
+    { stage:3, clear:true, show:["us-grid"], caps:["useful"],
+      title:"What they're good for today",
+      desc:"The repetitive middle of life: taming an inbox, planning a trip, watching a calendar, chasing paperwork, doing an hour of research in minutes. Start with a chore you dread." },
+    { stage:3, clear:true, openAll:true, show:["ans"],
+      title:"The answer",
+      desc:"An AI that's been given hands, a memory, and a job, working for you under rules you set. Everything on the right is that sentence, unpacked." },
+    { stage:3, clear:true, cta:true, complete:true, show:["synopsis"],
+      title:"In short",
+      desc:"The whole story in five lines, and where it goes next." },
+  ];
+
+  const STAGENAMES = ["THE LINE", "THE ABILITIES", "THE KINDS", "LIVING WITH THEM"];
+  const stageFirstBeat = [0, 4, 9, 13];
+  const els = {};
+  document.querySelectorAll("[data-el]").forEach(g => els[g.dataset.el] = g);
+  const caps = {};
+  document.querySelectorAll("[data-cap]").forEach(c => caps[c.dataset.cap] = c);
+  const groups = document.querySelectorAll(".capgroup");
+  const callout = document.getElementById("callout");
+  const coText = document.getElementById("co-text");
+  const coEyebrow = document.getElementById("co-eyebrow");
+  const panel = document.getElementById("panel");
+  const scrubBtns = document.querySelectorAll("#scrub button");
+  const backBtn = document.getElementById("back");
+  const nextBtn = document.getElementById("next");
+  const playBtn = document.getElementById("playall");
+
+  const voice = new Audio();
+  voice.preload = "auto";
+  let playingAll = false;
+  let holdTimer = null;
+  const CLIPV = 1; // bump when any narration clip is re-recorded, so caches refetch
+  const clip = (i) => `whats-an-agent-audio/beat-${String(i + 1).padStart(2, "0")}.mp3?v=${CLIPV}`;
+  function playBeat(){
+    clearTimeout(holdTimer);
+    const cur = BEATS[beat];
+    if (cur.silent){
+      voice.pause();
+      if (playingAll) holdTimer = setTimeout(() => { if (playingAll) go(beat + 1); }, cur.hold || 2500);
+      return;
+    }
+    voice.src = clip(beat);
+    voice.play().catch(() => {});
+  }
+  function stopAll(){
+    playingAll = false;
+    clearTimeout(holdTimer);
+    playBtn.textContent = "▶ Play";
+  }
+  voice.addEventListener("ended", () => {
+    if (!playingAll) return;
+    if (beat < BEATS.length - 1) go(beat + 1);
+    else stopAll();
+  });
+
+  let beat = 0;
+  let manualOpen = {};
+
+  function render(jumped){
+    const shown = new Set(), lit = new Set(), litGroups = new Set();
+    let title = "", desc = "", stage = 0, complete = false, latestGroup = null;
+    for (let i = 0; i <= beat; i++){
+      const b = BEATS[i];
+      if (b.clear) shown.clear();
+      (b.show || []).forEach(id => shown.add(id));
+      (b.caps || []).forEach(id => lit.add(id));
+      if (b.caps){ litGroups.add(String(b.stage)); latestGroup = String(b.stage); }
+      if (b.title) title = b.title;
+      if (b.desc) desc = b.desc;
+      stage = b.stage;
+      if (b.complete) complete = true;
+    }
+    const cur = BEATS[beat];
+
+    for (const [id, g] of Object.entries(els)){
+      g.classList.toggle("instant", !!jumped && shown.has(id) && !(cur.show || []).includes(id));
+      g.classList.toggle("on", shown.has(id));
+    }
+    for (const [id, c] of Object.entries(caps)) c.classList.toggle("on", lit.has(id));
+    groups.forEach(g => {
+      const id = g.dataset.group;
+      g.classList.toggle("on", litGroups.has(id));
+      const open = cur.openAll ? litGroups.has(id)
+        : manualOpen[id] !== undefined ? manualOpen[id] : id === latestGroup;
+      g.classList.toggle("open", open);
+      const n = g.querySelectorAll(".cap.on").length;
+      g.querySelector(".cg-count").textContent = n ? `${n} ✓` : "";
+    });
+    panel.classList.toggle("complete", complete);
+    document.getElementById("cta").hidden = !cur.cta;
+
+    if (cur.callout){
+      coEyebrow.textContent = cur.callout.eyebrow || "TAKE NOTE";
+      coText.textContent = cur.callout.text;
+      callout.style.left = cur.callout.x + "%";
+      callout.style.top = cur.callout.y + "%";
+      callout.style.maxWidth = (cur.callout.w || 330) + "px";
+      callout.classList.toggle("mint", !!cur.callout.mint);
+      callout.classList.add("on");
+    } else {
+      callout.classList.remove("on");
+    }
+
+    document.getElementById("b-title").textContent = title;
+    document.getElementById("b-desc").textContent = desc;
+    document.getElementById("stageno").textContent = STAGENAMES[stage];
+    document.getElementById("beatno").textContent = `${beat + 1} / ${BEATS.length}`;
+    scrubBtns.forEach(b => {
+      const s = Number(b.dataset.stage);
+      b.classList.toggle("on", s === stage);
+      b.classList.toggle("done", s < stage);
+    });
+    backBtn.disabled = beat === 0;
+    nextBtn.disabled = beat === BEATS.length - 1;
+  }
+
+  function go(n, jumped){
+    beat = Math.max(0, Math.min(BEATS.length - 1, n));
+    manualOpen = {};
+    render(jumped);
+    playBeat();
+  }
+
+  playBtn.addEventListener("click", () => {
+    if (playingAll){
+      stopAll();
+      voice.pause();
+      return;
+    }
+    playingAll = true;
+    playBtn.textContent = "■ Stop";
+    if (beat === BEATS.length - 1) go(0, true);
+    else playBeat();
+  });
+
+  groups.forEach(g => g.querySelector(".cg-head").addEventListener("click", () => {
+    manualOpen[g.dataset.group] = !g.classList.contains("open");
+    render();
+  }));
+
+  nextBtn.addEventListener("click", () => go(beat + 1));
+  backBtn.addEventListener("click", () => go(beat - 1));
+  scrubBtns.forEach(b => b.addEventListener("click", () =>
+    go(stageFirstBeat[Number(b.dataset.stage)], true)));
+  window.addEventListener("keydown", (e) => {
+    if (e.key === "ArrowRight" || e.key === " ") { e.preventDefault(); go(beat + 1); }
+    if (e.key === "ArrowLeft") { e.preventDefault(); go(beat - 1); }
+  });
+
+  render();
+})();
+</script>
+</body>
+</html>
