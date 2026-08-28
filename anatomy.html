@@ -1,0 +1,820 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The anatomy of an agent · AgentMesh</title>
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<meta name="robots" content="noindex">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+<style>
+  /* Same token system as adoption.html / business.html so this joins the funnel unchanged. */
+  :root{
+    --ink:#0A1417; --panel:#0F1D22; --panel-2:#12242A; --line:#1C2E33;
+    --paper:#E7EFEC; --dim:#7C918C; --faint:#4A5D5A;
+    --signal:#F2A93B;   /* amber: the model, the new problem */
+    --verify:#43D6A6;   /* mint: tools, plugins, the answer */
+    --address:#6BA8FF;  /* blue: the context window */
+    --broadcast:#B69CFF;/* violet: memory */
+    --accent:#6BA8FF;   /* this page's chrome leads blue; adoption leads amber */
+    --accent-soft:rgba(107,168,255,.15);
+    --disp:'Space Grotesk', sans-serif;
+    --body:'IBM Plex Sans', system-ui, sans-serif;
+    --wire:'IBM Plex Mono', ui-monospace, monospace;
+  }
+  *{ box-sizing:border-box; }
+  html,body{ margin:0; height:100%; }
+  body{ background:var(--ink); color:var(--paper); font-family:var(--body);
+    font-size:16px; line-height:1.55; -webkit-font-smoothing:antialiased;
+    background-image:
+      linear-gradient(var(--line) 1px, transparent 1px),
+      linear-gradient(90deg, var(--line) 1px, transparent 1px);
+    background-size:64px 64px; background-position:-1px -1px;
+    display:flex; flex-direction:column; }
+  body::before{ content:""; position:fixed; inset:0; z-index:0; pointer-events:none;
+    background:
+      radial-gradient(80% 45% at 30% 0%, rgba(107,168,255,.09), transparent 60%),
+      linear-gradient(180deg, rgba(10,20,23,.72), var(--ink) 62%); }
+
+  /* ── frame ── */
+  .topbar{ position:relative; z-index:5; border-bottom:1px solid var(--line);
+    background:rgba(10,20,23,.9); }
+  .topbar .bar{ max-width:1360px; margin:0 auto; padding:0 32px; height:60px;
+    display:flex; align-items:center; gap:26px; position:relative; }
+  .brand{ font-family:var(--wire); font-weight:600; font-size:.82rem; letter-spacing:.02em;
+    display:flex; align-items:center; gap:9px; color:var(--paper); text-decoration:none; }
+  .brand .dot{ width:9px; height:9px; border-radius:2px; background:var(--accent);
+    box-shadow:0 0 0 3px var(--accent-soft), 8px 0 0 -2px var(--verify), 16px 0 0 -2px var(--signal); }
+  .brand span.wm{ margin-left:14px; }
+
+  .scrub{ position:absolute; left:50%; transform:translateX(-50%); display:flex; gap:8px; }
+  .scrub button{ font-family:var(--wire); font-size:.74rem; letter-spacing:.02em;
+    color:var(--dim); background:none; border:1px solid var(--line); border-radius:999px;
+    padding:6px 14px; cursor:pointer; transition:color .18s, border-color .18s, background .18s; }
+  .scrub button:hover{ color:var(--paper); }
+  .scrub button.on{ color:var(--ink); background:var(--accent); border-color:var(--accent); font-weight:600; }
+  .scrub button.done{ color:var(--verify); border-color:rgba(67,214,166,.4); }
+
+  .stagegrid{ position:relative; z-index:1; flex:1; max-width:1360px; width:100%;
+    margin:0 auto; padding:22px 32px 26px; display:grid;
+    grid-template-columns:1fr 320px; grid-template-rows:1fr auto; gap:18px; min-height:0; }
+
+  /* ── canvas ── */
+  .canvas{ grid-row:1; grid-column:1; position:relative; border:1px solid var(--line);
+    border-radius:12px; background:linear-gradient(180deg, rgba(15,29,34,.6), rgba(10,20,23,.3));
+    overflow:hidden; min-height:420px; }
+  .canvas svg{ position:absolute; inset:0; width:100%; height:100%; }
+
+  .el{ opacity:0; transition:opacity .5s ease, transform .5s ease; transform:translateY(8px); }
+  .el.on{ opacity:1; transform:none; }
+  .el.instant{ transition:none; }
+
+  .wire-ask{ stroke:var(--signal); stroke-width:1.8; fill:none; }
+  .wire-reply{ stroke:var(--verify); stroke-width:1.6; fill:none; stroke-dasharray:5 5; }
+  g.el path.draw{ stroke-dashoffset:0; }
+  @media (prefers-reduced-motion: no-preference){
+    g.el:not(.on) path.draw{ stroke-dashoffset:var(--len, 300); }
+    g.el.on path.draw{ transition:stroke-dashoffset .9s ease .15s; }
+  }
+
+  .title-big{ font-family:var(--disp); font-size:60px; font-weight:700; fill:var(--paper); letter-spacing:.01em; }
+  .title-sub{ font-family:var(--wire); font-size:17px; fill:var(--dim); letter-spacing:.14em; }
+  .syn-head{ font-family:var(--disp); font-size:34px; font-weight:700; fill:var(--paper); }
+  .syn-line{ font-family:var(--body); font-size:19px; fill:var(--paper); }
+  .node-label{ font-family:var(--wire); font-size:17px; font-weight:600; fill:var(--paper); }
+  .node-sub{ font-family:var(--wire); font-size:14px; fill:var(--dim); }
+  .frame-label{ font-family:var(--wire); font-size:13px; font-weight:600;
+    letter-spacing:.14em; fill:var(--faint); }
+  .wire-label{ font-family:var(--wire); font-size:12.5px; fill:var(--signal); }
+  .wire-label.mint{ fill:var(--verify); }
+
+  /* the context gauge: the one genuinely animated organ */
+  #gauge{ transition:width 1.6s ease, fill .5s ease; }
+  #gauge.hot{ fill:rgba(242,169,59,.45); }
+
+  /* ── callout ── */
+  .callout{ position:absolute; z-index:4; max-width:330px; padding:14px 16px 15px;
+    background:var(--panel-2); border:1px solid rgba(242,169,59,.5); border-left:3px solid var(--signal);
+    border-radius:8px; box-shadow:0 14px 40px rgba(0,0,0,.5);
+    opacity:0; transform:translateY(10px); pointer-events:none;
+    transition:opacity .45s ease, transform .45s ease; }
+  .callout.on{ opacity:1; transform:none; }
+  .callout .co-eyebrow{ font-family:var(--wire); font-size:.68rem; letter-spacing:.14em;
+    color:var(--signal); margin-bottom:6px; }
+  .callout p{ margin:0; font-size:.92rem; line-height:1.5; color:var(--paper); }
+  .callout.mint{ border-color:rgba(67,214,166,.5); border-left-color:var(--verify); }
+  .callout.mint .co-eyebrow{ color:var(--verify); }
+
+  /* ── right panel: the parts list ── */
+  .panel{ grid-row:1 / span 2; grid-column:2; border:1px solid var(--line); border-radius:12px;
+    background:var(--panel); padding:20px 20px 16px; overflow-y:auto; min-height:0; }
+  .panel h2{ font-family:var(--wire); font-size:.72rem; font-weight:600; letter-spacing:.16em;
+    color:var(--dim); margin:0 0 4px; }
+  .panel .panel-sub{ font-size:.8rem; color:var(--faint); margin:0 0 14px; }
+  .capgroup{ display:none; }
+  .capgroup.on{ display:block; }
+  .cg-head{ width:100%; display:flex; align-items:center; gap:10px; cursor:pointer;
+    background:none; border:none; border-top:1px solid var(--line); padding:11px 0 9px;
+    text-align:left; }
+  .capgroup:first-of-type .cg-head{ border-top:none; padding-top:2px; }
+  .cg-head:focus-visible{ outline:2px solid var(--accent); outline-offset:2px; border-radius:4px; }
+  .cg-label{ font-family:var(--wire); font-size:.68rem; letter-spacing:.12em; color:var(--faint); }
+  .capgroup.open .cg-label{ color:var(--dim); }
+  .cg-count{ margin-left:auto; font-family:var(--wire); font-size:.68rem; color:var(--verify); }
+  .chev{ flex:none; width:7px; height:7px; margin-top:-3px;
+    border-right:1.5px solid var(--dim); border-bottom:1.5px solid var(--dim);
+    transform:rotate(45deg); transition:transform .2s ease; }
+  .capgroup.open .chev{ transform:rotate(-135deg); margin-top:3px; }
+  .cg-body{ display:none; padding-bottom:10px; }
+  .capgroup.open .cg-body{ display:block; }
+  .cap{ display:flex; align-items:baseline; gap:10px; padding:4px 0;
+    opacity:0; transform:translateX(8px); transition:opacity .4s ease, transform .4s ease; }
+  .cap.on{ opacity:1; transform:none; }
+  .cap .box{ flex:none; width:13px; height:13px; border:1.5px solid var(--faint); border-radius:3px;
+    position:relative; top:2px; transition:border-color .3s, background .3s; }
+  .cap.on .box{ border-color:var(--verify); background:rgba(67,214,166,.12); }
+  .cap.on .box::after{ content:""; position:absolute; inset:2px 2px 3px;
+    border-right:2px solid var(--verify); border-bottom:2px solid var(--verify);
+    transform:rotate(40deg) scale(.85); border-radius:1px; }
+  .cap .cap-name{ font-size:.9rem; font-weight:500; color:var(--paper); }
+  .cap .cap-why{ font-size:.8rem; color:var(--dim); display:block; margin-top:1px; }
+  .panel.complete{ border-color:rgba(67,214,166,.45);
+    box-shadow:0 0 0 1px rgba(67,214,166,.15), 0 0 40px rgba(67,214,166,.06) inset; }
+
+  /* ── bottom band ── */
+  .band{ grid-row:2; grid-column:1; border:1px solid var(--line); border-radius:12px;
+    background:var(--panel); padding:18px 22px; display:flex; gap:22px; align-items:flex-start; }
+  .band .stageno{ font-family:var(--wire); font-size:.72rem; letter-spacing:.14em;
+    color:var(--accent); white-space:nowrap; padding-top:6px; }
+  .band .bt{ flex:1; min-width:0; }
+  .band h1{ font-size:1.3rem; margin:0 0 4px; }
+  .band p{ margin:0; color:var(--dim); font-size:.95rem; max-width:64ch; }
+  .band .cta{ display:inline-block; margin-top:10px; font-family:var(--wire); font-size:.85rem;
+    font-weight:600; color:var(--ink); background:var(--accent); border-radius:8px;
+    padding:9px 16px; text-decoration:none; }
+  .band .cta:hover{ background:#8dbcff; }
+  .band .cta[hidden]{ display:none; }
+  .controls{ flex:none; display:flex; gap:10px; align-items:center; padding-top:4px; }
+  .controls .beatno{ font-family:var(--wire); font-size:.72rem; color:var(--faint); margin-right:4px; }
+  .controls button{ font-family:var(--wire); font-size:.82rem; font-weight:600; cursor:pointer;
+    border-radius:8px; padding:9px 18px; border:1px solid var(--line);
+    background:var(--panel-2); color:var(--paper); transition:background .18s, border-color .18s; }
+  .controls button:hover{ border-color:var(--dim); }
+  .controls button.primary{ background:var(--accent); border-color:var(--accent); color:var(--ink); }
+  .controls button.primary:hover{ background:#8dbcff; }
+  .controls button:disabled{ opacity:.35; cursor:default; }
+  .controls button:focus-visible{ outline:2px solid var(--accent); outline-offset:3px; }
+
+  @media (max-width: 1000px){
+    .stagegrid{ grid-template-columns:1fr; grid-template-rows:auto auto auto; padding:16px; }
+    .panel{ grid-row:3; grid-column:1; max-height:340px; }
+    .band{ grid-row:2; flex-wrap:wrap; }
+    .canvas{ min-height:360px; }
+  }
+</style>
+</head>
+<body>
+
+<header class="topbar"><div class="bar">
+  <a class="brand" href="/"><span class="dot"></span><span class="wm">AGENTMESH</span></a>
+  <nav class="scrub" id="scrub" aria-label="Stages">
+    <button data-stage="0">1 · The parts</button>
+    <button data-stage="1">2 · Workflow</button>
+    <button data-stage="2">3 · Harness</button>
+    <button data-stage="3">4 · Oriented</button>
+  </nav>
+</div></header>
+
+<div class="stagegrid">
+
+  <div class="canvas" id="canvas">
+    <svg viewBox="50 70 880 500" preserveAspectRatio="xMidYMid meet" aria-label="The anatomy of an agent, in three forms">
+
+      <!-- ═══ the title card ═══ -->
+      <g class="el" data-el="titlecard">
+        <text x="490" y="280" text-anchor="middle" class="title-big">The Anatomy of an Agent</text>
+        <text x="490" y="322" text-anchor="middle" class="title-sub">THREE FORMS · ONE BODY</text>
+        <rect x="420" y="348" width="140" height="3" rx="1.5" fill="var(--accent)"/>
+      </g>
+
+      <!-- ═══ scene 1: the shared anatomy ═══ -->
+      <g class="el" data-el="an-body">
+        <rect x="220" y="84" width="540" height="468" rx="14" fill="rgba(107,168,255,.02)"
+          stroke="var(--faint)" stroke-width="1.2" stroke-dasharray="6 6"/>
+        <text x="240" y="118" class="frame-label" font-size="20">AN AGENT</text>
+      </g>
+      <g class="el" data-el="an-spokes">
+        <line x1="382" y1="235" x2="428" y2="235" stroke="var(--faint)" stroke-dasharray="2 3"/>
+        <line x1="548" y1="208" x2="628" y2="196" stroke="var(--faint)" stroke-dasharray="2 3"/>
+        <line x1="550" y1="235" x2="628" y2="238" stroke="var(--faint)" stroke-dasharray="2 3"/>
+        <line x1="548" y1="262" x2="628" y2="280" stroke="var(--faint)" stroke-dasharray="2 3"/>
+        <line x1="490" y1="297" x2="490" y2="358" stroke="var(--faint)" stroke-dasharray="2 3"/>
+        <line x1="490" y1="398" x2="490" y2="426" stroke="var(--faint)" stroke-dasharray="2 3"/>
+      </g>
+      <g class="el" data-el="an-model">
+        <circle cx="490" cy="235" r="60" fill="var(--panel-2)" stroke="var(--signal)" stroke-width="2"/>
+        <text x="490" y="232" text-anchor="middle" class="node-label">LLM</text>
+        <text x="490" y="252" text-anchor="middle" class="node-sub" font-size="12.5">the brain</text>
+      </g>
+      <g class="el" data-el="an-instr">
+        <rect x="250" y="200" width="130" height="70" rx="8" fill="var(--panel-2)" stroke="var(--paper)" stroke-width="1.3" opacity=".9"/>
+        <line x1="266" y1="222" x2="364" y2="222" stroke="var(--faint)"/>
+        <line x1="266" y1="238" x2="364" y2="238" stroke="var(--faint)"/>
+        <line x1="266" y1="254" x2="344" y2="254" stroke="var(--faint)"/>
+        <text x="315" y="298" text-anchor="middle" class="node-label" font-size="15">Instructions</text>
+        <text x="315" y="316" text-anchor="middle" class="node-sub">job &amp; rules</text>
+      </g>
+      <g class="el" data-el="an-tools">
+        <rect x="632" y="180" width="32" height="32" rx="6" fill="var(--panel-2)" stroke="var(--verify)" stroke-width="1.6"/>
+        <rect x="632" y="222" width="32" height="32" rx="6" fill="var(--panel-2)" stroke="var(--verify)" stroke-width="1.6"/>
+        <rect x="632" y="264" width="32" height="32" rx="6" fill="var(--panel-2)" stroke="var(--verify)" stroke-width="1.6"/>
+        <text x="648" y="330" text-anchor="middle" class="node-label" font-size="15">Tools</text>
+        <text x="648" y="348" text-anchor="middle" class="node-sub">hands</text>
+      </g>
+      <g class="el" data-el="an-ctx">
+        <text x="300" y="352" class="frame-label">CONTEXT WINDOW</text>
+        <rect x="300" y="362" width="380" height="34" rx="7" fill="rgba(107,168,255,.06)" stroke="var(--address)" stroke-width="1.6"/>
+        <rect x="303" y="365" width="130" height="28" rx="5" fill="rgba(107,168,255,.35)"/>
+        <text x="300" y="418" class="node-sub">working memory</text>
+      </g>
+      <g class="el" data-el="an-mem">
+        <path d="M 430 442 v 44 a 60 12 0 0 0 120 0 v -44" fill="var(--panel-2)" stroke="var(--broadcast)" stroke-width="1.6"/>
+        <ellipse cx="490" cy="442" rx="60" ry="12" fill="var(--panel-2)" stroke="var(--broadcast)" stroke-width="1.6"/>
+        <text x="490" y="524" text-anchor="middle" class="node-label" font-size="15">Memory</text>
+        <text x="490" y="542" text-anchor="middle" class="node-sub">outlives the session</text>
+      </g>
+      <g class="el" data-el="an-mcp">
+        <text x="770" y="140" class="frame-label">MCP SERVERS</text>
+        <line x1="666" y1="196" x2="766" y2="174" stroke="var(--faint)" stroke-dasharray="2 3"/>
+        <line x1="666" y1="238" x2="766" y2="238" stroke="var(--faint)" stroke-dasharray="2 3"/>
+        <line x1="666" y1="280" x2="766" y2="302" stroke="var(--faint)" stroke-dasharray="2 3"/>
+        <rect x="770" y="150" width="150" height="48" rx="8" fill="var(--panel-2)" stroke="var(--address)" stroke-width="1.4"/>
+        <text x="845" y="170" text-anchor="middle" class="node-label" font-size="15">CRM</text>
+        <text x="845" y="188" text-anchor="middle" class="node-sub" font-size="12.5">system of record</text>
+        <rect x="770" y="214" width="150" height="48" rx="8" fill="var(--panel-2)" stroke="var(--address)" stroke-width="1.4"/>
+        <text x="845" y="234" text-anchor="middle" class="node-label" font-size="15">Knowledge base</text>
+        <text x="845" y="252" text-anchor="middle" class="node-sub" font-size="12.5">company knowledge</text>
+        <rect x="770" y="278" width="150" height="48" rx="8" fill="var(--panel-2)" stroke="var(--address)" stroke-width="1.4"/>
+        <text x="845" y="298" text-anchor="middle" class="node-label" font-size="15">Data warehouse</text>
+        <text x="845" y="316" text-anchor="middle" class="node-sub" font-size="12.5">the data</text>
+      </g>
+
+      <!-- ═══ scene 2: the workflow agent ═══ -->
+      <g class="el" data-el="wf-frame">
+        <rect x="64" y="120" width="852" height="380" rx="12" fill="rgba(107,168,255,.02)"
+          stroke="var(--faint)" stroke-width="1.2" stroke-dasharray="6 6"/>
+        <text x="84" y="152" class="frame-label" font-size="20">A WORKFLOW AGENT</text>
+      </g>
+      <g class="el" data-el="wf-author">
+        <circle cx="490" cy="185" r="13" fill="none" stroke="var(--paper)" stroke-width="2"/>
+        <path d="M 469 228 Q 490 204 511 228" fill="none" stroke="var(--paper)" stroke-width="2" stroke-linecap="round"/>
+        <text x="514" y="190" class="node-sub">the author · writes the graph</text>
+        <line x1="478" y1="230" x2="200" y2="272" stroke="var(--faint)" stroke-dasharray="2 4"/>
+        <line x1="486" y1="234" x2="384" y2="272" stroke="var(--faint)" stroke-dasharray="2 4"/>
+        <line x1="496" y1="234" x2="584" y2="272" stroke="var(--faint)" stroke-dasharray="2 4"/>
+        <line x1="502" y1="230" x2="784" y2="272" stroke="var(--faint)" stroke-dasharray="2 4"/>
+      </g>
+      <g class="el" data-el="wf-n1">
+        <rect x="100" y="280" width="150" height="80" rx="9" fill="var(--panel-2)" stroke="var(--address)" stroke-width="1.5"/>
+        <text x="175" y="305" text-anchor="middle" class="node-label">Extract</text>
+        <text x="175" y="321" text-anchor="middle" class="node-sub" font-size="12.5">parse the intake</text>
+        <text x="175" y="347" text-anchor="middle" class="node-sub" fill="var(--faint)" font-size="12.5">llm · fixed tools</text>
+      </g>
+      <g class="el" data-el="wf-n2">
+        <rect x="306" y="280" width="150" height="80" rx="9" fill="var(--panel-2)" stroke="var(--address)" stroke-width="1.5"/>
+        <text x="381" y="305" text-anchor="middle" class="node-label">Classify</text>
+        <text x="381" y="321" text-anchor="middle" class="node-sub" font-size="12.5">route by type</text>
+        <text x="381" y="347" text-anchor="middle" class="node-sub" fill="var(--faint)" font-size="12.5">llm · fixed tools</text>
+      </g>
+      <g class="el" data-el="wf-n3">
+        <rect x="512" y="280" width="150" height="80" rx="9" fill="var(--panel-2)" stroke="var(--address)" stroke-width="1.5"/>
+        <text x="587" y="305" text-anchor="middle" class="node-label">Draft</text>
+        <text x="587" y="321" text-anchor="middle" class="node-sub" font-size="12.5">write the reply</text>
+        <text x="587" y="347" text-anchor="middle" class="node-sub" fill="var(--faint)" font-size="12.5">llm · fixed tools</text>
+      </g>
+      <g class="el" data-el="wf-n4">
+        <rect x="718" y="280" width="150" height="80" rx="9" fill="var(--panel-2)" stroke="var(--address)" stroke-width="1.5"/>
+        <text x="793" y="305" text-anchor="middle" class="node-label">File</text>
+        <text x="793" y="321" text-anchor="middle" class="node-sub" font-size="12.5">update the system</text>
+        <text x="793" y="347" text-anchor="middle" class="node-sub" fill="var(--faint)" font-size="12.5">llm · fixed tools</text>
+      </g>
+      <g class="el" data-el="wf-arrows">
+        <path class="wire-ask draw" style="--len:60" stroke-dasharray="60" d="M 252 320 C 270 320, 286 320, 300 320"/>
+        <polygon points="300,314 310,320 300,326" fill="var(--signal)"/>
+        <path class="wire-ask draw" style="--len:60" stroke-dasharray="60" d="M 458 320 C 476 320, 492 320, 506 320"/>
+        <polygon points="506,314 516,320 506,326" fill="var(--signal)"/>
+        <path class="wire-ask draw" style="--len:60" stroke-dasharray="60" d="M 664 320 C 682 320, 698 320, 712 320"/>
+        <polygon points="712,314 722,320 712,326" fill="var(--signal)"/>
+      </g>
+      <g class="el" data-el="wf-branch">
+        <path class="wire-ask draw" style="--len:60" stroke-dasharray="60" d="M 381 362 C 381 380, 381 396, 381 412"/>
+        <polygon points="375,412 381,422 387,412" fill="var(--signal)"/>
+        <rect x="306" y="426" width="150" height="56" rx="9" fill="var(--panel-2)" stroke="var(--dim)" stroke-width="1.3"/>
+        <text x="381" y="450" text-anchor="middle" class="node-label">Escalate</text>
+        <text x="381" y="466" text-anchor="middle" class="node-sub">to a person</text>
+      </g>
+      <g class="el" data-el="wf-break">
+        <path class="wire-ask draw" style="--len:230" stroke-dasharray="6 5" d="M 130 470 C 200 468, 290 420, 352 374"/>
+        <line x1="352" y1="360" x2="370" y2="378" stroke="var(--signal)" stroke-width="2.4" stroke-linecap="round"/>
+        <line x1="370" y1="360" x2="352" y2="378" stroke="var(--signal)" stroke-width="2.4" stroke-linecap="round"/>
+        <text x="96" y="490" class="wire-label">a case the author never saw</text>
+      </g>
+
+      <!-- ═══ scene 3: the harness agent ═══ -->
+      <g class="el" data-el="h-frame">
+        <rect x="64" y="84" width="852" height="468" rx="12" fill="rgba(107,168,255,.02)"
+          stroke="var(--faint)" stroke-width="1.2" stroke-dasharray="6 6"/>
+        <text x="84" y="116" class="frame-label" font-size="20">A HARNESS AGENT</text>
+      </g>
+      <g class="el" data-el="h-loop">
+        <circle cx="400" cy="280" r="140" fill="none" stroke="var(--dim)" stroke-width="1.5" stroke-dasharray="10 8"/>
+        <polygon points="396,132 412,140 396,148" fill="var(--dim)"/>
+        <polygon points="404,412 388,420 404,428" fill="var(--dim)"/>
+        <polygon points="252,284 260,268 268,284" fill="var(--dim)"/>
+        <text x="400" y="126" text-anchor="middle" class="node-sub">look</text>
+        <text x="550" y="284" class="node-sub">think</text>
+        <text x="400" y="408" text-anchor="middle" class="node-sub">act</text>
+        <text x="276" y="284" class="node-sub">repeat</text>
+      </g>
+      <g class="el" data-el="h-person">
+        <circle cx="165" cy="152" r="13" fill="none" stroke="var(--paper)" stroke-width="2"/>
+        <path d="M 141 200 Q 165 174 189 200" fill="none" stroke="var(--paper)" stroke-width="2" stroke-linecap="round"/>
+        <path d="M 197 182 C 228 178, 260 180, 294 184" fill="none" stroke="var(--verify)" stroke-width="1.5" stroke-dasharray="2 5" stroke-linecap="round"/>
+        <text x="165" y="224" text-anchor="middle" class="node-sub" font-size="12.5">personal · a human</text>
+        <text x="165" y="240" text-anchor="middle" class="node-sub" font-size="12.5">at the wheel, turn by turn</text>
+      </g>
+      <g class="el" data-el="h-task">
+        <rect x="85" y="256" width="166" height="44" rx="9" fill="var(--panel-2)" stroke="var(--dim)" stroke-width="1.4"/>
+        <text x="168" y="274" text-anchor="middle" class="node-label" font-size="15">Task · hour six</text>
+        <text x="168" y="290" text-anchor="middle" class="node-sub" font-size="12.5">still running</text>
+        <line x1="253" y1="278" x2="266" y2="281" stroke="var(--faint)" stroke-dasharray="2 3"/>
+        <text x="180" y="318" text-anchor="middle" class="node-sub" font-size="12.5">started by a person or agent</text>
+      </g>
+      <g class="el" data-el="h-model">
+        <circle cx="400" cy="280" r="58" fill="var(--panel-2)" stroke="var(--signal)" stroke-width="2"/>
+        <text x="400" y="277" text-anchor="middle" class="node-label">LLM</text>
+        <text x="400" y="293" text-anchor="middle" class="node-sub" font-size="12">owns the loop</text>
+      </g>
+      <g class="el" data-el="h-tools">
+        <path d="M 542 268 C 580 240, 620 210, 656 196" fill="none" stroke="var(--faint)" stroke-dasharray="2 3"/>
+        <path d="M 544 280 C 580 274, 620 260, 656 253" fill="none" stroke="var(--faint)" stroke-dasharray="2 3"/>
+        <path d="M 542 292 C 580 300, 620 306, 656 311" fill="none" stroke="var(--faint)" stroke-dasharray="2 3"/>
+        <rect x="660" y="180" width="26" height="26" rx="5" fill="var(--panel-2)" stroke="var(--verify)" stroke-width="1.5"/>
+        <rect x="660" y="240" width="26" height="26" rx="5" fill="var(--panel-2)" stroke="var(--verify)" stroke-width="1.5"/>
+        <rect x="660" y="298" width="26" height="26" rx="5" fill="var(--panel-2)" stroke="var(--verify)" stroke-width="1.5"/>
+        <text x="673" y="348" text-anchor="middle" class="node-label" font-size="15">Tools</text>
+        <text x="673" y="362" text-anchor="middle" class="node-sub">chosen at run time</text>
+      </g>
+      <g class="el" data-el="h-ctx">
+        <text x="350" y="470" class="frame-label">CONTEXT WINDOW</text>
+        <rect x="180" y="480" width="500" height="30" rx="6" fill="rgba(107,168,255,.06)" stroke="var(--address)" stroke-width="1.5"/>
+        <rect id="gauge" x="183" y="483" width="80" height="24" rx="4" fill="rgba(107,168,255,.35)"/>
+        <line x1="400" y1="422" x2="400" y2="476" stroke="var(--faint)" stroke-dasharray="2 3"/>
+      </g>
+      <g class="el" data-el="h-memfile">
+        <path class="wire-reply draw" style="--len:100" d="M 686 494 C 715 492, 742 488, 770 484"/>
+        <text x="652" y="474" class="wire-label mint">compact &amp; spill</text>
+        <path d="M 776 468 v 30 a 34 8 0 0 0 68 0 v -30" fill="var(--panel-2)" stroke="var(--broadcast)" stroke-width="1.4"/>
+        <ellipse cx="810" cy="468" rx="34" ry="8" fill="var(--panel-2)" stroke="var(--broadcast)" stroke-width="1.4"/>
+        <text x="810" y="540" text-anchor="middle" class="node-sub">memory files</text>
+      </g>
+      <g class="el" data-el="h-subs">
+        <circle cx="120" cy="395" r="24" fill="none" stroke="var(--dim)" stroke-width="1.2" stroke-dasharray="6 6"/>
+        <circle cx="120" cy="395" r="7" fill="none" stroke="var(--signal)" stroke-width="1.4"/>
+        <circle cx="185" cy="395" r="24" fill="none" stroke="var(--dim)" stroke-width="1.2" stroke-dasharray="6 6"/>
+        <circle cx="185" cy="395" r="7" fill="none" stroke="var(--signal)" stroke-width="1.4"/>
+        <text x="152" y="440" text-anchor="middle" class="node-label" font-size="15">Subagents</text>
+        <text x="152" y="454" text-anchor="middle" class="node-sub">fresh, clean windows</text>
+      </g>
+
+      <!-- ═══ scene 4: the oriented harness ═══ -->
+      <g class="el" data-el="p-frame">
+        <rect x="64" y="84" width="852" height="468" rx="12" fill="rgba(107,168,255,.02)"
+          stroke="var(--faint)" stroke-width="1.2" stroke-dasharray="6 6"/>
+        <text x="84" y="116" class="frame-label" font-size="20">AN ORIENTED HARNESS AGENT</text>
+      </g>
+      <g class="el" data-el="p-loop">
+        <circle cx="360" cy="300" r="125" fill="none" stroke="var(--dim)" stroke-width="1.5" stroke-dasharray="10 8"/>
+        <rect x="470" y="278" width="28" height="44" rx="4" fill="var(--ink)" stroke="var(--dim)" stroke-width="1.3"/>
+        <text x="484" y="342" text-anchor="middle" class="node-sub">plugin slot</text>
+      </g>
+      <g class="el" data-el="p-model">
+        <circle cx="360" cy="300" r="52" fill="var(--panel-2)" stroke="var(--signal)" stroke-width="2"/>
+        <text x="360" y="297" text-anchor="middle" class="node-label">LLM</text>
+        <text x="360" y="313" text-anchor="middle" class="node-sub" font-size="12.5">same loop</text>
+      </g>
+      <g class="el" data-el="p-plugin">
+        <rect x="618" y="256" width="14" height="48" rx="3" fill="var(--panel-2)" stroke="var(--verify)" stroke-width="1.6"/>
+        <rect x="630" y="196" width="220" height="168" rx="10" fill="var(--panel-2)" stroke="var(--verify)" stroke-width="1.8"/>
+        <text x="740" y="226" text-anchor="middle" class="node-label">domain-expert</text>
+        <text x="740" y="246" text-anchor="middle" class="node-sub" font-size="12.5">an agent plugin</text>
+        <rect x="656" y="262" width="9" height="9" rx="2" fill="none" stroke="var(--verify)" stroke-width="1.3"/>
+        <text x="674" y="271" class="node-sub" fill="var(--paper)">skills</text>
+        <rect x="656" y="286" width="9" height="9" rx="2" fill="none" stroke="var(--verify)" stroke-width="1.3"/>
+        <text x="674" y="295" class="node-sub" fill="var(--paper)">tools &amp; MCP</text>
+        <rect x="656" y="310" width="9" height="9" rx="2" fill="none" stroke="var(--verify)" stroke-width="1.3"/>
+        <text x="674" y="319" class="node-sub" fill="var(--paper)">instructions</text>
+        <rect x="656" y="334" width="9" height="9" rx="2" fill="none" stroke="var(--verify)" stroke-width="1.3"/>
+        <text x="674" y="343" class="node-sub" fill="var(--paper)">guardrails</text>
+      </g>
+      <g class="el" data-el="p-wire">
+        <path class="wire-reply draw" style="--len:130" d="M 614 274 C 578 280, 540 290, 504 297"/>
+        <text x="536" y="266" class="wire-label mint">installs</text>
+      </g>
+      <g class="el" data-el="p-gains">
+        <line x1="212" y1="186" x2="256" y2="216" stroke="var(--faint)" stroke-dasharray="2 3"/>
+        <line x1="188" y1="276" x2="235" y2="288" stroke="var(--faint)" stroke-dasharray="2 3"/>
+        <line x1="212" y1="366" x2="258" y2="386" stroke="var(--faint)" stroke-dasharray="2 3"/>
+        <rect x="100" y="160" width="112" height="26" rx="13" fill="rgba(67,214,166,.08)" stroke="var(--verify)" stroke-width="1.2"/>
+        <text x="156" y="177" text-anchor="middle" class="node-sub" fill="var(--verify)">domain tools</text>
+        <rect x="76" y="262" width="112" height="26" rx="13" fill="rgba(67,214,166,.08)" stroke="var(--verify)" stroke-width="1.2"/>
+        <text x="132" y="279" text-anchor="middle" class="node-sub" fill="var(--verify)">domain rules</text>
+        <rect x="100" y="352" width="112" height="26" rx="13" fill="rgba(67,214,166,.08)" stroke="var(--verify)" stroke-width="1.2"/>
+        <text x="156" y="369" text-anchor="middle" class="node-sub" fill="var(--verify)">playbooks</text>
+      </g>
+      <g class="el" data-el="p-skills">
+        <line x1="360" y1="427" x2="360" y2="443" stroke="var(--faint)" stroke-dasharray="2 3"/>
+        <rect x="285" y="437" width="180" height="58" rx="8" fill="var(--panel-2)" stroke="var(--faint)" stroke-width="1.1"/>
+        <rect x="280" y="441" width="180" height="58" rx="8" fill="var(--panel-2)" stroke="var(--dim)" stroke-width="1.2"/>
+        <rect x="275" y="445" width="180" height="58" rx="8" fill="var(--panel-2)" stroke="var(--verify)" stroke-width="1.5"/>
+        <text x="365" y="470" text-anchor="middle" class="node-label" font-size="14">review-a-contract</text>
+        <text x="365" y="486" text-anchor="middle" class="node-sub" font-size="12.5">a skill · on demand</text>
+        <text x="365" y="530" text-anchor="middle" class="node-sub">Skills · procedural know-how</text>
+      </g>
+      <!-- ═══ the synopsis card ═══ -->
+      <g class="el" data-el="synopsis">
+        <text x="230" y="160" class="syn-head">In short</text>
+        <rect x="230" y="206" width="13" height="13" rx="3" fill="var(--paper)"/>
+        <text x="258" y="219" class="syn-line">Every agent is built from the same five parts.</text>
+        <rect x="230" y="266" width="13" height="13" rx="3" fill="var(--address)"/>
+        <text x="258" y="279" class="syn-line">Workflow agents hard-wire the steps, and break when the world shifts.</text>
+        <rect x="230" y="326" width="13" height="13" rx="3" fill="var(--signal)"/>
+        <text x="258" y="339" class="syn-line">Harness agents own the loop, and make managing context the craft.</text>
+        <rect x="230" y="386" width="13" height="13" rx="3" fill="var(--verify)"/>
+        <text x="258" y="399" class="syn-line">Oriented agents load their expertise as skills and plugins.</text>
+        <rect x="230" y="446" width="13" height="13" rx="3" fill="var(--broadcast)"/>
+        <text x="258" y="459" class="syn-line">The harness is a commodity. The expertise you write down is what compounds.</text>
+      </g>
+
+      <!-- ═══ the pendulum ═══ -->
+      <g class="el" data-el="pen-1">
+        <rect x="132" y="270" width="48" height="32" rx="6" fill="var(--panel-2)" stroke="var(--address)" stroke-width="1.4"/>
+        <rect x="188" y="270" width="48" height="32" rx="6" fill="var(--panel-2)" stroke="var(--address)" stroke-width="1.4"/>
+        <rect x="244" y="270" width="48" height="32" rx="6" fill="var(--panel-2)" stroke="var(--address)" stroke-width="1.4"/>
+        <line x1="180" y1="286" x2="188" y2="286" stroke="var(--signal)" stroke-width="1.6"/>
+        <line x1="236" y1="286" x2="244" y2="286" stroke="var(--signal)" stroke-width="1.6"/>
+        <text x="212" y="352" text-anchor="middle" class="frame-label">AUTHORED</text>
+        <text x="212" y="372" text-anchor="middle" class="node-sub">task-oriented · brittle</text>
+      </g>
+      <g class="el" data-el="pen-2">
+        <circle cx="490" cy="286" r="44" fill="none" stroke="var(--dim)" stroke-width="1.4" stroke-dasharray="8 7"/>
+        <circle cx="490" cy="286" r="12" fill="none" stroke="var(--signal)" stroke-width="1.6"/>
+        <text x="490" y="352" text-anchor="middle" class="frame-label">GENERAL</text>
+        <text x="490" y="372" text-anchor="middle" class="node-sub">flexible · unoriented</text>
+      </g>
+      <g class="el" data-el="pen-3">
+        <circle cx="760" cy="286" r="44" fill="none" stroke="var(--dim)" stroke-width="1.4" stroke-dasharray="8 7"/>
+        <circle cx="760" cy="286" r="12" fill="none" stroke="var(--signal)" stroke-width="1.6"/>
+        <rect x="798" y="272" width="12" height="28" rx="3" fill="var(--ink)" stroke="var(--verify)" stroke-width="1.3"/>
+        <rect x="814" y="274" width="30" height="24" rx="4" fill="var(--panel-2)" stroke="var(--verify)" stroke-width="1.4"/>
+        <text x="760" y="352" text-anchor="middle" class="frame-label" fill="var(--verify)">ORIENTED</text>
+        <text x="760" y="372" text-anchor="middle" class="node-sub">general body · swappable purpose</text>
+      </g>
+      <g class="el" data-el="pen-arrows">
+        <path class="wire-reply draw" style="--len:140" d="M 300 250 C 340 218, 400 218, 440 248"/>
+        <polygon points="434,240 446,252 430,254" fill="var(--verify)"/>
+        <path class="wire-reply draw" style="--len:140" d="M 570 250 C 610 218, 670 218, 710 248"/>
+        <polygon points="704,240 716,252 700,254" fill="var(--verify)"/>
+      </g>
+
+      <!-- ═══ the close: inside, then between ═══ -->
+      <g class="el" data-el="out-agent">
+        <rect x="370" y="240" width="240" height="120" rx="12" fill="var(--panel-2)" stroke="var(--paper)" stroke-width="1.5"/>
+        <text x="490" y="296" text-anchor="middle" class="node-label">AN AGENT</text>
+        <text x="490" y="314" text-anchor="middle" class="node-sub">any composition inside</text>
+      </g>
+      <g class="el" data-el="out-tags">
+        <line x1="376" y1="209" x2="410" y2="240" stroke="var(--faint)" stroke-dasharray="2 3"/>
+        <line x1="490" y1="202" x2="490" y2="236" stroke="var(--faint)" stroke-dasharray="2 3"/>
+        <line x1="604" y1="209" x2="570" y2="240" stroke="var(--faint)" stroke-dasharray="2 3"/>
+        <rect x="304" y="170" width="86" height="26" rx="13" fill="var(--ink)" stroke="var(--verify)" stroke-width="1.3"/>
+        <text x="347" y="187" text-anchor="middle" class="node-sub" fill="var(--verify)">name</text>
+        <rect x="447" y="150" width="86" height="26" rx="13" fill="var(--ink)" stroke="var(--verify)" stroke-width="1.3"/>
+        <text x="490" y="167" text-anchor="middle" class="node-sub" fill="var(--verify)">inbox</text>
+        <rect x="590" y="170" width="86" height="26" rx="13" fill="var(--ink)" stroke="var(--verify)" stroke-width="1.3"/>
+        <text x="633" y="187" text-anchor="middle" class="node-sub" fill="var(--verify)">manifest</text>
+      </g>
+      <g class="el" data-el="out-wires">
+        <line x1="366" y1="300" x2="110" y2="300" stroke="var(--faint)" stroke-width="1.2" stroke-dasharray="3 6"/>
+        <line x1="614" y1="300" x2="870" y2="300" stroke="var(--faint)" stroke-width="1.2" stroke-dasharray="3 6"/>
+        <text x="96" y="286" class="frame-label">OTHER AGENTS</text>
+        <text x="884" y="286" text-anchor="end" class="frame-label">OTHER AGENTS</text>
+      </g>
+    </svg>
+
+    <div class="callout" id="callout" role="status">
+      <div class="co-eyebrow" id="co-eyebrow">THE NEW PROBLEM</div>
+      <p id="co-text"></p>
+    </div>
+  </div>
+
+  <aside class="panel" id="panel" aria-label="The parts every form is made of">
+    <h2>WHAT IT'S MADE OF</h2>
+    <p class="panel-sub">The shared core stays lit. Each form adds its own layer.</p>
+
+    <div class="capgroup" data-group="0">
+      <button class="cg-head" type="button"><span class="cg-label">1 · THE SHARED CORE</span><span class="cg-count"></span><span class="chev"></span></button>
+      <div class="cg-body">
+      <div class="cap" data-cap="model"><span class="box"></span><span><span class="cap-name">LLM calls</span><span class="cap-why">the reasoning engine every form shares</span></span></div>
+      <div class="cap" data-cap="ctxwin"><span class="box"></span><span><span class="cap-name">Context window</span><span class="cap-why">the working memory it thinks in</span></span></div>
+      <div class="cap" data-cap="toolsc"><span class="box"></span><span><span class="cap-name">Tools</span><span class="cap-why">hands: how thinking becomes action</span></span></div>
+      <div class="cap" data-cap="mcp"><span class="box"></span><span><span class="cap-name">MCP servers</span><span class="cap-why">systems of record, KBs, data: one connector</span></span></div>
+      <div class="cap" data-cap="instr"><span class="box"></span><span><span class="cap-name">Instructions</span><span class="cap-why">the job, the rules, the disposition</span></span></div>
+      <div class="cap" data-cap="memory"><span class="box"></span><span><span class="cap-name">Memory</span><span class="cap-why">what survives past the session</span></span></div>
+      </div>
+    </div>
+
+    <div class="capgroup" data-group="1">
+      <button class="cg-head" type="button"><span class="cg-label">2 · AUTHORED CONTROL</span><span class="cg-count"></span><span class="chev"></span></button>
+      <div class="cg-body">
+      <div class="cap" data-cap="graph"><span class="box"></span><span><span class="cap-name">The authored graph</span><span class="cap-why">a person decides the steps, in advance</span></span></div>
+      <div class="cap" data-cap="nodeprompts"><span class="box"></span><span><span class="cap-name">Per-node prompts</span><span class="cap-why">each box tuned to one narrow job</span></span></div>
+      <div class="cap" data-cap="boundtools"><span class="box"></span><span><span class="cap-name">Hard-wired tools</span><span class="cap-why">bound at build time, per step</span></span></div>
+      <div class="cap" data-cap="steptests"><span class="box"></span><span><span class="cap-name">Step-level tests</span><span class="cap-why">the steps are the product, so test the steps</span></span></div>
+      </div>
+    </div>
+
+    <div class="capgroup" data-group="2">
+      <button class="cg-head" type="button"><span class="cg-label">3 · STAYING ORIENTED</span><span class="cg-count"></span><span class="chev"></span></button>
+      <div class="cg-body">
+      <div class="cap" data-cap="loop"><span class="box"></span><span><span class="cap-name">The loop</span><span class="cap-why">look, think, act, repeat; the LLM decides</span></span></div>
+      <div class="cap" data-cap="tasklife"><span class="box"></span><span><span class="cap-name">Long-running tasks</span><span class="cap-why">checkpoints &amp; deferred answers: hours, not turns</span></span></div>
+      <div class="cap" data-cap="compaction"><span class="box"></span><span><span class="cap-name">Compaction &amp; rolling windows</span><span class="cap-why">squeeze the history, keep going</span></span></div>
+      <div class="cap" data-cap="memfiles"><span class="box"></span><span><span class="cap-name">Memory files</span><span class="cap-why">what matters, written down outside the window</span></span></div>
+      <div class="cap" data-cap="subagents"><span class="box"></span><span><span class="cap-name">Subagents</span><span class="cap-why">fresh windows for subtasks; attention budgeting</span></span></div>
+      </div>
+    </div>
+
+    <div class="capgroup" data-group="3">
+      <button class="cg-head" type="button"><span class="cg-label">4 · PACKAGED EXPERTISE</span><span class="cg-count"></span><span class="chev"></span></button>
+      <div class="cg-body">
+      <div class="cap" data-cap="skills"><span class="box"></span><span><span class="cap-name">Skills</span><span class="cap-why">procedural know-how, loaded on demand</span></span></div>
+      <div class="cap" data-cap="plugins"><span class="box"></span><span><span class="cap-name">Plugins</span><span class="cap-why">the container: skills, tools, rules, shipped together</span></span></div>
+      <div class="cap" data-cap="tooldisc"><span class="box"></span><span><span class="cap-name">Tool discovery</span><span class="cap-why">find capabilities at run time, not build time</span></span></div>
+      <div class="cap" data-cap="guardrails"><span class="box"></span><span><span class="cap-name">Carried guardrails</span><span class="cap-why">the package brings its own limits</span></span></div>
+      <div class="cap" data-cap="evals"><span class="box"></span><span><span class="cap-name">Outcome evals</span><span class="cap-why">judge the result, not the steps</span></span></div>
+      </div>
+    </div>
+
+  </aside>
+
+  <div class="band">
+    <span class="stageno" id="stageno">THE PARTS</span>
+    <div class="bt">
+      <h1 id="b-title"></h1>
+      <p id="b-desc"></p>
+      <a class="cta" id="cta" href="adoption.html" hidden>Watch how agents take hold →</a>
+    </div>
+    <div class="controls">
+      <span class="beatno" id="beatno"></span>
+      <button id="playall" aria-label="Play the whole sequence">▶ Play</button>
+      <button id="back" aria-label="Previous step">← Back</button>
+      <button id="next" class="primary" aria-label="Next step">Next →</button>
+    </div>
+  </div>
+
+</div>
+
+<script>
+(() => {
+  // ── Beats, as on the adoption page, with two additions:
+  //    clear:true starts a fresh scene (forms replace each other, the parts list never resets),
+  //    gauge:<pct> drives the context-window fill in the harness scene.
+  const BEATS = [
+    // ═══ The title card: shown, not spoken ═══
+    { stage:0, silent:true, hold:2500, show:["titlecard"],
+      title:"The anatomy of an agent",
+      desc:"An agent, in three forms: what they share, and where they differ." },
+
+    // ═══ Stage 1 · The shared parts ═══
+    { stage:0, clear:true, show:["an-body","an-spokes","an-model","an-instr","an-tools","an-ctx","an-mem"],
+      title:"Every agent, the same parts",
+      desc:"Whatever the label on the box, every agent is built from the same organs: an LLM that does the reasoning, a context window where its thinking lives, tools that let it act on the world, instructions that give it a job, and memory that carries what it learned past the end of the conversation." },
+    { stage:0, show:["an-mcp"],
+      callout:{ x:66, y:53, w:310, eyebrow:"THE CONNECTION PROBLEM",
+        text:"Every agent-to-system pairing used to be its own custom integration, and that math gets ugly fast. MCP turns each system into a server any agent can discover, so one connector replaces the hundred integrations." },
+      desc:"An agent is only as useful as what it can reach, and what's worth reaching are systems like a CRM, a knowledge base, or a data warehouse. MCP is the reason reaching them no longer means custom integration work." },
+    { stage:0, caps:["model","ctxwin","toolsc","mcp","instr","memory"],
+      callout:{ x:64, y:58, w:320, mint:true, eyebrow:"THE CLAIM",
+        text:"The three forms of agent ahead all share these same parts. What separates them is arrangement: who owns the control flow, how the window gets managed, and where the expertise comes from." },
+      desc:"Keep the checklist on the right in view, because it stays with us for the whole story. Everything that follows is a rearrangement of these same parts." },
+
+    // ═══ Stage 2 · Form 1: the workflow agent ═══
+    { stage:1, clear:true, show:["wf-frame","wf-author","wf-n1","wf-n2","wf-n3","wf-n4","wf-arrows","wf-branch"],
+      title:"Form 1: the workflow agent",
+      desc:"The first generation stretched this body into a pipeline. A person sat down and authored the graph, and each box holds one small, focused LLM call with its tools wired in by hand. The model fills in the steps beautifully, but it never gets to choose them." },
+    { stage:1, show:["wf-break"],
+      callout:{ x:54, y:52, w:320, text:"The graph handles exactly the cases its author imagined, and nothing else. A new kind of request, a changed backend, or a slightly odd input either breaks the pipeline or sends it back to engineering for a rebuild." },
+      desc:"That design bought determinism and paid for it in brittleness, because the one component smart enough to improvise is never allowed to." },
+    { stage:1, caps:["graph","nodeprompts","boundtools","steptests"],
+      desc:"The workflow form contributes its own layer to the checklist: the authored graph itself, prompts tuned for each node, tools bound at build time, and tests on every step, because when the steps are the product, the steps are what you test." },
+
+    // ═══ Stage 3 · Form 2: the harness agent ═══
+    { stage:2, clear:true, gauge:16, show:["h-frame","h-loop","h-model","h-tools","h-ctx"],
+      title:"Form 2: the harness agent",
+      desc:"Then LLMs got strong enough to be trusted with the steering wheel, and the harness agent turned the design inside out. There is one general loop, and the model decides what to do next, picks its own tools, and recovers from its own mistakes." },
+    { stage:2, show:["h-person","h-task"],
+      title:"Two duty cycles, one body",
+      desc:"A personal agent lives in sessions, with a human at the wheel steering it turn by turn. A task agent is the very same loop left running for hours, started by a person or by another agent, and work that outlives the conversation needs task lifecycles, checkpoints, and answers that arrive after you have left." },
+    { stage:2, gauge:94,
+      title:"The window fills",
+      callout:{ x:68, y:32, w:270, text:"The loop can run all day, but the window it thinks in is only so big. Every tool result, every file it reads, and every step of its own reasoning lands in working memory, and working memory fills." },
+      desc:"The loop also has a problem the pipeline never had to face. Watch the gauge at the bottom as working memory fills." },
+    { stage:2, gauge:34, show:["h-memfile","h-subs"],
+      title:"Context engineering",
+      desc:"So managing that window becomes the real engineering. The agent compacts its history and keeps going, writes what matters into memory files that survive the session, and hands subtasks to fresh subagents with clean windows of their own. The craft quietly shifted from authoring steps to managing attention." },
+    { stage:2, caps:["loop","tasklife","compaction","memfiles","subagents"],
+      desc:"All of that earns the harness its own entries: the loop itself, long-running tasks with checkpoints, compaction and rolling windows, durable memory outside the window, and subagents, which are how a finite window buys itself more room." },
+
+    // ═══ Stage 4 · Form 3: the oriented harness ═══
+    { stage:3, clear:true, show:["p-frame","p-loop","p-model","p-plugin","p-wire"],
+      title:"Form 3: the oriented harness",
+      desc:"The newest form takes the general harness and snaps a sense of purpose back on. It is the same body and the same loop, but the expertise arrives as a package: a plugin clicks in, and the agent gains the skills, tools, instructions, and guardrails of an entire problem domain in one motion." },
+    { stage:3, show:["p-skills"],
+      title:"Skills: know-how as a file",
+      desc:"Skills are procedural knowledge written down, like how to review a contract or how to close the books, in a form the agent loads the moment a job calls for it. The division of labor is clean: skills teach the agent, MCP connects it, and the plugin is the shipping container that carries both." },
+    { stage:3, show:["p-gains"], title:"Leveraging agent plugins",
+      callout:{ x:66, y:54, w:300, eyebrow:"THE PORTABILITY QUESTION",
+        text:"Packaging only pays off if the package can travel. The agent plugin standard makes expertise an artifact you write once and install into any compliant harness, and then version, share, and audit like any other asset." },
+      desc:"The people who used to author workflow graphs become plugin authors, and their work stops dying with the pipeline it was built for." },
+    { stage:3, caps:["skills","plugins","tooldisc","guardrails","evals"],
+      desc:"The oriented form completes the checklist with skills, plugins to carry them, tool discovery at run time, guardrails that travel with the package, and evals that judge the outcome of the work rather than the steps taken to get there." },
+    { stage:3, clear:true, openAll:true, show:["pen-1","pen-2","pen-3","pen-arrows"],
+      title:"The pendulum closes",
+      callout:{ x:30, y:62, w:400, mint:true, eyebrow:"THE PENDULUM",
+        text:"We began with task orientation and no generality, then swung hard to generality with no orientation. The third form finally holds both at once: a general body with a swappable purpose, and that is why it is winning." },
+      desc:"Step back and the whole arc reads as a pendulum, and the third form is where it comes to rest." },
+    { stage:3, cta:true, complete:true, show:["out-agent","out-tags","out-wires"], clear:true,
+      title:"Why this matters",
+      callout:{ x:30, y:58, w:390, mint:true, eyebrow:"WHERE THIS GOES",
+        text:"The harness is becoming a commodity. The durable asset is the expertise you package: the skills and plugins that survive model upgrades and harness swaps, and keep their value while everything underneath them churns." },
+      desc:"From the outside, all of this anatomy disappears behind three simple things: a name, an inbox, and a manifest. What happens between agents is the other half of the story." },
+    { stage:3, clear:true, cta:true, complete:true, show:["synopsis"],
+      title:"In short",
+      desc:"The whole story in five lines, and where it goes next." },
+  ];
+
+  const STAGENAMES = ["THE PARTS", "FORM 1 · WORKFLOW", "FORM 2 · HARNESS", "FORM 3 · ORIENTED"];
+  const stageFirstBeat = [0, 4, 7, 12];
+  const els = {};
+  document.querySelectorAll("[data-el]").forEach(g => els[g.dataset.el] = g);
+  const caps = {};
+  document.querySelectorAll("[data-cap]").forEach(c => caps[c.dataset.cap] = c);
+  const groups = document.querySelectorAll(".capgroup");
+  const callout = document.getElementById("callout");
+  const coText = document.getElementById("co-text");
+  const coEyebrow = document.getElementById("co-eyebrow");
+  const panel = document.getElementById("panel");
+  const gauge = document.getElementById("gauge");
+  const scrubBtns = document.querySelectorAll("#scrub button");
+  const backBtn = document.getElementById("back");
+  const nextBtn = document.getElementById("next");
+  const playBtn = document.getElementById("playall");
+
+  // ── narration: one clip per beat ──
+  const voice = new Audio();
+  voice.preload = "auto";
+  let playingAll = false;
+  let holdTimer = null;
+  const CLIPV = 2; // bump when any narration clip is re-recorded, so caches refetch
+  const clip = (i) => `anatomy-audio/beat-${String(i + 1).padStart(2, "0")}.mp3?v=${CLIPV}`;
+  function playBeat(){
+    clearTimeout(holdTimer);
+    const cur = BEATS[beat];
+    if (cur.silent){
+      // A shown-not-spoken beat: in play-all, hold, then move on.
+      voice.pause();
+      if (playingAll) holdTimer = setTimeout(() => { if (playingAll) go(beat + 1); }, cur.hold || 2500);
+      return;
+    }
+    voice.src = clip(beat);
+    voice.play().catch(() => {});
+  }
+  function stopAll(){
+    playingAll = false;
+    clearTimeout(holdTimer);
+    playBtn.textContent = "▶ Play";
+  }
+  voice.addEventListener("ended", () => {
+    if (!playingAll) return;
+    if (beat < BEATS.length - 1) go(beat + 1);
+    else stopAll();
+  });
+
+  let beat = 0;
+  let manualOpen = {};
+
+  function render(jumped){
+    // replay beats 0..beat; clear resets the scene, never the parts list
+    const shown = new Set(), lit = new Set(), litGroups = new Set();
+    let title = "", desc = "", stage = 0, complete = false, latestGroup = null, gaugePct = null;
+    for (let i = 0; i <= beat; i++){
+      const b = BEATS[i];
+      if (b.clear) shown.clear();
+      (b.show || []).forEach(id => shown.add(id));
+      (b.caps || []).forEach(id => lit.add(id));
+      if (b.caps){ litGroups.add(String(b.stage)); latestGroup = String(b.stage); }
+      if (b.title) title = b.title;
+      if (b.desc) desc = b.desc;
+      if (b.gauge != null) gaugePct = b.gauge;
+      stage = b.stage;
+      if (b.complete) complete = true;
+    }
+    const cur = BEATS[beat];
+
+    for (const [id, g] of Object.entries(els)){
+      g.classList.toggle("instant", !!jumped && shown.has(id) && !(cur.show || []).includes(id));
+      g.classList.toggle("on", shown.has(id));
+    }
+    if (gaugePct != null){
+      gauge.style.width = Math.round(494 * gaugePct / 100) + "px";
+      gauge.classList.toggle("hot", gaugePct >= 85);
+    }
+    for (const [id, c] of Object.entries(caps)) c.classList.toggle("on", lit.has(id));
+    groups.forEach(g => {
+      const id = g.dataset.group;
+      g.classList.toggle("on", litGroups.has(id));
+      const open = cur.openAll ? litGroups.has(id)
+        : manualOpen[id] !== undefined ? manualOpen[id] : id === latestGroup;
+      g.classList.toggle("open", open);
+      const n = g.querySelectorAll(".cap.on").length;
+      g.querySelector(".cg-count").textContent = n ? `${n} ✓` : "";
+    });
+    panel.classList.toggle("complete", complete);
+    document.getElementById("cta").hidden = !cur.cta;
+
+    if (cur.callout){
+      coEyebrow.textContent = cur.callout.eyebrow || "THE NEW PROBLEM";
+      coText.textContent = cur.callout.text;
+      callout.style.left = cur.callout.x + "%";
+      callout.style.top = cur.callout.y + "%";
+      callout.style.maxWidth = (cur.callout.w || 330) + "px";
+      callout.classList.toggle("mint", !!cur.callout.mint);
+      callout.classList.add("on");
+    } else {
+      callout.classList.remove("on");
+    }
+
+    document.getElementById("b-title").textContent = title;
+    document.getElementById("b-desc").textContent = desc;
+    document.getElementById("stageno").textContent = STAGENAMES[stage];
+    document.getElementById("beatno").textContent = `${beat + 1} / ${BEATS.length}`;
+    scrubBtns.forEach(b => {
+      const s = Number(b.dataset.stage);
+      b.classList.toggle("on", s === stage);
+      b.classList.toggle("done", s < stage);
+    });
+    backBtn.disabled = beat === 0;
+    nextBtn.disabled = beat === BEATS.length - 1;
+  }
+
+  function go(n, jumped){
+    beat = Math.max(0, Math.min(BEATS.length - 1, n));
+    manualOpen = {};
+    render(jumped);
+    playBeat();
+  }
+
+  playBtn.addEventListener("click", () => {
+    if (playingAll){
+      stopAll();
+      voice.pause();
+      return;
+    }
+    playingAll = true;
+    playBtn.textContent = "■ Stop";
+    if (beat === BEATS.length - 1) go(0, true);
+    else playBeat();
+  });
+
+  groups.forEach(g => g.querySelector(".cg-head").addEventListener("click", () => {
+    manualOpen[g.dataset.group] = !g.classList.contains("open");
+    render();
+  }));
+
+  nextBtn.addEventListener("click", () => go(beat + 1));
+  backBtn.addEventListener("click", () => go(beat - 1));
+  scrubBtns.forEach(b => b.addEventListener("click", () =>
+    go(stageFirstBeat[Number(b.dataset.stage)], true)));
+  window.addEventListener("keydown", (e) => {
+    if (e.key === "ArrowRight" || e.key === " ") { e.preventDefault(); go(beat + 1); }
+    if (e.key === "ArrowLeft") { e.preventDefault(); go(beat - 1); }
+  });
+
+  render();
+})();
+</script>
+</body>
+</html>
