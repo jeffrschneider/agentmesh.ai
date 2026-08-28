@@ -56,7 +56,9 @@
   .sec{ padding:26px 0 8px; }
   .sec .sub{ color:var(--faint); font-size:.92rem; margin:0 0 22px; }
 
-  .series{ display:grid; grid-template-columns:repeat(3, 1fr); gap:18px; margin-bottom:40px; }
+  .rows{ display:flex; flex-direction:column; gap:18px; margin-bottom:40px; }
+  .card.row2{ display:grid; grid-template-columns:1fr 380px; gap:26px; align-items:center; }
+  .thumb{ width:100%; border-radius:8px; border:1px solid var(--line); display:block; }
   .card{ display:block; text-decoration:none; color:var(--paper); background:var(--panel);
     border:1px solid var(--line); border-top:3px solid var(--card, var(--dim));
     border-radius:12px; padding:22px 22px 20px; transition:border-color .18s, transform .18s, background .18s; }
@@ -69,7 +71,6 @@
   .card .meta b{ color:var(--card, var(--dim)); font-weight:600; }
 
   .more{ display:grid; grid-template-columns:repeat(2, 1fr); gap:18px; margin-bottom:64px; }
-  .pov{ display:grid; grid-template-columns:1fr; gap:18px; margin-bottom:40px; }
   .more .card{ border-top-width:1px; border-top-color:var(--line); }
   .more .card:hover{ border-color:var(--dim); }
   .more .card .part{ color:var(--faint); }
@@ -86,7 +87,7 @@
   .sitefoot .base .sep{ margin-left:auto; font-family:var(--wire); font-size:.78rem; }
 
   @media (max-width: 900px){
-    .series{ grid-template-columns:1fr; }
+    .card.row2{ grid-template-columns:1fr; }
     .more{ grid-template-columns:1fr; }
     .sitefoot .cols{ grid-template-columns:repeat(2, 1fr); }
   }
@@ -111,40 +112,52 @@
 <section class="sec"><div class="wrap">
   <h2>The animated series</h2>
   <p class="sub">Three parts, from first principles to the enterprise. New tutorials land here as they ship.</p>
-  <div class="series">
-    <a class="card" href="whats-an-agent.html" style="--card:var(--broadcast)">
-      <div class="part">PART 1 · START HERE</div>
-      <h3>What's an agent?</h3>
-      <p>The plain-English tour. Is ChatGPT an agent? A chatbot answers; an agent acts. The five
-      abilities, the kinds of agents, who builds them, and how you stay the boss.</p>
-      <div class="meta"><b>narrated</b> · 17 steps · no jargon</div>
+  <div class="rows">
+    <a class="card row2" href="whats-an-agent.html" style="--card:var(--broadcast)">
+      <div>
+        <div class="part">PART 1 · START HERE</div>
+        <h3>What's an agent?</h3>
+        <p>The plain-English tour. Is ChatGPT an agent? A chatbot answers; an agent acts. The five
+        abilities, the kinds of agents, who builds them, and how you stay the boss.</p>
+        <div class="meta"><b>narrated</b> · 17 steps · no jargon</div>
+      </div>
+      <img class="thumb" src="learn-thumbs/whats-an-agent.png" alt="A chatbot answers while an agent books the table" loading="lazy">
     </a>
-    <a class="card" href="anatomy.html" style="--card:var(--address)">
-      <div class="part">PART 2 · INSIDE</div>
-      <h3>The anatomy of an agent</h3>
-      <p>Every agent is built from the same parts. Three forms: workflow, harness, and oriented,
-      and why the expertise you write down is the asset that compounds.</p>
-      <div class="meta"><b>narrated</b> · 19 steps · for the curious</div>
+    <a class="card row2" href="anatomy.html" style="--card:var(--address)">
+      <div>
+        <div class="part">PART 2 · INSIDE</div>
+        <h3>The anatomy of an agent</h3>
+        <p>Every agent is built from the same parts. Three forms: workflow, harness, and oriented,
+        and why the expertise you write down is the asset that compounds.</p>
+        <div class="meta"><b>narrated</b> · 19 steps · for the curious</div>
+      </div>
+      <img class="thumb" src="learn-thumbs/anatomy.png" alt="The shared anatomy of an agent, reaching MCP servers" loading="lazy">
     </a>
-    <a class="card" href="adoption.html" style="--card:var(--signal)">
-      <div class="part">PART 3 · BETWEEN</div>
-      <h3>How agents take hold</h3>
-      <p>The enterprise story. From personal agents to task agents, to agents talking to agents,
-      to buying and selling agent work across company lines.</p>
-      <div class="meta"><b>narrated</b> · 16 steps · for teams</div>
+    <a class="card row2" href="adoption.html" style="--card:var(--signal)">
+      <div>
+        <div class="part">PART 3 · BETWEEN</div>
+        <h3>How agents take hold</h3>
+        <p>The enterprise story. From personal agents to task agents, to agents talking to agents,
+        to buying and selling agent work across company lines.</p>
+        <div class="meta"><b>narrated</b> · 16 steps · for teams</div>
+      </div>
+      <img class="thumb" src="learn-thumbs/adoption.png" alt="A company's agents working with a provider and a customer" loading="lazy">
     </a>
   </div>
 
   <h2>Where we stand</h2>
   <p class="sub">A point of view, for people mapping the landscape.</p>
-  <div class="pov">
-    <a class="card" href="where-agentmesh-sits.html" style="--card:var(--verify)">
-      <div class="part">A POINT OF VIEW</div>
-      <h3>Where AgentMesh sits</h3>
-      <p>The agent world sorts into four jobs: build, improve, run, protect, and all four point inward
-      at one agent. AgentMesh is the layer none of them cover: the streets between agents. What we are,
-      what we're not, and why the rest of your stack plugs in.</p>
-      <div class="meta"><b>narrated</b> · 15 steps · for evaluators</div>
+  <div class="rows">
+    <a class="card row2" href="where-agentmesh-sits.html" style="--card:var(--verify)">
+      <div>
+        <div class="part">A POINT OF VIEW</div>
+        <h3>Where AgentMesh sits</h3>
+        <p>The agent world sorts into four jobs: build, improve, run, protect, and all four point inward
+        at one agent. AgentMesh is the layer none of them cover: the streets between agents. What we are,
+        what we're not, and why the rest of your stack plugs in.</p>
+        <div class="meta"><b>narrated</b> · 15 steps · for evaluators</div>
+      </div>
+      <img class="thumb" src="learn-thumbs/where-agentmesh-sits.png" alt="A city of agents connected by streets" loading="lazy">
     </a>
   </div>
 
