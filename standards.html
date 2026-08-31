@@ -385,6 +385,7 @@
     .s-man{ --mk:var(--broadcast); }
     .s-rol,.s-col{ --mk:var(--dim); }
     .s-rep{ --mk:var(--verify); }
+    .s-desc{ --mk:var(--paper); }
 
     /* the ones we complement, compactly */
     .adopt{ display:grid; grid-template-columns:repeat(2,1fr); gap:13px; margin-top:26px; }
@@ -483,7 +484,7 @@
   <section class="band">
     <div class="wrap">
       <p class="kicker">what we publish</p>
-      <h2>The six standards</h2>
+      <h2>The seven standards</h2>
 
       <div class="std s-proto">
         <div class="top">
@@ -543,6 +544,16 @@
         <p class="role">evidence, afterwards</p>
         <p>The bureau holds evidence about how agent interactions actually went, in a ledger that cannot be quietly edited afterwards.</p>
         <p>It is what closes the loop. <b>What is recorded at the end of one engagement is what the next one reads first</b>, and it is read hardest for the roles that judge or recommend.</p>
+      </div>
+
+      <div class="std s-desc">
+        <div class="top">
+          <h3>The Agent Descriptor</h3>
+          <a class="dom" href="https://agentdoc.net/descriptor-spec.html">agentdoc.net/descriptor-spec.html &rarr;</a>
+        </div>
+        <p class="role">the agent's standing description</p>
+        <p>The Descriptor is the operator's standing description of one agent: what it does, what each offering takes and returns, who drives it, what it refuses, and where it runs. Every other format carries a projection of it or a reference into it, so each fact has one authored spelling.</p>
+        <p>A signed proposal makes a Descriptor fact binding by referencing it at a digest, and <b>AgentDoc, on the same site, is the assembled view built from it</b>, beside everything others have published about the agent.</p>
       </div>
 
     </div>
