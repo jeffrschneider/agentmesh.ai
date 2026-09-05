@@ -1,0 +1,758 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Delivering Agents · AgentMesh</title>
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<meta name="robots" content="noindex">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+<style>
+  /* Same token system as the rest of the series. Part 5 wears coral. */
+  :root{
+    --ink:#0A1417; --panel:#0F1D22; --panel-2:#12242A; --line:#1C2E33;
+    --paper:#E7EFEC; --dim:#7C918C; --faint:#4A5D5A;
+    --signal:#F2A93B; --verify:#43D6A6; --address:#6BA8FF; --broadcast:#B69CFF;
+    --accent:#F0836B;   /* coral: this part's colour */
+    --disp:'Space Grotesk', sans-serif;
+    --body:'IBM Plex Sans', system-ui, sans-serif;
+    --wire:'IBM Plex Mono', ui-monospace, monospace;
+  }
+  *{ box-sizing:border-box; }
+  html,body{ margin:0; height:100%; }
+  body{ background:var(--ink); color:var(--paper); font-family:var(--body);
+    font-size:16px; line-height:1.55; -webkit-font-smoothing:antialiased;
+    background-image:
+      linear-gradient(var(--line) 1px, transparent 1px),
+      linear-gradient(90deg, var(--line) 1px, transparent 1px);
+    background-size:64px 64px; background-position:-1px -1px;
+    display:flex; flex-direction:column; }
+  body::before{ content:""; position:fixed; inset:0; z-index:0; pointer-events:none;
+    background:
+      radial-gradient(80% 45% at 30% 0%, rgba(240,131,107,.08), transparent 60%),
+      linear-gradient(180deg, rgba(10,20,23,.72), var(--ink) 62%); }
+
+  .topbar{ position:relative; z-index:5; border-bottom:1px solid var(--line); background:rgba(10,20,23,.9); }
+  .topbar .bar{ max-width:1360px; margin:0 auto; padding:0 32px; height:60px;
+    display:flex; align-items:center; gap:26px; position:relative; }
+  .brand{ font-family:var(--wire); font-weight:600; font-size:.82rem; letter-spacing:.02em;
+    display:flex; align-items:center; gap:9px; color:var(--paper); text-decoration:none; }
+  .brand .dot{ width:9px; height:9px; border-radius:2px; background:var(--signal);
+    box-shadow:0 0 0 3px rgba(242,169,59,.15), 8px 0 0 -2px var(--verify), 16px 0 0 -2px var(--address); }
+  .brand span.wm{ margin-left:14px; }
+  .scrub{ position:absolute; left:50%; transform:translateX(-50%); display:flex; gap:8px; }
+  .scrub button{ font-family:var(--wire); font-size:.74rem; letter-spacing:.02em;
+    color:var(--dim); background:none; border:1px solid var(--line); border-radius:999px;
+    padding:6px 14px; cursor:pointer; transition:color .18s, border-color .18s, background .18s; }
+  .scrub button:hover{ color:var(--paper); }
+  .scrub button.on{ color:var(--ink); background:var(--accent); border-color:var(--accent); font-weight:600; }
+  .scrub button.done{ color:var(--verify); border-color:rgba(67,214,166,.4); }
+
+  .stagegrid{ position:relative; z-index:1; flex:1; max-width:1360px; width:100%;
+    margin:0 auto; padding:22px 32px 26px; display:grid;
+    grid-template-columns:1fr 320px; grid-template-rows:1fr auto; gap:18px; min-height:0; }
+
+  .canvas{ grid-row:1; grid-column:1; position:relative; border:1px solid var(--line);
+    border-radius:12px; background:linear-gradient(180deg, rgba(15,29,34,.6), rgba(10,20,23,.3));
+    overflow:hidden; min-height:420px; }
+  .canvas svg{ position:absolute; inset:0; width:100%; height:100%; }
+
+  .el{ opacity:0; transition:opacity .5s ease, transform .5s ease; transform:translateY(8px); }
+  .el.on{ opacity:1; transform:none; }
+  .el.instant{ transition:none; }
+
+  .title-big{ font-family:var(--disp); font-size:48px; font-weight:700; fill:var(--paper); }
+  .title-sub{ font-family:var(--wire); font-size:14px; letter-spacing:.2em; fill:var(--accent); }
+  .frame-label{ font-family:var(--wire); font-size:12px; font-weight:600; letter-spacing:.14em; fill:var(--faint); }
+  .node-label{ font-family:var(--wire); font-size:14px; font-weight:600; fill:var(--paper); }
+  .node-sub{ font-family:var(--wire); font-size:11px; fill:var(--dim); }
+  .card-title{ font-family:var(--disp); font-size:17px; font-weight:700; fill:var(--paper); }
+  .step-text{ font-family:var(--body); font-size:14px; fill:var(--paper); }
+  .chip-text{ font-family:var(--wire); font-size:10.5px; fill:var(--ink); font-weight:600; }
+  .chip-dim{ font-family:var(--wire); font-size:10.5px; fill:var(--paper); }
+  .syn-head{ font-family:var(--disp); font-size:40px; font-weight:700; fill:var(--paper); }
+  .syn-line{ font-family:var(--body); font-size:18px; fill:var(--paper); }
+  .h-big{ font-family:var(--disp); font-size:38px; font-weight:700; fill:var(--paper); }
+  .h-mid{ font-family:var(--disp); font-size:26px; font-weight:700; fill:var(--paper); }
+  .h-small{ font-family:var(--disp); font-size:20px; font-weight:700; fill:var(--paper); }
+  .p-big{ font-family:var(--body); font-size:19px; fill:var(--paper); }
+  .p-mid{ font-family:var(--body); font-size:16px; fill:var(--paper); }
+  .p-dim{ font-family:var(--body); font-size:16px; fill:var(--dim); }
+  .tag{ font-family:var(--wire); font-size:13px; font-weight:600; letter-spacing:.12em; }
+  .h-card{ font-family:var(--disp); font-size:23px; font-weight:700; fill:var(--paper); }
+  .p-l{ font-family:var(--body); font-size:19px; fill:var(--dim); }
+  .p-xl{ font-family:var(--body); font-size:22px; fill:var(--paper); }
+  .syn-xl{ font-family:var(--body); font-size:21px; fill:var(--paper); }
+  .wire-ask{ stroke:var(--accent); stroke-width:1.8; fill:none; }
+  .wire-reply{ stroke:var(--verify); stroke-width:1.6; fill:none; stroke-dasharray:5 5; }
+  g.el path.draw{ stroke-dashoffset:0; }
+  @media (prefers-reduced-motion: no-preference){
+    g.el:not(.on) path.draw{ stroke-dashoffset:var(--len, 300); }
+    g.el.on path.draw{ transition:stroke-dashoffset .9s ease .15s; }
+  }
+  #baton{ transition:cx 1.2s ease; }
+  .row-text{ font-family:var(--body); font-size:15px; fill:var(--paper); }
+  .row-num{ font-family:var(--wire); font-size:14px; font-weight:600; fill:var(--paper); }
+  .legend{ font-family:var(--wire); font-size:11px; fill:var(--dim); }
+  .note-text{ font-family:var(--body); font-size:13px; fill:var(--dim); }
+
+  .callout{ position:absolute; z-index:4; max-width:330px; padding:14px 16px 15px;
+    background:var(--panel-2); border:1px solid rgba(240,131,107,.5); border-left:3px solid var(--accent);
+    border-radius:8px; box-shadow:0 14px 40px rgba(0,0,0,.5);
+    opacity:0; transform:translateY(10px); pointer-events:none;
+    transition:opacity .45s ease, transform .45s ease; }
+  .callout.on{ opacity:1; transform:none; }
+  .callout .co-eyebrow{ font-family:var(--wire); font-size:.68rem; letter-spacing:.14em; color:var(--accent); margin-bottom:6px; }
+  .callout p{ margin:0; font-size:.92rem; line-height:1.5; color:var(--paper); }
+  .callout.mint{ border-color:rgba(67,214,166,.5); border-left-color:var(--verify); }
+  .callout.mint .co-eyebrow{ color:var(--verify); }
+
+  .panel{ grid-row:1 / span 2; grid-column:2; border:1px solid var(--line); border-radius:12px;
+    background:var(--panel); padding:20px 20px 16px; overflow-y:auto; min-height:0; }
+  .panel h2{ font-family:var(--wire); font-size:.72rem; font-weight:600; letter-spacing:.16em; color:var(--dim); margin:0 0 4px; }
+  .panel .panel-sub{ font-size:.8rem; color:var(--faint); margin:0 0 14px; }
+  .capgroup{ display:none; }
+  .capgroup.on{ display:block; }
+  .cg-head{ width:100%; display:flex; align-items:center; gap:10px; cursor:pointer;
+    background:none; border:none; border-top:1px solid var(--line); padding:11px 0 9px; text-align:left; }
+  .capgroup:first-of-type .cg-head{ border-top:none; padding-top:2px; }
+  .cg-head:focus-visible{ outline:2px solid var(--accent); outline-offset:2px; border-radius:4px; }
+  .cg-label{ font-family:var(--wire); font-size:.68rem; letter-spacing:.12em; color:var(--faint); }
+  .capgroup.open .cg-label{ color:var(--dim); }
+  .cg-count{ margin-left:auto; font-family:var(--wire); font-size:.68rem; color:var(--verify); }
+  .chev{ flex:none; width:7px; height:7px; margin-top:-3px; border-right:1.5px solid var(--dim);
+    border-bottom:1.5px solid var(--dim); transform:rotate(45deg); transition:transform .2s ease; }
+  .capgroup.open .chev{ transform:rotate(-135deg); margin-top:3px; }
+  .cg-body{ display:none; padding-bottom:10px; }
+  .capgroup.open .cg-body{ display:block; }
+  .cap{ display:flex; align-items:baseline; gap:10px; padding:4px 0;
+    opacity:0; transform:translateX(8px); transition:opacity .4s ease, transform .4s ease; }
+  .cap.on{ opacity:1; transform:none; }
+  .cap .box{ flex:none; width:13px; height:13px; border:1.5px solid var(--faint); border-radius:3px;
+    position:relative; top:2px; transition:border-color .3s, background .3s; }
+  .cap.on .box{ border-color:var(--verify); background:rgba(67,214,166,.12); }
+  .cap.on .box::after{ content:""; position:absolute; inset:2px 2px 3px;
+    border-right:2px solid var(--verify); border-bottom:2px solid var(--verify);
+    transform:rotate(40deg) scale(.85); border-radius:1px; }
+  .cap .cap-name{ font-size:.86rem; font-weight:500; color:var(--paper); }
+  .cap .cap-why{ font-size:.76rem; color:var(--dim); display:block; margin-top:1px; }
+  .panel.complete{ border-color:rgba(67,214,166,.45);
+    box-shadow:0 0 0 1px rgba(67,214,166,.15), 0 0 40px rgba(67,214,166,.06) inset; }
+
+  .band{ grid-row:2; grid-column:1; border:1px solid var(--line); border-radius:12px;
+    background:var(--panel); padding:18px 22px; display:flex; gap:22px; align-items:flex-start; }
+  .band .stageno{ font-family:var(--wire); font-size:.72rem; letter-spacing:.14em; color:var(--accent); white-space:nowrap; padding-top:6px; }
+  .band .bt{ flex:1; min-width:0; }
+  .band h1{ font-size:1.3rem; margin:0 0 4px; font-family:var(--disp); }
+  .band p{ margin:0; color:var(--dim); font-size:.92rem; max-width:64ch; }
+  .band .cta{ display:inline-block; margin-top:10px; font-family:var(--wire); font-size:.85rem; font-weight:600;
+    color:var(--ink); background:var(--accent); border-radius:8px; padding:9px 16px; text-decoration:none; }
+  .band .cta:hover{ background:#f59e8a; }
+  .band .cta[hidden]{ display:none; }
+  .controls{ flex:none; display:flex; gap:10px; align-items:center; padding-top:4px; }
+  .controls .beatno{ font-family:var(--wire); font-size:.72rem; color:var(--faint); margin-right:4px; }
+  .controls button{ font-family:var(--wire); font-size:.82rem; font-weight:600; cursor:pointer;
+    border-radius:8px; padding:9px 18px; border:1px solid var(--line);
+    background:var(--panel-2); color:var(--paper); transition:background .18s, border-color .18s; }
+  .controls button:hover{ border-color:var(--dim); }
+  .controls button.primary{ background:var(--accent); border-color:var(--accent); color:var(--ink); }
+  .controls button.primary:hover{ background:#f59e8a; }
+  .controls button:disabled{ opacity:.35; cursor:default; }
+  .controls button:focus-visible{ outline:2px solid var(--accent); outline-offset:3px; }
+
+  /* a short window: the caption band gives up a little room so it stays above the fold */
+  @media (max-height: 780px){
+    .stagegrid{ padding:14px 32px 16px; gap:12px; }
+    .band{ padding:12px 18px; }
+    .band p{ font-size:.86rem; line-height:1.45; }
+    .band .cta{ margin-top:6px; padding:7px 14px; }
+    .canvas{ min-height:380px; }
+  }
+  @media (max-width: 1000px){
+    .stagegrid{ grid-template-columns:1fr; grid-template-rows:auto auto auto; padding:16px; }
+    .panel{ grid-row:3; grid-column:1; max-height:340px; }
+    .band{ grid-row:2; flex-wrap:wrap; }
+    .canvas{ min-height:360px; }
+  }
+</style>
+</head>
+<body>
+
+<header class="topbar"><div class="bar">
+  <a class="brand" href="/"><span class="dot"></span><span class="wm">AGENTMESH</span></a>
+  <nav class="scrub" id="scrub" aria-label="Stages">
+    <button data-stage="0">1 · The business</button>
+    <button data-stage="1">2 · The deal</button>
+    <button data-stage="2">3 · The build</button>
+    <button data-stage="3">4 · The return</button>
+  </nav>
+</div></header>
+
+<div class="stagegrid">
+  <div class="canvas" id="canvas">
+    <svg viewBox="0 0 980 620" preserveAspectRatio="xMidYMid meet" aria-label="Delivering agents">
+
+      <!-- ═══ 1 · title ═══ -->
+      <g class="el" data-el="titlecard">
+        <text x="490" y="270" text-anchor="middle" class="title-big">Delivering Agents</text>
+        <text x="490" y="314" text-anchor="middle" class="title-sub">PART 5 · HOW DELIVERY GROUPS BUILD, SELL, AND SUPPORT AGENTS</text>
+        <rect x="420" y="340" width="140" height="3" rx="1.5" fill="var(--accent)"/>
+      </g>
+
+      <!-- ═══ 2 · a new kind of business ═══ -->
+      <g class="el" data-el="s-business">
+        <text x="70" y="110" class="h-big">A new kind of business.</text>
+        <rect x="70" y="150" width="290" height="410" rx="14" fill="var(--panel-2)" stroke="var(--paper)" stroke-width="1.6"/>
+        <text x="94" y="190" class="tag" fill="var(--paper)">COMPANIES NEED AGENTS</text>
+        <text x="94" y="240" class="p-xl">an invoice reader</text>
+        <text x="94" y="286" class="p-xl">a collections drafter</text>
+        <text x="94" y="332" class="p-xl">a questionnaire answerer</text>
+        <text x="94" y="378" class="p-xl">an onboarding coordinator</text>
+        <text x="94" y="424" class="p-xl">a quote preparer</text>
+        <text x="94" y="500" class="p-l">written down, role by role</text>
+        <rect x="390" y="150" width="200" height="410" rx="14" fill="rgba(240,131,107,.10)" stroke="var(--accent)" stroke-width="1.8"/>
+        <text x="490" y="190" text-anchor="middle" class="tag" fill="var(--accent)">THE BOARD</text>
+        <text x="490" y="330" text-anchor="middle" class="h-card">requests,</text>
+        <text x="490" y="364" text-anchor="middle" class="h-card">in public</text>
+        <text x="490" y="500" text-anchor="middle" class="p-l">on AgentMesh</text>
+        <rect x="620" y="150" width="290" height="410" rx="14" fill="var(--panel-2)" stroke="var(--broadcast)" stroke-width="1.6"/>
+        <text x="644" y="190" class="tag" fill="var(--broadcast)">BUILT OR TAILORED BY</text>
+        <text x="644" y="240" class="p-xl">the company's own</text>
+        <text x="644" y="270" class="p-xl">technical team, most often</text>
+        <text x="644" y="326" class="p-xl">an agency</text>
+        <text x="644" y="372" class="p-xl">a software firm</text>
+        <text x="644" y="418" class="p-xl">a single developer</text>
+        <text x="644" y="462" class="p-l">some build from scratch,</text>
+        <text x="644" y="488" class="p-l">some tailor a vendor's agent</text>
+        <text x="644" y="514" class="p-l">with your data and rules</text>
+        <text x="644" y="546" class="p-l">any of them is a delivery group</text>
+        <path d="M 360 355 L 390 355 M 590 355 L 620 355" stroke="var(--accent)" stroke-width="3"/>
+      </g>
+
+      <!-- ═══ 3 · finding the work ═══ -->
+      <g class="el" data-el="s-find">
+        <text x="70" y="110" class="h-big">Finding the work.</text>
+        <rect x="70" y="150" width="560" height="410" rx="14" fill="var(--panel-2)" stroke="var(--faint)" stroke-width="1.4"/>
+        <text x="94" y="190" class="tag" fill="var(--dim)">REQUESTS ON THE BOARD</text>
+        <rect x="94" y="212" width="512" height="50" rx="10" fill="rgba(240,131,107,.12)" stroke="var(--accent)" stroke-width="1.6"/>
+        <text x="112" y="244" class="p-xl">An invoice reader, for a manufacturer</text>
+        <text x="596" y="244" text-anchor="end" class="p-l" fill="var(--accent)">fits</text>
+        <rect x="94" y="272" width="512" height="50" rx="10" fill="rgba(240,131,107,.12)" stroke="var(--accent)" stroke-width="1.6"/>
+        <text x="112" y="304" class="p-xl">A collections drafter, for a distributor</text>
+        <text x="596" y="304" text-anchor="end" class="p-l" fill="var(--accent)">fits</text>
+        <rect x="94" y="332" width="512" height="50" rx="10" fill="none" stroke="var(--faint)" stroke-width="1.2"/>
+        <text x="112" y="364" class="p-xl" fill="var(--dim)">A claims triage agent, for an insurer</text>
+        <rect x="94" y="392" width="512" height="50" rx="10" fill="rgba(240,131,107,.12)" stroke="var(--accent)" stroke-width="1.6"/>
+        <text x="112" y="424" class="p-xl">A month-end reconciler, for a manufacturer</text>
+        <text x="596" y="424" text-anchor="end" class="p-l" fill="var(--accent)">fits</text>
+        <rect x="94" y="452" width="512" height="50" rx="10" fill="none" stroke="var(--faint)" stroke-width="1.2"/>
+        <text x="112" y="484" class="p-xl" fill="var(--dim)">A shift scheduler, for a hospital</text>
+        <text x="94" y="521" class="p-l">digital: your agent can read it and answer it for you,</text>
+        <text x="94" y="545" class="p-l">in minutes, where a traditional request takes months</text>
+        <rect x="660" y="150" width="250" height="410" rx="14" fill="rgba(182,156,255,.10)" stroke="var(--broadcast)" stroke-width="1.8"/>
+        <text x="684" y="190" class="tag" fill="var(--broadcast)">YOUR PROFILE</text>
+        <text x="684" y="240" class="p-l">you build</text>
+        <text x="684" y="270" class="p-xl">finance agents</text>
+        <text x="684" y="322" class="p-l">for</text>
+        <text x="684" y="352" class="p-xl">manufacturers and</text>
+        <text x="684" y="382" class="p-xl">distributors</text>
+        <text x="684" y="434" class="p-l">priced as</text>
+        <text x="684" y="464" class="p-xl">fixed fee, per use,</text>
+        <text x="684" y="494" class="p-xl">or time and materials</text>
+        <text x="684" y="536" class="p-l">filled in once</text>
+      </g>
+
+      <!-- ═══ 3b · months become minutes: an overlay on the board scene ═══ -->
+      <g class="el" data-el="s-fast">
+        <rect x="70" y="80" width="840" height="480" rx="14" fill="rgba(10,20,23,.92)"/>
+        <rect x="110" y="120" width="760" height="400" rx="16" fill="var(--panel-2)" stroke="var(--accent)" stroke-width="2.5"/>
+        <text x="490" y="190" text-anchor="middle" class="h-mid">A traditional RFP takes months.</text>
+        <text x="490" y="250" text-anchor="middle" class="h-mid">RFPs on AgentMesh are digital,</text>
+        <text x="490" y="290" text-anchor="middle" class="h-mid">so agents can answer them in minutes.</text>
+        <text x="490" y="400" text-anchor="middle" class="title-big">100 to 1,000 times faster</text>
+        <text x="490" y="460" text-anchor="middle" class="p-xl">in many cases</text>
+      </g>
+
+      <!-- ═══ 4 · a hand, then an offer ═══ -->
+      <g class="el" data-el="s-offer">
+        <text x="70" y="110" class="h-big">Showing interest, then making an offer.</text>
+        <rect x="70" y="150" width="330" height="410" rx="14" fill="var(--panel-2)" stroke="var(--paper)" stroke-width="1.6"/>
+        <text x="94" y="190" class="tag" fill="var(--paper)">STEP ONE · RAISE YOUR HAND</text>
+        <text x="94" y="250" class="p-xl">"We are interested."</text>
+        <text x="94" y="296" class="p-xl">"Please show us your terms."</text>
+        <text x="94" y="380" class="p-l">The company sees who is</text>
+        <text x="94" y="410" class="p-l">interested, and answers</text>
+        <text x="94" y="440" class="p-l">with its terms.</text>
+        <path d="M 400 355 L 440 355" stroke="var(--accent)" stroke-width="3"/>
+        <rect x="440" y="150" width="470" height="410" rx="14" fill="rgba(240,131,107,.10)" stroke="var(--accent)" stroke-width="1.8"/>
+        <text x="464" y="190" class="tag" fill="var(--accent)">STEP TWO · MAKE AN OFFER</text>
+        <text x="464" y="236" class="p-xl">The price</text>
+        <text x="464" y="262" class="p-l">a fixed fee, a price per use,</text>
+        <text x="464" y="286" class="p-l">or time and materials up to a cap</text>
+        <text x="464" y="328" class="p-xl">How long it is good for</text>
+        <text x="464" y="354" class="p-l">for example, ninety days</text>
+        <text x="464" y="396" class="p-xl">How disputes are handled</text>
+        <text x="464" y="422" class="p-l">the rule you both agree to</text>
+        <text x="464" y="464" class="p-xl">What stays confidential</text>
+        <text x="464" y="490" class="p-l">and for how long</text>
+        <rect x="464" y="510" width="422" height="1" fill="var(--line)"/>
+        <text x="464" y="540" class="p-l">Signed by you. Written once, pointed at any request.</text>
+      </g>
+
+      <!-- ═══ 5 · winning the work ═══ -->
+      <g class="el" data-el="s-win">
+        <text x="70" y="110" class="h-big">Winning the work.</text>
+        <rect x="70" y="170" width="260" height="300" rx="14" fill="var(--panel-2)" stroke="var(--paper)" stroke-width="1.6"/>
+        <text x="94" y="212" class="tag" fill="var(--paper)">THE COMPANY PICKS</text>
+        <text x="94" y="270" class="p-xl">It reviews the offers</text>
+        <text x="94" y="304" class="p-xl">and chooses yours.</text>
+        <path d="M 330 320 L 370 320" stroke="var(--accent)" stroke-width="3"/>
+        <rect x="370" y="170" width="260" height="300" rx="14" fill="rgba(240,131,107,.10)" stroke="var(--accent)" stroke-width="1.8"/>
+        <text x="394" y="212" class="tag" fill="var(--accent)">THE CONTRACT IS CREATED</text>
+        <text x="394" y="270" class="p-xl">your terms</text>
+        <text x="394" y="304" class="p-xl">the company's tests</text>
+        <text x="394" y="338" class="p-xl">created right away,</text>
+        <text x="394" y="372" class="p-xl">from your signed offer</text>
+        <path d="M 630 320 L 670 320" stroke="var(--accent)" stroke-width="3"/>
+        <rect x="670" y="170" width="240" height="300" rx="14" fill="rgba(67,214,166,.10)" stroke="var(--verify)" stroke-width="1.8"/>
+        <text x="694" y="212" class="tag" fill="var(--verify)">BOTH SIDES SIGN</text>
+        <text x="694" y="270" class="p-xl">you</text>
+        <text x="694" y="304" class="p-xl">the company</text>
+        <text x="694" y="372" class="p-l">the contract is on record</text>
+        <text x="70" y="540" class="p-xl">No separate round of paperwork.</text>
+      </g>
+
+      <!-- ═══ 6 · building the agent ═══ -->
+      <g class="el" data-el="s-build">
+        <text x="70" y="110" class="h-big">Building the agent.</text>
+        <rect x="70" y="150" width="250" height="410" rx="14" fill="var(--panel-2)" stroke="var(--paper)" stroke-width="1.6"/>
+        <text x="94" y="190" class="tag" fill="var(--paper)">THE ROLE</text>
+        <text x="94" y="244" class="p-xl">what it must do</text>
+        <text x="94" y="290" class="p-xl">what it must</text>
+        <text x="94" y="320" class="p-xl">never do</text>
+        <text x="94" y="366" class="p-xl">the tests it</text>
+        <text x="94" y="396" class="p-xl">must pass</text>
+        <path d="M 320 355 L 360 355" stroke="var(--accent)" stroke-width="3"/>
+        <rect x="360" y="150" width="300" height="410" rx="14" fill="rgba(240,131,107,.10)" stroke="var(--accent)" stroke-width="1.8"/>
+        <text x="384" y="190" class="tag" fill="var(--accent)">THE PACKAGE</text>
+        <text x="384" y="244" class="p-xl">the skills it needs</text>
+        <text x="384" y="290" class="p-xl">what it refuses to do</text>
+        <text x="384" y="336" class="p-xl">the records it keeps</text>
+        <text x="384" y="382" class="p-xl">the systems it may use</text>
+        <text x="384" y="470" class="p-l">Builder agents help with this.</text>
+        <text x="384" y="500" class="p-l">Everything the agent is made</text>
+        <text x="384" y="530" class="p-l">from stays together here.</text>
+        <path d="M 660 355 L 700 355" stroke="var(--accent)" stroke-width="3"/>
+        <rect x="700" y="150" width="210" height="410" rx="14" fill="rgba(67,214,166,.10)" stroke="var(--verify)" stroke-width="1.8"/>
+        <text x="724" y="190" class="tag" fill="var(--verify)">THE AGENT</text>
+        <text x="724" y="244" class="p-xl">its public record</text>
+        <text x="724" y="274" class="p-xl">on the network</text>
+        <text x="724" y="340" class="p-l">what it is</text>
+        <text x="724" y="370" class="p-l">who built it</text>
+        <text x="724" y="400" class="p-l">what it offers</text>
+      </g>
+
+      <!-- ═══ 7 · testing before delivery ═══ -->
+      <g class="el" data-el="s-test">
+        <text x="70" y="110" class="h-big">Testing it before delivery.</text>
+        <rect x="70" y="170" width="230" height="300" rx="14" fill="var(--panel-2)" stroke="var(--accent)" stroke-width="1.6"/>
+        <text x="94" y="212" class="tag" fill="var(--accent)">YOUR PACKAGE</text>
+        <text x="94" y="270" class="p-xl">what the agent</text>
+        <text x="94" y="300" class="p-xl">says it does</text>
+        <path d="M 300 320 L 340 320" stroke="var(--accent)" stroke-width="3"/>
+        <rect x="340" y="170" width="300" height="300" rx="14" fill="rgba(182,156,255,.10)" stroke="var(--broadcast)" stroke-width="1.8"/>
+        <text x="364" y="212" class="tag" fill="var(--broadcast)">THE EVALUATOR</text>
+        <text x="364" y="258" class="p-l">an independent agent</text>
+        <text x="364" y="310" class="p-xl">reads the package</text>
+        <text x="364" y="350" class="p-xl">creates a test from it</text>
+        <text x="364" y="390" class="p-xl">runs it against your agent</text>
+        <path d="M 640 320 L 680 320" stroke="var(--accent)" stroke-width="3"/>
+        <rect x="680" y="170" width="230" height="300" rx="14" fill="rgba(67,214,166,.10)" stroke="var(--verify)" stroke-width="1.8"/>
+        <text x="704" y="212" class="tag" fill="var(--verify)">SIGNED RESULT</text>
+        <text x="704" y="270" class="h-card">Passed</text>
+        <text x="704" y="320" class="p-l">the agent does what</text>
+        <text x="704" y="350" class="p-l">its package says</text>
+        <text x="704" y="410" class="p-l">published, signed</text>
+        <text x="70" y="540" class="p-xl">The company sees the result before it accepts the agent, and so do you.</text>
+      </g>
+
+      <!-- ═══ 8 · delivering ═══ -->
+      <g class="el" data-el="s-deliver">
+        <text x="70" y="110" class="h-big">Delivering the agent.</text>
+        <rect x="70" y="170" width="260" height="300" rx="14" fill="rgba(240,131,107,.10)" stroke="var(--accent)" stroke-width="1.8"/>
+        <text x="94" y="212" class="tag" fill="var(--accent)">1 · DELIVERED</text>
+        <text x="94" y="270" class="p-xl">You give the company</text>
+        <text x="94" y="304" class="p-xl">the agent's address</text>
+        <text x="94" y="338" class="p-xl">on the network.</text>
+        <path d="M 330 320 L 370 320" stroke="var(--accent)" stroke-width="3"/>
+        <rect x="370" y="170" width="260" height="300" rx="14" fill="var(--panel-2)" stroke="var(--paper)" stroke-width="1.6"/>
+        <text x="394" y="212" class="tag" fill="var(--paper)">2 · CONFIRMED</text>
+        <text x="394" y="270" class="p-xl">The person running</text>
+        <text x="394" y="304" class="p-xl">the project confirms</text>
+        <text x="394" y="338" class="p-xl">it into the role.</text>
+        <path d="M 630 320 L 670 320" stroke="var(--accent)" stroke-width="3"/>
+        <rect x="670" y="170" width="240" height="300" rx="14" fill="rgba(67,214,166,.10)" stroke="var(--verify)" stroke-width="1.8"/>
+        <text x="694" y="212" class="tag" fill="var(--verify)">3 · WORKING</text>
+        <text x="694" y="270" class="p-xl">Real work, inside</text>
+        <text x="694" y="304" class="p-xl">the company's</text>
+        <text x="694" y="338" class="p-xl">process.</text>
+        <text x="694" y="400" class="p-l">people steer and review</text>
+        <text x="70" y="540" class="p-xl">The agent starts the same day it is confirmed.</text>
+      </g>
+
+      <!-- ═══ 9 · getting paid ═══ -->
+      <g class="el" data-el="s-paid">
+        <text x="70" y="110" class="h-big">Getting paid.</text>
+        <text x="70" y="176" class="tag" fill="var(--dim)">THE WORK</text>
+        <rect x="70" y="192" width="190" height="70" rx="12" fill="var(--panel-2)" stroke="var(--faint)" stroke-width="1.4"/><text x="165" y="235" text-anchor="middle" class="p-xl">delivered</text>
+        <rect x="280" y="192" width="190" height="70" rx="12" fill="var(--panel-2)" stroke="var(--faint)" stroke-width="1.4"/><text x="375" y="235" text-anchor="middle" class="p-xl">accepted</text>
+        <rect x="490" y="192" width="190" height="70" rx="12" fill="var(--panel-2)" stroke="var(--faint)" stroke-width="1.4"/><text x="585" y="235" text-anchor="middle" class="p-xl">week one</text>
+        <rect x="700" y="192" width="210" height="70" rx="12" fill="var(--panel-2)" stroke="var(--faint)" stroke-width="1.4"/><text x="805" y="235" text-anchor="middle" class="p-xl">week two</text>
+        <text x="70" y="316" class="tag" fill="var(--verify)">THE PAYMENTS · THREE WAYS</text>
+        <rect x="280" y="332" width="190" height="80" rx="12" fill="rgba(67,214,166,.12)" stroke="var(--verify)" stroke-width="1.6"/><text x="375" y="365" text-anchor="middle" class="p-xl">a fixed fee</text><text x="375" y="392" text-anchor="middle" class="p-l">paid on acceptance</text>
+        <rect x="490" y="332" width="190" height="80" rx="12" fill="rgba(67,214,166,.12)" stroke="var(--verify)" stroke-width="1.6"/><text x="585" y="365" text-anchor="middle" class="p-xl">a price per use</text><text x="585" y="392" text-anchor="middle" class="p-l">paid per use</text>
+        <rect x="700" y="332" width="210" height="80" rx="12" fill="rgba(67,214,166,.12)" stroke="var(--verify)" stroke-width="1.6"/><text x="805" y="365" text-anchor="middle" class="p-xl">time and materials</text><text x="805" y="392" text-anchor="middle" class="p-l">up to a cap</text>
+        <path d="M 375 262 L 375 332 M 585 262 L 585 332 M 805 262 L 805 332" stroke="var(--verify)" stroke-width="2" stroke-dasharray="5 5"/>
+        <text x="70" y="462" class="p-xl">Each payment is recorded next to the work it paid for. No invoices to chase.</text>
+        <rect x="70" y="490" width="840" height="70" rx="12" fill="rgba(240,131,107,.10)" stroke="var(--accent)" stroke-width="1.6"/>
+        <text x="94" y="520" class="p-xl">When the delivery group is your own technical team, the payments are</text>
+        <text x="94" y="546" class="p-xl">internal charge-back codes, and the record works the same way.</text>
+      </g>
+
+      <!-- ═══ 10 · standing behind the work ═══ -->
+      <g class="el" data-el="s-stand">
+        <text x="70" y="110" class="h-big">Standing behind the work.</text>
+        <rect x="70" y="150" width="410" height="410" rx="14" fill="var(--panel-2)" stroke="var(--paper)" stroke-width="1.6"/>
+        <text x="94" y="190" class="tag" fill="var(--paper)">THE ACCEPTANCE</text>
+        <text x="94" y="244" class="p-xl">The company records whether</text>
+        <text x="94" y="278" class="p-xl">the agent passed the tests</text>
+        <text x="94" y="312" class="p-xl">it set at the start.</text>
+        <text x="94" y="372" class="p-l">Signed by the company, not anonymous.</text>
+        <text x="94" y="420" class="p-l">A rejection includes the reason, and</text>
+        <text x="94" y="450" class="p-l">the dispute terms in the contract say</text>
+        <text x="94" y="480" class="p-l">what happens next.</text>
+        <path d="M 480 355 L 520 355" stroke="var(--accent)" stroke-width="3"/>
+        <rect x="520" y="150" width="390" height="410" rx="14" fill="rgba(67,214,166,.10)" stroke="var(--verify)" stroke-width="1.8"/>
+        <text x="544" y="190" class="tag" fill="var(--verify)">YOUR REPUTATION</text>
+        <text x="544" y="256" class="h-big">12 accepted</text>
+        <text x="544" y="306" class="h-card">1 rejected, with its reason</text>
+        <text x="544" y="372" class="p-l">Each accepted delivery adds to the</text>
+        <text x="544" y="402" class="p-l">reputation of your agent and your group.</text>
+        <text x="544" y="450" class="p-l">It follows you to the next request,</text>
+        <text x="544" y="480" class="p-l">signed by the people who used the agent.</text>
+      </g>
+
+      <!-- ═══ 11 · doing it again ═══ -->
+      <g class="el" data-el="s-again">
+        <text x="70" y="110" class="h-big">Doing it again.</text>
+        <rect x="70" y="190" width="150" height="90" rx="12" fill="var(--panel-2)" stroke="var(--faint)" stroke-width="1.4"/><text x="145" y="242" text-anchor="middle" class="h-card">looking</text>
+        <rect x="240" y="190" width="150" height="90" rx="12" fill="var(--panel-2)" stroke="var(--faint)" stroke-width="1.4"/><text x="315" y="242" text-anchor="middle" class="h-card">offered</text>
+        <rect x="410" y="190" width="150" height="90" rx="12" fill="var(--panel-2)" stroke="var(--faint)" stroke-width="1.4"/><text x="485" y="242" text-anchor="middle" class="h-card">won</text>
+        <rect x="580" y="190" width="150" height="90" rx="12" fill="var(--panel-2)" stroke="var(--faint)" stroke-width="1.4"/><text x="655" y="242" text-anchor="middle" class="h-card">delivering</text>
+        <rect x="750" y="190" width="160" height="90" rx="12" fill="var(--panel-2)" stroke="var(--faint)" stroke-width="1.4"/><text x="830" y="242" text-anchor="middle" class="h-card">delivered</text>
+        <rect x="580" y="310" width="150" height="90" rx="12" fill="rgba(67,214,166,.12)" stroke="var(--verify)" stroke-width="1.6"/><text x="655" y="362" text-anchor="middle" class="h-card">paid</text>
+        <rect x="750" y="310" width="160" height="90" rx="12" fill="rgba(67,214,166,.12)" stroke="var(--verify)" stroke-width="1.6"/><text x="830" y="362" text-anchor="middle" class="h-card">reviewed</text>
+        <path d="M 220 235 L 240 235 M 390 235 L 410 235 M 560 235 L 580 235 M 730 235 L 750 235 M 830 280 L 830 310 M 750 355 L 730 355" stroke="var(--accent)" stroke-width="3"/>
+        <path d="M 580 355 C 400 355, 145 355, 145 280" fill="none" stroke="var(--accent)" stroke-width="2.5" stroke-dasharray="6 6"/>
+        <text x="300" y="345" class="p-l" fill="var(--accent)">and back to looking</text>
+        <text x="70" y="460" class="p-xl">Your offer stays available for the next request.</text>
+        <text x="70" y="496" class="p-xl">The same agent can be delivered to many companies.</text>
+        <text x="70" y="532" class="p-xl">Every delivery has a complete record, from the hand you raised to the payment you received.</text>
+      </g>
+
+      <!-- ═══ 12 · what is new ═══ -->
+      <g class="el" data-el="s-new">
+        <text x="70" y="110" class="h-big">What is new here.</text>
+        <rect x="70" y="150" width="410" height="200" rx="14" fill="var(--panel-2)" stroke="var(--accent)" stroke-width="1.8"/>
+        <text x="96" y="190" class="tag" fill="var(--accent)">NEW</text>
+        <text x="96" y="236" class="h-card">A public list of the agents</text>
+        <text x="96" y="266" class="h-card">companies need</text>
+        <text x="96" y="310" class="p-l">written down, role by role</text>
+        <rect x="500" y="150" width="410" height="200" rx="14" fill="var(--panel-2)" stroke="var(--signal)" stroke-width="1.8"/>
+        <text x="526" y="190" class="tag" fill="var(--signal)">NEW</text>
+        <text x="526" y="236" class="h-card">An offer that becomes the</text>
+        <text x="526" y="266" class="h-card">contract when it is accepted</text>
+        <text x="526" y="310" class="p-l">no separate round of paperwork</text>
+        <rect x="70" y="370" width="410" height="200" rx="14" fill="var(--panel-2)" stroke="var(--broadcast)" stroke-width="1.8"/>
+        <text x="96" y="410" class="tag" fill="var(--broadcast)">NEW</text>
+        <text x="96" y="456" class="h-card">An independent evaluator</text>
+        <text x="96" y="486" class="h-card">that proves the agent</text>
+        <text x="96" y="530" class="p-l">a signed result, before delivery</text>
+        <rect x="500" y="370" width="410" height="200" rx="14" fill="var(--panel-2)" stroke="var(--verify)" stroke-width="1.8"/>
+        <text x="526" y="410" class="tag" fill="var(--verify)">NEW</text>
+        <text x="526" y="456" class="h-card">A reputation that follows</text>
+        <text x="526" y="486" class="h-card">the agent</text>
+        <text x="526" y="530" class="p-l">signed by the people who used it</text>
+      </g>
+
+      <!-- ═══ 13 · in short ═══ -->
+      <g class="el" data-el="synopsis">
+        <text x="90" y="130" class="syn-head">In short</text>
+        <rect x="90" y="186" width="16" height="16" rx="3" fill="var(--accent)"/>
+        <text x="126" y="202" class="syn-xl">Companies post the agents they need, role by role.</text>
+        <rect x="90" y="256" width="16" height="16" rx="3" fill="var(--signal)"/>
+        <text x="126" y="272" class="syn-xl">You make a signed offer, and it becomes the contract when they accept it.</text>
+        <rect x="90" y="326" width="16" height="16" rx="3" fill="var(--broadcast)"/>
+        <text x="126" y="342" class="syn-xl">You build the agent, prove it, and deliver it.</text>
+        <rect x="90" y="396" width="16" height="16" rx="3" fill="var(--verify)"/>
+        <text x="126" y="412" class="syn-xl">You are paid on the terms in the contract.</text>
+        <rect x="90" y="466" width="16" height="16" rx="3" fill="var(--paper)"/>
+        <text x="126" y="482" class="syn-xl">Your reputation grows with each delivery.</text>
+      </g>
+    </svg>
+
+    <div class="callout" id="callout" role="status">
+      <div class="co-eyebrow" id="co-eyebrow">THE QUESTION</div>
+      <p id="co-text"></p>
+    </div>
+  </div>
+
+  <aside class="panel" id="panel" aria-label="The words this part introduces">
+    <h2>THE WORDS</h2>
+    <p class="panel-sub">Each word arrives when the story needs it.</p>
+
+    <div class="capgroup" data-group="0">
+      <button class="cg-head" type="button"><span class="cg-label">1 · THE BUSINESS</span><span class="cg-count"></span><span class="chev"></span></button>
+      <div class="cg-body">
+      <div class="cap" data-cap="group"><span class="box"></span><span><span class="cap-name">A delivery group</span><span class="cap-why">whoever builds or tailors the agents, including wrapping a vendor's agent: most often the company's own technical team</span></span></div>
+      <div class="cap" data-cap="request"><span class="box"></span><span><span class="cap-name">A request</span><span class="cap-why">a company's posted description of the agent it needs, with tests and terms; digital, so an agent can answer it in minutes</span></span></div>
+      <div class="cap" data-cap="profile"><span class="box"></span><span><span class="cap-name">Your profile</span><span class="cap-why">what you build and for whom, so matching requests come to you</span></span></div>
+      </div>
+    </div>
+
+    <div class="capgroup" data-group="1">
+      <button class="cg-head" type="button"><span class="cg-label">2 · THE DEAL</span><span class="cg-count"></span><span class="chev"></span></button>
+      <div class="cg-body">
+      <div class="cap" data-cap="hand"><span class="box"></span><span><span class="cap-name">Raising your hand</span><span class="cap-why">telling a company you are interested and asking for its terms</span></span></div>
+      <div class="cap" data-cap="offer"><span class="box"></span><span><span class="cap-name">An offer</span><span class="cap-why">your signed proposal: price, how long it stands, disputes, confidentiality</span></span></div>
+      <div class="cap" data-cap="contract"><span class="box"></span><span><span class="cap-name">The contract</span><span class="cap-why">created from your offer when the company accepts it, signed by both</span></span></div>
+      </div>
+    </div>
+
+    <div class="capgroup" data-group="2">
+      <button class="cg-head" type="button"><span class="cg-label">3 · THE BUILD</span><span class="cg-count"></span><span class="chev"></span></button>
+      <div class="cg-body">
+      <div class="cap" data-cap="package"><span class="box"></span><span><span class="cap-name">The package</span><span class="cap-why">everything the agent is made from, kept together</span></span></div>
+      <div class="cap" data-cap="evaluator"><span class="box"></span><span><span class="cap-name">The evaluator</span><span class="cap-why">an independent agent that tests yours and signs the result</span></span></div>
+      <div class="cap" data-cap="delivery"><span class="box"></span><span><span class="cap-name">A delivery</span><span class="cap-why">the agent's address handed over, confirmed into the role</span></span></div>
+      </div>
+    </div>
+
+    <div class="capgroup" data-group="3">
+      <button class="cg-head" type="button"><span class="cg-label">4 · THE RETURN</span><span class="cg-count"></span><span class="chev"></span></button>
+      <div class="cg-body">
+      <div class="cap" data-cap="payment"><span class="box"></span><span><span class="cap-name">Payment</span><span class="cap-why">a fixed fee, a price per use, or time and materials up to a cap; for an internal team, a charge-back code</span></span></div>
+      <div class="cap" data-cap="acceptance"><span class="box"></span><span><span class="cap-name">The acceptance</span><span class="cap-why">the company's signed record of whether the agent passed its tests</span></span></div>
+      <div class="cap" data-cap="reputation"><span class="box"></span><span><span class="cap-name">Reputation</span><span class="cap-why">what your accepted deliveries add up to, and it follows you</span></span></div>
+      </div>
+    </div>
+  </aside>
+
+  <div class="band">
+    <span class="stageno" id="stageno">STAGE 1 OF 4</span>
+    <div class="bt">
+      <h1 id="b-title"></h1>
+      <p id="b-desc"></p>
+      <a class="cta" id="cta" href="agentic-enterprise.html" hidden>Next: The Agentic Enterprise →</a>
+    </div>
+    <div class="controls">
+      <span class="beatno" id="beatno"></span>
+      <button id="playall" aria-label="Play the whole sequence">▶ Play</button>
+      <button id="back" aria-label="Previous step">← Back</button>
+      <button id="next" class="primary" aria-label="Next step">Next →</button>
+    </div>
+  </div>
+</div>
+
+<script>
+(() => {
+  // One scene per beat: each beat clears the canvas and draws its own slide.
+  const BEATS = [
+    { stage:0, silent:true, hold:2800, show:["titlecard"] },
+
+    // ═══ Stage 1 · The business ═══
+    { stage:0, clear:true, show:["s-business"], caps:["group"],
+      title:"A new kind of business",
+      desc:"When a company rebuilds its processes with agents, it needs agents built for specific jobs. Somebody has to build them, or tailor them. Often that is the company's own technical team. It can also be an agency, a software firm, or a single developer. Sometimes the agent comes from a software vendor, and the job is wrapping it with your own data and business rules. We call any of them a delivery group. This is a new line of business, because companies now post exactly which agents they need, in public." },
+    { stage:0, clear:true, show:["s-find"], caps:["request","profile"],
+      title:"Finding the work",
+      desc:"A company posts each role it needs as a request for proposals, written for agents. The request describes what the agent must do, what it must never do, the tests it has to pass, and the terms. A delivery group fills in a short profile of the work it does, and the matching requests show up in its own list." },
+
+    { stage:0, show:["s-fast"],
+      title:"Months become minutes",
+      desc:"A traditional request for proposals takes months. Requests on AgentMesh are digital, so agents can read them and answer them in minutes. In many cases that makes the process one hundred to one thousand times faster." },
+
+    // ═══ Stage 2 · The deal ═══
+    { stage:1, clear:true, show:["s-offer"], caps:["hand","offer"],
+      title:"Showing interest, then making an offer",
+      desc:"The first step is to raise your hand on a request. That tells the company you are interested and asks to see their terms. The second step is to make an offer. An offer is a signed proposal that states your price, how long the offer is good for, how any disputes will be handled, and what you will keep confidential. You can price the work as a fixed fee, as a price per use, or as time and materials with a cap." },
+    { stage:1, clear:true, show:["s-win"], caps:["contract"],
+      title:"Winning the work",
+      desc:"The company reviews the offers and picks one. If it picks yours, the contract is created right away, because your offer was already signed. The contract contains your terms and the company's acceptance tests, and both sides sign it. There is no separate round of paperwork." },
+
+    // ═══ Stage 3 · The build ═══
+    { stage:2, clear:true, show:["s-build"], caps:["package"],
+      title:"Building the agent",
+      desc:"Now you build the agent to match the role. You decide what skills it needs, what it must refuse to do, what records it keeps, and which of the company's systems it is allowed to use. Builder agents can help with this work. Everything the agent is made from is kept together in one package, and the agent's public record on the network describes what it is and who built it." },
+    { stage:2, clear:true, show:["s-test"], caps:["evaluator"],
+      title:"Testing it before delivery",
+      desc:"An independent evaluator agent reads your agent's package and creates a test from it. It runs that test against your running agent and publishes a signed result. A passing result means the agent does what its package says it does. The company can see the result before accepting the agent, and so can you." },
+    { stage:2, clear:true, show:["s-deliver"], caps:["delivery"],
+      title:"Delivering the agent",
+      desc:"When the agent is ready, you deliver it by giving the company its address on the network. The person running the company's project confirms the agent into the role. From that point the agent does real work inside the company's process, with people steering and reviewing it, as Part 4 described." },
+
+    // ═══ Stage 4 · The return ═══
+    { stage:3, clear:true, show:["s-paid"], caps:["payment"],
+      title:"Getting paid",
+      desc:"The contract states how you are paid. A fixed fee is paid when the company accepts the delivery. A price per use is paid each time the agent does the job. Time and materials are paid as the work happens, up to the cap written in the contract. Each payment is recorded next to the work it paid for, so there are no invoices to chase. In many companies the delivery group is the company's own technical team. Then the payments are internal charge-back codes, and the record works the same way." },
+    { stage:3, clear:true, show:["s-stand"], caps:["acceptance","reputation"],
+      title:"Standing behind the work",
+      desc:"The company records whether the agent passed the acceptance tests it set at the start. That review is signed by the company, so it is not anonymous. If the agent fails, the rejection includes a reason, and the dispute terms in the contract say what happens next. Each accepted delivery adds to the reputation of your agent and your group, and that reputation follows you to the next request." },
+    { stage:3, clear:true, show:["s-again"],
+      title:"Doing it again",
+      desc:"Your offer stays available for the next request. The same agent can be delivered to many companies. Over time your list of requests fills up, and every delivery has a complete record, from the moment you raised your hand to the moment you were paid." },
+    { stage:3, clear:true, show:["s-new"],
+      title:"What is new here",
+      desc:"Before this, there was no public list of the agents companies needed, role by role. There was no way to make an offer that could become a contract as soon as it was accepted. There was no independent evaluator to prove that an agent does what it claims. And there was no reputation that followed an agent from one company to the next, signed by the people who used it. AgentMesh provides all four." },
+    { stage:3, clear:true, cta:true, complete:true, show:["synopsis"],
+      title:"In short",
+      desc:"Companies post the agents they need. You make a signed offer, and it becomes the contract when they accept it. You build the agent, prove it, and deliver it. You are paid on the terms in the contract. Your reputation grows with each delivery." },
+  ];
+
+  const stageFirstBeat = [1, 4, 6, 9];
+  const els = {};
+  document.querySelectorAll("[data-el]").forEach(g => els[g.dataset.el] = g);
+  const caps = {};
+  document.querySelectorAll("[data-cap]").forEach(c => caps[c.dataset.cap] = c);
+  const groups = document.querySelectorAll(".capgroup");
+  const callout = document.getElementById("callout");
+  const coText = document.getElementById("co-text");
+  const coEyebrow = document.getElementById("co-eyebrow");
+  const panel = document.getElementById("panel");
+  const scrubBtns = document.querySelectorAll("#scrub button");
+  const backBtn = document.getElementById("back");
+  const nextBtn = document.getElementById("next");
+  const playBtn = document.getElementById("playall");
+
+  // ── narration: one clip per beat ──
+  const voice = new Audio();
+  voice.preload = "auto";
+  let playingAll = false;
+  let holdTimer = null;
+  const CLIPV = 4; // bump when any narration clip is re-recorded, so caches refetch
+  const clip = (i) => `delivering-agents-audio/beat-${String(i + 1).padStart(2, "0")}.mp3?v=${CLIPV}`;
+  function playBeat(){
+    clearTimeout(holdTimer);
+    const cur = BEATS[beat];
+    if (cur.silent){
+      voice.pause();
+      if (playingAll) holdTimer = setTimeout(() => { if (playingAll) go(beat + 1); }, cur.hold || 2500);
+      return;
+    }
+    voice.src = clip(beat);
+    voice.play().catch(() => {});
+  }
+  function stopAll(){
+    playingAll = false;
+    clearTimeout(holdTimer);
+    playBtn.textContent = "▶ Play";
+  }
+  voice.addEventListener("ended", () => {
+    if (!playingAll) return;
+    if (beat < BEATS.length - 1) go(beat + 1);
+    else stopAll();
+  });
+
+  let beat = 0;
+  let manualOpen = {};
+
+  function render(jumped){
+    const shown = new Set(), lit = new Set(), litGroups = new Set();
+    let title = "", desc = "", stage = 0, complete = false, latestGroup = null;
+    for (let i = 0; i <= beat; i++){
+      const b = BEATS[i];
+      if (b.clear) shown.clear();
+      (b.show || []).forEach(id => shown.add(id));
+      (b.caps || []).forEach(id => lit.add(id));
+      if (b.caps){ litGroups.add(String(b.stage)); latestGroup = String(b.stage); }
+      if (b.title) title = b.title;
+      if (b.desc) desc = b.desc;
+      stage = b.stage;
+      if (b.complete) complete = true;
+    }
+    const cur = BEATS[beat];
+    for (const [id, g] of Object.entries(els)){
+      g.classList.toggle("instant", !!jumped && shown.has(id) && !(cur.show || []).includes(id));
+      g.classList.toggle("on", shown.has(id));
+    }
+    for (const [id, c] of Object.entries(caps)) c.classList.toggle("on", lit.has(id));
+    groups.forEach(g => {
+      const id = g.dataset.group;
+      g.classList.toggle("on", litGroups.has(id));
+      const open = cur.openAll ? litGroups.has(id)
+        : manualOpen[id] !== undefined ? manualOpen[id] : id === latestGroup;
+      g.classList.toggle("open", open);
+      const n = g.querySelectorAll(".cap.on").length;
+      g.querySelector(".cg-count").textContent = n ? `${n} ✓` : "";
+    });
+    panel.classList.toggle("complete", complete);
+    document.getElementById("cta").hidden = !cur.cta;
+
+    if (cur.callout){
+      coEyebrow.textContent = cur.callout.eyebrow || "THE QUESTION";
+      coText.textContent = cur.callout.text;
+      callout.style.left = cur.callout.x + "%";
+      callout.style.top = cur.callout.y + "%";
+      callout.style.maxWidth = (cur.callout.w || 330) + "px";
+      callout.classList.toggle("mint", !!cur.callout.mint);
+      callout.classList.add("on");
+    } else {
+      callout.classList.remove("on");
+    }
+
+    document.getElementById("b-title").textContent = title;
+    document.getElementById("b-desc").textContent = desc;
+    document.getElementById("stageno").textContent = `STAGE ${stage + 1} OF 4`;
+    document.getElementById("beatno").textContent = `${beat + 1} / ${BEATS.length}`;
+    scrubBtns.forEach(b => {
+      const s = Number(b.dataset.stage);
+      b.classList.toggle("on", s === stage);
+      b.classList.toggle("done", s < stage);
+    });
+    backBtn.disabled = beat === 0;
+    nextBtn.disabled = beat === BEATS.length - 1;
+  }
+
+  function go(n, jumped){
+    beat = Math.max(0, Math.min(BEATS.length - 1, n));
+    manualOpen = {};
+    render(jumped);
+    playBeat();
+  }
+
+  playBtn.addEventListener("click", () => {
+    if (playingAll){ stopAll(); voice.pause(); return; }
+    playingAll = true;
+    playBtn.textContent = "■ Stop";
+    if (beat === BEATS.length - 1) go(0, true);
+    else playBeat();
+  });
+  groups.forEach(g => g.querySelector(".cg-head").addEventListener("click", () => {
+    manualOpen[g.dataset.group] = !g.classList.contains("open");
+    render();
+  }));
+  nextBtn.addEventListener("click", () => go(beat + 1));
+  backBtn.addEventListener("click", () => go(beat - 1));
+  scrubBtns.forEach(b => b.addEventListener("click", () => go(stageFirstBeat[Number(b.dataset.stage)], true)));
+  window.addEventListener("keydown", (e) => {
+    if (e.key === "ArrowRight" || e.key === " ") { e.preventDefault(); go(beat + 1); }
+    if (e.key === "ArrowLeft") { e.preventDefault(); go(beat - 1); }
+  });
+
+  render();
+})();
+</script>
+</body>
+</html>

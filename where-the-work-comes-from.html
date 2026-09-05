@@ -1,0 +1,710 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The Agentic Transformation · AgentMesh</title>
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<meta name="robots" content="noindex">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+<style>
+  /* Same token system as the rest of the series. Part 4 wears teal. */
+  :root{
+    --ink:#0A1417; --panel:#0F1D22; --panel-2:#12242A; --line:#1C2E33;
+    --paper:#E7EFEC; --dim:#7C918C; --faint:#4A5D5A;
+    --signal:#F2A93B; --verify:#43D6A6; --address:#6BA8FF; --broadcast:#B69CFF;
+    --accent:#62C6D8;   /* teal: this part's colour */
+    --disp:'Space Grotesk', sans-serif;
+    --body:'IBM Plex Sans', system-ui, sans-serif;
+    --wire:'IBM Plex Mono', ui-monospace, monospace;
+  }
+  *{ box-sizing:border-box; }
+  html,body{ margin:0; height:100%; }
+  body{ background:var(--ink); color:var(--paper); font-family:var(--body);
+    font-size:16px; line-height:1.55; -webkit-font-smoothing:antialiased;
+    background-image:
+      linear-gradient(var(--line) 1px, transparent 1px),
+      linear-gradient(90deg, var(--line) 1px, transparent 1px);
+    background-size:64px 64px; background-position:-1px -1px;
+    display:flex; flex-direction:column; }
+  body::before{ content:""; position:fixed; inset:0; z-index:0; pointer-events:none;
+    background:
+      radial-gradient(80% 45% at 30% 0%, rgba(98,198,216,.08), transparent 60%),
+      linear-gradient(180deg, rgba(10,20,23,.72), var(--ink) 62%); }
+
+  .topbar{ position:relative; z-index:5; border-bottom:1px solid var(--line); background:rgba(10,20,23,.9); }
+  .topbar .bar{ max-width:1360px; margin:0 auto; padding:0 32px; height:60px;
+    display:flex; align-items:center; gap:26px; position:relative; }
+  .brand{ font-family:var(--wire); font-weight:600; font-size:.82rem; letter-spacing:.02em;
+    display:flex; align-items:center; gap:9px; color:var(--paper); text-decoration:none; }
+  .brand .dot{ width:9px; height:9px; border-radius:2px; background:var(--signal);
+    box-shadow:0 0 0 3px rgba(242,169,59,.15), 8px 0 0 -2px var(--verify), 16px 0 0 -2px var(--address); }
+  .brand span.wm{ margin-left:14px; }
+  .scrub{ position:absolute; left:50%; transform:translateX(-50%); display:flex; gap:8px; }
+  .scrub button{ font-family:var(--wire); font-size:.74rem; letter-spacing:.02em;
+    color:var(--dim); background:none; border:1px solid var(--line); border-radius:999px;
+    padding:6px 14px; cursor:pointer; transition:color .18s, border-color .18s, background .18s; }
+  .scrub button:hover{ color:var(--paper); }
+  .scrub button.on{ color:var(--ink); background:var(--accent); border-color:var(--accent); font-weight:600; }
+  .scrub button.done{ color:var(--verify); border-color:rgba(67,214,166,.4); }
+
+  .stagegrid{ position:relative; z-index:1; flex:1; max-width:1360px; width:100%;
+    margin:0 auto; padding:22px 32px 26px; display:grid;
+    grid-template-columns:1fr 320px; grid-template-rows:1fr auto; gap:18px; min-height:0; }
+
+  .canvas{ grid-row:1; grid-column:1; position:relative; border:1px solid var(--line);
+    border-radius:12px; background:linear-gradient(180deg, rgba(15,29,34,.6), rgba(10,20,23,.3));
+    overflow:hidden; min-height:420px; }
+  .canvas svg{ position:absolute; inset:0; width:100%; height:100%; }
+
+  .el{ opacity:0; transition:opacity .5s ease, transform .5s ease; transform:translateY(8px); }
+  .el.on{ opacity:1; transform:none; }
+  .el.instant{ transition:none; }
+
+  .title-big{ font-family:var(--disp); font-size:48px; font-weight:700; fill:var(--paper); }
+  .title-sub{ font-family:var(--wire); font-size:14px; letter-spacing:.2em; fill:var(--accent); }
+  .frame-label{ font-family:var(--wire); font-size:12px; font-weight:600; letter-spacing:.14em; fill:var(--faint); }
+  .node-label{ font-family:var(--wire); font-size:14px; font-weight:600; fill:var(--paper); }
+  .node-sub{ font-family:var(--wire); font-size:11px; fill:var(--dim); }
+  .card-title{ font-family:var(--disp); font-size:17px; font-weight:700; fill:var(--paper); }
+  .step-text{ font-family:var(--body); font-size:14px; fill:var(--paper); }
+  .chip-text{ font-family:var(--wire); font-size:10.5px; fill:var(--ink); font-weight:600; }
+  .chip-dim{ font-family:var(--wire); font-size:10.5px; fill:var(--paper); }
+  .syn-head{ font-family:var(--disp); font-size:40px; font-weight:700; fill:var(--paper); }
+  .syn-line{ font-family:var(--body); font-size:18px; fill:var(--paper); }
+  .h-big{ font-family:var(--disp); font-size:38px; font-weight:700; fill:var(--paper); }
+  .h-mid{ font-family:var(--disp); font-size:26px; font-weight:700; fill:var(--paper); }
+  .h-small{ font-family:var(--disp); font-size:20px; font-weight:700; fill:var(--paper); }
+  .p-big{ font-family:var(--body); font-size:19px; fill:var(--paper); }
+  .p-mid{ font-family:var(--body); font-size:16px; fill:var(--paper); }
+  .p-dim{ font-family:var(--body); font-size:16px; fill:var(--dim); }
+  .tag{ font-family:var(--wire); font-size:13px; font-weight:600; letter-spacing:.12em; }
+  .h-card{ font-family:var(--disp); font-size:23px; font-weight:700; fill:var(--paper); }
+  .p-l{ font-family:var(--body); font-size:19px; fill:var(--dim); }
+  .p-xl{ font-family:var(--body); font-size:22px; fill:var(--paper); }
+  .syn-xl{ font-family:var(--body); font-size:21px; fill:var(--paper); }
+  .wire-ask{ stroke:var(--accent); stroke-width:1.8; fill:none; }
+  .wire-reply{ stroke:var(--verify); stroke-width:1.6; fill:none; stroke-dasharray:5 5; }
+  g.el path.draw{ stroke-dashoffset:0; }
+  @media (prefers-reduced-motion: no-preference){
+    g.el:not(.on) path.draw{ stroke-dashoffset:var(--len, 300); }
+    g.el.on path.draw{ transition:stroke-dashoffset .9s ease .15s; }
+  }
+  #baton{ transition:cx 1.2s ease; }
+  .row-text{ font-family:var(--body); font-size:15px; fill:var(--paper); }
+  .row-num{ font-family:var(--wire); font-size:14px; font-weight:600; fill:var(--paper); }
+  .legend{ font-family:var(--wire); font-size:11px; fill:var(--dim); }
+  .note-text{ font-family:var(--body); font-size:13px; fill:var(--dim); }
+
+  .callout{ position:absolute; z-index:4; max-width:330px; padding:14px 16px 15px;
+    background:var(--panel-2); border:1px solid rgba(98,198,216,.5); border-left:3px solid var(--accent);
+    border-radius:8px; box-shadow:0 14px 40px rgba(0,0,0,.5);
+    opacity:0; transform:translateY(10px); pointer-events:none;
+    transition:opacity .45s ease, transform .45s ease; }
+  .callout.on{ opacity:1; transform:none; }
+  .callout .co-eyebrow{ font-family:var(--wire); font-size:.68rem; letter-spacing:.14em; color:var(--accent); margin-bottom:6px; }
+  .callout p{ margin:0; font-size:.92rem; line-height:1.5; color:var(--paper); }
+  .callout.mint{ border-color:rgba(67,214,166,.5); border-left-color:var(--verify); }
+  .callout.mint .co-eyebrow{ color:var(--verify); }
+
+  .panel{ grid-row:1 / span 2; grid-column:2; border:1px solid var(--line); border-radius:12px;
+    background:var(--panel); padding:20px 20px 16px; overflow-y:auto; min-height:0; }
+  .panel h2{ font-family:var(--wire); font-size:.72rem; font-weight:600; letter-spacing:.16em; color:var(--dim); margin:0 0 4px; }
+  .panel .panel-sub{ font-size:.8rem; color:var(--faint); margin:0 0 14px; }
+  .capgroup{ display:none; }
+  .capgroup.on{ display:block; }
+  .cg-head{ width:100%; display:flex; align-items:center; gap:10px; cursor:pointer;
+    background:none; border:none; border-top:1px solid var(--line); padding:11px 0 9px; text-align:left; }
+  .capgroup:first-of-type .cg-head{ border-top:none; padding-top:2px; }
+  .cg-head:focus-visible{ outline:2px solid var(--accent); outline-offset:2px; border-radius:4px; }
+  .cg-label{ font-family:var(--wire); font-size:.68rem; letter-spacing:.12em; color:var(--faint); }
+  .capgroup.open .cg-label{ color:var(--dim); }
+  .cg-count{ margin-left:auto; font-family:var(--wire); font-size:.68rem; color:var(--verify); }
+  .chev{ flex:none; width:7px; height:7px; margin-top:-3px; border-right:1.5px solid var(--dim);
+    border-bottom:1.5px solid var(--dim); transform:rotate(45deg); transition:transform .2s ease; }
+  .capgroup.open .chev{ transform:rotate(-135deg); margin-top:3px; }
+  .cg-body{ display:none; padding-bottom:10px; }
+  .capgroup.open .cg-body{ display:block; }
+  .cap{ display:flex; align-items:baseline; gap:10px; padding:4px 0;
+    opacity:0; transform:translateX(8px); transition:opacity .4s ease, transform .4s ease; }
+  .cap.on{ opacity:1; transform:none; }
+  .cap .box{ flex:none; width:13px; height:13px; border:1.5px solid var(--faint); border-radius:3px;
+    position:relative; top:2px; transition:border-color .3s, background .3s; }
+  .cap.on .box{ border-color:var(--verify); background:rgba(67,214,166,.12); }
+  .cap.on .box::after{ content:""; position:absolute; inset:2px 2px 3px;
+    border-right:2px solid var(--verify); border-bottom:2px solid var(--verify);
+    transform:rotate(40deg) scale(.85); border-radius:1px; }
+  .cap .cap-name{ font-size:.86rem; font-weight:500; color:var(--paper); }
+  .cap .cap-why{ font-size:.76rem; color:var(--dim); display:block; margin-top:1px; }
+  .panel.complete{ border-color:rgba(67,214,166,.45);
+    box-shadow:0 0 0 1px rgba(67,214,166,.15), 0 0 40px rgba(67,214,166,.06) inset; }
+
+  .band{ grid-row:2; grid-column:1; border:1px solid var(--line); border-radius:12px;
+    background:var(--panel); padding:18px 22px; display:flex; gap:22px; align-items:flex-start; }
+  .band .stageno{ font-family:var(--wire); font-size:.72rem; letter-spacing:.14em; color:var(--accent); white-space:nowrap; padding-top:6px; }
+  .band .bt{ flex:1; min-width:0; }
+  .band h1{ font-size:1.3rem; margin:0 0 4px; font-family:var(--disp); }
+  .band p{ margin:0; color:var(--dim); font-size:.92rem; max-width:64ch; }
+  .band .cta{ display:inline-block; margin-top:10px; font-family:var(--wire); font-size:.85rem; font-weight:600;
+    color:var(--ink); background:var(--accent); border-radius:8px; padding:9px 16px; text-decoration:none; }
+  .band .cta:hover{ background:#84d5e3; }
+  .band .cta[hidden]{ display:none; }
+  .controls{ flex:none; display:flex; gap:10px; align-items:center; padding-top:4px; }
+  .controls .beatno{ font-family:var(--wire); font-size:.72rem; color:var(--faint); margin-right:4px; }
+  .controls button{ font-family:var(--wire); font-size:.82rem; font-weight:600; cursor:pointer;
+    border-radius:8px; padding:9px 18px; border:1px solid var(--line);
+    background:var(--panel-2); color:var(--paper); transition:background .18s, border-color .18s; }
+  .controls button:hover{ border-color:var(--dim); }
+  .controls button.primary{ background:var(--accent); border-color:var(--accent); color:var(--ink); }
+  .controls button.primary:hover{ background:#84d5e3; }
+  .controls button:disabled{ opacity:.35; cursor:default; }
+  .controls button:focus-visible{ outline:2px solid var(--accent); outline-offset:3px; }
+
+  /* a short window: the caption band gives up a little room so it stays above the fold */
+  @media (max-height: 780px){
+    .stagegrid{ padding:14px 32px 16px; gap:12px; }
+    .band{ padding:12px 18px; }
+    .band p{ font-size:.86rem; line-height:1.45; }
+    .band .cta{ margin-top:6px; padding:7px 14px; }
+    .canvas{ min-height:380px; }
+  }
+  @media (max-width: 1000px){
+    .stagegrid{ grid-template-columns:1fr; grid-template-rows:auto auto auto; padding:16px; }
+    .panel{ grid-row:3; grid-column:1; max-height:340px; }
+    .band{ grid-row:2; flex-wrap:wrap; }
+    .canvas{ min-height:360px; }
+  }
+</style>
+</head>
+<body>
+
+<header class="topbar"><div class="bar">
+  <a class="brand" href="/"><span class="dot"></span><span class="wm">AGENTMESH</span></a>
+  <nav class="scrub" id="scrub" aria-label="Stages">
+    <button data-stage="0">1 · The change</button>
+    <button data-stage="1">2 · The approach</button>
+    <button data-stage="2">3 · Sourcing agents</button>
+    <button data-stage="3">4 · The result</button>
+  </nav>
+</div></header>
+
+<div class="stagegrid">
+  <div class="canvas" id="canvas">
+    <svg viewBox="0 0 980 620" preserveAspectRatio="xMidYMid meet" aria-label="The agentic transformation">
+
+      <!-- ═══ 1 · title ═══ -->
+      <g class="el" data-el="titlecard">
+        <text x="490" y="270" text-anchor="middle" class="title-big">The Agentic Transformation</text>
+        <text x="490" y="314" text-anchor="middle" class="title-sub">PART 4 · HOW COMPANIES REBUILD THEIR WORK WITH AGENTS</text>
+        <rect x="420" y="340" width="140" height="3" rx="1.5" fill="var(--accent)"/>
+      </g>
+
+      <!-- ═══ 2 · the change ═══ -->
+      <g class="el" data-el="s-change">
+        <text x="70" y="120" class="h-big">Software can now do real work</text>
+        <text x="70" y="166" class="h-big">inside a business process.</text>
+        <rect x="70" y="220" width="400" height="150" rx="14" fill="var(--panel-2)" stroke="var(--faint)" stroke-width="1.4"/>
+        <text x="94" y="256" class="tag" fill="var(--dim)">BEFORE</text>
+        <text x="94" y="296" class="p-big">People do the work.</text>
+        <text x="94" y="328" class="p-big">Software keeps the records.</text>
+        <rect x="510" y="220" width="400" height="150" rx="14" fill="rgba(98,198,216,.08)" stroke="var(--accent)" stroke-width="1.8"/>
+        <text x="534" y="256" class="tag" fill="var(--accent)">NOW</text>
+        <text x="534" y="296" class="p-big">Agents do the work they are able to.</text>
+        <text x="534" y="328" class="p-big">People steer it and review it.</text>
+        <text x="70" y="440" class="p-big">Read, draft, check, chase, answer, reconcile, and hand back a result.</text>
+        <text x="70" y="474" class="p-dim">Companies that rebuild their processes around this run faster and cheaper</text>
+        <text x="70" y="500" class="p-dim">than the ones that bolt an agent onto the side.</text>
+      </g>
+
+      <!-- ═══ 3 · agents deliver, people steer ═══ -->
+      <g class="el" data-el="s-split">
+        <text x="70" y="110" class="h-big">Agents deliver. People steer and review.</text>
+        <rect x="70" y="150" width="410" height="400" rx="14" fill="rgba(182,156,255,.08)" stroke="var(--broadcast)" stroke-width="1.8"/>
+        <text x="96" y="192" class="tag" fill="var(--broadcast)">AGENTS DELIVER</text>
+        <text x="96" y="240" class="p-big">Read every invoice that comes in</text>
+        <text x="96" y="278" class="p-big">Draft the reminder to a late payer</text>
+        <text x="96" y="316" class="p-big">Fill in a customer questionnaire</text>
+        <text x="96" y="354" class="p-big">Reconcile the numbers</text>
+        <text x="96" y="392" class="p-big">Collect a new hire's documents</text>
+        <text x="96" y="430" class="p-big">Prepare the quote</text>
+        <text x="96" y="490" class="p-dim">and the list grows every month</text>
+        <rect x="500" y="150" width="410" height="400" rx="14" fill="rgba(231,239,236,.05)" stroke="var(--paper)" stroke-width="1.8"/>
+        <text x="526" y="192" class="tag" fill="var(--paper)">PEOPLE STEER AND REVIEW</text>
+        <text x="526" y="240" class="p-big">Set the rules and the limits</text>
+        <text x="526" y="278" class="p-big">Watch the results</text>
+        <text x="526" y="316" class="p-big">Answer what an agent is unsure of</text>
+        <text x="526" y="354" class="p-big">Decide the calls that matter</text>
+        <text x="526" y="392" class="p-big">Change the process when it should change</text>
+        <text x="526" y="490" class="p-dim">in charge, with far less time on the routine</text>
+      </g>
+
+      <!-- ═══ 4 · who leads it ═══ -->
+      <g class="el" data-el="s-team">
+        <text x="70" y="110" class="h-big">Strategy &amp; Process teams lead it.</text>
+        <rect x="330" y="290" width="320" height="80" rx="14" fill="rgba(98,198,216,.10)" stroke="var(--accent)" stroke-width="2"/>
+        <text x="490" y="324" text-anchor="middle" class="h-small">The transformation team</text>
+        <text x="490" y="350" text-anchor="middle" class="p-dim">one process at a time</text>
+        <rect x="70" y="170" width="250" height="84" rx="12" fill="var(--panel-2)" stroke="var(--faint)" stroke-width="1.4"/>
+        <text x="195" y="204" text-anchor="middle" class="h-small">1 · Pick a process</text>
+        <text x="195" y="232" text-anchor="middle" class="p-dim">where agents can deliver</text>
+        <rect x="660" y="170" width="250" height="84" rx="12" fill="var(--panel-2)" stroke="var(--faint)" stroke-width="1.4"/>
+        <text x="785" y="204" text-anchor="middle" class="h-small">2 · Redesign it</text>
+        <text x="785" y="232" text-anchor="middle" class="p-dim">with agents inside</text>
+        <rect x="660" y="410" width="250" height="84" rx="12" fill="var(--panel-2)" stroke="var(--faint)" stroke-width="1.4"/>
+        <text x="785" y="444" text-anchor="middle" class="h-small">3 · Run and measure</text>
+        <text x="785" y="472" text-anchor="middle" class="p-dim">every run on the record</text>
+        <rect x="70" y="410" width="250" height="84" rx="12" fill="var(--panel-2)" stroke="var(--faint)" stroke-width="1.4"/>
+        <text x="195" y="444" text-anchor="middle" class="h-small">4 · The next process</text>
+        <text x="195" y="472" text-anchor="middle" class="p-dim">and the one after that</text>
+        <path d="M 320 212 C 420 212, 560 212, 660 212" fill="none" stroke="var(--accent)" stroke-width="2" stroke-dasharray="6 6"/>
+        <path d="M 785 254 C 785 300, 785 360, 785 410" fill="none" stroke="var(--accent)" stroke-width="2" stroke-dasharray="6 6"/>
+        <path d="M 660 452 C 560 452, 420 452, 320 452" fill="none" stroke="var(--accent)" stroke-width="2" stroke-dasharray="6 6"/>
+        <path d="M 195 410 C 195 360, 195 300, 195 254" fill="none" stroke="var(--accent)" stroke-width="2" stroke-dasharray="6 6"/>
+        <text x="70" y="560" class="p-dim">The reengineering companies did with software and with outsourcing, done again with agents.</text>
+      </g>
+
+      <!-- ═══ 5 · the catalog ═══ -->
+      <g class="el" data-el="s-catalog">
+        <text x="70" y="110" class="h-big">Start from a catalog, not a blank page.</text>
+        <text x="70" y="150" class="p-dim">Business processes, written step by step, with the agent roles that deliver them already defined.</text>
+        <rect x="70" y="186" width="266" height="96" rx="12" fill="var(--panel-2)" stroke="var(--accent)" stroke-width="1.6"/>
+        <text x="92" y="222" class="h-small">Paying supplier invoices</text>
+        <text x="92" y="254" class="p-dim">4 steps · 2 agent roles</text>
+        <rect x="357" y="186" width="266" height="96" rx="12" fill="var(--panel-2)" stroke="var(--accent)" stroke-width="1.6"/>
+        <text x="379" y="222" class="h-small">Late payments</text>
+        <text x="379" y="254" class="p-dim">3 steps · 1 agent role</text>
+        <rect x="644" y="186" width="266" height="96" rx="12" fill="var(--panel-2)" stroke="var(--accent)" stroke-width="1.6"/>
+        <text x="666" y="222" class="h-small">Customer questionnaires</text>
+        <text x="666" y="254" class="p-dim">5 steps · 2 agent roles</text>
+        <rect x="70" y="302" width="266" height="96" rx="12" fill="var(--panel-2)" stroke="var(--accent)" stroke-width="1.6"/>
+        <text x="92" y="338" class="h-small">Onboarding a new hire</text>
+        <text x="92" y="370" class="p-dim">6 steps · 2 agent roles</text>
+        <rect x="357" y="302" width="266" height="96" rx="12" fill="var(--panel-2)" stroke="var(--accent)" stroke-width="1.6"/>
+        <text x="379" y="338" class="h-small">Quoting a customer</text>
+        <text x="379" y="370" class="p-dim">5 steps · 2 agent roles</text>
+        <rect x="644" y="302" width="266" height="96" rx="12" fill="var(--panel-2)" stroke="var(--accent)" stroke-width="1.6"/>
+        <text x="666" y="338" class="h-small">Working sessions</text>
+        <text x="666" y="370" class="p-dim">11 steps · 1 agent role</text>
+        <rect x="70" y="418" width="266" height="96" rx="12" fill="var(--panel-2)" stroke="var(--accent)" stroke-width="1.6"/>
+        <text x="92" y="454" class="h-small">Screening applicants</text>
+        <text x="92" y="486" class="p-dim">4 steps · 2 agent roles</text>
+        <rect x="357" y="418" width="266" height="96" rx="12" fill="var(--panel-2)" stroke="var(--accent)" stroke-width="1.6"/>
+        <text x="379" y="454" class="h-small">Closing the month</text>
+        <text x="379" y="486" class="p-dim">7 steps · 3 agent roles</text>
+        <rect x="644" y="418" width="266" height="96" rx="12" fill="var(--panel-2)" stroke="var(--accent)" stroke-width="1.6"/>
+        <text x="666" y="454" class="h-small">Support cases</text>
+        <text x="666" y="486" class="p-dim">5 steps · 2 agent roles</text>
+        <text x="70" y="560" class="p-dim">and many more, in every department</text>
+      </g>
+
+      <!-- ═══ 6 · redesign with agents inside ═══ -->
+      <g class="el" data-el="s-redesign">
+        <text x="70" y="110" class="h-big">Redesign the process with agents inside.</text>
+        <text x="70" y="150" class="p-dim">Paying supplier invoices, as one company rebuilt it</text>
+        <rect x="70" y="200" width="150" height="150" rx="14" fill="rgba(182,156,255,.14)" stroke="var(--broadcast)" stroke-width="1.8"/>
+        <text x="145" y="250" text-anchor="middle" class="h-small">Read</text>
+        <text x="145" y="290" text-anchor="middle" class="p-mid">an agent</text>
+        <text x="145" y="316" text-anchor="middle" class="p-dim">delivers</text>
+        <rect x="260" y="200" width="150" height="150" rx="14" fill="rgba(182,156,255,.14)" stroke="var(--broadcast)" stroke-width="1.8"/>
+        <text x="335" y="250" text-anchor="middle" class="h-small">Check</text>
+        <text x="335" y="290" text-anchor="middle" class="p-mid">an agent</text>
+        <text x="335" y="316" text-anchor="middle" class="p-dim">delivers</text>
+        <rect x="450" y="200" width="150" height="150" rx="14" fill="rgba(231,239,236,.07)" stroke="var(--paper)" stroke-width="1.8"/>
+        <text x="525" y="250" text-anchor="middle" class="h-small">Approve</text>
+        <text x="525" y="290" text-anchor="middle" class="p-mid">a person</text>
+        <text x="525" y="316" text-anchor="middle" class="p-dim">reviews and decides</text>
+        <rect x="640" y="200" width="150" height="150" rx="14" fill="rgba(182,156,255,.14)" stroke="var(--broadcast)" stroke-width="1.8"/>
+        <text x="715" y="250" text-anchor="middle" class="h-small">Pay</text>
+        <text x="715" y="290" text-anchor="middle" class="p-mid">an agent</text>
+        <text x="715" y="316" text-anchor="middle" class="p-dim">delivers</text>
+        <rect x="830" y="200" width="80" height="150" rx="14" fill="rgba(231,239,236,.07)" stroke="var(--paper)" stroke-width="1.8"/>
+        <text x="870" y="270" text-anchor="middle" class="h-small">Steer</text>
+        <text x="870" y="300" text-anchor="middle" class="p-dim">a person</text>
+        <path d="M 220 275 L 260 275 M 410 275 L 450 275 M 600 275 L 640 275 M 790 275 L 830 275" stroke="var(--accent)" stroke-width="2.5"/>
+        <text x="70" y="420" class="p-big">Your names, your limits, your systems, filled in.</text>
+        <text x="70" y="456" class="p-big">What each agent must do, and what it must never do, written down.</text>
+        <text x="70" y="492" class="p-big">Every change to the design carries a reason.</text>
+      </g>
+
+      <!-- ═══ 7 · agents help build it ═══ -->
+      <g class="el" data-el="s-helpers">
+        <text x="70" y="110" class="h-big">Agents help build it.</text>
+        <rect x="70" y="170" width="400" height="360" rx="14" fill="rgba(98,198,216,.08)" stroke="var(--accent)" stroke-width="1.8"/>
+        <text x="96" y="214" class="tag" fill="var(--accent)">THE HELPER AGENT</text>
+        <text x="96" y="262" class="p-big">Reads the process with the team</text>
+        <text x="96" y="300" class="p-big">Answers questions about it</text>
+        <text x="96" y="338" class="p-big">Writes down every decision</text>
+        <text x="96" y="376" class="p-big">Fills in what it can from what it knows</text>
+        <text x="96" y="440" class="p-dim">A transformation project with an agent</text>
+        <text x="96" y="466" class="p-dim">on the team from day one.</text>
+        <rect x="510" y="170" width="400" height="360" rx="14" fill="rgba(182,156,255,.08)" stroke="var(--broadcast)" stroke-width="1.8"/>
+        <text x="536" y="214" class="tag" fill="var(--broadcast)">BUILDER AGENTS</text>
+        <text x="536" y="262" class="p-big">Take a role the redesign needs</text>
+        <text x="536" y="300" class="p-big">Build the agent to do it</text>
+        <text x="536" y="338" class="p-big">Test it against what the team wrote</text>
+        <text x="536" y="376" class="p-big">Hand it back, ready to place</text>
+        <text x="536" y="440" class="p-dim">Agents building agents, to a written</text>
+        <text x="536" y="466" class="p-dim">job description, checked before they start.</text>
+      </g>
+
+      <!-- ═══ 8 · source the agents: the agentic RFP ═══ -->
+      <g class="el" data-el="s-rfp">
+        <text x="70" y="110" class="h-big">Source the agents you need.</text>
+        <text x="70" y="150" class="p-dim">An RFP written for agents, answered by delivery groups inside or outside the company.</text>
+        <rect x="70" y="210" width="190" height="200" rx="14" fill="var(--panel-2)" stroke="var(--accent)" stroke-width="1.8"/>
+        <text x="165" y="252" text-anchor="middle" class="tag" fill="var(--accent)">THE ROLE</text>
+        <text x="165" y="296" text-anchor="middle" class="p-mid">what it must do</text>
+        <text x="165" y="324" text-anchor="middle" class="p-mid">what it must never do</text>
+        <text x="165" y="352" text-anchor="middle" class="p-mid">the tests it must pass</text>
+        <path d="M 260 310 L 300 310" stroke="var(--accent)" stroke-width="2.5"/>
+        <rect x="300" y="210" width="190" height="200" rx="14" fill="rgba(242,169,59,.10)" stroke="var(--signal)" stroke-width="1.8"/>
+        <text x="395" y="252" text-anchor="middle" class="tag" fill="var(--signal)">THE RFP</text>
+        <text x="395" y="296" text-anchor="middle" class="p-mid">posted on AgentMesh</text>
+        <text x="395" y="324" text-anchor="middle" class="p-mid">open to builders</text>
+        <text x="395" y="352" text-anchor="middle" class="p-mid">answers with terms</text>
+        <path d="M 490 310 L 530 310" stroke="var(--accent)" stroke-width="2.5"/>
+        <rect x="530" y="210" width="190" height="94" rx="14" fill="var(--panel-2)" stroke="var(--paper)" stroke-width="1.6"/>
+        <text x="625" y="248" text-anchor="middle" class="h-small">An internal team</text>
+        <text x="625" y="278" text-anchor="middle" class="p-dim">your own builders</text>
+        <rect x="530" y="316" width="190" height="94" rx="14" fill="var(--panel-2)" stroke="var(--paper)" stroke-width="1.6"/>
+        <text x="625" y="354" text-anchor="middle" class="h-small">An outside firm</text>
+        <text x="625" y="384" text-anchor="middle" class="p-dim">a delivery group</text>
+        <path d="M 720 310 L 760 310" stroke="var(--accent)" stroke-width="2.5"/>
+        <rect x="760" y="210" width="150" height="200" rx="14" fill="rgba(67,214,166,.10)" stroke="var(--verify)" stroke-width="1.8"/>
+        <text x="835" y="252" text-anchor="middle" class="tag" fill="var(--verify)">THE AGENT</text>
+        <text x="835" y="296" text-anchor="middle" class="p-mid">built to the role</text>
+        <text x="835" y="324" text-anchor="middle" class="p-mid">tested</text>
+        <text x="835" y="352" text-anchor="middle" class="p-mid">placed</text>
+        <text x="70" y="480" class="p-big">You choose the offer, the contract forms, and the agent is checked before it takes the role.</text>
+        <text x="70" y="516" class="p-dim">Sourcing agents like this is new. It is the whole of Part 5.</text>
+      </g>
+
+      <!-- ═══ 9 · run it, on the record ═══ -->
+      <g class="el" data-el="s-run">
+        <text x="70" y="110" class="h-big">Run it, on the record.</text>
+        <rect x="70" y="180" width="190" height="120" rx="14" fill="rgba(182,156,255,.14)" stroke="var(--broadcast)" stroke-width="1.8"/>
+        <text x="165" y="230" text-anchor="middle" class="h-small">Read</text>
+        <text x="165" y="262" text-anchor="middle" class="p-dim">an agent delivers</text>
+        <rect x="300" y="180" width="190" height="120" rx="14" fill="rgba(182,156,255,.14)" stroke="var(--broadcast)" stroke-width="1.8"/>
+        <text x="395" y="230" text-anchor="middle" class="h-small">Check</text>
+        <text x="395" y="262" text-anchor="middle" class="p-dim">an agent delivers</text>
+        <rect x="530" y="180" width="190" height="120" rx="14" fill="rgba(231,239,236,.07)" stroke="var(--paper)" stroke-width="1.8"/>
+        <text x="625" y="230" text-anchor="middle" class="h-small">Approve</text>
+        <text x="625" y="262" text-anchor="middle" class="p-dim">a person decides</text>
+        <rect x="760" y="180" width="150" height="120" rx="14" fill="rgba(182,156,255,.14)" stroke="var(--broadcast)" stroke-width="1.8"/>
+        <text x="835" y="230" text-anchor="middle" class="h-small">Pay</text>
+        <text x="835" y="262" text-anchor="middle" class="p-dim">an agent delivers</text>
+        <path d="M 260 240 L 300 240 M 490 240 L 530 240 M 720 240 L 760 240" stroke="var(--accent)" stroke-width="2.5"/>
+        <rect x="300" y="330" width="420" height="70" rx="12" fill="rgba(242,169,59,.10)" stroke="var(--signal)" stroke-width="1.6"/>
+        <text x="510" y="360" text-anchor="middle" class="p-mid">A question for a person:</text>
+        <text x="510" y="386" text-anchor="middle" class="p-mid">"invoice 2's total does not add up"</text>
+        <rect x="70" y="440" width="840" height="100" rx="14" fill="var(--panel-2)" stroke="var(--faint)" stroke-width="1.4"/>
+        <text x="96" y="474" class="tag" fill="var(--dim)">THE RECORD OF THIS RUN</text>
+        <text x="96" y="512" class="p-big">what was done · by which agent or person · how long it took · what it cost · what was asked</text>
+      </g>
+
+      <!-- ═══ 10 · the company, rebuilt ═══ -->
+      <g class="el" data-el="s-rebuilt">
+        <text x="70" y="110" class="h-big">Process by process, the company changes shape.</text>
+        <rect x="70" y="160" width="200" height="104" rx="12" fill="rgba(98,198,216,.12)" stroke="var(--accent)" stroke-width="1.6"/><text x="170" y="206" text-anchor="middle" class="h-card">Invoices</text><text x="170" y="240" text-anchor="middle" class="p-l">people and agents</text>
+        <rect x="283" y="160" width="200" height="104" rx="12" fill="rgba(98,198,216,.12)" stroke="var(--accent)" stroke-width="1.6"/><text x="383" y="206" text-anchor="middle" class="h-card">Late payments</text><text x="383" y="240" text-anchor="middle" class="p-l">people and agents</text>
+        <rect x="496" y="160" width="200" height="104" rx="12" fill="rgba(98,198,216,.12)" stroke="var(--accent)" stroke-width="1.6"/><text x="596" y="206" text-anchor="middle" class="h-card">Questionnaires</text><text x="596" y="240" text-anchor="middle" class="p-l">people and agents</text>
+        <rect x="709" y="160" width="200" height="104" rx="12" fill="rgba(98,198,216,.12)" stroke="var(--accent)" stroke-width="1.6"/><text x="809" y="206" text-anchor="middle" class="h-card">New hires</text><text x="809" y="240" text-anchor="middle" class="p-l">people and agents</text>
+        <rect x="70" y="284" width="200" height="104" rx="12" fill="rgba(98,198,216,.12)" stroke="var(--accent)" stroke-width="1.6"/><text x="170" y="330" text-anchor="middle" class="h-card">Quotes</text><text x="170" y="364" text-anchor="middle" class="p-l">people and agents</text>
+        <rect x="283" y="284" width="200" height="104" rx="12" fill="rgba(98,198,216,.12)" stroke="var(--accent)" stroke-width="1.6"/><text x="383" y="330" text-anchor="middle" class="h-card">Month end</text><text x="383" y="364" text-anchor="middle" class="p-l">people and agents</text>
+        <rect x="496" y="284" width="200" height="104" rx="12" fill="var(--panel-2)" stroke="var(--faint)" stroke-width="1.4"/><text x="596" y="330" text-anchor="middle" class="h-card">Support cases</text><text x="596" y="364" text-anchor="middle" class="p-l">being redesigned</text>
+        <rect x="709" y="284" width="200" height="104" rx="12" fill="var(--panel-2)" stroke="var(--faint)" stroke-width="1.4"/><text x="809" y="330" text-anchor="middle" class="h-card">Applicants</text><text x="809" y="364" text-anchor="middle" class="p-l">next</text>
+        <text x="70" y="450" class="p-xl">Work that took a team days takes hours. Work that was turned away gets done.</text>
+        <text x="70" y="494" class="p-xl">People spend their time steering and deciding.</text>
+        <text x="70" y="538" class="p-xl">The transformation team is already on the next process.</text>
+      </g>
+
+      <!-- ═══ 11 · why this is new ═══ -->
+      <g class="el" data-el="s-new">
+        <text x="70" y="110" class="h-big">None of this was possible before.</text>
+        <rect x="70" y="150" width="410" height="200" rx="14" fill="var(--panel-2)" stroke="var(--broadcast)" stroke-width="1.8"/>
+        <text x="96" y="190" class="tag" fill="var(--broadcast)">NEW</text>
+        <text x="96" y="236" class="h-card">Agents that do business work</text>
+        <text x="96" y="276" class="p-l">not chatbots that answer questions,</text>
+        <text x="96" y="304" class="p-l">workers that hand back a result</text>
+        <rect x="500" y="150" width="410" height="200" rx="14" fill="var(--panel-2)" stroke="var(--accent)" stroke-width="1.8"/>
+        <text x="526" y="190" class="tag" fill="var(--accent)">NEW</text>
+        <text x="526" y="236" class="h-card">A catalog with agents inside</text>
+        <text x="526" y="276" class="p-l">business processes, with the roles</text>
+        <text x="526" y="304" class="p-l">that deliver each step already defined</text>
+        <rect x="70" y="370" width="410" height="200" rx="14" fill="var(--panel-2)" stroke="var(--signal)" stroke-width="1.8"/>
+        <text x="96" y="410" class="tag" fill="var(--signal)">NEW</text>
+        <text x="96" y="456" class="h-card">An RFP for agents</text>
+        <text x="96" y="496" class="p-l">sourced like a supplier, from an internal</text>
+        <text x="96" y="524" class="p-l">team or an outside firm, tested first</text>
+        <rect x="500" y="370" width="410" height="200" rx="14" fill="var(--panel-2)" stroke="var(--verify)" stroke-width="1.8"/>
+        <text x="526" y="410" class="tag" fill="var(--verify)">NEW</text>
+        <text x="526" y="456" class="h-card">Agents that build agents</text>
+        <text x="526" y="496" class="p-l">a helper on the team, and builders that</text>
+        <text x="526" y="524" class="p-l">make the agent to the written role</text>
+      </g>
+
+      <!-- ═══ 12 · in short ═══ -->
+      <g class="el" data-el="synopsis">
+        <text x="90" y="130" class="syn-head">In short</text>
+        <rect x="90" y="186" width="16" height="16" rx="3" fill="var(--accent)"/>
+        <text x="126" y="202" class="syn-xl">Agents deliver real work inside a business process; people steer and review.</text>
+        <rect x="90" y="256" width="16" height="16" rx="3" fill="var(--signal)"/>
+        <text x="126" y="272" class="syn-xl">Strategy &amp; Process teams lead the change, one process at a time.</text>
+        <rect x="90" y="326" width="16" height="16" rx="3" fill="var(--verify)"/>
+        <text x="126" y="342" class="syn-xl">Start from a catalog of processes with the agent roles already inside.</text>
+        <rect x="90" y="396" width="16" height="16" rx="3" fill="var(--broadcast)"/>
+        <text x="126" y="412" class="syn-xl">Source agents through an RFP, inside or outside, tested before they start.</text>
+        <rect x="90" y="466" width="16" height="16" rx="3" fill="var(--paper)"/>
+        <text x="126" y="482" class="syn-xl">Run it on the record, measure it, and move to the next process.</text>
+      </g>
+    </svg>
+
+    <div class="callout" id="callout" role="status">
+      <div class="co-eyebrow" id="co-eyebrow">THE QUESTION</div>
+      <p id="co-text"></p>
+    </div>
+  </div>
+
+  <aside class="panel" id="panel" aria-label="The words this part introduces">
+    <h2>THE WORDS</h2>
+    <p class="panel-sub">Each word arrives when the story needs it.</p>
+
+    <div class="capgroup" data-group="0">
+      <button class="cg-head" type="button"><span class="cg-label">1 · THE CHANGE</span><span class="cg-count"></span><span class="chev"></span></button>
+      <div class="cg-body">
+      <div class="cap" data-cap="deliver"><span class="box"></span><span><span class="cap-name">Agents deliver, people steer</span><span class="cap-why">agents do the work they are able to; people set the rules, review, and decide</span></span></div>
+      <div class="cap" data-cap="team"><span class="box"></span><span><span class="cap-name">A Strategy &amp; Process team</span><span class="cap-why">the people who redesign how the company works</span></span></div>
+      </div>
+    </div>
+
+    <div class="capgroup" data-group="1">
+      <button class="cg-head" type="button"><span class="cg-label">2 · THE APPROACH</span><span class="cg-count"></span><span class="chev"></span></button>
+      <div class="cg-body">
+      <div class="cap" data-cap="catalog"><span class="box"></span><span><span class="cap-name">The catalog</span><span class="cap-why">business processes, with the agent roles that deliver them</span></span></div>
+      <div class="cap" data-cap="role"><span class="box"></span><span><span class="cap-name">An agent role</span><span class="cap-why">a job an agent can hold: what it does, and must never do</span></span></div>
+      <div class="cap" data-cap="redesign"><span class="box"></span><span><span class="cap-name">Your redesign</span><span class="cap-why">your copy of a process, with agents inside and your own rules</span></span></div>
+      <div class="cap" data-cap="helper"><span class="box"></span><span><span class="cap-name">The helper agent</span><span class="cap-why">on the transformation team from day one</span></span></div>
+      <div class="cap" data-cap="builders"><span class="box"></span><span><span class="cap-name">Builder agents</span><span class="cap-why">agents that build an agent to a written role</span></span></div>
+      </div>
+    </div>
+
+    <div class="capgroup" data-group="2">
+      <button class="cg-head" type="button"><span class="cg-label">3 · SOURCING AGENTS</span><span class="cg-count"></span><span class="chev"></span></button>
+      <div class="cg-body">
+      <div class="cap" data-cap="rfp"><span class="box"></span><span><span class="cap-name">An RFP for agents</span><span class="cap-why">the role, posted; builders answer with terms</span></span></div>
+      <div class="cap" data-cap="group"><span class="box"></span><span><span class="cap-name">A delivery group</span><span class="cap-why">an internal team or an outside firm that builds the agent</span></span></div>
+      </div>
+    </div>
+
+    <div class="capgroup" data-group="3">
+      <button class="cg-head" type="button"><span class="cg-label">4 · THE RESULT</span><span class="cg-count"></span><span class="chev"></span></button>
+      <div class="cg-body">
+      <div class="cap" data-cap="run"><span class="box"></span><span><span class="cap-name">A run, on the record</span><span class="cap-why">one pass of real work: who did what, how long, what it cost</span></span></div>
+      <div class="cap" data-cap="enterprise"><span class="box"></span><span><span class="cap-name">The agentic enterprise</span><span class="cap-why">a company rebuilt this way, process by process</span></span></div>
+      </div>
+    </div>
+  </aside>
+
+  <div class="band">
+    <span class="stageno" id="stageno">STAGE 1 OF 4</span>
+    <div class="bt">
+      <h1 id="b-title"></h1>
+      <p id="b-desc"></p>
+      <a class="cta" id="cta" href="delivering-agents.html" hidden>Next: Delivering Agents →</a>
+    </div>
+    <div class="controls">
+      <span class="beatno" id="beatno"></span>
+      <button id="playall" aria-label="Play the whole sequence">▶ Play</button>
+      <button id="back" aria-label="Previous step">← Back</button>
+      <button id="next" class="primary" aria-label="Next step">Next →</button>
+    </div>
+  </div>
+</div>
+
+<script>
+(() => {
+  // One scene per beat: each beat clears the canvas and draws its own slide,
+  // so nothing reserves space for something that comes later.
+  const BEATS = [
+    { stage:0, silent:true, hold:2800, show:["titlecard"] },
+
+    // ═══ Stage 1 · The change ═══
+    { stage:0, clear:true, show:["s-change"],
+      title:"Software can now do real work",
+      desc:"For the first time, software can do real work inside a business process: read, draft, check, chase, answer, reconcile, and hand back a result. Companies that rebuild their processes around that will run faster and cheaper than the ones that bolt an agent onto the side. That is the agentic transformation, and it is a business change before it is a technology change." },
+    { stage:0, clear:true, show:["s-split"], caps:["deliver"],
+      title:"Agents deliver. People steer and review.",
+      desc:"The new division of work is simple. Agents deliver the work they are able to do, and that list grows every month. People steer the work and review it: they set the rules and the limits, watch the results, answer what an agent is unsure of, and decide the calls that matter. People stay in charge, with far less of their time going to the routine." },
+    { stage:0, clear:true, show:["s-team"], caps:["team"],
+      title:"Strategy & Process teams lead it",
+      desc:"This is led by Strategy and Process teams, not one department and not one tool at a time. They pick a process where agents can deliver, redesign it with agents inside, run it and measure it, and move to the next one. It is the reengineering companies did with software and with outsourcing, done again, and this time the new workforce is agents." },
+
+    // ═══ Stage 2 · The approach ═══
+    { stage:1, clear:true, show:["s-catalog"], caps:["catalog","role"],
+      title:"Start from a catalog, not a blank page",
+      desc:"AgentMesh has a catalog of business processes that transformation teams use to speed up their agentic reengineering. Each process is written step by step, and the agent roles that can deliver its steps are already defined. A team picks the process it wants to change and starts from a working design instead of a blank page." },
+    { stage:1, clear:true, show:["s-redesign"], caps:["redesign"],
+      title:"Redesign the process with agents inside",
+      desc:"The team takes its copy of the process and decides where agents deliver and where people steer and review. It fills in its own names, limits and systems, and writes down what each agent must do and what it must never do. That redesign is the transformation, one process at a time." },
+    { stage:1, clear:true, show:["s-helpers"], caps:["helper","builders"],
+      title:"Agents help build it",
+      desc:"The team is not working alone. A helper agent reads the process with them, answers questions about it, and records every decision. And when the redesign needs an agent that does not exist yet, builder agents make it, to the written role, and test it against what the team wrote. Agents helping to build processes, and agents building agents, is part of what makes this wave different." },
+
+    // ═══ Stage 3 · Sourcing agents ═══
+    { stage:2, clear:true, show:["s-rfp"], caps:["rfp","group"],
+      title:"Source the agents you need",
+      desc:"Each agent role the redesign needs becomes a request on AgentMesh: an RFP written for agents. Delivery groups answer it, whether an internal team or an outside firm, and build the agent to the role. You choose the offer, the contract forms, and the agent is tested against what the team wrote before it takes the role. Sourcing agents this way is new, and it is the whole of the next part of this series." },
+
+    // ═══ Stage 4 · The result ═══
+    { stage:3, clear:true, show:["s-run"], caps:["run"],
+      title:"Run it, on the record",
+      desc:"Then the process runs. Agents deliver their steps, people review and steer, and anything an agent is unsure of comes to a person as a question. Every run leaves a record: what was done, by which agent or person, how long it took, what it cost, and what was asked. The team measures the change instead of guessing at it." },
+    { stage:3, clear:true, show:["s-rebuilt"], caps:["enterprise"],
+      title:"Process by process, the company changes shape",
+      desc:"Work that took a team days takes hours. Work that was turned away gets done. People spend their time steering and deciding, and the transformation team is already on the next process. That is the agentic enterprise, and the last part of this series is about running one." },
+    { stage:3, clear:true, show:["s-new"],
+      title:"None of this was possible before",
+      desc:"There were no agents that could deliver business work, only chatbots that answered questions. There was no catalog of processes with agent roles ready inside them. There was no way to source an agent the way you source a supplier, through an RFP, from inside or outside the company. And there were no agents helping to build the processes, or building the agents. That is what AgentMesh gives a transformation team." },
+    { stage:3, clear:true, cta:true, complete:true, show:["synopsis"],
+      title:"In short",
+      desc:"Agents can now do real work inside a business process: agents deliver, people steer and review. Strategy and Process teams lead the change one process at a time, starting from a catalog with the agent roles already inside, sourcing the agents through an RFP from inside or outside the company, and running each process on the record before moving to the next." },
+  ];
+
+  const stageFirstBeat = [1, 4, 7, 8];
+  const els = {};
+  document.querySelectorAll("[data-el]").forEach(g => els[g.dataset.el] = g);
+  const caps = {};
+  document.querySelectorAll("[data-cap]").forEach(c => caps[c.dataset.cap] = c);
+  const groups = document.querySelectorAll(".capgroup");
+  const callout = document.getElementById("callout");
+  const coText = document.getElementById("co-text");
+  const coEyebrow = document.getElementById("co-eyebrow");
+  const panel = document.getElementById("panel");
+  const scrubBtns = document.querySelectorAll("#scrub button");
+  const backBtn = document.getElementById("back");
+  const nextBtn = document.getElementById("next");
+  const playBtn = document.getElementById("playall");
+
+  // ── narration: one clip per beat ──
+  const voice = new Audio();
+  voice.preload = "auto";
+  let playingAll = false;
+  let holdTimer = null;
+  const CLIPV = 3; // bump when any narration clip is re-recorded, so caches refetch
+  const clip = (i) => `where-the-work-comes-from-audio/beat-${String(i + 1).padStart(2, "0")}.mp3?v=${CLIPV}`;
+  function playBeat(){
+    clearTimeout(holdTimer);
+    const cur = BEATS[beat];
+    if (cur.silent){
+      voice.pause();
+      if (playingAll) holdTimer = setTimeout(() => { if (playingAll) go(beat + 1); }, cur.hold || 2500);
+      return;
+    }
+    voice.src = clip(beat);
+    voice.play().catch(() => {});
+  }
+  function stopAll(){
+    playingAll = false;
+    clearTimeout(holdTimer);
+    playBtn.textContent = "▶ Play";
+  }
+  voice.addEventListener("ended", () => {
+    if (!playingAll) return;
+    if (beat < BEATS.length - 1) go(beat + 1);
+    else stopAll();
+  });
+
+  let beat = 0;
+  let manualOpen = {};
+
+  function render(jumped){
+    const shown = new Set(), lit = new Set(), litGroups = new Set();
+    let title = "", desc = "", stage = 0, complete = false, latestGroup = null;
+    for (let i = 0; i <= beat; i++){
+      const b = BEATS[i];
+      if (b.clear) shown.clear();
+      (b.show || []).forEach(id => shown.add(id));
+      (b.caps || []).forEach(id => lit.add(id));
+      if (b.caps){ litGroups.add(String(b.stage)); latestGroup = String(b.stage); }
+      if (b.title) title = b.title;
+      if (b.desc) desc = b.desc;
+      stage = b.stage;
+      if (b.complete) complete = true;
+    }
+    const cur = BEATS[beat];
+    for (const [id, g] of Object.entries(els)){
+      g.classList.toggle("instant", !!jumped && shown.has(id) && !(cur.show || []).includes(id));
+      g.classList.toggle("on", shown.has(id));
+    }
+    for (const [id, c] of Object.entries(caps)) c.classList.toggle("on", lit.has(id));
+    groups.forEach(g => {
+      const id = g.dataset.group;
+      g.classList.toggle("on", litGroups.has(id));
+      const open = cur.openAll ? litGroups.has(id)
+        : manualOpen[id] !== undefined ? manualOpen[id] : id === latestGroup;
+      g.classList.toggle("open", open);
+      const n = g.querySelectorAll(".cap.on").length;
+      g.querySelector(".cg-count").textContent = n ? `${n} ✓` : "";
+    });
+    panel.classList.toggle("complete", complete);
+    document.getElementById("cta").hidden = !cur.cta;
+
+    if (cur.callout){
+      coEyebrow.textContent = cur.callout.eyebrow || "THE QUESTION";
+      coText.textContent = cur.callout.text;
+      callout.style.left = cur.callout.x + "%";
+      callout.style.top = cur.callout.y + "%";
+      callout.style.maxWidth = (cur.callout.w || 330) + "px";
+      callout.classList.toggle("mint", !!cur.callout.mint);
+      callout.classList.add("on");
+    } else {
+      callout.classList.remove("on");
+    }
+
+    document.getElementById("b-title").textContent = title;
+    document.getElementById("b-desc").textContent = desc;
+    document.getElementById("stageno").textContent = `STAGE ${stage + 1} OF 4`;
+    document.getElementById("beatno").textContent = `${beat + 1} / ${BEATS.length}`;
+    scrubBtns.forEach(b => {
+      const s = Number(b.dataset.stage);
+      b.classList.toggle("on", s === stage);
+      b.classList.toggle("done", s < stage);
+    });
+    backBtn.disabled = beat === 0;
+    nextBtn.disabled = beat === BEATS.length - 1;
+  }
+
+  function go(n, jumped){
+    beat = Math.max(0, Math.min(BEATS.length - 1, n));
+    manualOpen = {};
+    render(jumped);
+    playBeat();
+  }
+
+  playBtn.addEventListener("click", () => {
+    if (playingAll){ stopAll(); voice.pause(); return; }
+    playingAll = true;
+    playBtn.textContent = "■ Stop";
+    if (beat === BEATS.length - 1) go(0, true);
+    else playBeat();
+  });
+  groups.forEach(g => g.querySelector(".cg-head").addEventListener("click", () => {
+    manualOpen[g.dataset.group] = !g.classList.contains("open");
+    render();
+  }));
+  nextBtn.addEventListener("click", () => go(beat + 1));
+  backBtn.addEventListener("click", () => go(beat - 1));
+  scrubBtns.forEach(b => b.addEventListener("click", () => go(stageFirstBeat[Number(b.dataset.stage)], true)));
+  window.addEventListener("keydown", (e) => {
+    if (e.key === "ArrowRight" || e.key === " ") { e.preventDefault(); go(beat + 1); }
+    if (e.key === "ArrowLeft") { e.preventDefault(); go(beat - 1); }
+  });
+
+  render();
+})();
+</script>
+</body>
+</html>

@@ -380,7 +380,7 @@
     <div class="bt">
       <h1 id="b-title"></h1>
       <p id="b-desc"></p>
-      <a class="cta" id="cta" href="https://agentmesh.ai/business.html#demo" hidden>See it running · get a demo →</a>
+      <a class="cta" id="cta" href="where-the-work-comes-from.html" hidden>Next: The Agentic Transformation →</a>
     </div>
     <div class="controls">
       <span class="beatno" id="beatno"></span>
@@ -443,10 +443,10 @@
       title:"The agent economy",
       desc:"Then the economics turn on: work is metered, budgets cap spend before it happens, and settlement lands on the record. Agents stop being a cost line and start being a revenue line." },
     { stage:3, show:["meshwide"], cta:true, complete:true,
-      title:"One platform",
+      title:"What comes next",
       callout:{ x:32, y:68, w:380, mint:true, eyebrow:"WHERE THIS GOES",
         text:"Every company will run agents. The ones whose agents can find, trust, and pay each other are the ones that compound. Nothing was thrown away: the name from stage one signs the invoice in stage four." },
-      desc:"One platform, assembled in the order adoption actually happens. The next step is seeing it run on your own agents." },
+      desc:"One platform, assembled in the order adoption actually happens. What comes next is the company itself changing. It takes its work apart, process by process, and rebuilds it with agents inside. That story is next: the agentic transformation." },
   ];
 
   const stageFirstBeat = [0, 3, 6, 9];
@@ -468,7 +468,7 @@
   const voice = new Audio();
   voice.preload = "auto";
   let playingAll = false;
-  const clip = (i) => `adoption-audio/beat-${String(i + 1).padStart(2, "0")}.mp3`;
+  const clip = (i) => `adoption-audio/beat-${String(i + 1).padStart(2, "0")}.mp3?v=2`;
   function playBeat(){
     voice.src = clip(beat);
     // Autoplay may be blocked before the first user gesture; that's fine.

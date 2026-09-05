@@ -1,0 +1,764 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The Agentic Enterprise · AgentMesh</title>
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<meta name="robots" content="noindex">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+<style>
+  /* Same token system as the rest of the series. Part 6 wears lime. */
+  :root{
+    --ink:#0A1417; --panel:#0F1D22; --panel-2:#12242A; --line:#1C2E33;
+    --paper:#E7EFEC; --dim:#7C918C; --faint:#4A5D5A;
+    --signal:#F2A93B; --verify:#43D6A6; --address:#6BA8FF; --broadcast:#B69CFF;
+    --accent:#A9D65C;   /* lime: this part's colour */
+    --disp:'Space Grotesk', sans-serif;
+    --body:'IBM Plex Sans', system-ui, sans-serif;
+    --wire:'IBM Plex Mono', ui-monospace, monospace;
+  }
+  *{ box-sizing:border-box; }
+  html,body{ margin:0; height:100%; }
+  body{ background:var(--ink); color:var(--paper); font-family:var(--body);
+    font-size:16px; line-height:1.55; -webkit-font-smoothing:antialiased;
+    background-image:
+      linear-gradient(var(--line) 1px, transparent 1px),
+      linear-gradient(90deg, var(--line) 1px, transparent 1px);
+    background-size:64px 64px; background-position:-1px -1px;
+    display:flex; flex-direction:column; }
+  body::before{ content:""; position:fixed; inset:0; z-index:0; pointer-events:none;
+    background:
+      radial-gradient(80% 45% at 30% 0%, rgba(169,214,92,.08), transparent 60%),
+      linear-gradient(180deg, rgba(10,20,23,.72), var(--ink) 62%); }
+
+  .topbar{ position:relative; z-index:5; border-bottom:1px solid var(--line); background:rgba(10,20,23,.9); }
+  .topbar .bar{ max-width:1360px; margin:0 auto; padding:0 32px; height:60px;
+    display:flex; align-items:center; gap:26px; position:relative; }
+  .brand{ font-family:var(--wire); font-weight:600; font-size:.82rem; letter-spacing:.02em;
+    display:flex; align-items:center; gap:9px; color:var(--paper); text-decoration:none; }
+  .brand .dot{ width:9px; height:9px; border-radius:2px; background:var(--signal);
+    box-shadow:0 0 0 3px rgba(242,169,59,.15), 8px 0 0 -2px var(--verify), 16px 0 0 -2px var(--address); }
+  .brand span.wm{ margin-left:14px; }
+  .scrub{ position:absolute; left:50%; transform:translateX(-50%); display:flex; gap:8px; }
+  .scrub button{ font-family:var(--wire); font-size:.74rem; letter-spacing:.02em;
+    color:var(--dim); background:none; border:1px solid var(--line); border-radius:999px;
+    padding:6px 14px; cursor:pointer; transition:color .18s, border-color .18s, background .18s; }
+  .scrub button:hover{ color:var(--paper); }
+  .scrub button.on{ color:var(--ink); background:var(--accent); border-color:var(--accent); font-weight:600; }
+  .scrub button.done{ color:var(--verify); border-color:rgba(67,214,166,.4); }
+
+  .stagegrid{ position:relative; z-index:1; flex:1; max-width:1360px; width:100%;
+    margin:0 auto; padding:22px 32px 26px; display:grid;
+    grid-template-columns:1fr 320px; grid-template-rows:1fr auto; gap:18px; min-height:0; }
+
+  .canvas{ grid-row:1; grid-column:1; position:relative; border:1px solid var(--line);
+    border-radius:12px; background:linear-gradient(180deg, rgba(15,29,34,.6), rgba(10,20,23,.3));
+    overflow:hidden; min-height:420px; }
+  .canvas svg{ position:absolute; inset:0; width:100%; height:100%; }
+
+  .el{ opacity:0; transition:opacity .5s ease, transform .5s ease; transform:translateY(8px); }
+  .el.on{ opacity:1; transform:none; }
+  .el.instant{ transition:none; }
+
+  .title-big{ font-family:var(--disp); font-size:48px; font-weight:700; fill:var(--paper); }
+  .title-sub{ font-family:var(--wire); font-size:14px; letter-spacing:.2em; fill:var(--accent); }
+  .frame-label{ font-family:var(--wire); font-size:12px; font-weight:600; letter-spacing:.14em; fill:var(--faint); }
+  .node-label{ font-family:var(--wire); font-size:14px; font-weight:600; fill:var(--paper); }
+  .node-sub{ font-family:var(--wire); font-size:11px; fill:var(--dim); }
+  .card-title{ font-family:var(--disp); font-size:17px; font-weight:700; fill:var(--paper); }
+  .step-text{ font-family:var(--body); font-size:14px; fill:var(--paper); }
+  .chip-text{ font-family:var(--wire); font-size:10.5px; fill:var(--ink); font-weight:600; }
+  .chip-dim{ font-family:var(--wire); font-size:10.5px; fill:var(--paper); }
+  .syn-head{ font-family:var(--disp); font-size:40px; font-weight:700; fill:var(--paper); }
+  .syn-line{ font-family:var(--body); font-size:18px; fill:var(--paper); }
+  .h-big{ font-family:var(--disp); font-size:38px; font-weight:700; fill:var(--paper); }
+  .h-mid{ font-family:var(--disp); font-size:26px; font-weight:700; fill:var(--paper); }
+  .h-small{ font-family:var(--disp); font-size:20px; font-weight:700; fill:var(--paper); }
+  .p-big{ font-family:var(--body); font-size:19px; fill:var(--paper); }
+  .p-mid{ font-family:var(--body); font-size:16px; fill:var(--paper); }
+  .p-dim{ font-family:var(--body); font-size:16px; fill:var(--dim); }
+  .tag{ font-family:var(--wire); font-size:13px; font-weight:600; letter-spacing:.12em; }
+  .h-card{ font-family:var(--disp); font-size:23px; font-weight:700; fill:var(--paper); }
+  .p-l{ font-family:var(--body); font-size:19px; fill:var(--dim); }
+  .p-xl{ font-family:var(--body); font-size:22px; fill:var(--paper); }
+  .syn-xl{ font-family:var(--body); font-size:21px; fill:var(--paper); }
+  .wire-ask{ stroke:var(--accent); stroke-width:1.8; fill:none; }
+  .wire-reply{ stroke:var(--verify); stroke-width:1.6; fill:none; stroke-dasharray:5 5; }
+  g.el path.draw{ stroke-dashoffset:0; }
+  @media (prefers-reduced-motion: no-preference){
+    g.el:not(.on) path.draw{ stroke-dashoffset:var(--len, 300); }
+    g.el.on path.draw{ transition:stroke-dashoffset .9s ease .15s; }
+  }
+  #baton{ transition:cx 1.2s ease; }
+  .row-text{ font-family:var(--body); font-size:15px; fill:var(--paper); }
+  .row-num{ font-family:var(--wire); font-size:14px; font-weight:600; fill:var(--paper); }
+  .legend{ font-family:var(--wire); font-size:11px; fill:var(--dim); }
+  .note-text{ font-family:var(--body); font-size:13px; fill:var(--dim); }
+
+  .callout{ position:absolute; z-index:4; max-width:330px; padding:14px 16px 15px;
+    background:var(--panel-2); border:1px solid rgba(169,214,92,.5); border-left:3px solid var(--accent);
+    border-radius:8px; box-shadow:0 14px 40px rgba(0,0,0,.5);
+    opacity:0; transform:translateY(10px); pointer-events:none;
+    transition:opacity .45s ease, transform .45s ease; }
+  .callout.on{ opacity:1; transform:none; }
+  .callout .co-eyebrow{ font-family:var(--wire); font-size:.68rem; letter-spacing:.14em; color:var(--accent); margin-bottom:6px; }
+  .callout p{ margin:0; font-size:.92rem; line-height:1.5; color:var(--paper); }
+  .callout.mint{ border-color:rgba(67,214,166,.5); border-left-color:var(--verify); }
+  .callout.mint .co-eyebrow{ color:var(--verify); }
+
+  .panel{ grid-row:1 / span 2; grid-column:2; border:1px solid var(--line); border-radius:12px;
+    background:var(--panel); padding:20px 20px 16px; overflow-y:auto; min-height:0; }
+  .panel h2{ font-family:var(--wire); font-size:.72rem; font-weight:600; letter-spacing:.16em; color:var(--dim); margin:0 0 4px; }
+  .panel .panel-sub{ font-size:.8rem; color:var(--faint); margin:0 0 14px; }
+  .capgroup{ display:none; }
+  .capgroup.on{ display:block; }
+  .cg-head{ width:100%; display:flex; align-items:center; gap:10px; cursor:pointer;
+    background:none; border:none; border-top:1px solid var(--line); padding:11px 0 9px; text-align:left; }
+  .capgroup:first-of-type .cg-head{ border-top:none; padding-top:2px; }
+  .cg-head:focus-visible{ outline:2px solid var(--accent); outline-offset:2px; border-radius:4px; }
+  .cg-label{ font-family:var(--wire); font-size:.68rem; letter-spacing:.12em; color:var(--faint); }
+  .capgroup.open .cg-label{ color:var(--dim); }
+  .cg-count{ margin-left:auto; font-family:var(--wire); font-size:.68rem; color:var(--verify); }
+  .chev{ flex:none; width:7px; height:7px; margin-top:-3px; border-right:1.5px solid var(--dim);
+    border-bottom:1.5px solid var(--dim); transform:rotate(45deg); transition:transform .2s ease; }
+  .capgroup.open .chev{ transform:rotate(-135deg); margin-top:3px; }
+  .cg-body{ display:none; padding-bottom:10px; }
+  .capgroup.open .cg-body{ display:block; }
+  .cap{ display:flex; align-items:baseline; gap:10px; padding:4px 0;
+    opacity:0; transform:translateX(8px); transition:opacity .4s ease, transform .4s ease; }
+  .cap.on{ opacity:1; transform:none; }
+  .cap .box{ flex:none; width:13px; height:13px; border:1.5px solid var(--faint); border-radius:3px;
+    position:relative; top:2px; transition:border-color .3s, background .3s; }
+  .cap.on .box{ border-color:var(--verify); background:rgba(67,214,166,.12); }
+  .cap.on .box::after{ content:""; position:absolute; inset:2px 2px 3px;
+    border-right:2px solid var(--verify); border-bottom:2px solid var(--verify);
+    transform:rotate(40deg) scale(.85); border-radius:1px; }
+  .cap .cap-name{ font-size:.86rem; font-weight:500; color:var(--paper); }
+  .cap .cap-why{ font-size:.76rem; color:var(--dim); display:block; margin-top:1px; }
+  .panel.complete{ border-color:rgba(67,214,166,.45);
+    box-shadow:0 0 0 1px rgba(67,214,166,.15), 0 0 40px rgba(67,214,166,.06) inset; }
+
+  .band{ grid-row:2; grid-column:1; border:1px solid var(--line); border-radius:12px;
+    background:var(--panel); padding:18px 22px; display:flex; gap:22px; align-items:flex-start; }
+  .band .stageno{ font-family:var(--wire); font-size:.72rem; letter-spacing:.14em; color:var(--accent); white-space:nowrap; padding-top:6px; }
+  .band .bt{ flex:1; min-width:0; }
+  .band h1{ font-size:1.3rem; margin:0 0 4px; font-family:var(--disp); }
+  .band p{ margin:0; color:var(--dim); font-size:.92rem; max-width:64ch; }
+  .band .cta{ display:inline-block; margin-top:10px; font-family:var(--wire); font-size:.85rem; font-weight:600;
+    color:var(--ink); background:var(--accent); border-radius:8px; padding:9px 16px; text-decoration:none; }
+  .band .cta:hover{ background:#bde07a; }
+  .band .cta[hidden]{ display:none; }
+  .controls{ flex:none; display:flex; gap:10px; align-items:center; padding-top:4px; }
+  .controls .beatno{ font-family:var(--wire); font-size:.72rem; color:var(--faint); margin-right:4px; }
+  .controls button{ font-family:var(--wire); font-size:.82rem; font-weight:600; cursor:pointer;
+    border-radius:8px; padding:9px 18px; border:1px solid var(--line);
+    background:var(--panel-2); color:var(--paper); transition:background .18s, border-color .18s; }
+  .controls button:hover{ border-color:var(--dim); }
+  .controls button.primary{ background:var(--accent); border-color:var(--accent); color:var(--ink); }
+  .controls button.primary:hover{ background:#bde07a; }
+  .controls button:disabled{ opacity:.35; cursor:default; }
+  .controls button:focus-visible{ outline:2px solid var(--accent); outline-offset:3px; }
+
+  /* a short window: the caption band gives up a little room so it stays above the fold */
+
+  /* ── motion inside a slide: children rise in turn, bars grow, lines draw, tokens travel ── */
+  .el .rise{ opacity:0; transform:translateY(10px); transition:opacity .5s ease, transform .5s ease;
+    transition-delay:calc(var(--i, 0) * 170ms + 120ms); }
+  .el.on .rise{ opacity:1; transform:none; }
+  .el.instant .rise{ transition:none; }
+  .el .grow{ transform:scaleX(0); transform-box:fill-box; transform-origin:left center;
+    transition:transform 1.1s ease; transition-delay:calc(var(--i, 0) * 320ms + 260ms); }
+  .el.on .grow{ transform:scaleX(1); }
+  .el.instant .grow{ transition:none; }
+  .el .draw2{ stroke-dasharray:var(--len, 300); stroke-dashoffset:var(--len, 300); transition:stroke-dashoffset 1s ease;
+    transition-delay:calc(var(--i, 0) * 320ms + 300ms); }
+  .el.on .draw2{ stroke-dashoffset:0; }
+  .el.instant .draw2{ transition:none; }
+  @keyframes pulse{ 0%,100%{ opacity:.35 } 50%{ opacity:1 } }
+  .pulse{ animation:pulse 1.6s ease-in-out infinite; }
+  @keyframes night{ 0%{ transform:translateX(-300px) } 100%{ transform:translateX(900px) } }
+  .el.on .night{ animation:night 7s linear infinite; }
+  @media (prefers-reduced-motion: reduce){
+    .el .rise, .el .grow, .el .draw2{ transition:none; }
+    .pulse, .el.on .night{ animation:none; }
+  }
+  @media (max-height: 780px){
+    .stagegrid{ padding:14px 32px 16px; gap:12px; }
+    .band{ padding:12px 18px; }
+    .band p{ font-size:.86rem; line-height:1.45; }
+    .band .cta{ margin-top:6px; padding:7px 14px; }
+    .canvas{ min-height:380px; }
+  }
+  @media (max-width: 1000px){
+    .stagegrid{ grid-template-columns:1fr; grid-template-rows:auto auto auto; padding:16px; }
+    .panel{ grid-row:3; grid-column:1; max-height:340px; }
+    .band{ grid-row:2; flex-wrap:wrap; }
+    .canvas{ min-height:360px; }
+  }
+</style>
+</head>
+<body>
+
+<header class="topbar"><div class="bar">
+  <a class="brand" href="/"><span class="dot"></span><span class="wm">AGENTMESH</span></a>
+  <nav class="scrub" id="scrub" aria-label="Stages">
+    <button data-stage="0">1 · Getting going</button>
+    <button data-stage="1">2 · The company changes</button>
+    <button data-stage="2">3 · Getting sophisticated</button>
+    <button data-stage="3">4 · Year three</button>
+  </nav>
+</div></header>
+
+<div class="stagegrid">
+  <div class="canvas" id="canvas">
+    <svg viewBox="0 0 980 620" preserveAspectRatio="xMidYMid meet" aria-label="The agentic enterprise">
+
+      <!-- ═══ 1 · title ═══ -->
+      <g class="el" data-el="titlecard">
+        <text x="490" y="270" text-anchor="middle" class="title-big">The Agentic Enterprise</text>
+        <text x="490" y="314" text-anchor="middle" class="title-sub">PART 6 · WHAT A COMPANY LOOKS LIKE AS IT KEEPS ADDING AGENTS</text>
+        <rect x="420" y="340" width="140" height="3" rx="1.5" fill="var(--accent)"/>
+      </g>
+
+      <!-- ═══ 2 · where this leads: a company's processes light up one by one ═══ -->
+      <g class="el" data-el="s-leads">
+        <text x="70" y="110" class="h-big">Where this leads.</text>
+        <text x="70" y="150" class="p-l">One process at a time, until agents are simply part of how the company works.</text>
+        <g class="rise" style="--i:0"><rect x="70" y="190" width="200" height="90" rx="12" fill="rgba(169,214,92,.14)" stroke="var(--accent)" stroke-width="1.6"/><text x="170" y="242" text-anchor="middle" class="h-card">Invoices</text></g>
+        <g class="rise" style="--i:1"><rect x="283" y="190" width="200" height="90" rx="12" fill="rgba(169,214,92,.14)" stroke="var(--accent)" stroke-width="1.6"/><text x="383" y="242" text-anchor="middle" class="h-card">Late payments</text></g>
+        <g class="rise" style="--i:2"><rect x="496" y="190" width="200" height="90" rx="12" fill="rgba(169,214,92,.14)" stroke="var(--accent)" stroke-width="1.6"/><text x="596" y="242" text-anchor="middle" class="h-card">Questionnaires</text></g>
+        <g class="rise" style="--i:3"><rect x="709" y="190" width="200" height="90" rx="12" fill="rgba(169,214,92,.14)" stroke="var(--accent)" stroke-width="1.6"/><text x="809" y="242" text-anchor="middle" class="h-card">New hires</text></g>
+        <g class="rise" style="--i:4"><rect x="70" y="300" width="200" height="90" rx="12" fill="rgba(169,214,92,.14)" stroke="var(--accent)" stroke-width="1.6"/><text x="170" y="352" text-anchor="middle" class="h-card">Quotes</text></g>
+        <g class="rise" style="--i:5"><rect x="283" y="300" width="200" height="90" rx="12" fill="rgba(169,214,92,.14)" stroke="var(--accent)" stroke-width="1.6"/><text x="383" y="352" text-anchor="middle" class="h-card">Month end</text></g>
+        <g class="rise" style="--i:6"><rect x="496" y="300" width="200" height="90" rx="12" fill="rgba(169,214,92,.14)" stroke="var(--accent)" stroke-width="1.6"/><text x="596" y="352" text-anchor="middle" class="h-card">Support cases</text></g>
+        <g class="rise" style="--i:7"><rect x="709" y="300" width="200" height="90" rx="12" fill="rgba(169,214,92,.14)" stroke="var(--accent)" stroke-width="1.6"/><text x="809" y="352" text-anchor="middle" class="h-card">Applicants</text></g>
+        <g class="rise" style="--i:8"><rect x="70" y="410" width="200" height="90" rx="12" fill="rgba(169,214,92,.14)" stroke="var(--accent)" stroke-width="1.6"/><text x="170" y="462" text-anchor="middle" class="h-card">Purchasing</text></g>
+        <g class="rise" style="--i:9"><rect x="283" y="410" width="200" height="90" rx="12" fill="rgba(169,214,92,.14)" stroke="var(--accent)" stroke-width="1.6"/><text x="383" y="462" text-anchor="middle" class="h-card">Contracts</text></g>
+        <g class="rise" style="--i:10"><rect x="496" y="410" width="200" height="90" rx="12" fill="rgba(169,214,92,.14)" stroke="var(--accent)" stroke-width="1.6"/><text x="596" y="462" text-anchor="middle" class="h-card">Expenses</text></g>
+        <g class="rise" style="--i:11"><rect x="709" y="410" width="200" height="90" rx="12" fill="rgba(169,214,92,.14)" stroke="var(--accent)" stroke-width="1.6"/><text x="809" y="462" text-anchor="middle" class="h-card">Reporting</text></g>
+        <text x="70" y="550" class="p-xl rise" style="--i:12">We call that an agentic enterprise.</text>
+      </g>
+
+      <!-- ═══ 3 · year one ═══ -->
+      <g class="el" data-el="s-year1">
+        <text x="70" y="110" class="h-big">Year one: the first few processes.</text>
+        <g class="rise" style="--i:0">
+          <rect x="70" y="160" width="270" height="250" rx="14" fill="var(--panel-2)" stroke="var(--accent)" stroke-width="1.8"/>
+          <text x="94" y="204" class="h-card">Paying invoices</text>
+          <circle cx="104" cy="250" r="7" fill="var(--verify)" class="pulse"/><text x="122" y="256" class="p-l">running</text>
+          <text x="94" y="300" class="p-l">picked, redesigned,</text>
+          <text x="94" y="326" class="p-l">sourced, run, measured</text>
+        </g>
+        <g class="rise" style="--i:1">
+          <rect x="355" y="160" width="270" height="250" rx="14" fill="var(--panel-2)" stroke="var(--accent)" stroke-width="1.8"/>
+          <text x="379" y="204" class="h-card">Questionnaires</text>
+          <circle cx="389" cy="250" r="7" fill="var(--verify)" class="pulse"/><text x="407" y="256" class="p-l">running</text>
+          <text x="379" y="300" class="p-l">picked, redesigned,</text>
+          <text x="379" y="326" class="p-l">sourced, run, measured</text>
+        </g>
+        <g class="rise" style="--i:2">
+          <rect x="640" y="160" width="270" height="250" rx="14" fill="var(--panel-2)" stroke="var(--accent)" stroke-width="1.8"/>
+          <text x="664" y="204" class="h-card">New hires</text>
+          <circle cx="674" cy="250" r="7" fill="var(--verify)" class="pulse"/><text x="692" y="256" class="p-l">running</text>
+          <text x="664" y="300" class="p-l">picked, redesigned,</text>
+          <text x="664" y="326" class="p-l">sourced, run, measured</text>
+        </g>
+        <text x="70" y="480" class="p-xl rise" style="--i:3">Each one goes through the same five steps.</text>
+        <text x="70" y="520" class="p-xl rise" style="--i:4">The first few take months, because the team is still learning.</text>
+      </g>
+
+      <!-- ═══ 4 · each one gets faster: bars that shrink ═══ -->
+      <g class="el" data-el="s-faster">
+        <text x="70" y="110" class="h-big">Each one gets faster.</text>
+        <text x="70" y="150" class="p-l">how long a process took, from picking it to running it (an illustration)</text>
+        <text x="70" y="220" class="p-xl">the first process</text>
+        <rect class="grow" style="--i:0" x="300" y="196" width="610" height="36" rx="8" fill="rgba(169,214,92,.25)" stroke="var(--accent)" stroke-width="1.4"/>
+        <text x="895" y="221" text-anchor="end" class="p-xl rise" style="--i:2">twelve weeks</text>
+        <text x="70" y="316" class="p-xl">the fifth</text>
+        <rect class="grow" style="--i:1" x="300" y="292" width="300" height="36" rx="8" fill="rgba(169,214,92,.25)" stroke="var(--accent)" stroke-width="1.4"/>
+        <text x="585" y="317" text-anchor="end" class="p-xl rise" style="--i:3">four weeks</text>
+        <text x="70" y="412" class="p-xl">the tenth</text>
+        <rect class="grow" style="--i:2" x="300" y="388" width="160" height="36" rx="8" fill="rgba(169,214,92,.25)" stroke="var(--accent)" stroke-width="1.4"/>
+        <text x="445" y="413" text-anchor="end" class="p-xl rise" style="--i:4">two weeks</text>
+        <text x="70" y="500" class="p-xl rise" style="--i:5">The catalog gives a starting point. The team's own builders answer most requests.</text>
+        <text x="70" y="536" class="p-xl rise" style="--i:6">The helper agent recorded every decision, so nothing is worked out twice.</text>
+      </g>
+
+      <!-- ═══ 5 · people move to steering ═══ -->
+      <g class="el" data-el="s-steer">
+        <text x="70" y="110" class="h-big">People move to steering.</text>
+        <rect x="70" y="150" width="460" height="410" rx="14" fill="var(--panel-2)" stroke="var(--paper)" stroke-width="1.6"/>
+        <text x="94" y="190" class="tag" fill="var(--paper)">WHAT PEOPLE DO NOW</text>
+        <text x="94" y="246" class="p-xl rise" style="--i:0">Set the rules and the limits</text>
+        <text x="94" y="298" class="p-xl rise" style="--i:1">Review the results</text>
+        <text x="94" y="350" class="p-xl rise" style="--i:2">Answer the questions agents raise</text>
+        <text x="94" y="402" class="p-xl rise" style="--i:3">Decide the exceptions</text>
+        <text x="94" y="470" class="p-l rise" style="--i:4">more of their time goes to judgment</text>
+        <rect x="560" y="150" width="350" height="410" rx="14" fill="rgba(169,214,92,.10)" stroke="var(--accent)" stroke-width="1.8"/>
+        <text x="584" y="190" class="tag" fill="var(--accent)">WHAT AGENTS DO</text>
+        <text x="584" y="246" class="p-xl rise" style="--i:1">the routine steps</text>
+        <text x="584" y="298" class="p-xl rise" style="--i:2">at any hour</text>
+        <text x="584" y="350" class="p-xl rise" style="--i:3">across more and more processes</text>
+        <text x="584" y="440" class="p-l rise" style="--i:5">each person covers far more work,</text>
+        <text x="584" y="466" class="p-l rise" style="--i:5">and the company gets more done</text>
+      </g>
+
+      <!-- ═══ 6 · the company's own agents ═══ -->
+      <g class="el" data-el="s-assets">
+        <text x="70" y="110" class="h-big">The company's own agents.</text>
+        <text x="70" y="150" class="p-l">agents that carry the company's own knowledge, reused across processes</text>
+        <g class="rise" style="--i:0">
+          <rect x="70" y="180" width="270" height="220" rx="14" fill="var(--panel-2)" stroke="var(--accent)" stroke-width="1.8"/>
+          <text x="94" y="222" class="h-card">The pricing agent</text>
+          <text x="94" y="262" class="p-l">how this company prices</text>
+          <text x="94" y="330" class="p-l rise" style="--i:3">used in quotes, renewals,</text>
+          <text x="94" y="356" class="p-l rise" style="--i:3">and the sales desk</text>
+        </g>
+        <g class="rise" style="--i:1">
+          <rect x="355" y="180" width="270" height="220" rx="14" fill="var(--panel-2)" stroke="var(--accent)" stroke-width="1.8"/>
+          <text x="379" y="222" class="h-card">The complaints agent</text>
+          <text x="379" y="262" class="p-l">how it handles a complaint</text>
+          <text x="379" y="330" class="p-l rise" style="--i:4">used in support cases</text>
+          <text x="379" y="356" class="p-l rise" style="--i:4">and returns</text>
+        </g>
+        <g class="rise" style="--i:2">
+          <rect x="640" y="180" width="270" height="220" rx="14" fill="var(--panel-2)" stroke="var(--accent)" stroke-width="1.8"/>
+          <text x="664" y="222" class="h-card">The month-end agent</text>
+          <text x="664" y="262" class="p-l">how it closes its books</text>
+          <text x="664" y="330" class="p-l rise" style="--i:5">used in month end</text>
+          <text x="664" y="356" class="p-l rise" style="--i:5">and reporting</text>
+        </g>
+        <text x="70" y="470" class="p-xl rise" style="--i:6">These agents are assets. They are reused, and they improve as the company learns.</text>
+      </g>
+
+      <!-- ═══ 7 · limits the agents cannot cross ═══ -->
+      <g class="el" data-el="s-limits">
+        <text x="70" y="110" class="h-big">Limits the agents cannot cross.</text>
+        <text x="70" y="150" class="p-l">written once, enforced everywhere, checked before an agent acts (an illustration)</text>
+        <g class="rise" style="--i:0">
+          <rect x="70" y="180" width="560" height="96" rx="12" fill="var(--panel-2)" stroke="var(--accent)" stroke-width="1.6"/>
+          <text x="94" y="214" class="h-card">Refunds</text>
+          <text x="94" y="242" class="p-l">an agent may approve up to 500;</text>
+          <text x="94" y="266" class="p-l">a person approves anything above that</text>
+        </g>
+        <g class="rise" style="--i:1">
+          <rect x="70" y="288" width="560" height="96" rx="12" fill="var(--panel-2)" stroke="var(--accent)" stroke-width="1.6"/>
+          <text x="94" y="322" class="h-card">Purchases</text>
+          <text x="94" y="350" class="p-l">an agent may commit up to 5,000 a month;</text>
+          <text x="94" y="374" class="p-l">a person approves the rest</text>
+        </g>
+        <g class="rise" style="--i:2">
+          <rect x="70" y="396" width="560" height="96" rx="12" fill="var(--panel-2)" stroke="var(--accent)" stroke-width="1.6"/>
+          <text x="94" y="430" class="h-card">Contracts</text>
+          <text x="94" y="458" class="p-l">always a person</text>
+        </g>
+        <g class="rise" style="--i:3">
+          <rect x="660" y="180" width="250" height="312" rx="14" fill="rgba(169,214,92,.10)" stroke="var(--accent)" stroke-width="2"/>
+          <text x="785" y="222" text-anchor="middle" class="tag" fill="var(--accent)">THE CHECK</text>
+          <text x="785" y="290" text-anchor="middle" class="p-xl">before the agent acts,</text>
+          <text x="785" y="324" text-anchor="middle" class="p-xl">not after</text>
+          <circle cx="785" cy="400" r="14" fill="var(--verify)" class="pulse"/>
+        </g>
+        <text x="70" y="530" class="p-xl rise" style="--i:4">The company decides what its agents may do and how much they may commit to.</text>
+      </g>
+
+      <!-- ═══ 8 · change no longer waits for people: every process improving at once, through the night ═══ -->
+      <g class="el" data-el="s-parallel">
+        <text x="70" y="110" class="h-big">Change no longer waits for people.</text>
+        <clipPath id="wallclip"><rect x="70" y="150" width="840" height="242" rx="12"/></clipPath>
+        <rect class="night" clip-path="url(#wallclip)" x="70" y="140" width="300" height="270" fill="rgba(182,156,255,.26)"/>
+        <g class="rise" style="--i:0"><rect x="70" y="150" width="200" height="70" rx="12" fill="rgba(169,214,92,.16)" stroke="var(--accent)" stroke-width="1.6"/><text x="170" y="193" text-anchor="middle" class="h-card">Invoices</text><circle cx="252" cy="166" r="5" fill="var(--verify)" class="pulse" style="animation-delay:0.0s"/></g>
+        <g class="rise" style="--i:1"><rect x="283" y="150" width="200" height="70" rx="12" fill="rgba(169,214,92,.16)" stroke="var(--accent)" stroke-width="1.6"/><text x="383" y="193" text-anchor="middle" class="h-card">Late payments</text><circle cx="465" cy="166" r="5" fill="var(--verify)" class="pulse" style="animation-delay:0.7s"/></g>
+        <g class="rise" style="--i:2"><rect x="496" y="150" width="200" height="70" rx="12" fill="rgba(169,214,92,.16)" stroke="var(--accent)" stroke-width="1.6"/><text x="596" y="193" text-anchor="middle" class="h-card">Questionnaires</text><circle cx="678" cy="166" r="5" fill="var(--verify)" class="pulse" style="animation-delay:1.4s"/></g>
+        <g class="rise" style="--i:3"><rect x="709" y="150" width="200" height="70" rx="12" fill="rgba(169,214,92,.16)" stroke="var(--accent)" stroke-width="1.6"/><text x="809" y="193" text-anchor="middle" class="h-card">New hires</text><circle cx="891" cy="166" r="5" fill="var(--verify)" class="pulse" style="animation-delay:0.5s"/></g>
+        <g class="rise" style="--i:4"><rect x="70" y="236" width="200" height="70" rx="12" fill="rgba(169,214,92,.16)" stroke="var(--accent)" stroke-width="1.6"/><text x="170" y="279" text-anchor="middle" class="h-card">Quotes</text><circle cx="252" cy="252" r="5" fill="var(--verify)" class="pulse" style="animation-delay:1.2s"/></g>
+        <g class="rise" style="--i:5"><rect x="283" y="236" width="200" height="70" rx="12" fill="rgba(169,214,92,.16)" stroke="var(--accent)" stroke-width="1.6"/><text x="383" y="279" text-anchor="middle" class="h-card">Month end</text><circle cx="465" cy="252" r="5" fill="var(--verify)" class="pulse" style="animation-delay:0.3s"/></g>
+        <g class="rise" style="--i:6"><rect x="496" y="236" width="200" height="70" rx="12" fill="rgba(169,214,92,.16)" stroke="var(--accent)" stroke-width="1.6"/><text x="596" y="279" text-anchor="middle" class="h-card">Support cases</text><circle cx="678" cy="252" r="5" fill="var(--verify)" class="pulse" style="animation-delay:1.0s"/></g>
+        <g class="rise" style="--i:7"><rect x="709" y="236" width="200" height="70" rx="12" fill="rgba(169,214,92,.16)" stroke="var(--accent)" stroke-width="1.6"/><text x="809" y="279" text-anchor="middle" class="h-card">Applicants</text><circle cx="891" cy="252" r="5" fill="var(--verify)" class="pulse" style="animation-delay:0.1s"/></g>
+        <g class="rise" style="--i:8"><rect x="70" y="322" width="200" height="70" rx="12" fill="rgba(169,214,92,.16)" stroke="var(--accent)" stroke-width="1.6"/><text x="170" y="365" text-anchor="middle" class="h-card">Purchasing</text><circle cx="252" cy="338" r="5" fill="var(--verify)" class="pulse" style="animation-delay:0.8s"/></g>
+        <g class="rise" style="--i:9"><rect x="283" y="322" width="200" height="70" rx="12" fill="rgba(169,214,92,.16)" stroke="var(--accent)" stroke-width="1.6"/><text x="383" y="365" text-anchor="middle" class="h-card">Contracts</text><circle cx="465" cy="338" r="5" fill="var(--verify)" class="pulse" style="animation-delay:1.5s"/></g>
+        <g class="rise" style="--i:10"><rect x="496" y="322" width="200" height="70" rx="12" fill="rgba(169,214,92,.16)" stroke="var(--accent)" stroke-width="1.6"/><text x="596" y="365" text-anchor="middle" class="h-card">Expenses</text><circle cx="678" cy="338" r="5" fill="var(--verify)" class="pulse" style="animation-delay:0.6s"/></g>
+        <g class="rise" style="--i:11"><rect x="709" y="322" width="200" height="70" rx="12" fill="rgba(169,214,92,.16)" stroke="var(--accent)" stroke-width="1.6"/><text x="809" y="365" text-anchor="middle" class="h-card">Reporting</text><circle cx="891" cy="338" r="5" fill="var(--verify)" class="pulse" style="animation-delay:1.3s"/></g>
+        <text x="70" y="450" class="p-xl rise" style="--i:12">Now imagine that on every process at once. Overnight, agents propose.</text>
+        <text x="70" y="490" class="p-xl rise" style="--i:13">In the morning, people decide what to keep.</text>
+        <text x="70" y="546" class="p-xl rise" style="--i:14">No longer limited by how many people can work on change at once.</text>
+      </g>
+
+      <!-- ═══ 9 · processes keep improving: proposed, approved, running ═══ -->
+      <g class="el" data-el="s-improve">
+        <text x="70" y="110" class="h-big">Processes keep improving.</text>
+        <g class="rise" style="--i:0">
+          <rect x="70" y="170" width="250" height="220" rx="14" fill="var(--panel-2)" stroke="var(--broadcast)" stroke-width="1.6"/>
+          <text x="94" y="212" class="tag" fill="var(--broadcast)">PROPOSED</text>
+          <text x="94" y="258" class="p-xl">by an agent, overnight</text>
+          <text x="94" y="330" class="p-l">it saw the same mismatch</text>
+          <text x="94" y="356" class="p-l">forty times, and said so</text>
+        </g>
+        <path class="draw2" style="--i:1;--len:60" d="M 320 280 L 350 280" stroke="var(--accent)" stroke-width="3" fill="none"/>
+        <g class="rise" style="--i:2">
+          <rect x="350" y="170" width="270" height="220" rx="14" fill="var(--panel-2)" stroke="var(--paper)" stroke-width="1.6"/>
+          <text x="372" y="212" class="tag" fill="var(--paper)">APPROVED</text>
+          <text x="372" y="258" class="p-xl">by Dana, with the reason</text>
+          <text x="372" y="330" class="p-l">the agent checks, and a</text>
+          <text x="372" y="356" class="p-l">person sees only the flags</text>
+        </g>
+        <path class="draw2" style="--i:3;--len:60" d="M 620 280 L 650 280" stroke="var(--accent)" stroke-width="3" fill="none"/>
+        <g class="rise" style="--i:4">
+          <rect x="650" y="170" width="260" height="220" rx="14" fill="rgba(169,214,92,.10)" stroke="var(--accent)" stroke-width="1.8"/>
+          <text x="674" y="212" class="tag" fill="var(--accent)">RUNNING</text>
+          <text x="674" y="258" class="p-xl">the new version</text>
+          <text x="674" y="330" class="p-l">every run shows which</text>
+          <text x="674" y="356" class="p-l">version it followed</text>
+        </g>
+        <text x="70" y="480" class="p-xl rise" style="--i:5">The team reviews what the agents found, and the changes they approve go live.</text>
+      </g>
+
+      <!-- ═══ 10 · agents working with agents: a token travels the chain ═══ -->
+      <g class="el" data-el="s-chain">
+        <text x="70" y="110" class="h-big">Agents working with agents.</text>
+        <g class="rise" style="--i:0"><rect x="70" y="220" width="190" height="120" rx="14" fill="rgba(182,156,255,.14)" stroke="var(--broadcast)" stroke-width="1.8"/><text x="165" y="272" text-anchor="middle" class="h-card">Invoice agent</text><text x="165" y="304" text-anchor="middle" class="p-l">reads, flags</text></g>
+        <path class="draw2" style="--i:1;--len:60" d="M 260 280 L 310 280" stroke="var(--accent)" stroke-width="3" fill="none"/>
+        <g class="rise" style="--i:2"><rect x="310" y="220" width="250" height="120" rx="14" fill="rgba(182,156,255,.14)" stroke="var(--broadcast)" stroke-width="1.8"/><text x="435" y="272" text-anchor="middle" class="h-card">Reconciliation agent</text><text x="435" y="304" text-anchor="middle" class="p-l">matches, fixes what it can</text></g>
+        <path class="draw2" style="--i:3;--len:60" d="M 560 280 L 610 280" stroke="var(--accent)" stroke-width="3" fill="none"/>
+        <g class="rise" style="--i:4"><rect x="610" y="220" width="130" height="120" rx="14" fill="rgba(231,239,236,.08)" stroke="var(--paper)" stroke-width="2"/><text x="675" y="272" text-anchor="middle" class="h-card">A person</text><text x="675" y="304" text-anchor="middle" class="p-l">only if asked</text></g>
+        <path class="draw2" style="--i:5;--len:60" d="M 740 280 L 790 280" stroke="var(--accent)" stroke-width="3" fill="none"/>
+        <g class="rise" style="--i:6"><rect x="790" y="220" width="100" height="120" rx="14" fill="rgba(182,156,255,.14)" stroke="var(--broadcast)" stroke-width="1.8"/><text x="840" y="272" text-anchor="middle" class="h-card">Pay</text><text x="840" y="304" text-anchor="middle" class="p-l">agent</text></g>
+        <circle r="9" fill="var(--accent)"><animateMotion dur="6s" repeatCount="indefinite" path="M 165 360 L 435 360 L 675 360 L 840 360"/></circle>
+        <text x="70" y="450" class="p-xl rise" style="--i:7">Work moves from agent to agent, and a person is asked only where the company decided</text>
+        <text x="70" y="486" class="p-xl rise" style="--i:7">a person must stay in the loop.</text>
+      </g>
+
+      <!-- ═══ 11 · from buyer to supplier: the company's agent slides onto the board ═══ -->
+      <g class="el" data-el="s-supplier">
+        <text x="70" y="110" class="h-big">From buyer to supplier.</text>
+        <rect x="70" y="160" width="380" height="380" rx="14" fill="var(--panel-2)" stroke="var(--faint)" stroke-width="1.4"/>
+        <text x="94" y="200" class="tag" fill="var(--dim)">INSIDE THE COMPANY</text>
+        <text x="94" y="250" class="p-l">the agents it built for itself</text>
+        <rect x="530" y="160" width="380" height="380" rx="14" fill="rgba(169,214,92,.08)" stroke="var(--accent)" stroke-width="1.8"/>
+        <text x="554" y="200" class="tag" fill="var(--accent)">THE BOARD</text>
+        <g class="rise" style="--i:2"><rect x="554" y="230" width="332" height="80" rx="12" fill="var(--panel-2)" stroke="var(--faint)" stroke-width="1.4"/><text x="578" y="264" class="p-xl">Another company asks for</text><text x="578" y="292" class="p-xl">a month-end agent</text></g>
+        <g class="rise" style="--i:0"><rect x="94" y="290" width="332" height="80" rx="12" fill="rgba(169,214,92,.14)" stroke="var(--accent)" stroke-width="1.6"/><text x="118" y="324" class="p-xl">The month-end agent</text><text x="118" y="352" class="p-l">proven in its own books</text></g>
+        <g class="rise" style="--i:4"><rect x="554" y="340" width="332" height="80" rx="12" fill="rgba(169,214,92,.14)" stroke="var(--accent)" stroke-width="1.6"/><text x="578" y="374" class="p-xl">This company answers,</text><text x="578" y="402" class="p-l">same contract, same reputation</text></g>
+        <path class="draw2" style="--i:3;--len:120" d="M 426 330 C 470 330, 500 380, 554 380" stroke="var(--accent)" stroke-width="3" fill="none"/>
+        <text x="70" y="590" class="p-xl rise" style="--i:5">Work that was internal becomes a product.</text>
+      </g>
+
+      <!-- ═══ 12 · year three: the wall lights up ═══ -->
+      <g class="el" data-el="s-year3">
+        <text x="70" y="110" class="h-big">Year three.</text>
+        <g class="rise" style="--i:0"><rect x="70" y="150" width="200" height="70" rx="12" fill="rgba(169,214,92,.16)" stroke="var(--accent)" stroke-width="1.6"/><text x="170" y="193" text-anchor="middle" class="h-card">Invoices</text></g>
+        <g class="rise" style="--i:1"><rect x="283" y="150" width="200" height="70" rx="12" fill="rgba(169,214,92,.16)" stroke="var(--accent)" stroke-width="1.6"/><text x="383" y="193" text-anchor="middle" class="h-card">Late payments</text></g>
+        <g class="rise" style="--i:2"><rect x="496" y="150" width="200" height="70" rx="12" fill="rgba(169,214,92,.16)" stroke="var(--accent)" stroke-width="1.6"/><text x="596" y="193" text-anchor="middle" class="h-card">Questionnaires</text></g>
+        <g class="rise" style="--i:3"><rect x="709" y="150" width="200" height="70" rx="12" fill="rgba(169,214,92,.16)" stroke="var(--accent)" stroke-width="1.6"/><text x="809" y="193" text-anchor="middle" class="h-card">New hires</text></g>
+        <g class="rise" style="--i:4"><rect x="70" y="236" width="200" height="70" rx="12" fill="rgba(169,214,92,.16)" stroke="var(--accent)" stroke-width="1.6"/><text x="170" y="279" text-anchor="middle" class="h-card">Quotes</text></g>
+        <g class="rise" style="--i:5"><rect x="283" y="236" width="200" height="70" rx="12" fill="rgba(169,214,92,.16)" stroke="var(--accent)" stroke-width="1.6"/><text x="383" y="279" text-anchor="middle" class="h-card">Month end</text></g>
+        <g class="rise" style="--i:6"><rect x="496" y="236" width="200" height="70" rx="12" fill="rgba(169,214,92,.16)" stroke="var(--accent)" stroke-width="1.6"/><text x="596" y="279" text-anchor="middle" class="h-card">Support cases</text></g>
+        <g class="rise" style="--i:7"><rect x="709" y="236" width="200" height="70" rx="12" fill="rgba(169,214,92,.16)" stroke="var(--accent)" stroke-width="1.6"/><text x="809" y="279" text-anchor="middle" class="h-card">Applicants</text></g>
+        <g class="rise" style="--i:8"><rect x="70" y="322" width="200" height="70" rx="12" fill="rgba(169,214,92,.16)" stroke="var(--accent)" stroke-width="1.6"/><text x="170" y="365" text-anchor="middle" class="h-card">Purchasing</text></g>
+        <g class="rise" style="--i:9"><rect x="283" y="322" width="200" height="70" rx="12" fill="rgba(169,214,92,.16)" stroke="var(--accent)" stroke-width="1.6"/><text x="383" y="365" text-anchor="middle" class="h-card">Contracts</text></g>
+        <g class="rise" style="--i:10"><rect x="496" y="322" width="200" height="70" rx="12" fill="var(--panel-2)" stroke="var(--faint)" stroke-width="1.4"/><text x="596" y="365" text-anchor="middle" class="h-card">Expenses</text></g>
+        <g class="rise" style="--i:11"><rect x="709" y="322" width="200" height="70" rx="12" fill="var(--panel-2)" stroke="var(--faint)" stroke-width="1.4"/><text x="809" y="365" text-anchor="middle" class="h-card">Reporting</text></g>
+        <text x="70" y="450" class="p-xl rise" style="--i:12">Most processes run with agents inside. A small Strategy &amp; Process team keeps redesigning.</text>
+        <text x="70" y="490" class="p-xl rise" style="--i:13">People spend their time on judgment, relationships, and new work.</text>
+        <text x="70" y="530" class="p-xl rise" style="--i:14">Each process costs less to run, and the company can take on more.</text>
+      </g>
+
+      <!-- ═══ 13 · what is new here ═══ -->
+      <g class="el" data-el="s-new">
+        <text x="70" y="110" class="h-big">What is new here.</text>
+        <g class="rise" style="--i:0">
+          <rect x="70" y="150" width="410" height="200" rx="14" fill="var(--panel-2)" stroke="var(--accent)" stroke-width="1.8"/>
+          <text x="96" y="190" class="tag" fill="var(--accent)">NEW</text>
+          <text x="96" y="236" class="h-card">A company that improves</text>
+          <text x="96" y="266" class="h-card">everywhere at once</text>
+          <text x="96" y="310" class="p-l">not one project at a time</text>
+        </g>
+        <g class="rise" style="--i:1">
+          <rect x="500" y="150" width="410" height="200" rx="14" fill="var(--panel-2)" stroke="var(--broadcast)" stroke-width="1.8"/>
+          <text x="526" y="190" class="tag" fill="var(--broadcast)">NEW</text>
+          <text x="526" y="236" class="h-card">Agents that are company</text>
+          <text x="526" y="266" class="h-card">assets</text>
+          <text x="526" y="310" class="p-l">reused, improved, and sold</text>
+        </g>
+        <g class="rise" style="--i:2">
+          <rect x="70" y="370" width="410" height="200" rx="14" fill="var(--panel-2)" stroke="var(--signal)" stroke-width="1.8"/>
+          <text x="96" y="410" class="tag" fill="var(--signal)">NEW</text>
+          <text x="96" y="456" class="h-card">Limits enforced by the</text>
+          <text x="96" y="486" class="h-card">platform</text>
+          <text x="96" y="530" class="p-l">with everything on the record,</text>
+          <text x="96" y="556" class="p-l">so moving fast stays safe</text>
+        </g>
+        <g class="rise" style="--i:3">
+          <rect x="500" y="370" width="410" height="200" rx="14" fill="var(--panel-2)" stroke="var(--verify)" stroke-width="1.8"/>
+          <text x="526" y="410" class="tag" fill="var(--verify)">NEW</text>
+          <text x="526" y="456" class="h-card">Agents that improve things</text>
+          <text x="526" y="486" class="h-card">while people sleep</text>
+          <text x="526" y="530" class="p-l">the work keeps moving overnight</text>
+        </g>
+      </g>
+
+      <!-- ═══ 14 · in short ═══ -->
+      <g class="el" data-el="synopsis">
+        <text x="90" y="130" class="syn-head">In short</text>
+        <g class="rise" style="--i:0"><rect x="90" y="186" width="16" height="16" rx="3" fill="var(--accent)"/><text x="126" y="202" class="syn-xl">Start with a few processes, and get faster with each one.</text></g>
+        <g class="rise" style="--i:1"><rect x="90" y="256" width="16" height="16" rx="3" fill="var(--paper)"/><text x="126" y="272" class="syn-xl">People move to steering and reviewing.</text></g>
+        <g class="rise" style="--i:2"><rect x="90" y="326" width="16" height="16" rx="3" fill="var(--broadcast)"/><text x="126" y="342" class="syn-xl">The company's agents become its assets, within the limits it set.</text></g>
+        <g class="rise" style="--i:3"><rect x="90" y="396" width="16" height="16" rx="3" fill="var(--signal)"/><text x="126" y="412" class="syn-xl">Agents improve every process at once, and people decide what to keep.</text></g>
+        <g class="rise" style="--i:4"><rect x="90" y="466" width="16" height="16" rx="3" fill="var(--verify)"/><text x="126" y="482" class="syn-xl">The company that bought agents can also sell them.</text></g>
+      </g>
+    </svg>
+
+    <div class="callout" id="callout" role="status">
+      <div class="co-eyebrow" id="co-eyebrow">THE QUESTION</div>
+      <p id="co-text"></p>
+    </div>
+  </div>
+
+  <aside class="panel" id="panel" aria-label="The words this part introduces">
+    <h2>THE WORDS</h2>
+    <p class="panel-sub">Each word arrives when the story needs it.</p>
+
+    <div class="capgroup" data-group="0">
+      <button class="cg-head" type="button"><span class="cg-label">1 · GETTING GOING</span><span class="cg-count"></span><span class="chev"></span></button>
+      <div class="cg-body">
+      <div class="cap" data-cap="enterprise"><span class="box"></span><span><span class="cap-name">An agentic enterprise</span><span class="cap-why">a company where agents are a normal part of how the work gets done</span></span></div>
+      <div class="cap" data-cap="rhythm"><span class="box"></span><span><span class="cap-name">The five steps</span><span class="cap-why">pick a process, redesign it, source the agents, run it, measure it</span></span></div>
+      </div>
+    </div>
+
+    <div class="capgroup" data-group="1">
+      <button class="cg-head" type="button"><span class="cg-label">2 · THE COMPANY CHANGES</span><span class="cg-count"></span><span class="chev"></span></button>
+      <div class="cg-body">
+      <div class="cap" data-cap="steering"><span class="box"></span><span><span class="cap-name">Steering and reviewing</span><span class="cap-why">what people do once agents deliver the routine steps</span></span></div>
+      <div class="cap" data-cap="assets"><span class="box"></span><span><span class="cap-name">The company's own agents</span><span class="cap-why">agents that carry its knowledge, reused across processes</span></span></div>
+      <div class="cap" data-cap="limits"><span class="box"></span><span><span class="cap-name">Limits</span><span class="cap-why">what an agent may do and how much it may commit to, checked before it acts</span></span></div>
+      <div class="cap" data-cap="versions"><span class="box"></span><span><span class="cap-name">Versions</span><span class="cap-why">every change to a process carries a reason, and a run shows which version it followed</span></span></div>
+      </div>
+    </div>
+
+    <div class="capgroup" data-group="2">
+      <button class="cg-head" type="button"><span class="cg-label">3 · GETTING SOPHISTICATED</span><span class="cg-count"></span><span class="chev"></span></button>
+      <div class="cg-body">
+      <div class="cap" data-cap="parallel"><span class="box"></span><span><span class="cap-name">Improving in parallel</span><span class="cap-why">agents improve many processes at the same time and keep going through the night; people decide what to keep</span></span></div>
+      <div class="cap" data-cap="chain"><span class="box"></span><span><span class="cap-name">Agents working with agents</span><span class="cap-why">work handed from one agent to the next, with a person where the company decided</span></span></div>
+      <div class="cap" data-cap="supplier"><span class="box"></span><span><span class="cap-name">Buyer to supplier</span><span class="cap-why">the company's own agents answering other companies' requests</span></span></div>
+      </div>
+    </div>
+
+    <div class="capgroup" data-group="3">
+      <button class="cg-head" type="button"><span class="cg-label">4 · YEAR THREE</span><span class="cg-count"></span><span class="chev"></span></button>
+      <div class="cg-body">
+      <div class="cap" data-cap="continuous"><span class="box"></span><span><span class="cap-name">Continuous redesign</span><span class="cap-why">a small team that keeps going, rather than one big project</span></span></div>
+      </div>
+    </div>
+  </aside>
+
+  <div class="band">
+    <span class="stageno" id="stageno">STAGE 1 OF 4</span>
+    <div class="bt">
+      <h1 id="b-title"></h1>
+      <p id="b-desc"></p>
+      <a class="cta" id="cta" href="learn.html" hidden>Back to the series →</a>
+    </div>
+    <div class="controls">
+      <span class="beatno" id="beatno"></span>
+      <button id="playall" aria-label="Play the whole sequence">▶ Play</button>
+      <button id="back" aria-label="Previous step">← Back</button>
+      <button id="next" class="primary" aria-label="Next step">Next →</button>
+    </div>
+  </div>
+</div>
+
+<script>
+(() => {
+  // One scene per beat, and motion inside each: children rise in turn, bars
+  // grow, lines draw, a token travels the chain.
+  const BEATS = [
+    { stage:0, silent:true, hold:2800, show:["titlecard"] },
+
+    // ═══ Stage 1 · Getting going ═══
+    { stage:0, clear:true, show:["s-leads"], caps:["enterprise"],
+      title:"Where this leads",
+      desc:"Part 4 showed one process being redesigned with agents inside. Part 5 showed one agent being built and delivered. This part is about what happens after that, when a company keeps going, process after process, until agents are simply part of how it works. And once they are, the company can change faster than it ever could before. We call that an agentic enterprise." },
+    { stage:0, clear:true, show:["s-year1"], caps:["rhythm"],
+      title:"Year one: the first few processes",
+      desc:"Most companies start with three or four processes where agents can clearly deliver. Each one goes through the same steps. The team picks the process, redesigns it with agents inside, sources the agents, runs it, and measures it. The first few take months, because the team is still learning how to do this." },
+    { stage:0, clear:true, show:["s-faster"],
+      title:"Each one gets faster",
+      desc:"By the tenth process the team has a rhythm. The catalog gives them a starting point. Their own technical team answers most of the requests. The helper agent has recorded every decision they made, so nothing has to be worked out twice. What took twelve weeks now takes two." },
+
+    // ═══ Stage 2 · The company changes ═══
+    { stage:1, clear:true, show:["s-steer"], caps:["steering"],
+      title:"People move to steering",
+      desc:"As agents take over the routine steps, people's jobs change. They set the rules, review the results, answer the questions agents raise, and decide the exceptions. Each person covers far more work than before, and more of their time goes to judgment." },
+    { stage:1, clear:true, show:["s-assets"], caps:["assets"],
+      title:"The company's own agents",
+      desc:"Over time the company builds a set of agents that carry its own knowledge, such as how it prices, how it handles a complaint, and how it closes its books. These agents are assets. They can be reused across processes, and they improve as the company learns." },
+    { stage:1, clear:true, show:["s-limits"], caps:["limits"],
+      title:"Limits the agents cannot cross",
+      desc:"The company decides what its agents are allowed to do and how much they may commit to. For example, an agent may approve a refund up to a limit, and a person approves anything above it. These limits are written once, enforced everywhere, and checked before an agent acts, not after." },
+    { stage:1, clear:true, show:["s-improve"], caps:["versions"],
+      title:"Processes keep improving",
+      desc:"A process is never finished. Agents watch the work as it runs, spot what could be better, and propose the change with its reason. The team reviews what the agents found, and the changes they approve go live." },
+
+    // ═══ Stage 3 · Getting sophisticated ═══
+    { stage:2, clear:true, show:["s-parallel"], caps:["parallel"],
+      title:"Change no longer waits for people",
+      desc:"Now imagine that on every process at once. Changing a process used to mean a project, and a project waits for people: a business case, a budget, a team with time to build it. Now agents do the improving. They work on many processes at the same time, and they keep going through the night. In the morning, the team finds the proposals waiting and decides what to keep. The company is no longer limited by how many people can work on change at once." },
+    { stage:2, clear:true, show:["s-chain"], caps:["chain"],
+      title:"Agents working with agents",
+      desc:"As more processes run, agents begin to hand work to each other. The invoice agent passes a mismatch to the reconciliation agent, which asks a person only when it needs to. The company decides where a person must stay in the loop, and the rest of the work flows." },
+    { stage:2, clear:true, show:["s-supplier"], caps:["supplier"],
+      title:"From buyer to supplier",
+      desc:"A company that started by buying agents can become a supplier of them. Its own agents can answer other companies' requests on the same board, with the same contracts and the same reputation. Work that was internal becomes a product." },
+
+    // ═══ Stage 4 · Year three ═══
+    { stage:3, clear:true, show:["s-year3"], caps:["continuous"],
+      title:"Year three",
+      desc:"Most processes run with agents inside. A small Strategy and Process team keeps redesigning. People spend their time on judgment, relationships, and new work the company could not take on before. Each process costs less to run, and the company can take on more." },
+    { stage:3, clear:true, show:["s-new"],
+      title:"What is new here",
+      desc:"None of this was possible before. Improving a process meant a project, with a budget and a queue, so a company could change only as fast as its people could carry it. Software was something you bought and configured, not an asset you grew and could sell. And the only way to keep control was to slow down. Now the agents do the improving across every process at once, the company owns what they become, and the limits and the record let it move that fast without losing control." },
+    { stage:3, clear:true, cta:true, complete:true, show:["synopsis"],
+      title:"In short",
+      desc:"Start with a few processes and get faster with each one. People move to steering and reviewing. The company's agents become its assets, working within limits it set. Agents improve every process at once, and people decide what to keep. The company that bought agents can also sell them." },
+  ];
+
+  const stageFirstBeat = [1, 4, 8, 11];
+  const els = {};
+  document.querySelectorAll("[data-el]").forEach(g => els[g.dataset.el] = g);
+  const caps = {};
+  document.querySelectorAll("[data-cap]").forEach(c => caps[c.dataset.cap] = c);
+  const groups = document.querySelectorAll(".capgroup");
+  const callout = document.getElementById("callout");
+  const coText = document.getElementById("co-text");
+  const coEyebrow = document.getElementById("co-eyebrow");
+  const panel = document.getElementById("panel");
+  const scrubBtns = document.querySelectorAll("#scrub button");
+  const backBtn = document.getElementById("back");
+  const nextBtn = document.getElementById("next");
+  const playBtn = document.getElementById("playall");
+
+  // ── narration: one clip per beat ──
+  const voice = new Audio();
+  voice.preload = "auto";
+  let playingAll = false;
+  let holdTimer = null;
+  const CLIPV = 4; // bump when any narration clip is re-recorded, so caches refetch
+  const clip = (i) => `agentic-enterprise-audio/beat-${String(i + 1).padStart(2, "0")}.mp3?v=${CLIPV}`;
+  function playBeat(){
+    clearTimeout(holdTimer);
+    const cur = BEATS[beat];
+    if (cur.silent){
+      voice.pause();
+      if (playingAll) holdTimer = setTimeout(() => { if (playingAll) go(beat + 1); }, cur.hold || 2500);
+      return;
+    }
+    voice.src = clip(beat);
+    voice.play().catch(() => {});
+  }
+  function stopAll(){
+    playingAll = false;
+    clearTimeout(holdTimer);
+    playBtn.textContent = "▶ Play";
+  }
+  voice.addEventListener("ended", () => {
+    if (!playingAll) return;
+    if (beat < BEATS.length - 1) go(beat + 1);
+    else stopAll();
+  });
+
+  let beat = 0;
+  let manualOpen = {};
+
+  function render(jumped){
+    const shown = new Set(), lit = new Set(), litGroups = new Set();
+    let title = "", desc = "", stage = 0, complete = false, latestGroup = null;
+    for (let i = 0; i <= beat; i++){
+      const b = BEATS[i];
+      if (b.clear) shown.clear();
+      (b.show || []).forEach(id => shown.add(id));
+      (b.caps || []).forEach(id => lit.add(id));
+      if (b.caps){ litGroups.add(String(b.stage)); latestGroup = String(b.stage); }
+      if (b.title) title = b.title;
+      if (b.desc) desc = b.desc;
+      stage = b.stage;
+      if (b.complete) complete = true;
+    }
+    const cur = BEATS[beat];
+    for (const [id, g] of Object.entries(els)){
+      g.classList.toggle("instant", !!jumped && shown.has(id) && !(cur.show || []).includes(id));
+      g.classList.toggle("on", shown.has(id));
+    }
+    for (const [id, c] of Object.entries(caps)) c.classList.toggle("on", lit.has(id));
+    groups.forEach(g => {
+      const id = g.dataset.group;
+      g.classList.toggle("on", litGroups.has(id));
+      const open = cur.openAll ? litGroups.has(id)
+        : manualOpen[id] !== undefined ? manualOpen[id] : id === latestGroup;
+      g.classList.toggle("open", open);
+      const n = g.querySelectorAll(".cap.on").length;
+      g.querySelector(".cg-count").textContent = n ? `${n} ✓` : "";
+    });
+    panel.classList.toggle("complete", complete);
+    document.getElementById("cta").hidden = !cur.cta;
+
+    if (cur.callout){
+      coEyebrow.textContent = cur.callout.eyebrow || "THE QUESTION";
+      coText.textContent = cur.callout.text;
+      callout.style.left = cur.callout.x + "%";
+      callout.style.top = cur.callout.y + "%";
+      callout.style.maxWidth = (cur.callout.w || 330) + "px";
+      callout.classList.toggle("mint", !!cur.callout.mint);
+      callout.classList.add("on");
+    } else {
+      callout.classList.remove("on");
+    }
+
+    document.getElementById("b-title").textContent = title;
+    document.getElementById("b-desc").textContent = desc;
+    document.getElementById("stageno").textContent = `STAGE ${stage + 1} OF 4`;
+    document.getElementById("beatno").textContent = `${beat + 1} / ${BEATS.length}`;
+    scrubBtns.forEach(b => {
+      const s = Number(b.dataset.stage);
+      b.classList.toggle("on", s === stage);
+      b.classList.toggle("done", s < stage);
+    });
+    backBtn.disabled = beat === 0;
+    nextBtn.disabled = beat === BEATS.length - 1;
+  }
+
+  function go(n, jumped){
+    beat = Math.max(0, Math.min(BEATS.length - 1, n));
+    manualOpen = {};
+    render(jumped);
+    playBeat();
+  }
+
+  playBtn.addEventListener("click", () => {
+    if (playingAll){ stopAll(); voice.pause(); return; }
+    playingAll = true;
+    playBtn.textContent = "■ Stop";
+    if (beat === BEATS.length - 1) go(0, true);
+    else playBeat();
+  });
+  groups.forEach(g => g.querySelector(".cg-head").addEventListener("click", () => {
+    manualOpen[g.dataset.group] = !g.classList.contains("open");
+    render();
+  }));
+  nextBtn.addEventListener("click", () => go(beat + 1));
+  backBtn.addEventListener("click", () => go(beat - 1));
+  scrubBtns.forEach(b => b.addEventListener("click", () => go(stageFirstBeat[Number(b.dataset.stage)], true)));
+  window.addEventListener("keydown", (e) => {
+    if (e.key === "ArrowRight" || e.key === " ") { e.preventDefault(); go(beat + 1); }
+    if (e.key === "ArrowLeft") { e.preventDefault(); go(beat - 1); }
+  });
+
+  render();
+})();
+</script>
+</body>
+</html>
