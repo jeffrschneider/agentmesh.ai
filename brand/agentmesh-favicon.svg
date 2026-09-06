@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" width="32" height="32" role="img" aria-label="AgentMesh">
+  <title>AgentMesh</title>
+  <!-- The 16px cut. Strokes are what die in a tab, so the two quiet tiles are
+       filled at low opacity instead of outlined, and the chip keeps the mark
+       legible on a light tab bar. Geometry is otherwise identical to the mark. -->
+  <rect width="32" height="32" rx="7" fill="#0A1417"/>
+  <rect x="4" y="4" width="11" height="11" rx="3.2" fill="#E7EFEC" opacity=".22"/>
+  <rect x="17" y="17" width="11" height="11" rx="3.2" fill="#E7EFEC" opacity=".22"/>
+  <rect x="4" y="17" width="11" height="11" rx="3.2" fill="#43D6A6"/>
+  <rect x="17" y="4" width="11" height="11" rx="3.2" fill="#F2A93B"/>
+</svg>

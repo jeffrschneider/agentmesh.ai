@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" width="32" height="32" role="img" aria-label="AgentMesh">
+  <title>AgentMesh</title>
+  <!-- One color. Set `color` on the parent, or replace currentColor with a hex. -->
+  <rect x="3" y="3" width="12" height="12" rx="3.5" fill="none" stroke="currentColor" stroke-width="2" opacity=".4"/>
+  <rect x="17" y="17" width="12" height="12" rx="3.5" fill="none" stroke="currentColor" stroke-width="2" opacity=".4"/>
+  <rect x="3" y="17" width="12" height="12" rx="3.5" fill="currentColor" opacity=".55"/>
+  <rect x="17" y="3" width="12" height="12" rx="3.5" fill="currentColor"/>
+</svg>
