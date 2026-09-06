@@ -30,6 +30,11 @@ fi
 if [ -f "$STAGE/.well-known/ai-catalog.json" ]; then
   "$GCLOUD" storage cp "$STAGE/.well-known/ai-catalog.json" "$BUCKET/.well-known/ai-catalog.json"     --content-type=application/json --project "$PROJECT"
 fi
+# The domain proof for this organisation's charter: the app generates the value,
+# this file publishes it, and the verifier reads it over https.
+if [ -f "$STAGE/.well-known/agentmesh-domain.json" ]; then
+  "$GCLOUD" storage cp "$STAGE/.well-known/agentmesh-domain.json" "$BUCKET/.well-known/agentmesh-domain.json"     --content-type=application/json --project "$PROJECT"
+fi
 for h in "${HOSTS[@]}"; do
   "$GCLOUD" compute url-maps invalidate-cdn-cache agentcatalog-lb --path "/*" --host "$h" --project "$PROJECT"
 done
