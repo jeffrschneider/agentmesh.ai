@@ -107,3 +107,25 @@ email signatures, Office, some slide tools):
 
 The tagline version is `png/og-image.png`, which sets "a network custom built
 for agents" under the lockup on ink.
+
+## Social
+
+`social/` holds one file per platform slot, sized to that platform's spec.
+Avatars are the mark alone — the wordmark is unreadable at avatar size, and
+most platforms mask avatars into a circle, so the mark sits at 62% of the
+square with the corners well inside the circle.
+
+| File | Slot |
+|---|---|
+| `avatar-dark-{400,512,800}.png` | X, LinkedIn, GitHub, Slack, Discord, YouTube channel icon |
+| `avatar-light-{400,512}.png` | the same, for platforms that frame avatars on white |
+| `x-header-1500x500.png` | X profile header |
+| `linkedin-cover-1128x191.png` | LinkedIn page cover (light variant included) |
+| `youtube-banner-2560x1440.png` | YouTube channel art; lockup sits inside the 1546x423 safe area |
+| `github-social-1280x640.png` | GitHub repo social preview (Settings → Social preview) |
+| `square-1080x1080.png` | square post, dark and light |
+| `../png/og-image.png` | Open Graph / X large card, with the tagline |
+| `../lockup/png/social-{dark,light}-1200x630.png` | the same card without the tagline |
+
+Not included, because nothing points at them yet: Facebook page cover
+(820x312), Instagram profile (320x320). Ask and they take a minute.
