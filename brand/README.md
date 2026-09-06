@@ -49,8 +49,7 @@ SVG is the source; these are exports for the places that can't take one.
 - **png/mark-dark-{16,32,64,128,256,512}.png** — same, quiet tiles in ink.
   For light grounds.
 - **png/favicon-{16,32,48,64,180,192,512}.png** — the favicon cut with its chip.
-- **png/lockup-light@2x.png**, **png/lockup-dark@2x.png** — mark plus wordmark,
-  transparent, 2x for retina.
+- **lockup/** — mark plus wordmark, no tagline. See below.
 - **png/og-image.png** — 1200x630 social card, for og:image and twitter:image.
 - **favicon.ico** — 16/32/48 in one file, for browsers that still ask for it.
 - **apple-touch-icon.png** — 180x180, what iOS uses when a page is saved to
@@ -62,3 +61,33 @@ iOS find them without a link tag. The og-image needs meta tags to be used:
     <meta property="og:image" content="https://agentmesh.ai/brand/png/og-image.png">
     <meta name="twitter:image" content="https://agentmesh.ai/brand/png/og-image.png">
     <meta name="twitter:card" content="summary_large_image">
+
+
+## Lockups: mark + name, no tagline
+
+Names say what the artwork sits **on**, not what color the artwork is.
+`on-dark` is light artwork for a dark ground; `on-light` is dark artwork for a
+light ground.
+
+**Transparent** (drop onto anything):
+
+- `lockup/agentmesh-lockup-on-dark.svg` · `lockup/agentmesh-lockup-on-light.svg`
+- `lockup/png/lockup-on-dark-{1x,2x,3x}.png`
+- `lockup/png/lockup-on-light-{1x,2x,3x}.png`
+
+1x is a 32px mark, 2x is 64px, 3x is 96px. Use the SVG wherever you can.
+
+**Background baked in** (for anywhere transparency gets flattened badly —
+email signatures, Office, some slide tools):
+
+- `lockup/png/lockup-dark-bg.png` — on ink `#0A1417`
+- `lockup/png/lockup-light-bg.png` — on white `#FFFFFF`
+- `lockup/png/lockup-paper-bg.png` — on paper `#E7EFEC`
+
+**Social cards, 1200x630, no tagline:**
+
+- `lockup/png/social-dark-1200x630.png`
+- `lockup/png/social-light-1200x630.png`
+
+The tagline version is `png/og-image.png`, which sets "a network custom built
+for agents" under the lockup on ink.

@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 172 32" width="172" height="32" role="img" aria-label="AgentMesh">
+  <title>AgentMesh</title>
+  <!-- For dark grounds: artwork in paper. Mark plus wordmark, no tagline. Transparent background.
+       The wordmark is live text in Space Grotesk; outline it for print. -->
+  <rect x="3" y="3" width="12" height="12" rx="3.5" fill="none" stroke="#E7EFEC" stroke-width="2" opacity=".35"/>
+  <rect x="17" y="17" width="12" height="12" rx="3.5" fill="none" stroke="#E7EFEC" stroke-width="2" opacity=".35"/>
+  <rect x="3" y="17" width="12" height="12" rx="3.5" fill="#43D6A6"/>
+  <rect x="17" y="3" width="12" height="12" rx="3.5" fill="#F2A93B"/>
+  <text x="44" y="22" font-family="'Space Grotesk', 'Helvetica Neue', Arial, sans-serif"
+        font-size="19" font-weight="500" letter-spacing="-0.2" fill="#E7EFEC">Agent<tspan font-weight="700">Mesh</tspan></text>
+</svg>
