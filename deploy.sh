@@ -35,6 +35,13 @@ fi
 if [ -f "$STAGE/.well-known/agentmesh-domain.json" ]; then
   "$GCLOUD" storage cp "$STAGE/.well-known/agentmesh-domain.json" "$BUCKET/.well-known/agentmesh-domain.json"     --content-type=application/json --project "$PROJECT"
 fi
+# The charter's own proof, which is a different claim from the one above: that
+# whoever controls this domain published THIS charter, named by its id. The
+# mandate registry checks it itself and does not take the platform's word for
+# it. Extensionless, so the content type needs pinning by hand.
+if [ -f "$STAGE/.well-known/agent-charter" ]; then
+  "$GCLOUD" storage cp "$STAGE/.well-known/agent-charter" "$BUCKET/.well-known/agent-charter"     --content-type=application/json --project "$PROJECT"
+fi
 for h in "${HOSTS[@]}"; do
   "$GCLOUD" compute url-maps invalidate-cdn-cache agentcatalog-lb --path "/*" --host "$h" --project "$PROJECT"
 done
