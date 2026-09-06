@@ -40,6 +40,17 @@ Clear space on all sides: the width of one tile (a quarter of the mark).
 Minimum size for the mark alone: 16px. Minimum for the lockup: 120px wide —
 below that, use the mark on its own.
 
+## Where these live
+
+This folder is the source of truth. Three files are also copied to the site
+root, because that is where user agents look for them and nowhere else:
+
+- `/favicon.svg` — what every page's `<link rel="icon">` points at
+- `/favicon.ico` — requested at the root by browsers, with no link tag
+- `/apple-touch-icon.png` — requested at the root by iOS, with no link tag
+
+They are copies, not originals. Change the file here, then copy it out.
+
 ## Raster sizes
 
 SVG is the source; these are exports for the places that can't take one.
@@ -52,8 +63,13 @@ SVG is the source; these are exports for the places that can't take one.
 - **lockup/** — mark plus wordmark, no tagline. See below.
 - **png/og-image.png** — 1200x630 social card, for og:image and twitter:image.
 - **favicon.ico** — 16/32/48 in one file, for browsers that still ask for it.
-- **apple-touch-icon.png** — 180x180, what iOS uses when a page is saved to
-  the home screen.
+- **png/apple-touch-icon.png** — 180x180 for iOS. Full-bleed and opaque, with
+  square corners: iOS masks the icon into its own squircle, so an icon that
+  arrives pre-rounded gets masked twice and its transparent corners composite
+  to black. The chip cut (png/favicon-*.png) is the rounded, transparent one —
+  correct for tabs and avatars, wrong for a home screen.
+- **png/icon-{192,512}-maskable.png** — same full-bleed treatment, for an
+  Android/PWA manifest whenever one gets added.
 
 favicon.ico and apple-touch-icon.png sit at the site root, where browsers and
 iOS find them without a link tag. The og-image needs meta tags to be used:
