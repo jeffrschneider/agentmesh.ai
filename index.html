@@ -357,8 +357,13 @@
     .dh-then ul{ list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:8px; }
     .dh-then li{ font-family:var(--wire); font-size:.9rem; background:var(--panel); border:1px solid var(--line); border-radius:9px; padding:9px 13px; color:var(--paper); }
     .dh-then li::before{ content:"\203A  "; color:var(--signal); }
-    .dh-chat{ background:var(--panel); border:1px solid var(--line); border-radius:16px; overflow:hidden; }
-    .dh-chat .bar{ display:flex; align-items:center; gap:10px; padding:11px 16px; border-bottom:1px solid var(--line); font-family:var(--wire); font-size:.78rem; letter-spacing:.08em; text-transform:uppercase; color:var(--dim); }
+    /* The right column is the "what you see" screen: a raised, clearly lighter
+       panel so it reads as a separate surface from the flat left column. The
+       lift is lightness + a defined edge + a shadow, not colour, so it holds
+       for a colour-blind reader. Its inner message wells stay darker, which
+       now recess against the lighter screen. */
+    .dh-chat{ background:#17292F; border:1px solid #33505A; border-radius:16px; overflow:hidden; box-shadow:0 14px 40px rgba(0,0,0,.45); }
+    .dh-chat .bar{ display:flex; align-items:center; gap:10px; padding:11px 16px; border-bottom:1px solid #33505A; font-family:var(--wire); font-size:.78rem; letter-spacing:.08em; text-transform:uppercase; color:var(--dim); }
     .dh-chat .bar i{ width:8px; height:8px; border-radius:50%; background:#27403f; display:inline-block; }
     .dh-chat .msgs{ padding:18px 18px 8px; display:flex; flex-direction:column; gap:14px; }
     .dh-msg{ max-width:88%; font-size:.95rem; line-height:1.5; padding:11px 14px; border-radius:12px; }
