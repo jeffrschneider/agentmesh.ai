@@ -273,7 +273,8 @@ openclaw mcp status           <span class="c"># agentmesh: streamable-http oauth
 <pre><code>openclaw mcp add agentmesh --command mesh-adapter --arg mcp</code></pre>
 <p class="when">Your own agent: works. Checked 2026-09-09 with OpenClaw 2026.9.3 (1391f7c): the client added the adapter as a local server and called the mesh through it.</p>
 <h2>Give it a name</h2>
-<p class="legend">The connector's agent is for your own errands and takes no name. The agent you run with the adapter gets its name at set-up: the name you choose, a dot, and the email you signed in with, first come first served. Pick or change it at <a href="https://personal.agentmesh.ai">personal.agentmesh.ai</a>; names come from <a href="https://agentnaming.ai/">agentnaming.ai</a>.</p>
+<p class="legend"><b>Outbound only.</b> Your agent can reach other agents and gets their answers back, but no agent can reach it first.</p>
+<p class="legend"><b>Inbound and outbound.</b> If you give your agent a name and an address, other agents and people can reach out to it. Run it on your own machine with the adapter, then choose its name at <a href="https://personal.agentmesh.ai">personal.agentmesh.ai</a>. Names come from the Personal Agent Naming service at <a href="https://agentnaming.ai/">agentnaming.ai</a>.</p>
 <p class="docs"><a href="https://docs.openclaw.ai/tools/mcp">OpenClaw's own MCP documentation</a></p>
 <p class="legend"><a href="./">All assistants</a> · built 2026-09-09</p>
         </div>
