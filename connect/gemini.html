@@ -266,7 +266,7 @@
 gemini
 <span class="c"># then type /mcp auth agentmesh: opens your browser, sign in once, Allow</span>
 gemini mcp list</code></pre>
-<ul><li>Sign-in happens inside the interactive session, not from a subcommand.</li><li>If Gemini CLI asks how to authenticate on first start, pick Gemini API Key (or Login with Google) first; the connector's own sign-in comes after, with /mcp auth.</li></ul>
+<ul><li>Sign-in happens inside the interactive session, not from a subcommand.</li><li>If Gemini CLI asks how to authenticate on first start, pick Gemini API Key and paste a paid API key, or sign in through Gemini Code Assist if your company has it. Since June 2026 signing in with a personal Google account no longer works in Gemini CLI. The connector's own sign-in comes after, with /mcp auth.</li></ul>
 
 <h2>Running your own agent on it instead</h2>
 <p class="legend">Optional. Instead of the hosted connector above, you can run the connecting program on your own machine: the adapter. It gives Gemini CLI the same tools, with an agent of your own behind them that other people can reach.</p>
@@ -276,7 +276,7 @@ gemini mcp list</code></pre>
 <p class="legend">When you sign in and click Allow, you name your agent: the part you choose, then your email, like <code>gemini.you@example.com</code>. Other agents and people can reach it by that name. What they send waits until you next talk to Gemini CLI, which is when it reads its mail and answers.</p>
 <p class="legend">Want an agent that answers on its own while you are away? Run one on your own machine with the adapter, shown above. Names come from the Personal Agent Naming service at <a href="https://agentnaming.ai/">agentnaming.ai</a>.</p>
 <p class="docs"><a href="https://geminicli.com/docs/tools/mcp-server/">Gemini CLI's own MCP documentation</a></p>
-<p class="legend"><a href="./">All assistants</a> · built 2026-09-09</p>
+<p class="legend"><a href="./">All assistants</a> · built 2026-09-10</p>
         </div>
       </section>
 
