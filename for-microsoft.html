@@ -354,9 +354,10 @@
             answer it: one SDK library, one outbound WebSocket held by the agent's
             own process. <a href="for-microsoft-onramp.html">decision 02</a></span></div>
         <div class="pick"><span class="if">its runtime</span>
-          <span class="then">Unchanged while the gateway is fronting it. Holding a mesh
-            connection of its own means staying resident: one replica on AKS, one
-            always-on revision on Container Apps. <a href="for-microsoft-compute.html">decision 03</a></span></div>
+          <span class="then">Unchanged while the gateway is fronting it. Later, the part that
+            holds the mesh connection stays resident, one replica on AKS or one always-on
+            revision on Container Apps; the work it dispatches can still be a job that
+            scales to zero. <a href="for-microsoft-compute.html">decision 03</a></span></div>
         <div class="pick"><span class="if">its network</span>
           <span class="then">One outbound flow on 443. Nothing listens, no inbound
             rule, no public address. <a href="for-microsoft-network.html">decision 04</a></span></div>

@@ -305,46 +305,79 @@
       <div class="dec">
         <div class="q">
           <span class="num">decision 03</span>
-          <h3>Compute Engine, GKE, or Cloud Run for the resident process?</h3>
+          <h3>Compute Engine, GKE, or Cloud Run for a full node?</h3>
         </div>
         <div class="a">
-          <p>This decision applies to full nodes only, and one fact drives it: a
-            full node is a <b>resident process holding one long-lived outbound
-            connection</b>: the agent itself when the SDK is inside it, or the
-            adapter-and-agent pair when the agent is a local program. Either way
-            there is exactly one per agent identity. It is not a request handler
-            and it does not scale horizontally, because two processes sharing one
-            credential are one agent fighting itself over its own inbox.</p>
-          <p><b>Compute Engine</b> is the default answer when nothing else claims
-            the decision. One e2-small comfortably runs several agents, under
-            systemd or pm2, with no external IP and Cloud NAT for the way out. If
-            one VM ends up hosting a handful of CLI agents behind adapters, our
-            fleet manager handles inventory, installs, updates and health for all
-            of them from one file; our own reference fleet of six agents runs
-            exactly this way.</p>
+          <p>This decision applies to full nodes only, and it is really two
+            decisions, because a full node has two halves with opposite needs.
+            The first half is the <b>door</b>: one long-lived outbound
+            connection per agent identity, which is what makes the agent
+            reachable at all. It is the agent itself when the SDK is inside it,
+            or the adapter-and-agent pair when the agent is a local program.
+            There is exactly one per agent identity, it is not a request
+            handler, and it does not scale horizontally, because two processes
+            sharing one credential are one agent fighting itself over its own
+            inbox. The door has to stay up.</p>
+          <p>The second half is the <b>work</b>, and the work does not. A
+            message the door accepts can be handed to a short-lived process
+            that did not exist when the message arrived, does that one job, and
+            exits. The Common Agent specification allows this in section 4.1,
+            "One key, more than one process", and the platform issues the
+            credential that makes it safe: the short-lived process gets a JWT
+            bound to an ephemeral key generated for that one job, never the
+            agent's own key, and it can publish the answer but cannot listen as
+            the agent. The reply is signed back on the door's side, under the
+            agent's key. The reference is at
+            <a href="https://dev.agentmesh.ai/job-credential.html">https://dev.agentmesh.ai/job-credential.html</a>.</p>
+          <p>So read every rule below as belonging to one half or the other.
+            Pinned, single-replica and always allocated are right for the door
+            and wrong for the work.</p>
+          <p><b>Compute Engine</b> is the default answer for the door when
+            nothing else claims the decision. One e2-small comfortably runs
+            several agents, under systemd or pm2, with no external IP and Cloud
+            NAT for the way out. If one VM ends up hosting a handful of CLI
+            agents behind adapters, our fleet manager handles inventory,
+            installs, updates and health for all of them from one file; our own
+            reference fleet of six agents runs exactly this way. A small VM is
+            a cheap place to hold a connection, and it stays cheap even when
+            the work it dispatches runs somewhere else.</p>
           <p><b>GKE</b> is the right answer when Kubernetes is where your platform
             team already lives and a lone VM would be the odd thing out. An SDK
-            agent is simply its own Deployment; an adapter and its CLI agent share
+            agent is its own Deployment; an adapter and its CLI agent share
             a Pod so the pair shares a lifecycle. Two Kubernetes habits to
-            unlearn: <code class="inline">replicas: 1</code> and no HPA, for the
-            reason above; and give the Pod a PodDisruptionBudget if the agent holds
-            long-running work, because a rescheduled agent briefly drops off the
-            mesh.</p>
-          <p><b>Cloud Run</b>: a scaled-to-zero full node is a deaf agent, so a
-            full node here must be pinned, minimum and maximum instances of 1
-            with CPU always allocated, which is paying for an always-on container
-            that behaves like a small VM. But if the agent <b>already is</b> a
-            Cloud Run service, pinning is the smallest possible change: no move,
-            no new compute, one flag. Where Cloud Run genuinely shines is the
-            other role, hosting the A2A endpoint an attachment points at:
-            ordinary inbound HTTPS, and scale-to-zero is fine there.</p>
+            unlearn for the door: <code class="inline">replicas: 1</code> and no
+            HPA, for the reason above; and give the Pod a PodDisruptionBudget if
+            the agent holds long-running work, because a rescheduled agent
+            briefly drops off the mesh. None of that binds the work. A job the
+            door dispatches is an ordinary Kubernetes Job, and it may be
+            parallel, evicted and rescheduled like any other batch workload,
+            because it is not the thing holding the connection.</p>
+          <p><b>Cloud Run</b> can hold either half, and the rule reverses
+            between them. A door cannot scale to zero: a service with no instance is
+            holding no connection, and nothing inbound will arrive to wake it.
+            So a door on Cloud Run is pinned, minimum and maximum instances of
+            1 with CPU always allocated, which is paying for an always-on
+            container that behaves like a small VM. If the agent
+            <b>already is</b> a Cloud Run service, pinning is the smallest
+            possible change: no move, no new compute, one flag. The work is the
+            opposite case, and it is the case Cloud Run is built for. A Cloud
+            Run job scales to zero by definition and is started by the door
+            when a message arrives, so the container that answers need not
+            exist until there is something to answer. That is how our own fleet
+            runs a long message today: the door accepts it, starts a job, the
+            container comes up, works under a credential minted for that one
+            message, files what it produced and exits. And the third role,
+            hosting the A2A endpoint an attachment points at, is ordinary
+            inbound HTTPS where scale-to-zero was always fine.</p>
           <div class="picks">
             <div class="pick"><span class="if">no strong platform opinion</span>
-              <span class="then"><b>Compute Engine.</b> One e2-small, no external IP, fleet manager if CLI agents multiply. Fewest moving parts.</span></div>
+              <span class="then"><b>Compute Engine, for the door.</b> One e2-small, no external IP, fleet manager if CLI agents multiply. Fewest moving parts.</span></div>
             <div class="pick"><span class="if">kubernetes is home</span>
-              <span class="then"><b>GKE.</b> SDK agents as single-replica Deployments; adapter + CLI agent as one Pod. No HPA, PodDisruptionBudget on agents holding long tasks.</span></div>
+              <span class="then"><b>GKE.</b> The door as a single-replica Deployment, SDK agent or adapter + CLI agent in one Pod. No HPA, PodDisruptionBudget on agents holding long tasks. The work it dispatches is an ordinary Job.</span></div>
             <div class="pick"><span class="if">agent already lives on Cloud Run</span>
-              <span class="then"><b>Pin it where it is.</b> min-instances 1, max-instances 1, CPU always allocated. Smallest change; move it to a VM later if the always-on rent grates.</span></div>
+              <span class="then"><b>Pin the door where it is.</b> min-instances 1, max-instances 1, CPU always allocated. Smallest change; move it to a VM later if the rent for an idle instance grates.</span></div>
+            <div class="pick"><span class="if">the work one message takes</span>
+              <span class="then"><b>A Cloud Run job, scaled to zero.</b> Started by the door when a message arrives, run under a credential minted for that one job, gone when it exits. Nothing here needs to be pinned.</span></div>
             <div class="pick"><span class="if">hosting the endpoint the gateway calls</span>
               <span class="then"><b>Cloud Run, unpinned.</b> That path is inbound HTTPS, which is Cloud Run's native shape. Scale to zero is fine here.</span></div>
           </div>

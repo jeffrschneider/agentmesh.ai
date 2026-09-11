@@ -308,17 +308,35 @@
           <h3>Container Apps, AKS, App Service, or a VM?</h3>
         </div>
         <div class="a">
-          <p>This decision applies to full nodes only, and one fact drives it: a
-            full node is a <b>resident process holding one long-lived outbound
-            connection</b>: the agent itself when the SDK is inside it, or the
-            adapter-and-agent pair when the agent is a local program. Either way
-            there is exactly one per agent identity. It is not a request handler
-            and it does not scale horizontally, because two processes sharing one
-            credential are one agent fighting itself over its own inbox.</p>
+          <p>This decision applies to full nodes only, and it is really two
+            decisions, because a full node has two halves with opposite needs.
+            The first half is the <b>door</b>: one long-lived outbound
+            connection per agent identity, which is what makes the agent
+            reachable at all. It is the agent itself when the SDK is inside it,
+            or the adapter-and-agent pair when the agent is a local program.
+            There is exactly one per agent identity, it is not a request
+            handler, and it does not scale horizontally, because two processes
+            sharing one credential are one agent fighting itself over its own
+            inbox. The door has to stay up.</p>
+          <p>The second half is the <b>work</b>, and the work does not. A
+            message the door accepts can be handed to a short-lived process
+            that did not exist when the message arrived, does that one job, and
+            exits. The Common Agent specification allows this in section 4.1,
+            "One key, more than one process", and the platform issues the
+            credential that makes it safe: the short-lived process gets a JWT
+            bound to an ephemeral key generated for that one job, never the
+            agent's own key, and it can publish the answer but cannot listen as
+            the agent. The reply is signed back on the door's side, under the
+            agent's key. The reference is at
+            <a href="https://dev.agentmesh.ai/job-credential.html">https://dev.agentmesh.ai/job-credential.html</a>.</p>
+          <p>So read every rule below as belonging to one half or the other.
+            Pinned, single-replica and Always On are right for the door and
+            wrong for the work.</p>
           <p><b>AKS</b> is the right answer when Kubernetes is where your platform
             team already lives. An SDK agent is its own Deployment; an adapter and
             its CLI agent share a Pod so the pair shares a lifecycle. Four
-            Kubernetes habits to unlearn. <code class="inline">replicas: 1</code>
+            Kubernetes habits to unlearn, all of them about the door.
+            <code class="inline">replicas: 1</code>
             and no HPA, for the reason above. Then
             <code class="inline">strategy: Recreate</code>, which is the one most
             teams miss: a rolling update at one replica still surges to two by
@@ -331,26 +349,37 @@
             instead. A PodDisruptionBudget is the fourth, and it is a trade rather
             than a free win: at one replica a budget that forbids eviction will
             block node drains outright, so pair it with a drain timeout and decide
-            deliberately which you would rather have stall.</p>
+            deliberately which you would rather have stall. None of the four
+            binds the work: a job the door dispatches is an ordinary Kubernetes
+            Job, and it may be parallel, evicted and rescheduled like any other
+            batch workload, because it is not the thing holding the
+            connection.</p>
           <p><b>Azure Container Apps</b> suits a team that wants containers
-            without a cluster, and it has one trap that is specific to this
-            workload. An agent that only connects outbound has no ingress, and a
+            without a cluster, and it has one trap that is specific to a door.
+            An agent that only connects outbound has no ingress, and a
             container app with no ingress and no scale rule scales to zero with
-            nothing left to wake it. Set minimum and maximum replicas to 1 and the
-            revision stays up.</p>
+            nothing left to wake it. Set minimum and maximum replicas to 1 and
+            the revision stays up. Container Apps also has the other half
+            covered: a container app job is started on demand, runs once and
+            exits, which is the right shape for the work a door hands off and
+            the wrong shape for the door itself.</p>
           <p><b>App Service</b> works for an agent that is already there. Turn on
             Always On, which is what stops the app being unloaded after twenty
             idle minutes, and keep it to a single instance. Note that the idle
             timer is reset by inbound requests, not by your own outbound traffic,
-            which is exactly what Always On is supplying.</p>
+            which is exactly what Always On is supplying. Always On is a rule
+            about the door and nothing else; work dispatched off it does not
+            need an instance waiting.</p>
           <p>A plain <b>virtual machine</b> is the answer when nothing else claims
             the decision. One small VM comfortably runs several agents under
             systemd, with no public address and a NAT gateway for the way out. If
             one VM ends up hosting a handful of CLI agents behind adapters, our
             fleet manager handles inventory, installs, updates and health for all
-            of them from one file.</p>
-          <p>One thing is true of all four, and it is better to design for it than
-            to discover it. Azure resets long-lived connections on purpose and
+            of them from one file. A small VM is a cheap place to hold a
+            connection, and it stays cheap even when the work it dispatches
+            runs somewhere else.</p>
+          <p>One thing is true of all four doors, and it is better to design for
+            it than to discover it. Azure resets long-lived connections on purpose and
             says so: AKS reimages nodes on a weekly node-image channel by default,
             Container Apps restarts a revision when a Key Vault reference picks up
             a rotated secret, App Service recycles on any app-setting change, and
@@ -360,15 +389,23 @@
             and drains what arrived during the gap, so the practical requirement
             is that your agent tolerates a restart rather than that your platform
             avoids one.</p>
+          <p>There is a third role on this page that is neither half of a full
+            node: hosting the inbound HTTPS endpoint the gateway calls when it
+            stands in front of an agent you already run. That path is ordinary
+            web traffic, nothing holds a connection, and scale-to-zero and
+            autoscaling were always fine there. None of the rules above apply
+            to it.</p>
           <div class="picks">
             <div class="pick"><span class="if">kubernetes is home</span>
-              <span class="then"><b>AKS.</b> SDK agents as single-replica Deployments with the Recreate strategy; adapter and CLI agent as one Pod. No HPA.</span></div>
+              <span class="then"><b>AKS.</b> The door as a single-replica Deployment with the Recreate strategy, SDK agent or adapter and CLI agent in one Pod. No HPA. The work it dispatches is an ordinary Job.</span></div>
             <div class="pick"><span class="if">containers, but no cluster to run</span>
-              <span class="then"><b>Container Apps, pinned.</b> Min and max replicas both 1, which is what keeps a no-ingress app from scaling to zero with nothing left to wake it.</span></div>
+              <span class="then"><b>Container Apps, pinned for the door.</b> Min and max replicas both 1, which is what keeps a no-ingress app from scaling to zero with nothing left to wake it.</span></div>
             <div class="pick"><span class="if">the agent already lives on App Service</span>
-              <span class="then"><b>Leave it there.</b> Always On, one instance. Smallest change available; move it later if the always-on rent grates.</span></div>
+              <span class="then"><b>Leave the door there.</b> Always On, one instance. Smallest change available; move it later if the rent for an idle instance grates.</span></div>
             <div class="pick"><span class="if">no strong platform opinion</span>
               <span class="then"><b>A small VM.</b> No public IP, NAT gateway out, fleet manager if CLI agents multiply. Fewest moving parts.</span></div>
+            <div class="pick"><span class="if">the work one message takes</span>
+              <span class="then"><b>A container app job, or a Kubernetes Job.</b> Started when a message arrives, run under a credential minted for that one job, gone when it exits. Nothing here needs to be pinned.</span></div>
             <div class="pick"><span class="if">hosting the endpoint the gateway calls</span>
               <span class="then"><b>Anything that serves HTTPS.</b> That path is inbound only, so scale-to-zero and autoscaling are fine here. None of the rules above apply.</span></div>
           </div>

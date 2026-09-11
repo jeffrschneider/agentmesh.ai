@@ -350,8 +350,9 @@
             answer it: one SDK library, one outbound WebSocket held by the agent's
             own process. <a href="for-google-onramp.html">decision 02</a></span></div>
         <div class="pick"><span class="if">its runtime</span>
-          <span class="then">Unchanged while the gateway is fronting it. Holding a mesh connection
-            means staying resident: pinned on Cloud Run, one replica on GKE.
+          <span class="then">Unchanged while the gateway is fronting it. Later, the part that
+            holds the mesh connection stays resident, pinned on Cloud Run or one replica
+            on GKE; the work it dispatches can still be a job that scales to zero.
             <a href="for-google-compute.html">decision 03</a></span></div>
         <div class="pick"><span class="if">its network</span>
           <span class="then">One outbound flow on 443. Nothing listens, no inbound
