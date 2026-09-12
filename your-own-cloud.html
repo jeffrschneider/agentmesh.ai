@@ -9,7 +9,7 @@
   <meta property="og:site_name" content="AgentMesh">
   <meta property="og:title" content="AgentMesh: permissions in your Google Cloud project">
   <meta property="og:description" content="The complete list of permissions AgentMesh asks for in your Google Cloud project, what each one is for, and the things we deliberately do not ask for.">
-  <meta property="og:url" content="https://agentmesh.ai/cloud-permissions.html">
+  <meta property="og:url" content="https://agentmesh.ai/your-own-cloud.html">
   <meta property="og:image" content="https://agentmesh.ai/brand/png/og-image.png">
   <meta property="og:image:width" content="1200">
   <meta property="og:image:height" content="630">
@@ -132,7 +132,7 @@
     .ident p b{ color:var(--paper); font-weight:600; }
     .ident p:last-child{ margin-bottom:0; }
 
-    /* what we cannot do */
+    /* our safeguards */
     .cannot{ display:grid; grid-template-columns:repeat(2,1fr); gap:18px; margin-bottom:34px; }
     .cant{ border:1px solid var(--line); border-radius:14px; background:var(--panel);
       padding:24px 24px 22px; min-width:0; }
@@ -267,9 +267,9 @@
       <span class="eyebrow"><span class="tag">//</span> cloud permissions</span>
       <h1>What AgentMesh asks for in your Google Cloud project</h1>
       <p class="lede">Read this before you grant anything. It is the complete list of permissions we ask for, what each one is for, and the things we deliberately do not ask for. <b>Nothing here is a summary of a longer list held somewhere else.</b></p>
-      <p class="point">If you are handing this to a security reviewer, the four claims under <a href="#cannot">What we cannot do</a> are the ones they will want first.</p>
+      <p class="point">If you are handing this to a security reviewer, the four claims under <a href="#safeguards">Our safeguards</a> are the ones they will want first.</p>
       <div class="hero-actions">
-        <a class="btn btn-ghost" href="#cannot">What we cannot do</a>
+        <a class="btn btn-ghost" href="#safeguards">Our safeguards</a>
         <a class="btn btn-ghost" href="#permissions">The permission list</a>
         <a class="btn btn-ghost" href="#revoke">Revoking us</a>
       </div>
@@ -296,12 +296,14 @@
     </div>
   </section>
 
-  <!-- what we cannot do : hoisted above the list, because this is what a reviewer reads first -->
-  <section class="band" id="cannot">
+  <!-- our safeguards : hoisted above the list, because this is what a reviewer reads first.
+       Framed as what protects the customer rather than as what we are unable to do: the
+       content is identical and the second framing sells the first one short. -->
+  <section class="band" id="safeguards">
     <div class="wrap">
       <div class="col">
         <p class="kicker">read this first</p>
-        <h2>What we cannot do</h2>
+        <h2>Our safeguards</h2>
         <p class="standfirst">These are not promises about our conduct. They are things the permissions on the list below do not allow, which your own IAM policy will confirm.</p>
       </div>
 
@@ -699,7 +701,7 @@ gcloud storage buckets add-iam-policy-binding gs://YOUR_PROJECT_cloudbuild \
           <a href="plans.html">plans</a>
           <a href="standards.html">the standards</a>
           <a href="bring-your-own-agent.html">bring your own agent</a>
-          <a href="cloud-permissions.html">cloud permissions</a>
+          <a href="your-own-cloud.html">run it in your own cloud</a>
           <a href="integrations.html">integrations</a>
         </div>
         <div>
