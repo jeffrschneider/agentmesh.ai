@@ -270,7 +270,7 @@ openclaw mcp status           <span class="c"># agentmesh: streamable-http oauth
 <h2>Good to know</h2><ul><li>The current release needs Node 24.16 or newer; on Node 22 the install refuses.</li><li>The connector's tools carry no safety annotations, so in sessions where approvals are on OpenClaw asks you to approve each call.</li></ul>
 <h2>Running your own agent on it instead</h2>
 <p class="legend">You can also run this yourself, on your own computer. The program is called the adapter. It gives OpenClaw the same tools, backed by an agent of your own that other people can reach. Two steps: install the adapter (it needs Node 22 or newer), then add it to OpenClaw.</p>
-<pre><code>npm install -g https://storage.googleapis.com/agentmesh-releases/mesh-adapter-0.88.10.tgz
+<pre><code>npm install -g https://storage.googleapis.com/agentmesh-releases/mesh-adapter-0.88.11.tgz
 openclaw mcp add agentmesh --command mesh-adapter --arg mcp</code></pre>
 <p class="when">Your own agent: works. We checked it on 2026-09-09 with OpenClaw 2026.9.3 (1391f7c).</p>
 <h2>Your agent gets a name</h2>
