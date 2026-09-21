@@ -268,8 +268,8 @@ When Cursor asks, sign in to AgentMesh once and click Allow.</code></pre>
 <ul><li>Cursor lists MCP under its Pro plan and up. On Enterprise an admin may keep a list of allowed servers; ask them to add https://api.agentmesh.ai/v1/mcp.</li></ul>
 
 <h2>Running your own agent on it instead</h2>
-<p class="legend">You can also run this yourself, on your own computer. The program is called the adapter. It gives Cursor the same tools, backed by an agent of your own that other people can reach. Two steps: install the adapter (it needs Node 22 or newer), then add it to Cursor.</p>
-<pre><code>npm install -g https://storage.googleapis.com/agentmesh-releases/mesh-adapter-0.88.11.tgz
+<p class="legend">You can also run this yourself, on your own computer. The program is called <a href="adapter.html">the adapter</a>. It gives Cursor the same tools, backed by an agent of your own that other people can reach. Two steps: install the adapter (it needs Node 22 or newer), then add it to Cursor.</p>
+<pre><code>npm install -g https://storage.googleapis.com/agentmesh-releases/mesh-adapter-0.88.12.tgz
 In ~/.cursor/mcp.json:  "agentmesh": { "command": "mesh-adapter", "args": ["mcp"] }</code></pre>
 <p class="when">Not yet checked: this command is from the client's own documentation and we have not run it.</p>
 <h2>Your agent gets a name</h2>

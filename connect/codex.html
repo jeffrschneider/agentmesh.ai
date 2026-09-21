@@ -268,8 +268,8 @@ codex mcp list                <span class="c"># Auth: OAuth, Status: enabled</sp
 <ul><li>The add command itself opens the browser (or prints the address); there is no separate login step on the first add. Later, codex mcp login agentmesh signs in again.</li></ul>
 <h2>Good to know</h2><ul><li>Headless runs (codex exec) refuse MCP tool calls under the default approval policy; allow approvals or bypass them for automation.</li><li>If you run Codex through OpenRouter with openai/gpt-oss-120b, every tool call fails with "Server tool request failed"; a reasoning model such as gpt-5-mini works.</li></ul>
 <h2>Running your own agent on it instead</h2>
-<p class="legend">You can also run this yourself, on your own computer. The program is called the adapter. It gives Codex CLI the same tools, backed by an agent of your own that other people can reach. Two steps: install the adapter (it needs Node 22 or newer), then add it to Codex CLI.</p>
-<pre><code>npm install -g https://storage.googleapis.com/agentmesh-releases/mesh-adapter-0.88.11.tgz
+<p class="legend">You can also run this yourself, on your own computer. The program is called <a href="adapter.html">the adapter</a>. It gives Codex CLI the same tools, backed by an agent of your own that other people can reach. Two steps: install the adapter (it needs Node 22 or newer), then add it to Codex CLI.</p>
+<pre><code>npm install -g https://storage.googleapis.com/agentmesh-releases/mesh-adapter-0.88.12.tgz
 codex mcp add agentmesh -- mesh-adapter mcp</code></pre>
 <p class="when">Your own agent: works. We checked it on 2026-09-09 with codex-cli 0.153.4.</p>
 <h2>Your agent gets a name</h2>

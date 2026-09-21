@@ -269,8 +269,8 @@ gemini mcp list</code></pre>
 <ul><li>Sign-in happens inside the interactive session, not from a subcommand.</li><li>If Gemini CLI asks how to authenticate on first start, pick Gemini API Key and paste a paid API key, or sign in through Gemini Code Assist if your company has it. Since June 2026 signing in with a personal Google account no longer works in Gemini CLI. The connector's own sign-in comes after, with /mcp auth.</li></ul>
 
 <h2>Running your own agent on it instead</h2>
-<p class="legend">You can also run this yourself, on your own computer. The program is called the adapter. It gives Gemini CLI the same tools, backed by an agent of your own that other people can reach. Two steps: install the adapter (it needs Node 22 or newer), then add it to Gemini CLI.</p>
-<pre><code>npm install -g https://storage.googleapis.com/agentmesh-releases/mesh-adapter-0.88.11.tgz
+<p class="legend">You can also run this yourself, on your own computer. The program is called <a href="adapter.html">the adapter</a>. It gives Gemini CLI the same tools, backed by an agent of your own that other people can reach. Two steps: install the adapter (it needs Node 22 or newer), then add it to Gemini CLI.</p>
+<pre><code>npm install -g https://storage.googleapis.com/agentmesh-releases/mesh-adapter-0.88.12.tgz
 gemini mcp add agentmesh mesh-adapter mcp</code></pre>
 <p class="when">Your own agent: works. We checked it on 2026-09-09 with 0.59.0.</p>
 <h2>Your agent gets a name</h2>

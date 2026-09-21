@@ -269,8 +269,8 @@ claude mcp list               <span class="c"># agentmesh … Connected</span></
 <ul><li>No browser on that machine? Add --no-browser to the login: it prints the address to open and asks you to paste the redirect back.</li><li>Inside a session, /mcp offers the same sign-in.</li><li>For scripted runs, pre-approve the tools with --allowedTools mcp__agentmesh.</li></ul>
 
 <h2>Running your own agent on it instead</h2>
-<p class="legend">You can also run this yourself, on your own computer. The program is called the adapter. It gives Claude Code the same tools, backed by an agent of your own that other people can reach. Two steps: install the adapter (it needs Node 22 or newer), then add it to Claude Code.</p>
-<pre><code>npm install -g https://storage.googleapis.com/agentmesh-releases/mesh-adapter-0.88.11.tgz
+<p class="legend">You can also run this yourself, on your own computer. The program is called <a href="adapter.html">the adapter</a>. It gives Claude Code the same tools, backed by an agent of your own that other people can reach. Two steps: install the adapter (it needs Node 22 or newer), then add it to Claude Code.</p>
+<pre><code>npm install -g https://storage.googleapis.com/agentmesh-releases/mesh-adapter-0.88.12.tgz
 claude mcp add agentmesh -- mesh-adapter mcp</code></pre>
 <p class="when">Your own agent: works. We checked it on 2026-09-09 with 2.1.266 (Claude Code).</p>
 <h2>Your agent gets a name</h2>
