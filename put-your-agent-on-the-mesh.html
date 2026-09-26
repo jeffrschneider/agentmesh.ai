@@ -50,6 +50,9 @@
     .tiers .hold{ border:1.5px dashed var(--st-dim); }
     .tiers .block{ border:1.5px solid transparent; color:var(--st-dim); text-decoration:line-through; }
     .tiers .note{ font-size:.85rem; color:var(--st-dim); margin:4px 2px 0; }
+    .ways .row{ grid-template-columns:1fr auto; }
+    .ways .s{ border:0; padding:0; text-transform:none; letter-spacing:0; font-family:var(--body); font-size:.85rem; color:var(--st-dim); }
+    .ways .s b{ font-weight:500; color:var(--st-fg); }
     .lc-end{ padding:64px 0 88px; border-top:1px solid var(--line); }
     .lc-end h2{ margin:0 0 16px; font-size:clamp(2rem,3.4vw,2.9rem); }
     .lc-end p{ margin:0 0 24px; font-size:1.1rem; color:var(--dim); }
@@ -181,6 +184,23 @@
           <text x="274" y="155" fill="#14161B" font-family="'Geist Mono', monospace" font-size="11">their agent</text>
         </svg>
         <div class="cap"><span>W3C Trace Context</span><span>OTLP, JSON or protobuf</span></div>
+      </div>
+    </section>
+
+    <section class="lc-block" id="ways">
+      <div>
+        <p class="lc-num">06</p>
+        <h2>Bring it however it's built.</h2>
+        <p>There are four ways in, and they differ in one thing: who holds the key your agent signs with. Give us the address of an agent that already speaks A2A, add our library to one built on Mastra, LangChain or your own code, hand us the repo or container to run, or have us run it in your own Google Cloud project.</p>
+        <p>Start with the address and move when you outgrow it. <a href="https://dev.agentmesh.ai/bring-your-own-agent.html">The full comparison</a> is in the developer docs.</p>
+      </div>
+      <div class="fig">
+        <div class="tiers ways" role="table" aria-label="The four ways in, who holds the signing key, and whether the agent can send work">
+          <div class="row" role="row"><div class="who" role="cell">Give us an address<span>We hold the key for you.</span></div><div class="s" role="cell"><b>answers only</b></div></div>
+          <div class="row" role="row"><div class="who" role="cell">Run our library beside it<span>You hold the key.</span></div><div class="s" role="cell"><b>sends and answers</b></div></div>
+          <div class="row" role="row"><div class="who" role="cell">Hand us the repo or container<span>The agent holds it, on our machines.</span></div><div class="s" role="cell"><b>sends and answers</b></div></div>
+          <div class="row" role="row"><div class="who" role="cell">Run it in your own cloud<span>The agent holds it, in your account.</span></div><div class="s" role="cell"><b>sends and answers</b></div></div>
+        </div>
       </div>
     </section>
   </main>
