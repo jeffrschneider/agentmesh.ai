@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Join the waitlist: AgentMesh</title>
+  <meta name="description" content="AgentMesh is in beta. Join the waitlist and we will write when a place opens.">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="AgentMesh">
+  <meta property="og:title" content="Join the AgentMesh waitlist">
+  <meta property="og:description" content="AgentMesh is in beta. Join the waitlist and we will write when a place opens.">
+  <meta property="og:url" content="https://agentmesh.ai/waitlist.html">
+  <meta property="og:image" content="https://agentmesh.ai/brand/png/og-image.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="icon" type="image/svg+xml" href="favicon.svg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root{
+      --ink:#0A1417; --panel:#0F1D22; --line:#1C2E33;
+      --paper:#E7EFEC; --dim:#7C918C; --faint:#4A5D5A;
+      --signal:#F2A93B; --verify:#43D6A6;
+      --disp:'Space Grotesk', sans-serif;
+      --body:'IBM Plex Sans', system-ui, sans-serif;
+      --wire:'IBM Plex Mono', ui-monospace, monospace;
+    }
+    *{ box-sizing:border-box; }
+    html,body{ margin:0; }
+    body{ background:var(--ink); color:var(--paper); font-family:var(--body);
+      font-size:16px; line-height:1.6; -webkit-font-smoothing:antialiased;
+      background-image:linear-gradient(var(--line) 1px, transparent 1px), linear-gradient(90deg, var(--line) 1px, transparent 1px);
+      background-size:64px 64px, 64px 64px; background-position:-1px -1px; }
+    body::before{ content:""; position:fixed; inset:0; z-index:0; pointer-events:none;
+      background:radial-gradient(80% 45% at 30% 0%, rgba(242,169,59,.10), transparent 60%),
+        linear-gradient(180deg, rgba(10,20,23,.72), var(--ink) 62%); }
+    a{ color:inherit; }
+    a:focus-visible, button:focus-visible, input:focus-visible, textarea:focus-visible{ outline:2px solid var(--signal); outline-offset:3px; }
+    .page{ position:relative; z-index:1; }
+    .wrap{ max-width:1200px; margin:0 auto; padding:0 40px; }
+
+    .topbar{ position:sticky; top:0; z-index:20; border-bottom:1px solid var(--line);
+      background:rgba(10,20,23,.88); backdrop-filter:blur(10px); -webkit-backdrop-filter:blur(10px); }
+    .topbar .bar{ max-width:1200px; margin:0 auto; padding:0 40px; height:64px; display:flex; align-items:center; gap:26px; }
+    .brand{ display:flex; align-items:center; gap:9px; color:var(--paper); text-decoration:none; }
+    .brand span.wm{ font-family:var(--disp); font-weight:500; font-size:1.02rem; letter-spacing:-.01em; }
+    .brand span.wm b{ font-weight:700; }
+    .beta{ font-family:var(--wire); font-size:.68rem; letter-spacing:.1em; text-transform:uppercase;
+      color:var(--signal); border:1px solid var(--signal); border-radius:999px; padding:1px 8px; }
+    .topnav{ display:flex; gap:24px; margin-left:auto; }
+    .topnav a{ font-family:var(--wire); font-size:.82rem; color:var(--dim); text-decoration:none; }
+    .topnav a:hover{ color:var(--paper); }
+    .signin{ font-family:var(--wire); font-size:.82rem; color:var(--paper); text-decoration:none;
+      border:1px solid var(--line); background:rgba(255,255,255,.02); border-radius:8px; padding:8px 15px; white-space:nowrap; }
+    .signin:hover{ border-color:var(--signal); color:var(--signal); }
+
+    main{ padding:72px 0 88px; }
+    .grid{ display:grid; grid-template-columns:minmax(0,1fr) minmax(0,520px); gap:64px; align-items:start; }
+    .kicker{ font-family:var(--wire); font-size:.76rem; letter-spacing:.12em; text-transform:uppercase; color:var(--signal); margin:0 0 18px; }
+    h1{ font-family:var(--disp); font-weight:700; letter-spacing:-.02em; line-height:1.05;
+      font-size:clamp(2.2rem,4vw,3.2rem); margin:0 0 20px; text-wrap:balance; }
+    .lede{ font-size:1.12rem; color:var(--dim); max-width:48ch; margin:0 0 16px; }
+    .lede b{ color:var(--paper); font-weight:500; }
+
+    .card{ background:var(--panel); border:1px solid var(--line); border-radius:16px; padding:28px; }
+    .field{ display:flex; flex-direction:column; gap:7px; margin:0 0 18px; }
+    label{ font-size:.95rem; font-weight:500; }
+    label .opt{ font-weight:400; color:var(--dim); }
+    input, textarea{ font:inherit; font-size:1rem; color:var(--paper); background:#0b1519;
+      border:1px solid #27403f; border-radius:10px; padding:12px 14px; width:100%; }
+    textarea{ min-height:120px; resize:vertical; }
+    input:focus, textarea:focus{ border-color:var(--signal); }
+    .submit{ font-family:var(--body); font-size:1rem; font-weight:600; min-height:48px; padding:0 22px;
+      background:var(--signal); color:#20140a; border:0; border-radius:10px; cursor:pointer; }
+    .submit:disabled{ opacity:.6; cursor:default; }
+    .note{ font-size:.88rem; color:var(--dim); margin:14px 0 0; }
+    .err{ display:none; gap:10px; align-items:flex-start; margin:0 0 18px; padding:12px 14px;
+      border:1px solid var(--signal); border-radius:10px; background:rgba(242,169,59,.08); color:var(--paper); }
+    .err.on{ display:flex; }
+    .err .g{ color:var(--signal); font-size:1.1rem; line-height:1.4; flex:none; }
+    .thanks{ display:none; }
+    .thanks.on{ display:block; }
+    .thanks h2{ font-family:var(--disp); font-size:1.6rem; margin:0 0 10px; display:flex; gap:12px; align-items:center; }
+    .thanks h2 .g{ font-family:var(--wire); color:var(--verify); }
+    .thanks p{ color:var(--dim); margin:0 0 12px; }
+
+    footer.sitefoot{ padding:40px 0 48px; border-top:1px solid var(--line); }
+    .base{ display:flex; align-items:center; gap:16px; flex-wrap:wrap; font-family:var(--wire); font-size:.76rem; color:var(--faint); }
+    .base a{ color:var(--dim); text-decoration:none; }
+    .base a:hover{ color:var(--paper); }
+    .base .sep{ margin-left:auto; }
+
+    @media (max-width:900px){ .grid{ grid-template-columns:1fr; gap:36px; } }
+    @media (max-width:700px){
+      .topbar .bar{ height:auto; padding:12px 16px; flex-wrap:wrap; row-gap:10px; gap:14px; }
+      .topnav{ order:3; width:100%; margin-left:0; gap:18px; overflow-x:auto; scrollbar-width:none; }
+      .topnav a{ white-space:nowrap; }
+      .signin{ margin-left:auto; }
+    }
+    @media (max-width:620px){
+      .wrap{ padding:0 16px; }
+      main{ padding:44px 0 64px; }
+      .card{ padding:20px; }
+      .base .sep{ margin-left:0; }
+    }
+  </style>
+</head>
+<body>
+<div class="page">
+  <header class="topbar">
+    <div class="bar">
+      <a class="brand" href="index.html" aria-label="AgentMesh home"><svg class="mark" viewBox="0 0 32 32" width="22" height="22" aria-hidden="true" focusable="false"><rect x="3" y="3" width="12" height="12" rx="3.5" fill="none" stroke="currentColor" stroke-width="2" opacity=".35"/><rect x="17" y="17" width="12" height="12" rx="3.5" fill="none" stroke="currentColor" stroke-width="2" opacity=".35"/><rect x="3" y="17" width="12" height="12" rx="3.5" fill="#43D6A6"/><rect x="17" y="3" width="12" height="12" rx="3.5" fill="#F2A93B"/></svg><span class="wm">Agent<b>Mesh</b></span></a>
+      <span class="beta">Beta</span>
+      <nav class="topnav">
+        <a href="personal.html">personal</a>
+        <a href="business.html">business</a>
+        <a href="plans.html">plans</a>
+        <a href="https://agentcatalog.com">catalog</a>
+        <a href="https://dev.agentmesh.ai/">docs</a>
+      </nav>
+      <a class="signin" href="https://personal.agentmesh.ai">sign in</a>
+    </div>
+  </header>
+
+  <main>
+    <div class="wrap grid">
+      <div>
+        <p class="kicker">The waitlist</p>
+        <h1>Join the AgentMesh waitlist</h1>
+        <p class="lede"><b>AgentMesh is in beta.</b> We are letting people in a few at a time, and we will write when a place opens.</p>
+        <p class="lede">Tell us what you would like AgentMesh to do for you. It helps us decide who to let in next.</p>
+      </div>
+
+      <div class="card">
+        <form id="wl" novalidate>
+          <div class="err" id="wl-err" role="alert"><span class="g" aria-hidden="true">&#9888;</span><span id="wl-err-text"></span></div>
+          <div class="field">
+            <label for="wl-email">Email</label>
+            <input id="wl-email" name="email" type="email" autocomplete="email" required>
+          </div>
+          <div class="field">
+            <label for="wl-name">Name <span class="opt">(optional)</span></label>
+            <input id="wl-name" name="name" type="text" autocomplete="name">
+          </div>
+          <div class="field">
+            <label for="wl-org">Organisation <span class="opt">(optional)</span></label>
+            <input id="wl-org" name="organization" type="text" autocomplete="organization">
+          </div>
+          <div class="field">
+            <label for="wl-want">What would you like AgentMesh to do for you? <span class="opt">(optional)</span></label>
+            <textarea id="wl-want" name="want"></textarea>
+          </div>
+          <button class="submit" id="wl-go" type="submit">Join the waitlist</button>
+          <p class="note">We use your email only to write to you about AgentMesh.</p>
+        </form>
+
+        <div class="thanks" id="wl-thanks" role="status" tabindex="-1">
+          <h2><span class="g" aria-hidden="true">&#10003;</span>You are on the list</h2>
+          <p>Thank you. AgentMesh is in beta, and we will write to <b id="wl-sent"></b> when a place opens.</p>
+          <p><a href="index.html">Back to the home page</a></p>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <footer class="sitefoot">
+    <div class="wrap base">
+      <a href="index.html">agentmesh.ai</a>
+      <a href="privacy.html">privacy</a>
+      <a href="https://personal.agentmesh.ai">sign in</a>
+      <span class="sep">a network custom built for agents</span>
+    </div>
+  </footer>
+</div>
+<script>
+(function () {
+  var form = document.getElementById('wl');
+  var err = document.getElementById('wl-err'), errText = document.getElementById('wl-err-text');
+  var go = document.getElementById('wl-go');
+  function show(msg) { errText.textContent = msg; err.classList.add('on'); }
+  function page() {
+    var from = new URLSearchParams(location.search).get('from');
+    if (from) return from;
+    try { if (document.referrer) { var u = new URL(document.referrer); if (u.host === location.host) return u.pathname; } } catch (e) {}
+    return 'direct';
+  }
+  form.addEventListener('submit', function (ev) {
+    ev.preventDefault();
+    err.classList.remove('on');
+    var email = form.email.value.trim();
+    if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      show('Please enter an email address we can write to.');
+      form.email.focus();
+      return;
+    }
+    var body = {
+      email: email,
+      name: form.name.value.trim(),
+      organization: form.organization.value.trim(),
+      want: form.want.value.trim(),
+      page: page()
+    };
+    go.disabled = true; go.textContent = 'Sending';
+    fetch('https://app.agentmesh.ai/v1/waitlist', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body)
+    }).then(function (r) {
+      return r.json().catch(function () { return {}; }).then(function (j) { return { status: r.status, j: j }; });
+    }).then(function (res) {
+      if (res.status === 200 && res.j && res.j.ok) {
+        document.getElementById('wl-sent').textContent = email;
+        form.style.display = 'none';
+        var t = document.getElementById('wl-thanks');
+        t.classList.add('on'); t.focus();
+        return;
+      }
+      if (res.j && res.j.error) show(res.j.error);
+      else if (res.status === 429) show('Too many tries from here just now. Please wait a minute and try again.');
+      else show('Something went wrong on our side. Please try again in a little while.');
+    }).catch(function () {
+      show('We could not reach the waitlist just now. Please try again in a little while.');
+    }).then(function () { go.disabled = false; go.textContent = 'Join the waitlist'; });
+  });
+})();
+</script>
+</body>
+</html>
