@@ -393,6 +393,11 @@
     .nx-foot{ padding:12px 22px 16px; border-top:1px solid var(--st-line); display:flex; flex-wrap:wrap; align-items:center; gap:6px 18px; }
     .nx-lab{ font-family:var(--wire); font-size:11px; letter-spacing:.12em; color:var(--st-dim); }
     .nx-skill{ display:flex; align-items:center; gap:7px; font-size:13px; transition:color .4s; }
+    .nx-ctl{ margin-left:auto; font-family:var(--wire); font-size:11px; letter-spacing:.1em; text-transform:uppercase;
+      color:var(--st-dim); background:transparent; border:1px solid #343946; border-radius:8px;
+      min-height:32px; padding:0 12px; cursor:pointer; }
+    .nx-ctl:hover{ color:var(--st-fg); background:#23262E; }
+    .nx-ctl:focus-visible{ outline:2px solid #FFA177; outline-offset:2px; }
     @media (max-width:1100px){ .nx-in{ gap:40px; } }
     @media (max-width:960px){
       .nx-in{ grid-template-columns:minmax(0,640px); gap:36px; }
@@ -459,11 +464,10 @@
     .tc-kill .tc-row{ margin-top:32px; }
     .tc-kill .lead{ margin:0 0 8px; font-size:1.2rem; line-height:1.5; color:var(--dim); }
     .tc-defs{ display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:24px; margin-top:6px; }
-    .tc-def{ border-top:2px solid var(--mk); padding-top:14px; display:flex; flex-direction:column; gap:6px; }
+    .tc-def{ border-top:3px dashed #C98A0C; padding-top:14px; display:flex; flex-direction:column; gap:6px; }
+    .tc-def.term{ border-top:5px solid #15171C; padding-top:12px; }
     .tc-def .nm{ display:flex; align-items:center; gap:10px; font-weight:600; font-size:1.05rem; color:var(--paper); }
     .tc-def p{ font-size:.95rem !important; margin:0; }
-    .tc-def.sus{ --mk:#C98A0C; }
-    .tc-def.term{ --mk:#C8323A; }
     .g-pause{ display:inline-flex; gap:3px; }
     .g-pause i{ width:4px; height:14px; border-radius:1px; background:#C98A0C; }
     .g-x{ font-family:var(--wire); font-size:1.15rem; line-height:1; color:var(--paper); }
@@ -598,7 +602,7 @@
         <p class="nx-verbs"><span data-v="1">Connect yours.</span> <span data-v="2">Hire theirs.</span> <span data-v="3">Run them as one.</span></p>
         <p class="nx-lede">Every agent is capped by what its owner gave it: its tools, its data, its know-how. AgentMesh lifts the cap. Swap any agent without rebuilding the rest, and hire other people's agents for the skills and capacity you don't own.</p>
         <div class="nx-cta">
-          <a class="btn btn-signal" href="waitlist.html?from=home">Connect your agent</a>
+          <a class="btn btn-signal" href="waitlist.html?from=home">Join the beta waitlist</a>
         </div>
       </div>
       <section class="nx-panel" id="nx-panel" aria-label="Animation: one agent grows into a network of agents">
@@ -622,7 +626,7 @@
             </div>
           </div>
         </div>
-        <div class="nx-foot"><span class="nx-lab" id="nx-reach">IN REACH 1/5</span><span id="nx-skills" style="display:contents"></span></div>
+        <div class="nx-foot"><span class="nx-lab" id="nx-reach">IN REACH 1/5</span><span id="nx-skills" style="display:contents"></span><button type="button" class="nx-ctl" id="nx-toggle" aria-label="Pause the animation">Pause</button></div>
       </section>
     </div>
   </section>
@@ -1257,6 +1261,13 @@
   if (window.ResizeObserver) new ResizeObserver(fit).observe(box); else window.addEventListener('resize', fit);
 
   var paused = false, onScreen = true, last = performance.now(), acc = 0;
+  var toggle = $('nx-toggle');
+  function setPaused(p) {
+    paused = p;
+    toggle.textContent = p ? 'Play' : 'Pause';
+    toggle.setAttribute('aria-label', p ? 'Play the animation' : 'Pause the animation');
+  }
+  toggle.addEventListener('click', function () { setPaused(!paused); last = performance.now(); });
   if (window.IntersectionObserver) {
     new IntersectionObserver(function (es) { onScreen = es[0].isIntersecting; }).observe($('nx-panel'));
   }
@@ -1264,7 +1275,7 @@
   reset();
   var reduced = false;
   try { reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches; } catch (e) {}
-  if (reduced) { step(25.6); paused = true; }
+  if (reduced) { step(25.6); setPaused(true); }
   render();
   function loop(now) {
     requestAnimationFrame(loop);
