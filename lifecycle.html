@@ -16,6 +16,6 @@
 </head>
 <body>
   <p>This page moved to <a href="put-your-agent-on-the-mesh.html">Put your agent on the mesh</a>.</p>
-  <script>location.replace("put-your-agent-on-the-mesh.html" + location.hash);</script>
+  <script>location.replace("put-your-agent-on-the-mesh.html" + ("put-your-agent-on-the-mesh.html".includes('#') ? '' : location.hash));</script>
 </body>
 </html>
