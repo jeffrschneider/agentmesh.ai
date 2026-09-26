@@ -78,3 +78,4 @@ footer.sitefoot{ padding:54px 0 48px; border-top:1px solid var(--line); }
   .sitefoot .base .sep{ margin-left:0; }
 }
 @media (prefers-reduced-motion:reduce){ *{ transition:none !important; } }
+.sitefoot .copy{ margin:18px 0 0; font-family:var(--wire); font-size:.74rem; color:var(--dim); }
