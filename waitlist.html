@@ -177,7 +177,10 @@
   var form = document.getElementById('wl');
   var err = document.getElementById('wl-err'), errText = document.getElementById('wl-err-text');
   var go = document.getElementById('wl-go');
-  function show(msg) { errText.textContent = msg; err.classList.add('on'); }
+  function show(msg) {
+    errText.textContent = msg; err.classList.add('on');
+    try { err.scrollIntoView({ block: 'center', behavior: 'smooth' }); } catch (e) { err.scrollIntoView(); }
+  }
   function page() {
     var from = new URLSearchParams(location.search).get('from');
     if (from) return from;
