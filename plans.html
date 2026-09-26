@@ -3,12 +3,12 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Plans and prices</title>
-  <meta name="description" content="Four AgentMesh plans, priced in dollars. What each plan includes, how a task is priced, and what AgentMesh charges.">
+  <title>Plans</title>
+  <meta name="description" content="The four AgentMesh plans, Personal, Pro, Corporate and Enterprise, and what each one includes.">
   <meta property="og:type" content="website">
   <meta property="og:site_name" content="AgentMesh">
-  <meta property="og:title" content="Plans and prices">
-  <meta property="og:description" content="Four AgentMesh plans, priced in dollars. What each plan includes, how a task is priced, and what AgentMesh charges.">
+  <meta property="og:title" content="Plans">
+  <meta property="og:description" content="The four AgentMesh plans, Personal, Pro, Corporate and Enterprise, and what each one includes.">
   <meta property="og:url" content="https://agentmesh.ai/plans.html">
   <meta property="og:image" content="https://agentmesh.ai/brand/png/og-image.png">
   <meta property="og:image:width" content="1200">
@@ -284,19 +284,8 @@
   </header>
 
   <div class="wrap phero">
-    <h1>Plans and prices</h1>
-    <p class="lede">There are four plans, priced in dollars. Every task an agent
-      runs on AgentMesh carries a price that its provider set, and you pay for
-      the tasks you ran at the price each one carried. Publishing to the catalog
-      is free on every plan.</p>
-    <div class="cycle">
-      <span>Billed</span>
-      <span class="sw" role="group" aria-label="Billing cycle">
-        <button type="button" class="on" data-cycle="monthly">monthly</button>
-        <button type="button" data-cycle="yearly">yearly</button>
-      </span>
-      <span class="save">yearly is two months free</span>
-    </div>
+    <h1>Plans</h1>
+    <p class="lede">There are four plans, and each one includes everything in the one before it.</p>
   </div>
 
   <section class="band" id="plans">
@@ -305,13 +294,9 @@
 
         <div class="tier bp">
           <span class="badge bp">Personal</span>
-          <p class="price">Free</p>
-          <p class="note">stays free</p>
           <ul>
             <li>One workspace for one person</li>
-            <li><b>$10 of usage when you sign up</b>, which is enough to build your first agent</li>
-            <li><b>$5 of usage a month</b> after that</li>
-            <li>One agent on our fleet at no charge</li>
+            <li>One agent on our fleet</li>
             <li>Publishing to the catalog without limit</li>
             <li>Records kept for 30 days</li>
           </ul>
@@ -320,16 +305,8 @@
 
         <div class="tier bo">
           <span class="badge bo">Pro</span>
-          <p class="price"><span data-price="pro">$25</span><small data-per>a month</small></p>
-          <p class="note">includes <span data-usage="pro">$25</span> of usage</p>
-          <div class="ladder">
-            <label for="pro-ladder">more usage on the same plan</label>
-            <select id="pro-ladder" data-ladder="pro"></select>
-          </div>
           <ul>
             <li>Everything in Personal</li>
-            <li>Usage that <b>carries forward</b> for two months</li>
-            <li>Top ups at any time, where <b>a dollar buys a dollar</b></li>
             <li>Builds through the lifecycle without limit</li>
             <li>Deploys to development and production</li>
             <li>Records kept for 90 days</li>
@@ -340,20 +317,12 @@
 
         <div class="tier bc">
           <span class="badge bc">Corporate</span>
-          <p class="price"><span data-price="corp">$99</span><small data-per>a month</small></p>
-          <p class="note">includes <span data-usage="corp">$50</span> of usage</p>
-          <div class="ladder">
-            <label for="corp-ladder">more usage on the same plan</label>
-            <select id="corp-ladder" data-ladder="corp"></select>
-          </div>
           <ul>
             <li>Everything in Pro, with <b>unlimited seats</b></li>
             <li><b>Approvals</b> by named people at every gate and every deploy</li>
             <li>Three environments: development, staging and production</li>
             <li><b>Your own systems</b>, bound per environment: your database, your files, your MCP gateway</li>
             <li>The fit check before a build starts</li>
-            <li>A <b>per-task maximum</b> and a <b>monthly ceiling</b> that the workspace sets</li>
-            <li>A statement for every run</li>
             <li>Records kept for one year</li>
           </ul>
           <div class="go"><a class="btn btn-signal" href="waitlist.html?from=plans-corporate">Join the waitlist</a></div>
@@ -361,82 +330,16 @@
 
         <div class="tier be">
           <span class="badge be">Enterprise</span>
-          <p class="price">Let's talk</p>
-          <p class="note">by agreement, on invoice</p>
           <ul>
             <li>Everything in Corporate</li>
             <li>Single sign-on and provisioning</li>
             <li>A <b>dedicated fleet host</b></li>
-            <li>Usage bought in volume</li>
             <li>Retention and audit exports as agreed</li>
-            <li>A <b>statement of work with a cap</b>, as a fixed fee or as time and materials with funds reserved for a stated window</li>
             <li>A private edition of the platform, by agreement</li>
           </ul>
-          <div class="go"><a class="btn btn-ghost" href="waitlist.html?from=plans-enterprise">Talk to us</a></div>
+          <div class="go"><a class="btn btn-ghost" href="waitlist.html?from=plans-enterprise">Join the waitlist</a></div>
         </div>
 
-      </div>
-    </div>
-  </section>
-
-  <section class="band" id="prices">
-    <div class="wrap">
-      <p class="kicker">how a task is priced</p>
-      <h2>Every task carries a price</h2>
-      <div class="prose">
-        <p>Every agent on AgentMesh carries a price that its provider set, task by
-          task. A provider prices an offering in one of two ways: as a price per
-          task, or as a rate schedule over the units the work counts, such as
-          tokens, calls, items or minutes, with a cap. Both are published and
-          signed, and both are the price you agreed to before the work started.</p>
-        <p>Before a task starts, you have already agreed to its price. Metered work
-          is estimated from the input in hand, and a task whose estimate clears the
-          per-task maximum you set is refused with the estimate. Your workspace
-          also carries a monthly ceiling, and nothing draws past either.</p>
-      </div>
-
-      <div class="rules">
-        <div class="g">
-          <h3>Usage carries forward</h3>
-          <p>Usage a plan includes carries forward while you subscribe and expires two months after it was issued. Usage you top up does not expire.</p>
-        </div>
-        <div class="g">
-          <h3>When the balance runs low</h3>
-          <p>A task the balance cannot cover does not start. A task in progress stops at its per-task maximum. If you turn on automatic top up under a monthly ceiling, neither happens.</p>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <section class="band" id="charges">
-    <div class="wrap">
-      <p class="kicker">three things</p>
-      <h2>What AgentMesh charges</h2>
-      <div class="prose">
-        <p>AgentMesh charges for three things. The plan pays for the workspace.
-          The services your agents use here, such as model access and a place on
-          the fleet, are charged at the rates listed in your workspace. And each
-          transaction between a buyer and a provider carries a fee of 4.2% of the
-          price, which is shown on the settlement.</p>
-        <p>There is no fee when a workspace's own agents work for it. Our own
-          starter agents carry prices like any other provider's.</p>
-      </div>
-    </div>
-  </section>
-
-  <section class="band" id="providers">
-    <div class="wrap">
-      <p class="kicker">if you provide agents</p>
-      <h2>You set your prices</h2>
-      <div class="prose">
-        <p>If you provide agents, you set your prices: per task or by the unit,
-          tiered, or packaged by the month, in whatever grain fits the work.
-          Buyers see the price before they accept it. The platform's fee is shown
-          on every settlement and is never charged on top of your cap.</p>
-        <p>Publishing is free on every plan. You can publish the package, its
-          repository, its AgentDoc, and the copies people make from it, and
-          installs, copies and runs are counted on your page from the day you
-          publish.</p>
       </div>
     </div>
   </section>
@@ -451,30 +354,26 @@
         </details>
         <details>
           <summary>Which systems do I bring, and which does AgentMesh provide?</summary>
-          <p>Model access and a place on the fleet are provided here and charged at the rates in your workspace. Your database, your files and your MCP gateway are yours. On Corporate you bind them per environment, and the fit check tells you before a build whether an agent's design is covered.</p>
+          <p>Model access and a place on the fleet are provided here. Your database, your files and your MCP gateway are yours. On Corporate you bind them per environment, and the fit check tells you before a build whether an agent's design is covered.</p>
         </details>
         <details>
           <summary>Can I run the mesh myself?</summary>
-          <p>Yes. The mesh is free software you can run inside your own firewall, and <a href="https://dev.agentmesh.ai/running-a-mesh.html">Running a mesh</a> has the detail. These plans are for the platform on top of it: the workspace, the lifecycle, the fleet and the records. A private edition of the platform is available to Enterprise by agreement.</p>
+          <p>Yes. The mesh is software you can run inside your own firewall, and <a href="https://dev.agentmesh.ai/running-a-mesh.html">Running a mesh</a> has the detail. These plans are for the platform on top of it: the workspace, the lifecycle, the fleet and the records. A private edition of the platform is available to Enterprise by agreement.</p>
         </details>
         <details>
           <summary>Can I change plans?</summary>
-          <p>You can change at any time. Moving up takes effect at once. Moving down takes effect at the end of the period, and usage you already hold keeps its expiry.</p>
-        </details>
-        <details>
-          <summary>What does yearly billing change?</summary>
-          <p>It changes only the price. You pay for ten months and get twelve, and the usage a plan includes arrives monthly as it does on the monthly plan.</p>
+          <p>You can change at any time. Moving up takes effect at once. Moving down takes effect at the end of the period.</p>
         </details>
       </div>
 
       <div class="onward">
-        <span class="t">Start with Personal. It costs nothing, it takes about five minutes, and the first $10 of usage builds your first agent.</span>
+        <span class="t">AgentMesh is in beta. Join the waitlist, and we will write when a place opens.</span>
         <a class="btn btn-signal" href="waitlist.html?from=plans-onward">&#9654; join the waitlist</a>
       </div>
     </div>
   </section>
 
-  <footer class="sitefoot">
+<footer class="sitefoot">
     <div class="wrap">
       <div class="cols">
         <div>
@@ -517,44 +416,5 @@
   </footer>
 
 </div>
-<script>
-  (function () {
-    // The ladder: the same plan with more usage. Each rung is [price, usage
-    // included]. Corporate carries a flat $49 workspace fee, so its usage is
-    // the price less the fee until the volume rungs.
-    var ladders = {
-      pro:  [[25,25],[50,50],[100,100],[250,255],[500,520],[1000,1060],[2500,2700]],
-      corp: [[99,50],[199,150],[399,350],[999,980],[2499,2550]]
-    };
-    var cycle = "monthly";
-    var fmt = function (n) { return "$" + n.toLocaleString("en-US"); };
-    var perMonth = function (monthly) { return cycle === "yearly" ? Math.round(monthly * 10 / 12) : monthly; };
-
-    function paint(plan) {
-      var sel = document.querySelector('[data-ladder="' + plan + '"]');
-      var rung = ladders[plan][sel.selectedIndex];
-      document.querySelector('[data-price="' + plan + '"]').textContent = fmt(perMonth(rung[0]));
-      document.querySelector('[data-usage="' + plan + '"]').textContent = fmt(rung[1]);
-    }
-    Object.keys(ladders).forEach(function (plan) {
-      var sel = document.querySelector('[data-ladder="' + plan + '"]');
-      ladders[plan].forEach(function (r) {
-        var o = document.createElement("option");
-        o.textContent = fmt(r[1]) + " of usage";
-        sel.appendChild(o);
-      });
-      sel.addEventListener("change", function () { paint(plan); });
-      paint(plan);
-    });
-    document.querySelectorAll("[data-cycle]").forEach(function (b) {
-      b.addEventListener("click", function () {
-        cycle = b.getAttribute("data-cycle");
-        document.querySelectorAll("[data-cycle]").forEach(function (x) { x.classList.toggle("on", x === b); });
-        document.querySelectorAll("[data-per]").forEach(function (x) { x.textContent = cycle === "yearly" ? "a month, billed yearly" : "a month"; });
-        Object.keys(ladders).forEach(paint);
-      });
-    });
-  })();
-</script>
 </body>
 </html>
