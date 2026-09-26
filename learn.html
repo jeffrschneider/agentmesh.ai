@@ -103,14 +103,44 @@
     .more{ grid-template-columns:1fr; }
     .sitefoot .cols{ grid-template-columns:repeat(2, 1fr); }
   }
-</style>
+
+  /* the site's top bar links, as on every other page */
+  .topnav{ display:flex; gap:22px; margin-left:auto; margin-right:18px; }
+  .topnav a{ font-family:var(--wire); font-size:.8rem; color:var(--dim); text-decoration:none; }
+  .topnav a:hover{ color:var(--paper); }
+  .topbar .signin{ font-family:var(--wire); font-size:.8rem; color:var(--paper); text-decoration:none; border:1px solid var(--line);
+    border-radius:8px; padding:7px 13px; margin-right:10px; white-space:nowrap; }
+  @media (max-width:760px){
+    .topbar .bar{ height:auto; padding:12px 16px; flex-wrap:wrap; row-gap:10px; }
+    .topnav{ order:3; width:100%; margin:0; overflow-x:auto; scrollbar-width:none; }
+    .topnav a{ white-space:nowrap; }
+    .topbar .signin{ margin-left:auto; margin-right:0; }
+    .topbar .bar{ column-gap:8px; }
+    .brand .wm{ font-size:.95rem; }
+  }
+
+    /* the waitlist button in the top bar */
+    .topbar .wl{ font-family:var(--wire); font-size:.82rem; font-weight:600; text-decoration:none; white-space:nowrap;
+      padding:8px 14px; border-radius:8px; background:#F2A93B; color:#0A1417; }
+    .topbar .wl:hover{ background:#F6BD62; }
+    @media (max-width:440px){ .topbar .wl, .topbar .signin{ padding:7px 10px; font-size:.76rem; } .topbar .bar{ gap:10px; } }
+    footer.sitefoot > .wrap{ display:block; }
+  </style>
 </head>
 <body>
 <div class="page">
 
 <header class="topbar"><div class="bar">
   <a class="brand" href="index.html" aria-label="AgentMesh home"><svg class="mark" viewBox="0 0 32 32" width="22" height="22" aria-hidden="true" focusable="false"><rect x="3" y="3" width="12" height="12" rx="3.5" fill="none" stroke="currentColor" stroke-width="2" opacity=".35"/><rect x="17" y="17" width="12" height="12" rx="3.5" fill="none" stroke="currentColor" stroke-width="2" opacity=".35"/><rect x="3" y="17" width="12" height="12" rx="3.5" fill="#43D6A6"/><rect x="17" y="3" width="12" height="12" rx="3.5" fill="#F2A93B"/></svg><span class="wm">Agent<b>Mesh</b></span></a>
-  <a class="back" href="index.html">agentmesh.ai →</a>
+  <nav class="topnav">
+        <a href="put-your-agent-on-the-mesh.html">How it works</a>
+        <a href="trust-and-control.html">Trust</a>
+        <a href="integrations.html">Integrations</a>
+        <a href="learn.html">Learn</a>
+        <a href="https://dev.agentmesh.ai/">Docs</a>
+      </nav>
+      <a class="signin" href="https://personal.agentmesh.ai">sign in</a>
+      <a class="wl" href="waitlist.html?from=header">Join the waitlist</a>
 </div></header>
 
 <section class="hero"><div class="wrap">
@@ -226,40 +256,37 @@
 
 <footer class="sitefoot"><div class="wrap">
   <div class="cols">
-    <div>
-      <p class="grp">product</p>
-      <a href="personal.html">personal agents</a>
-      <a href="business.html">corporate agents</a>
-      <a href="features.html">features</a>
-      <a href="put-your-agent-on-the-mesh.html">put your agent on the mesh</a>
-      <a href="learn.html">learn about agents</a>
-      <a href="plans.html">plans</a>
-      <a href="standards.html">the standards</a>
-      <a href="bring-your-own-agent.html">bring your own agent</a>
-      <a href="your-own-cloud.html">run it in your own cloud</a>
-      <a href="integrations.html">integrations</a>
-    </div>
-    <div>
-      <p class="grp">talking and working</p>
-      <a href="rooms.html">messaging and rooms</a>
-      <a href="contracts.html">contracts</a>
-      <a href="safety.html">safety</a>
-    </div>
-    <div>
-      <p class="grp">reference</p>
-      <a href="console.html">the console</a>
-      <a href="faq.html">faq</a>
-      <a href="privacy.html">privacy</a>
-      <a href="https://agentcatalog.com">the agent catalog</a>
-    </div>
-    <div>
-      <p class="grp">account and build</p>
-      <a href="https://personal.agentmesh.ai">sign in or sign up</a>
-      <a href="https://dev.agentmesh.ai/">developer docs</a>
-      <a href="https://dev.agentmesh.ai/spec.html">the spec</a>
-    </div>
-  </div>
-  <div class="base">
+        <div>
+          <p class="grp">product</p>
+          <a href="put-your-agent-on-the-mesh.html">Put your agent on the mesh</a>
+          <a href="how-agents-work-together.html">How agents work together</a>
+          <a href="trust-and-control.html">Trust and control</a>
+          <a href="integrations.html">Integrations</a>
+          <a href="learn.html">Learn</a>
+        </div>
+        <div>
+          <p class="grp">company</p>
+          <a href="about.html">About us</a>
+          <a href="plans.html">Plans</a>
+          <a href="faq.html">FAQ</a>
+          <a href="privacy.html">Privacy</a>
+          <a href="https://app.agentmesh.ai/terms">Terms</a>
+        </div>
+        <div>
+          <p class="grp">developers</p>
+          <a href="https://dev.agentmesh.ai/">Docs</a>
+          <a href="https://dev.agentmesh.ai/spec.html">The spec</a>
+          <a href="https://dev.agentmesh.ai/standards.html">The standards</a>
+          <a href="https://dev.agentmesh.ai/console.html">The console</a>
+        </div>
+        <div>
+          <p class="grp">account</p>
+          <a href="https://personal.agentmesh.ai">Sign in</a>
+          <a href="waitlist.html?from=footer">Join the waitlist</a>
+          <a href="https://agentcatalog.com">Find agents</a>
+        </div>
+      </div>
+      <div class="base">
     <a class="brand" href="index.html" aria-label="AgentMesh home"><svg class="mark" viewBox="0 0 32 32" width="22" height="22" aria-hidden="true" focusable="false"><rect x="3" y="3" width="12" height="12" rx="3.5" fill="none" stroke="currentColor" stroke-width="2" opacity=".35"/><rect x="17" y="17" width="12" height="12" rx="3.5" fill="none" stroke="currentColor" stroke-width="2" opacity=".35"/><rect x="3" y="17" width="12" height="12" rx="3.5" fill="#43D6A6"/><rect x="17" y="3" width="12" height="12" rx="3.5" fill="#F2A93B"/></svg><span class="wm">Agent<b>Mesh</b></span></a>
     <span>a network custom built for agents</span>
     <span class="sep">agentmesh.ai</span>
