@@ -18,7 +18,7 @@
   <link rel="icon" type="image/svg+xml" href="favicon.svg">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&family=Fraunces:ital,opsz,wght@0,9..144,400;1,9..144,400&family=Geist:wght@400;500;600&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet">
   <style>
     /* ══════════ THE WIRE : design token system ══════════ */
     :root{
@@ -342,40 +342,91 @@
       .btn:hover, .docs a:hover{ transform:none; }
     }
   
-    /* the front door: the address, the examples, the transcript */
-    .dh-hero{ display:grid; grid-template-columns:minmax(0,1.05fr) minmax(0,.95fr); gap:48px; align-items:start; padding:64px 0 24px; }
-    .dh-hero h1{ font-size:clamp(2.5rem,3.6vw,3.5rem); line-height:1.05; color:#fff; text-wrap:balance; margin:0 0 18px; }
-    .dh-beat{ font-family:var(--disp,inherit); font-size:clamp(1.15rem,1.6vw,1.45rem); font-weight:600;
-      color:var(--paper); margin:0 0 16px; letter-spacing:-.01em; line-height:1.3; }
-    .dh-lead{ font-size:1.16rem; color:var(--dim); margin:0 0 26px; max-width:56ch; line-height:1.55; }
-    .dh-cta{ margin:0 0 14px; }
-    .dh-btn.big{ font-size:1.06rem; padding:14px 24px; border-radius:11px; }
+    /* ══════════ the hero: the network is the agent ══════════
+       A paper band with a dark stage. The stage plays one agent growing into
+       a network: yours are solid rings, hired ones are dashed rings, so the
+       two read apart without their colours. The stage is drawn at 640 by 540
+       and scaled to fit its box. */
+    .nx-hero{ position:relative; background:#F3EFE6; color:#15171C;
+      font-family:'Geist', system-ui, sans-serif; line-height:1.4; }
+    .nx-in{ max-width:1440px; margin:0 auto; padding:48px 88px 72px; display:grid;
+      grid-template-columns:minmax(0,46fr) minmax(0,54fr); gap:72px; align-items:center; }
+    .nx-copy{ display:flex; flex-direction:column; gap:28px; min-width:0; }
+    .nx-eyebrow{ margin:0; font-family:'Geist Mono', monospace; font-size:13px;
+      letter-spacing:.14em; text-transform:uppercase; color:#B53A15; }
+    .nx-hero h1{ margin:0; font-family:'Fraunces', Georgia, serif; font-weight:400;
+      font-size:clamp(2.6rem,5.15vw,74px); line-height:1.02; letter-spacing:-.025em; color:#15171C; }
+    .nx-hero h1 em{ font-style:italic; background-image:linear-gradient(rgba(255,107,61,.42),rgba(255,107,61,.42));
+      background-repeat:no-repeat; background-position:0 86%; background-size:0% .16em;
+      -webkit-box-decoration-break:clone; box-decoration-break:clone; transition:background-size .9s ease; }
+    .nx-hero h1 em.on{ background-size:100% .16em; }
+    .nx-verbs{ margin:0; font-size:clamp(1.3rem,2vw,28px); line-height:1.3; font-weight:500;
+      letter-spacing:-.01em; display:flex; flex-wrap:wrap; gap:0 12px; }
+    .nx-verbs span{ color:#15171C; transition:color .5s ease, box-shadow .5s ease; }
+    .nx-verbs span.off{ color:#8C867C; }
+    .nx-verbs span.now{ box-shadow:inset 0 -.3em 0 rgba(255,107,61,.42); }
+    .nx-lede{ margin:0; font-size:18px; line-height:1.55; color:#50555D; max-width:520px; }
+    .nx-cta{ display:flex; flex-wrap:wrap; gap:12px; align-items:center; padding-top:6px; }
+    .nx-btn{ display:flex; align-items:center; min-height:52px; padding:0 24px; border-radius:14px;
+      font-size:16px; font-weight:500; text-decoration:none; transition:background .2s ease; }
+    .nx-primary{ background:#15171C; color:#F3EFE6; }
+    .nx-primary:hover{ background:#2A2D35; }
+    .nx-ghost{ color:#15171C; border:1px solid #CFC6B6; padding:0 22px; }
+    .nx-ghost:hover{ background:#E8E1D4; }
+    .nx-hero a:focus-visible, .nx-ctl:focus-visible{ outline:2px solid #B53A15; outline-offset:2px; }
+
+    .nx-panel{ background:#14161B; color:#ECE8E0; border-radius:28px; overflow:hidden;
+      display:flex; flex-direction:column; min-width:0; }
+    .nx-top{ min-height:80px; padding:22px 28px 0; display:flex; flex-wrap:wrap; gap:10px 16px;
+      justify-content:space-between; align-items:flex-start; }
+    .nx-act{ display:flex; gap:14px; align-items:baseline; min-width:0; }
+    .nx-num{ font-family:'Geist Mono', monospace; font-size:13px; color:#8E949E; }
+    .nx-h{ font-size:19px; font-weight:600; }
+    .nx-d{ font-size:14px; color:#9AA0AA; margin-top:4px; }
+    .nx-legend{ display:flex; gap:16px; align-items:center; padding-top:4px;
+      font-family:'Geist Mono', monospace; font-size:12px; color:#9AA0AA; }
+    .nx-legend span{ display:flex; gap:7px; align-items:center; }
+    .nx-legend i{ width:10px; height:10px; border-radius:50%; box-sizing:border-box; }
+    .nx-legend .ly{ border:2px solid #FF6B3D; }
+    .nx-legend .lt{ border:2px dashed #7C93FF; }
+    .nx-box{ position:relative; width:100%; aspect-ratio:640 / 540; overflow:hidden;
+      background-color:#14161B; background-image:radial-gradient(rgba(236,232,224,.07) 1px, transparent 1px);
+      background-size:22px 22px; }
+    .nx-stage{ position:absolute; left:0; top:0; width:640px; height:540px; transform-origin:0 0; }
+    .nx-layer{ position:absolute; left:0; top:0; width:640px; height:540px; }
+    .nx-foot{ padding:16px 28px 22px; border-top:1px solid #252932; display:flex; flex-direction:column; gap:12px; }
+    .nx-row{ display:flex; flex-wrap:wrap; align-items:center; gap:8px 18px; }
+    .nx-row2{ display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:8px 18px; }
+    .nx-lab{ font-family:'Geist Mono', monospace; font-size:11px; letter-spacing:.12em; color:#9AA0AA; width:104px; }
+    .nx-skill{ display:flex; align-items:center; gap:7px; font-size:13px; transition:color .4s; }
+    .nx-wait{ display:flex; align-items:center; gap:18px; min-height:44px; flex-wrap:wrap; }
+    .nx-chips{ display:flex; gap:6px; align-items:center; width:190px; }
+    .nx-done{ font-family:'Geist Mono', monospace; font-size:11px; letter-spacing:.12em; color:#ECE8E0; }
+    .nx-ctls{ display:flex; gap:8px; }
+    .nx-ctl{ font-family:'Geist Mono', monospace; font-size:12px; letter-spacing:.08em; text-transform:uppercase;
+      color:#ECE8E0; background:transparent; border:1px solid #343946; border-radius:10px;
+      min-height:44px; padding:0 16px; cursor:pointer; }
+    .nx-ctl:hover{ background:#23262E; }
+    @media (max-width:1320px){ .nx-in{ padding-left:48px; padding-right:48px; gap:48px; } }
+    @media (max-width:960px){
+      .nx-in{ grid-template-columns:minmax(0,640px); gap:44px; }
+    }
+    @media (max-width:620px){
+      .nx-in{ padding:36px 16px 48px; }
+      .nx-copy{ gap:22px; }
+      .nx-panel{ border-radius:20px; }
+      .nx-top{ padding:18px 18px 0; min-height:0; }
+      .nx-foot{ padding:14px 18px 18px; }
+      .nx-lab{ width:auto; }
+      .nx-chips{ width:auto; min-width:0; }
+    }
+    @media (prefers-reduced-motion:reduce){
+      .nx-hero h1 em, .nx-verbs span{ transition:none; }
+    }
+
     .dh-btn{ font-family:var(--body); font-size:.95rem; font-weight:600; border:1px solid var(--signal); border-radius:9px; padding:9px 15px; background:var(--signal); color:var(--ink); cursor:pointer; text-decoration:none; display:inline-flex; align-items:center; gap:8px; white-space:nowrap; }
     .dh-btn.ghost{ background:transparent; color:var(--paper); border-color:#27403f; }
     .dh-btn.small{ font-size:.88rem; padding:7px 12px; border-radius:8px; }
-    .dh-works{ font-size:.95rem; color:var(--dim); margin:0 0 22px; }
-    .dh-works b{ color:var(--paper); font-weight:500; }
-    .dh-then p{ margin:0 0 8px; font-size:.95rem; color:var(--dim); }
-    .dh-then ul{ list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:8px; }
-    .dh-then li{ font-family:var(--wire); font-size:.9rem; background:var(--panel); border:1px solid var(--line); border-radius:9px; padding:9px 13px; color:var(--paper); }
-    .dh-then li::before{ content:"\203A  "; color:var(--signal); }
-    /* The right column is the "what you see" screen: a raised, clearly lighter
-       panel so it reads as a separate surface from the flat left column. The
-       lift is lightness + a defined edge + a shadow, not colour, so it holds
-       for a colour-blind reader. Its inner message wells stay darker, which
-       now recess against the lighter screen. */
-    .dh-chat{ background:#17292F; border:1px solid #33505A; border-radius:16px; overflow:hidden; box-shadow:0 14px 40px rgba(0,0,0,.45); }
-    .dh-chat .bar{ display:flex; align-items:center; gap:10px; padding:11px 16px; border-bottom:1px solid #33505A; font-family:var(--wire); font-size:.78rem; letter-spacing:.08em; text-transform:uppercase; color:var(--dim); }
-    .dh-chat .bar i{ width:8px; height:8px; border-radius:50%; background:#27403f; display:inline-block; }
-    .dh-chat .msgs{ padding:18px 18px 8px; display:flex; flex-direction:column; gap:14px; }
-    .dh-msg{ max-width:88%; font-size:.95rem; line-height:1.5; padding:11px 14px; border-radius:12px; }
-    .dh-msg.you{ align-self:flex-end; background:#132328; border:1px solid #27403f; }
-    .dh-msg.it{ align-self:flex-start; background:#0b1519; border:1px solid var(--line); }
-    .dh-msg .who{ display:block; font-family:var(--wire); font-size:.78rem; letter-spacing:.08em; text-transform:uppercase; color:var(--dim); margin:0 0 4px; }
-    .dh-msg .acard{ margin:8px 0 2px; border:1px solid #27403f; border-radius:10px; padding:10px 12px; background:var(--panel); }
-    .dh-msg .acard b{ font-weight:600; display:block; }
-    .dh-msg .acard span{ display:block; color:var(--dim); font-size:.88rem; }
-    .dh-msg .tools{ display:block; font-family:var(--wire); font-size:.76rem; color:var(--dim); margin:6px 0 0; }
     .dh-sub{ font-size:1.02rem; color:var(--dim); margin:0 0 22px; max-width:60ch; }
     .dh-search{ display:flex; gap:10px; margin:0 0 14px; max-width:760px; }
     .dh-search input{ flex:1; background:#0b1519; border:1px solid #27403f; border-radius:12px; color:var(--paper); font-family:var(--body); font-size:1.05rem; padding:14px 16px; }
@@ -398,7 +449,6 @@
     .dh-gets li .g{ color:var(--verify); font-family:var(--wire); }
     .dh-gets li span{ display:block; color:var(--dim); font-size:.9rem; }
     @media (max-width:900px){
-      .dh-hero{ grid-template-columns:1fr; padding-top:40px; }
       .dh-two{ grid-template-columns:1fr; }
     }
   </style>
@@ -422,26 +472,49 @@
   </header>
 
 <!-- ══════════ the front door ══════════ -->
-  <div class="wrap dh-hero">
-    <div>
-      <h1>Offload your work to a network of agents</h1>
-      <p class="dh-beat">Connect yours. Hire theirs. Run them as one.</p>
-      <p class="dh-lead">In the agentic economy, business value tracks two things: how quickly your agents adapt, and how much work they can take on. AgentMesh provides both: swap an agent without rebuilding anything, and hire the capacity you do not own.</p>
-      <p class="dh-cta"><a class="dh-btn big" href="https://agentcatalog.com">Find an agent &rarr;</a> <a class="dh-btn big ghost" href="bring-your-own-agent.html">Bring your own</a></p>
-      <p class="dh-works">Already use Claude, Cursor or another assistant with an MCP setting? <a href="connect/">Connect it</a> and it can do all of this for you.</p>
-    </div>
-    <div class="dh-chat" aria-label="What you see in your assistant">
-      <div class="bar"><i></i><i></i><i></i> One way in: your assistant, connected</div>
-      <div class="msgs">
-        <div class="dh-msg you"><span class="who">You</span>Find an agent that turns a brief into a narrated explainer.</div>
-        <div class="dh-msg it"><span class="who">Claude</span>One on AgentMesh does that:
-          <div class="acard"><b>Explainer</b><span>Turns a brief into a narrated page that plays itself, checked on two screen sizes, put at a private link for you to review.</span><span>Explainer.jeff@agentmesh.ai · one change included within 14 days</span></div>
-          Want me to send it a brief?<span class="tools">find_agent</span></div>
-        <div class="dh-msg you"><span class="who">You</span>Yes. Two minutes on our refund policy, for new customers, plain words.</div>
-        <div class="dh-msg it"><span class="who">Claude</span>Sent. The job is on your list as asked; I will check back when it delivers.<span class="tools">send_message · list_jobs</span></div>
+  <section class="nx-hero">
+    <div class="nx-in">
+      <div class="nx-copy">
+        <p class="nx-eyebrow">The network is the agent</p>
+        <h1>Your agent can't do everything. <em id="nx-em">Its network can.</em></h1>
+        <p class="nx-verbs"><span data-v="1">Connect yours.</span> <span data-v="2">Hire theirs.</span> <span data-v="3">Run them as one.</span></p>
+        <p class="nx-lede">Every agent is capped by what its owner gave it: its tools, its data, its know-how. AgentMesh lifts the cap. Swap any agent without rebuilding the rest, and hire other people's agents for the skills and capacity you don't own.</p>
+        <div class="nx-cta">
+          <a class="nx-btn nx-primary" href="connect/">Connect your agent</a>
+          <a class="nx-btn nx-ghost" href="https://agentcatalog.com">Find agents on the mesh</a>
+        </div>
       </div>
+      <section class="nx-panel" id="nx-panel" aria-label="Animation: one agent grows into a network of agents">
+        <div class="nx-top">
+          <div class="nx-act"><span class="nx-num" id="nx-num">01</span><div id="nx-cap"><div class="nx-h" id="nx-h">Your agent, working alone</div><div class="nx-d" id="nx-d">Capped by the tools its owner gave it.</div></div></div>
+          <div class="nx-legend"><span><i class="ly"></i>yours</span><span><i class="lt"></i>hired</span></div>
+        </div>
+        <div class="nx-box" id="nx-box">
+          <div class="nx-stage" id="nx-stage">
+            <div class="nx-layer" id="nx-globe">
+              <div id="nx-glow"></div>
+              <div id="nx-gedges"></div><div id="nx-gdots"></div><div id="nx-gpulses"></div>
+              <div id="nx-gring"></div><div id="nx-gyou"></div><div id="nx-gyoulabel">you</div>
+            </div>
+            <div class="nx-layer" id="nx-local">
+              <div id="nx-hull"></div>
+              <div id="nx-edges"></div><div id="nx-rings"></div>
+              <div id="nx-youlabel">your agent</div>
+              <div id="nx-nodes"></div><div id="nx-packets"></div>
+              <div id="nx-swap">swapped in<br>no rebuild</div>
+            </div>
+          </div>
+        </div>
+        <div class="nx-foot">
+          <div class="nx-row"><span class="nx-lab" id="nx-reach">IN REACH 1/5</span><span id="nx-skills" style="display:contents"></span></div>
+          <div class="nx-row2">
+            <div class="nx-wait"><span class="nx-lab" id="nx-waitn">WAITING 0</span><span class="nx-chips" id="nx-chips"></span><span class="nx-done" id="nx-done">DONE 0</span></div>
+            <div class="nx-ctls"><button type="button" class="nx-ctl" id="nx-toggle">Pause</button><button type="button" class="nx-ctl" id="nx-replay">Replay</button></div>
+          </div>
+        </div>
+      </section>
     </div>
-  </div>
+  </section>
 
 
   <!-- ══════════ personal and corporate ══════════ -->
@@ -643,5 +716,451 @@ npx "https://storage.googleapis.com/agentmesh-releases/mesh-adapter-$(curl -fsS 
   </footer>
 
 </div>
+<script>
+/* The hero animation: one agent, then yours, then hired ones, then the wider
+   mesh. Everything is drawn in a 640 by 540 stage that is scaled to its box. */
+(function () {
+  var box = document.getElementById('nx-box');
+  if (!box) return;
+  var $ = function (id) { return document.getElementById(id); };
+  var Y = '#FF6B3D', T = '#7C93FF';
+  var LOOP = 28.6, ZOOM_AT = 19.0;
+  var ENTRY = { x: -14, y: 272 };
+  var SK = ['Research', 'Code', 'Design', 'Data', 'Legal'];
+  var PATTERN = [0, 2, 1, 0, 4, 3, 0, 2, 1, 4, 0, 3, 2, 1, 0, 4];
+  var ACTS = [
+    { s: 0, n: '01', h: 'Your agent, working alone', d: 'Capped by the tools its owner gave it.' },
+    { s: 4, n: '02', h: 'Connect yours', d: 'Your other agents join the same mesh.' },
+    { s: 9, n: '03', h: 'Hire theirs', d: 'Agents from other owners bring skills you lack.' },
+    { s: 14.6, n: '04', h: 'Run them as one', d: 'Swap any agent out. Nothing rebuilds.' },
+    { s: 19.2, n: '05', h: 'Grow the network', d: 'Every agent you reach brings its own connections.' }
+  ];
+  var NODES = [
+    { id: 'Y0', x: 300, y: 272, own: 'y', sk: 0, a: 0, r: 34 },
+    { id: 'Y1', x: 188, y: 186, own: 'y', sk: 1, a: 4.3, r: 26 },
+    { id: 'Y2', x: 414, y: 196, own: 'y', sk: 3, a: 5.6, r: 26 },
+    { id: 'H1', x: 128, y: 384, own: 't', sk: 2, a: 9.3, r: 26 },
+    { id: 'H2', x: 462, y: 392, own: 't', sk: 4, a: 10.3, r: 26, l: 16.6 },
+    { id: 'H3', x: 298, y: 440, own: 't', sk: 0, a: 11.3, r: 26 },
+    { id: 'H4', x: 520, y: 112, own: 't', sk: 1, a: 12.2, r: 26 },
+    { id: 'H5', x: 540, y: 300, own: 't', sk: 4, a: 14.9, r: 26 }
+  ];
+  var EDGES = [
+    ['Y0', 'Y1'], ['Y0', 'Y2'], ['Y1', 'Y2'], ['Y0', 'H1'], ['Y1', 'H1'],
+    ['Y0', 'H2'], ['Y2', 'H2'], ['Y0', 'H3'], ['H1', 'H3'], ['H2', 'H3'],
+    ['Y2', 'H4'], ['Y0', 'H5'], ['Y2', 'H5'], ['H3', 'H5']
+  ].map(function (p) { return { a: p[0], b: p[1] }; });
+  var byId = {};
+  NODES.forEach(function (n) { byId[n.id] = n; });
+  var CLIPS = [null,
+    'polygon(12% 12%, 88% 12%, 88% 88%, 12% 88%)',
+    'polygon(50% 4%, 97% 90%, 3% 90%)',
+    'polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%)',
+    'polygon(25% 6%, 75% 6%, 100% 50%, 75% 94%, 25% 94%, 0% 50%)'];
+
+  function clamp01(v) { return v < 0 ? 0 : v > 1 ? 1 : v; }
+  function easeOut(v) { v = clamp01(v); return 1 - Math.pow(1 - v, 3); }
+  function easeBack(v) { v = clamp01(v); var c = 1.70158, c3 = c + 1; return 1 + c3 * Math.pow(v - 1, 3) + c * Math.pow(v - 1, 2); }
+  function easeInOut(v) { v = clamp01(v); return v < 0.5 ? 4 * v * v * v : 1 - Math.pow(-2 * v + 2, 3) / 2; }
+  function hash(i) { var x = Math.sin(i * 127.1 + 311.7) * 43758.5453; return x - Math.floor(x); }
+  function hexA(h, a) {
+    var n = parseInt(String(h).replace('#', '').slice(0, 6), 16);
+    return 'rgba(' + ((n >> 16) & 255) + ',' + ((n >> 8) & 255) + ',' + (n & 255) + ',' + a + ')';
+  }
+  function glyph(sk, size, color, extra) {
+    var s = { width: size + 'px', height: size + 'px', background: color, flexShrink: 0, display: 'block' };
+    if (sk === 0) { var k = Math.round(size * 0.84); s.width = k + 'px'; s.height = k + 'px'; s.borderRadius = '50%'; }
+    else s.clipPath = CLIPS[sk];
+    if (extra) for (var key in extra) s[key] = extra[key];
+    return s;
+  }
+  function present(n, t) {
+    var i = t < n.a ? 0 : easeBack((t - n.a) / 0.45);
+    var o = n.l ? clamp01((n.l - t) / 0.45) : 1;
+    return Math.max(0, i) * o;
+  }
+  function avail(n, t) { return t >= n.a + 0.35 && (!n.l || t < n.l - 1.2); }
+  function edgeDrawn(e, t) { return easeOut((t - (Math.max(byId[e.a].a, byId[e.b].a) + 0.15)) / 0.5); }
+  function edgeFade(e, t) {
+    var A = byId[e.a], B = byId[e.b], f = 1;
+    if (A.l) f = Math.min(f, clamp01((A.l - t) / 0.45));
+    if (B.l) f = Math.min(f, clamp01((B.l - t) / 0.45));
+    return f;
+  }
+
+  /* the global mesh: a sphere of agents that grows outward from yours */
+  var GN = 150, GR = 232, GCX = 320, GCY = 272, TILT = 0.38;
+  var GP = (function () {
+    var pts = [{ x: 0, y: Math.sin(TILT), z: Math.cos(TILT), own: 'y' }];
+    for (var i = 0; i < GN; i++) {
+      var yy = 1 - (i + 0.5) / GN * 2, r = Math.sqrt(1 - yy * yy), th = i * 2.399963;
+      pts.push({ x: Math.cos(th) * r, y: yy, z: Math.sin(th) * r, own: hash(i) < 0.3 ? 't' : 'n' });
+    }
+    var v0 = pts[0];
+    pts.forEach(function (p, i) {
+      var dot = Math.max(-1, Math.min(1, p.x * v0.x + p.y * v0.y + p.z * v0.z));
+      p.ap = i === 0 ? ZOOM_AT + 0.7 : ZOOM_AT + 1.0 + (Math.acos(dot) / Math.PI) * 5.2 + hash(i + 900) * 0.35;
+    });
+    return pts;
+  })();
+  var GE = (function () {
+    var seen = {}, out = [];
+    for (var i = 0; i < GP.length; i++) {
+      var d = [];
+      for (var j = 0; j < GP.length; j++) {
+        if (j === i) continue;
+        var a = GP[i], b = GP[j];
+        d.push({ j: j, v: a.x * b.x + a.y * b.y + a.z * b.z });
+      }
+      d.sort(function (p, q) { return q.v - p.v; });
+      var k = i === 0 ? 5 : 3;
+      for (var m = 0; m < k; m++) {
+        var jj = d[m].j, key = Math.min(i, jj) + '-' + Math.max(i, jj);
+        if (seen[key]) continue;
+        seen[key] = 1;
+        var A = i, B = jj;
+        if (GP[A].ap > GP[B].ap) { var tmp = A; A = B; B = tmp; }
+        out.push({ a: A, b: B, st: GP[A].ap + 0.05, dur: Math.max(0.35, GP[B].ap - GP[A].ap) });
+      }
+    }
+    return out;
+  })();
+  function gproj(p, ang) {
+    var ca = Math.cos(ang), sa = Math.sin(ang);
+    var x = p.x * ca + p.z * sa, z = -p.x * sa + p.z * ca, y = p.y;
+    var ct = Math.cos(TILT), st = Math.sin(TILT);
+    return { x: x, y: y * ct - z * st, z: y * st + z * ct };
+  }
+  function usable(e, t) { return edgeDrawn(e, t) >= 0.999 && avail(byId[e.a], t) && avail(byId[e.b], t); }
+  function pathTo(to, t) {
+    if (to === 'Y0') return ['Y0'];
+    var prev = { Y0: null }, q = ['Y0'];
+    while (q.length) {
+      var c = q.shift();
+      for (var i = 0; i < EDGES.length; i++) {
+        var e = EDGES[i];
+        if (!usable(e, t)) continue;
+        var nb = e.a === c ? e.b : (e.b === c ? e.a : null);
+        if (nb && !(nb in prev)) {
+          prev[nb] = c;
+          if (nb === to) {
+            var p = [to], k = c;
+            while (k) { p.unshift(k); k = prev[k]; }
+            return p;
+          }
+          q.push(nb);
+        }
+      }
+    }
+    return null;
+  }
+
+  /* the simulation */
+  var s;
+  function reset() { s = { t: 0, next: 0.5, idx: 0, packets: [], waiting: [], done: 0, hits: {}, lastRel: 0, load: {} }; }
+  function routeFrom(sk) {
+    var t = s.t, best = null, bestP = null, bs = Infinity;
+    for (var i = 0; i < NODES.length; i++) {
+      var n = NODES[i];
+      if (n.sk !== sk || !avail(n, t)) continue;
+      var p = pathTo(n.id, t);
+      if (!p) continue;
+      var h = s.hits[n.id];
+      var sc = (s.load[n.id] || 0) * 100 + (h == null ? -100 : h);
+      if (sc < bs) { bs = sc; best = n; bestP = p; }
+    }
+    if (!best) return false;
+    if (best.id === 'Y0') { s.hits.Y0 = t; s.done++; return true; }
+    s.packets.push({ pts: bestP.map(function (id) { return { x: byId[id].x, y: byId[id].y }; }), seg: 0, d: 0, sk: sk, target: best.id });
+    s.load[best.id] = (s.load[best.id] || 0) + 1;
+    return true;
+  }
+  function tick(d) {
+    s.t += d;
+    if (s.t >= LOOP) { reset(); return; }
+    var t = s.t, Y0 = byId.Y0;
+    while (s.next <= t && s.next < 18.4) {
+      s.packets.push({ pts: [ENTRY, { x: Y0.x, y: Y0.y }], seg: 0, d: 0, sk: PATTERN[s.idx % PATTERN.length], target: null });
+      s.idx++;
+      s.next += s.next < 14.6 ? 0.6 : 0.27;
+    }
+    if (s.waiting.length && t - s.lastRel > 0.16) {
+      for (var i = 0; i < s.waiting.length; i++) {
+        if (routeFrom(s.waiting[i].sk)) { s.waiting.splice(i, 1); s.lastRel = t; break; }
+      }
+    }
+    var speed = 300 * d, arrived = [];
+    for (var j = 0; j < s.packets.length; j++) {
+      var p = s.packets[j], m = speed;
+      while (m > 0 && p.seg < p.pts.length - 1) {
+        var A = p.pts[p.seg], B = p.pts[p.seg + 1];
+        var L = Math.hypot(B.x - A.x, B.y - A.y);
+        if (p.d + m >= L) { m -= L - p.d; p.seg++; p.d = 0; } else { p.d += m; m = 0; }
+      }
+      if (p.seg >= p.pts.length - 1) arrived.push(p);
+    }
+    if (arrived.length) {
+      s.packets = s.packets.filter(function (p) { return arrived.indexOf(p) < 0; });
+      for (var k = 0; k < arrived.length; k++) {
+        var q = arrived[k];
+        if (q.target) {
+          s.hits[q.target] = t;
+          s.load[q.target] = Math.max(0, (s.load[q.target] || 0) - 1);
+          s.done++;
+        } else if (!routeFrom(q.sk)) {
+          s.waiting.push({ sk: q.sk });
+        }
+      }
+    }
+  }
+  function step(dt) { while (dt > 1e-6) { var d = Math.min(dt, 1 / 60); dt -= d; tick(d); } }
+
+  /* drawing: each layer keeps a pool of divs and restyles them every frame */
+  function put(el, st) { el.style.cssText = ''; for (var k in st) el.style[k] = st[k]; }
+  function sync(layer, list, nested) {
+    while (layer.children.length < list.length) {
+      var d = document.createElement('div');
+      if (nested) d.appendChild(document.createElement('div'));
+      layer.appendChild(d);
+    }
+    while (layer.children.length > list.length) layer.removeChild(layer.lastChild);
+    for (var i = 0; i < list.length; i++) {
+      var el = layer.children[i];
+      if (nested) { put(el, list[i].wrap); put(el.firstChild, list[i].g); }
+      else put(el, list[i]);
+    }
+  }
+
+  var verbs = document.querySelectorAll('.nx-verbs span');
+  var em = $('nx-em');
+  var skillsEl = $('nx-skills');
+  var skillSpans = SK.map(function (name) {
+    var w = document.createElement('span'); w.className = 'nx-skill';
+    var g = document.createElement('span'); w.appendChild(g);
+    w.appendChild(document.createTextNode(name));
+    skillsEl.appendChild(w);
+    return { w: w, g: g };
+  });
+  var lastAct = -1;
+
+  function render() {
+    var t = s.t;
+    var ai = 0;
+    for (var i = 0; i < ACTS.length; i++) if (t >= ACTS[i].s) ai = i;
+    var act = ACTS[ai];
+    if (ai !== lastAct) {
+      lastAct = ai;
+      $('nx-num').textContent = act.n; $('nx-h').textContent = act.h; $('nx-d').textContent = act.d;
+      for (var v = 0; v < verbs.length; v++) {
+        verbs[v].classList.toggle('off', ai < v + 1);
+        verbs[v].classList.toggle('now', ai === v + 1);
+      }
+      em.classList.toggle('on', ai === 4);
+    }
+    var ca = easeOut((t - act.s) / 0.45);
+    put($('nx-cap'), { opacity: ca, transform: 'translateY(' + ((1 - ca) * 6) + 'px)' });
+    var g = t < 0.35 ? t / 0.35 : (t > LOOP - 0.9 ? clamp01((LOOP - t) / 0.9) : 1);
+    $('nx-stage').style.opacity = g;
+
+    var edges = [];
+    EDGES.forEach(function (e) {
+      var A = byId[e.a], B = byId[e.b];
+      if (A.a > B.a) { var tmp = A; A = B; B = tmp; }
+      var dr = edgeDrawn(e, t), f = edgeFade(e, t);
+      if (dr <= 0 || f <= 0) return;
+      var dx = B.x - A.x, dy = B.y - A.y, len = Math.hypot(dx, dy);
+      var hired = A.own === 't' || B.own === 't';
+      edges.push({
+        position: 'absolute', left: A.x + 'px', top: (A.y - 1) + 'px', width: (len * dr) + 'px', height: '2px',
+        borderRadius: '1px', background: hired ? hexA(T, 0.5) : hexA(Y, 0.5),
+        transformOrigin: '0 50%', transform: 'rotate(' + Math.atan2(dy, dx) + 'rad)', opacity: f
+      });
+    });
+    var rings = [], nodes = [];
+    NODES.forEach(function (n) {
+      var p = present(n, t);
+      if (p <= 0.001) return;
+      var col = n.own === 'y' ? Y : T;
+      var h = s.hits[n.id];
+      var age = t - Math.max(h == null ? -99 : h, n.a);
+      if (age < 0.8) {
+        var R = n.r + 4 + age * 40;
+        rings.push({
+          position: 'absolute', left: (n.x - R) + 'px', top: (n.y - R) + 'px', width: (2 * R) + 'px', height: (2 * R) + 'px',
+          borderRadius: '50%', boxSizing: 'border-box', border: '1.5px solid ' + col, opacity: 0.6 * (1 - age / 0.8) * Math.min(1, p)
+        });
+      }
+      nodes.push({
+        wrap: {
+          position: 'absolute', left: (n.x - n.r) + 'px', top: (n.y - n.r) + 'px', width: (2 * n.r) + 'px', height: (2 * n.r) + 'px',
+          borderRadius: '50%', boxSizing: 'border-box', border: '2px ' + (n.own === 'y' ? 'solid ' : 'dashed ') + col,
+          background: '#1C1F27', display: 'flex', alignItems: 'center', justifyContent: 'center',
+          transform: 'scale(' + p + ')', opacity: Math.min(1, p * 1.2),
+          boxShadow: age < 0.5 ? '0 0 ' + Math.round(28 * (1 - age / 0.5)) + 'px ' + hexA(col, 0.55) : 'none'
+        },
+        g: glyph(n.sk, Math.round(n.r * 0.85), col)
+      });
+    });
+    var packets = s.packets.map(function (p) {
+      var A = p.pts[p.seg], B = p.pts[Math.min(p.seg + 1, p.pts.length - 1)];
+      var L = Math.hypot(B.x - A.x, B.y - A.y) || 1, f = p.d / L;
+      var x = A.x + (B.x - A.x) * f, y = A.y + (B.y - A.y) * f;
+      return {
+        wrap: { position: 'absolute', left: (x - 7) + 'px', top: (y - 7) + 'px', width: '14px', height: '14px', display: 'flex', alignItems: 'center', justifyContent: 'center' },
+        g: glyph(p.sk, 13, '#F4EFE6')
+      };
+    });
+    sync($('nx-edges'), edges); sync($('nx-rings'), rings);
+    sync($('nx-nodes'), nodes, true); sync($('nx-packets'), packets, true);
+
+    var reach = 0;
+    SK.forEach(function (name, k) {
+      var prov = NODES.filter(function (n) { return n.sk === k && avail(n, t); });
+      var lit = prov.length > 0;
+      if (lit) reach++;
+      var c = !lit ? '#3A3F4A' : (prov.some(function (n) { return n.own === 'y'; }) ? Y : T);
+      skillSpans[k].w.style.color = lit ? '#ECE8E0' : '#6B717C';
+      put(skillSpans[k].g, glyph(k, 12, c, { transition: 'background .4s' }));
+    });
+    $('nx-reach').textContent = 'IN REACH ' + reach + '/5';
+
+    var hl = easeOut((t - 14.6) / 0.8);
+    var so = clamp01((t - 16.2) / 0.4) * clamp01((18.8 - t) / 0.4);
+    var zl = easeInOut((t - ZOOM_AT) / 1.3);
+    var sl = 1 - 0.96 * zl;
+    put($('nx-local'), {
+      position: 'absolute', left: '0px', top: '0px', width: '640px', height: '540px',
+      transformOrigin: '300px 272px', transform: 'translate(' + (20 * zl) + 'px,0px) scale(' + sl + ')',
+      opacity: 1 - clamp01((t - ZOOM_AT - 0.7) / 0.6)
+    });
+    put($('nx-hull'), {
+      position: 'absolute', left: '14px', top: '8px', right: '14px', bottom: '8px', borderRadius: '40px',
+      border: '1.5px dashed rgba(236,232,224,0.3)',
+      background: 'radial-gradient(ellipse at 50% 50%, ' + hexA(Y, 0.1) + ' 0%, ' + hexA(T, 0.06) + ' 55%, rgba(0,0,0,0) 80%)',
+      opacity: hl, transform: 'scale(' + (1.04 - 0.04 * hl) + ')'
+    });
+    put($('nx-youlabel'), {
+      position: 'absolute', left: '250px', width: '100px', top: '212px', textAlign: 'center',
+      fontFamily: "'Geist Mono', monospace", fontSize: '11px', letterSpacing: '0.12em', textTransform: 'uppercase',
+      color: Y, opacity: Math.min(1, present(byId.Y0, t))
+    });
+    put($('nx-swap'), {
+      position: 'absolute', left: '490px', width: '100px', top: '334px', textAlign: 'center',
+      fontFamily: "'Geist Mono', monospace", fontSize: '11px', lineHeight: '1.35', letterSpacing: '0.08em', textTransform: 'uppercase',
+      color: T, opacity: so
+    });
+
+    var gOn = t >= ZOOM_AT;
+    $('nx-globe').style.opacity = gOn ? clamp01((t - ZOOM_AT - 0.2) / 0.8) : 0;
+    var gEdges = [], gDots = [], gPulses = [];
+    var Z = 3.2 - 2.2 * easeOut((t - ZOOM_AT) / 2.4);
+    var PR = [];
+    if (gOn) {
+      var ang = (t - ZOOM_AT) * 0.11;
+      PR = GP.map(function (p) { var q = gproj(p, ang); return { x: GCX + q.x * GR * Z, y: GCY + q.y * GR * Z, z: q.z }; });
+      GE.forEach(function (e) {
+        var A = PR[e.a], B = PR[e.b];
+        var zAvg = (A.z + B.z) / 2;
+        if (zAvg < -0.3) return;
+        var dr = easeOut((t - e.st) / e.dur);
+        if (dr <= 0) return;
+        var dx = B.x - A.x, dy = B.y - A.y, len = Math.hypot(dx, dy);
+        var dep = (zAvg + 1) / 2, a = 0.05 + 0.3 * dep * dep;
+        var col = e.a === 0 ? hexA(Y, 0.75) : (GP[e.a].own === 't' && GP[e.b].own === 't' ? hexA(T, Math.min(0.8, a * 1.6)) : 'rgba(236,232,224,' + a.toFixed(3) + ')');
+        gEdges.push({
+          position: 'absolute', left: A.x + 'px', top: (A.y - 0.5) + 'px', width: (len * dr) + 'px', height: e.a === 0 ? '1.5px' : '1px',
+          background: col, transformOrigin: '0 50%', transform: 'rotate(' + Math.atan2(dy, dx) + 'rad)'
+        });
+      });
+      for (var gi = 1; gi < GP.length; gi++) {
+        var P = PR[gi], gp = GP[gi];
+        if (P.z < -0.5 || t < gp.ap) continue;
+        var pop = easeBack((t - gp.ap) / 0.4), dep2 = (P.z + 1) / 2, sz = (1.8 + 3.6 * dep2) * pop;
+        gDots.push({
+          position: 'absolute', left: (P.x - sz / 2) + 'px', top: (P.y - sz / 2) + 'px', width: sz + 'px', height: sz + 'px',
+          borderRadius: '50%', background: gp.own === 't' ? T : '#ECE8E0', opacity: 0.2 + 0.75 * dep2
+        });
+      }
+      if (t > ZOOM_AT + 1.6) {
+        for (var pi = 0; pi < 36; pi++) {
+          var PER = 1.5, u = (t + hash(pi + 500) * PER) / PER, cyc = Math.floor(u), fr = u - cyc;
+          var ed = GE[(pi * 131 + cyc * 977) % GE.length];
+          if (t < ed.st + ed.dur + 0.1) continue;
+          var from = PR[ed.a], to = PR[ed.b];
+          if (hash(cyc * 7 + pi) < 0.5) { var sw = from; from = to; to = sw; }
+          if ((from.z + to.z) / 2 < -0.15) continue;
+          gPulses.push({
+            position: 'absolute', left: (from.x + (to.x - from.x) * fr - 2) + 'px', top: (from.y + (to.y - from.y) * fr - 2) + 'px',
+            width: '4px', height: '4px', borderRadius: '50%',
+            background: '#FFF8EE', boxShadow: '0 0 6px rgba(255,248,238,0.8)', opacity: Math.sin(fr * Math.PI)
+          });
+        }
+      }
+    }
+    sync($('nx-gedges'), gEdges); sync($('nx-gdots'), gDots); sync($('nx-gpulses'), gPulses);
+    var Y0g = gOn ? PR[0] : { x: GCX, y: GCY, z: 1 };
+    var yp = gOn ? easeBack((t - GP[0].ap) / 0.4) : 0;
+    var yr = ((t - GP[0].ap) % 1.4 + 1.4) % 1.4, RR = 7 + yr * 22, gR = GR * Z;
+    put($('nx-glow'), {
+      position: 'absolute', left: (GCX - gR) + 'px', top: (GCY - gR) + 'px', width: (2 * gR) + 'px', height: (2 * gR) + 'px',
+      borderRadius: '50%', border: '1px solid rgba(236,232,224,0.08)',
+      background: 'radial-gradient(circle at 42% 38%, rgba(236,232,224,0.07) 0%, ' + hexA(T, 0.05) + ' 45%, rgba(0,0,0,0) 72%)'
+    });
+    put($('nx-gyou'), {
+      position: 'absolute', left: (Y0g.x - 6 * yp) + 'px', top: (Y0g.y - 6 * yp) + 'px', width: (12 * yp) + 'px', height: (12 * yp) + 'px',
+      borderRadius: '50%', background: Y, boxShadow: '0 0 16px ' + hexA(Y, 0.7), opacity: Y0g.z < -0.2 ? 0 : 1
+    });
+    put($('nx-gring'), {
+      position: 'absolute', left: (Y0g.x - RR) + 'px', top: (Y0g.y - RR) + 'px', width: (2 * RR) + 'px', height: (2 * RR) + 'px',
+      borderRadius: '50%', boxSizing: 'border-box', border: '1.5px solid ' + Y,
+      opacity: gOn && t > GP[0].ap ? 0.7 * (1 - yr / 1.4) : 0
+    });
+    put($('nx-gyoulabel'), {
+      position: 'absolute', left: (Y0g.x - 40) + 'px', width: '80px', top: (Y0g.y - 34) + 'px', textAlign: 'center',
+      fontFamily: "'Geist Mono', monospace", fontSize: '11px', letterSpacing: '0.14em', textTransform: 'uppercase',
+      color: Y, opacity: clamp01((t - GP[0].ap - 0.3) / 0.5)
+    });
+
+    var chips = s.waiting.slice(0, 10).map(function (w) { return glyph(w.sk, 12, '#9AA0AA'); });
+    var chipsEl = $('nx-chips');
+    while (chipsEl.children.length < chips.length) chipsEl.appendChild(document.createElement('span'));
+    while (chipsEl.children.length > chips.length) chipsEl.removeChild(chipsEl.lastChild);
+    for (var c = 0; c < chips.length; c++) put(chipsEl.children[c], chips[c]);
+    $('nx-waitn').textContent = 'WAITING ' + s.waiting.length;
+    $('nx-done').textContent = 'DONE ' + s.done;
+  }
+
+  /* fit the 640 by 540 stage to its box */
+  function fit() { $('nx-stage').style.transform = 'scale(' + (box.clientWidth / 640) + ')'; }
+  fit();
+  if (window.ResizeObserver) new ResizeObserver(fit).observe(box); else window.addEventListener('resize', fit);
+
+  var paused = false, onScreen = true, last = performance.now(), acc = 0;
+  var toggle = $('nx-toggle');
+  function setPaused(p) { paused = p; toggle.textContent = p ? 'Play' : 'Pause'; }
+  toggle.addEventListener('click', function () { setPaused(!paused); });
+  $('nx-replay').addEventListener('click', function () { reset(); setPaused(false); render(); });
+  if (window.IntersectionObserver) {
+    new IntersectionObserver(function (es) { onScreen = es[0].isIntersecting; }).observe($('nx-panel'));
+  }
+
+  reset();
+  var reduced = false;
+  try { reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches; } catch (e) {}
+  if (reduced) { step(25.6); setPaused(true); }
+  render();
+  function loop(now) {
+    requestAnimationFrame(loop);
+    var dt = (now - last) / 1000;
+    last = now;
+    if (dt > 0.1) dt = 0.1;
+    if (paused || !onScreen) return;
+    step(dt);
+    acc += dt;
+    if (acc >= 1 / 45) { acc = 0; render(); }
+  }
+  requestAnimationFrame(loop);
+})();
+</script>
 </body>
 </html>
