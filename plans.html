@@ -18,7 +18,7 @@
   <link rel="icon" type="image/svg+xml" href="favicon.svg">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&family=Fraunces:ital,opsz,wght@0,9..144,400;1,9..144,400&family=Geist:wght@400;500;600&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet">
   <style>
     /* ══════════ THE WIRE : design token system ══════════ */
     :root{
@@ -214,6 +214,55 @@
     @media (max-width:440px){ .topbar .wl, .topbar .signin{ padding:7px 10px; font-size:.76rem; } .topbar .bar{ gap:10px; } }
       footer.sitefoot > .wrap{ display:block; }
       .sitefoot .copy{ margin:18px 0 0; font-family:var(--wire); font-size:.74rem; color:var(--dim); }
+    /* ══════════ the home page on cream paper ══════════
+       This page takes the design canvas's cream look; every other page
+       keeps the dark site. The tokens above are redefined here so the header,
+       the builders section, the cards and the footer follow along. Small
+       accent text uses a dark rust, which reads at more than 5 to 1 on the
+       cream. */
+    :root{
+      --ink:#F3EFE6; --panel:#FBF8F2; --panel-2:#EFE9DD; --line:#D9D1C3;
+      --paper:#15171C; --dim:#50555D; --faint:#6A6E75;
+      --signal:#B53A15; --rust:#B53A15; --verify:#1F6B4F; --address:#2F5BD0; --broadcast:#6A4BC4;
+      --disp:'Fraunces', Georgia, serif;
+      --body:'Geist', system-ui, sans-serif;
+      --wire:'Geist Mono', ui-monospace, monospace;
+    }
+    body{ background:var(--ink); background-image:none; color:var(--paper); }
+    body::before{ display:none; }
+    a:focus-visible, .btn:focus-visible{ outline-color:var(--rust); }
+    h1,h2,h3{ font-weight:400; }
+    .topbar{ background:rgba(243,239,230,.9); border-bottom-color:var(--line); }
+    .brand{ color:var(--paper); }
+    .brand:hover span.wm b{ color:var(--rust); }
+    .topnav a{ font-family:var(--body); font-size:.92rem; color:var(--dim); }
+    .topnav a:hover{ color:var(--paper); }
+    .signin{ font-family:var(--body); font-size:.92rem; color:var(--paper); border-color:#CFC6B6; background:transparent; }
+    .signin:hover{ border-color:var(--paper); color:var(--paper); background:#E8E1D4; }
+    .btn{ font-family:var(--body); }
+    .btn-signal{ background:#15171C; color:#F3EFE6; box-shadow:none; font-weight:500; }
+    .btn-signal:hover{ background:#2A2D35; box-shadow:none; }
+    .btn-ghost{ border-color:#CFC6B6; background:transparent; }
+    .btn-ghost:hover{ background:#E8E1D4; border-color:#CFC6B6; }
+    section.band h2{ font-weight:400; font-size:clamp(2rem,3.4vw,2.8rem); letter-spacing:-.02em; }
+    .kicker{ color:var(--faint); }
+    .dh-sub a, .docs a, .sitefoot a{ text-decoration-color:#CFC6B6; }
+    .dh-gets li .g{ color:var(--paper); }
+    .docs a{ background:var(--panel); }
+    .docs a:hover{ border-color:var(--faint); }
+    .docs a .h{ color:var(--rust); }
+    .docs a h3{ font-size:1.3rem; }
+    .sitefoot .grp{ color:var(--faint); }
+    .sitefoot .cols a{ font-family:var(--body); font-size:.9rem; color:var(--dim); }
+    .sitefoot .cols a:hover, .sitefoot .base a:hover{ color:var(--paper); }
+    .sitefoot .base{ color:var(--faint); }
+    .topbar .wl{ font-family:var(--body); font-size:.92rem; font-weight:500; background:#15171C; color:#F3EFE6; }
+    .topbar .wl:hover{ background:#2A2D35; }
+    footer.sitefoot{ border-top:1px solid var(--line); }
+    .tier .price{ font-weight:400; }
+    .tier.bc .go .btn{ background:#15171C; color:#F3EFE6; border-color:#15171C; }
+    .ladder select{ background:#FFFDF8; border-color:var(--line-2,#CFC6B6); }
+    .btn-ghost{ color:var(--paper); }
   </style>
 </head>
 <body>
