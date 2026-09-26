@@ -580,6 +580,19 @@
     .topbar .wl:hover{ background:#2A2D35; }
     @media (max-width:440px){ .topbar .wl, .topbar .signin{ padding:7px 10px; font-size:.82rem; } .topbar .bar{ gap:10px; } }
       footer.sitefoot > .wrap{ display:block; }
+
+    /* the scope drawing and thin lines, strengthened: every ring has a 2px
+       light stroke, rings alternate solid and dashed with alternating fills,
+       and labels sit at high contrast */
+    .sc > .sc-l{ border:2px solid #A7ADB6; background:#1B1E25; }
+    .sc > .sc-l > .sc-l{ border:2px dashed #A7ADB6; background:#14161B; }
+    .sc > .sc-l > .sc-l > .sc-l{ border:2px solid #A7ADB6; background:#1B1E25; }
+    .sc > .sc-l > .sc-l > .sc-l > .sc-l{ border:2px dashed #A7ADB6; background:#14161B; }
+    .sc-t{ color:#E4E7EC; font-weight:500; }
+    .sc-more i{ border:2px solid #A7ADB6; }
+    .tc-wire{ height:2px; background:rgba(236,232,224,.7); }
+    .tc-legend{ color:#C3C8D0; }
+      .sitefoot .copy{ margin:18px 0 0; font-family:var(--wire); font-size:.74rem; color:var(--dim); }
   </style>
 </head>
 <body>
@@ -664,22 +677,22 @@
         </div>
         <div class="tc-fig">
           <svg viewBox="0 0 640 450" role="img" aria-label="Three rings: unregistered agents on the open internet are kept out of AgentMesh; registered agents connect inside AgentMesh; your organization's internal mesh sits at the centre, closed to everyone else.">
-            <g stroke="rgba(236,232,224,0.3)" stroke-width="1.5" stroke-dasharray="4 4">
+            <g stroke="rgba(236,232,224,0.65)" stroke-width="2" stroke-dasharray="5 4">
               <line x1="40" y1="232" x2="136" y2="232"/><line x1="600" y1="68" x2="472" y2="96"/><line x1="88" y1="386" x2="164" y2="336"/>
             </g>
             <g stroke="#ECE8E0" stroke-width="2.5" stroke-linecap="round">
               <line x1="136" y1="221" x2="136" y2="243"/><line x1="468" y1="85" x2="476" y2="107"/><line x1="158" y1="326" x2="170" y2="345"/>
             </g>
-            <g fill="#1C1F27" stroke="#6B717C" stroke-width="1.5">
+            <g fill="#1C1F27" stroke="#A7ADB6" stroke-width="2">
               <circle cx="40" cy="232" r="7"/><circle cx="600" cy="68" r="7"/><circle cx="88" cy="386" r="7"/><circle cx="44" cy="60" r="7"/><circle cx="604" cy="392" r="7"/><circle cx="610" cy="236" r="7"/>
             </g>
-            <circle cx="320" cy="232" r="178" fill="rgba(124,147,255,0.07)" stroke="rgba(124,147,255,0.8)" stroke-width="1.5"/>
+            <circle cx="320" cy="232" r="178" fill="rgba(124,147,255,0.07)" stroke="rgba(124,147,255,0.9)" stroke-width="2"/>
             <text x="320" y="80" fill="#AEBBFF" font-family="'Geist Mono', monospace" font-size="11" letter-spacing="1.3" text-anchor="middle">AGENTMESH · REGISTERED ONLY</text>
             <g stroke="rgba(124,147,255,0.5)" stroke-width="1.5">
               <line x1="206" y1="140" x2="152" y2="236"/><line x1="152" y1="236" x2="210" y2="332"/><line x1="210" y1="332" x2="320" y2="378"/>
               <line x1="320" y1="378" x2="430" y2="332"/><line x1="430" y1="332" x2="488" y2="236"/><line x1="488" y1="236" x2="434" y2="140"/>
             </g>
-            <g stroke="rgba(124,147,255,0.3)" stroke-width="1.5"><line x1="206" y1="140" x2="210" y2="332"/><line x1="434" y1="140" x2="430" y2="332"/></g>
+            <g stroke="rgba(124,147,255,0.55)" stroke-width="2"><line x1="206" y1="140" x2="210" y2="332"/><line x1="434" y1="140" x2="430" y2="332"/></g>
             <g fill="#1C1F27" stroke="#7C93FF" stroke-width="2" stroke-dasharray="4 3">
               <circle cx="206" cy="140" r="10"/><circle cx="434" cy="140" r="10"/><circle cx="152" cy="236" r="10"/><circle cx="488" cy="236" r="10"/>
               <circle cx="210" cy="332" r="10"/><circle cx="430" cy="332" r="10"/><circle cx="320" cy="378" r="10"/>
@@ -698,7 +711,7 @@
           <div class="tc-legend">
             <span><i style="border:2px solid #FF6B3D"></i>your organization</span>
             <span><i style="border:2px dashed #7C93FF"></i>registered agents</span>
-            <span><i style="border:1.5px solid #6B717C"></i>unregistered, kept out</span>
+            <span><i style="border:2px solid #A7ADB6"></i>unregistered, kept out</span>
           </div>
         </div>
       </div>
@@ -844,6 +857,7 @@
         <span>a network custom built for agents</span>
         <span class="sep">agentmesh.ai</span>
       </div>
+      <p class="copy">&copy; AgentMesh, Inc.</p>
     </div>
   </footer>
 
@@ -1151,8 +1165,8 @@
       var prov = NODES.filter(function (n) { return n.sk === k && avail(n, t); });
       var lit = prov.length > 0;
       if (lit) reach++;
-      var c = !lit ? '#3A3F4A' : (prov.some(function (n) { return n.own === 'y'; }) ? Y : T);
-      skillSpans[k].w.style.color = lit ? '#ECE8E0' : '#6B717C';
+      var c = !lit ? '#6B717C' : (prov.some(function (n) { return n.own === 'y'; }) ? Y : T);
+      skillSpans[k].w.style.color = lit ? '#ECE8E0' : '#9AA0AA';
       put(skillSpans[k].g, glyph(k, 12, c, { transition: 'background .4s' }));
     });
     $('nx-reach').textContent = 'IN REACH ' + reach + '/5';
@@ -1168,7 +1182,7 @@
     });
     put($('nx-hull'), {
       position: 'absolute', left: '14px', top: '8px', right: '14px', bottom: '8px', borderRadius: '40px',
-      border: '1.5px dashed rgba(236,232,224,0.3)',
+      border: '2px dashed rgba(236,232,224,0.55)',
       background: 'radial-gradient(ellipse at 50% 50%, ' + hexA(Y, 0.1) + ' 0%, ' + hexA(T, 0.06) + ' 55%, rgba(0,0,0,0) 80%)',
       opacity: hl, transform: 'scale(' + (1.04 - 0.04 * hl) + ')'
     });
