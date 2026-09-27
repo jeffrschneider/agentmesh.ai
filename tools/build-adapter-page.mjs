@@ -1,7 +1,7 @@
 #!/usr/bin/env node
-// Builds the-adapter.html from the one source for the adapter story,
+// Builds into-the-mesh.html from the one source for the adapter story,
 // C:\Users\jeffr\Desktop\AgentMesh\docs\stories\the-adapter.json (the explainer
-// and the video read the same file). Never hand-edit the-adapter.html: change
+// and the video read the same file). Never hand-edit into-the-mesh.html: change
 // the story and run
 //
 //   node tools/build-adapter-page.mjs      (from the repo root)
@@ -26,7 +26,7 @@ const cut = (from, to) => {
   return tpl.slice(a, b);
 };
 
-const url = "https://agentmesh.ai/the-adapter.html";
+const url = "https://agentmesh.ai/into-the-mesh.html";
 const title = `${story.title}: one plug for any agent | AgentMesh`;
 const head = cut("<!DOCTYPE html>", "<style>")
   .replace(/<title>[^<]*<\/title>/, `<title>${esc(title)}</title>`)
@@ -139,7 +139,7 @@ ${parts}
     <div class="wrap">
       <h2>Plug yours in.</h2>
       <p>AgentMesh is in beta. Join the waitlist, and we will write when a place opens.</p>
-      <a class="btn btn-primary" href="waitlist.html?from=the-adapter">Join the waitlist</a>
+      <a class="btn btn-primary" href="waitlist.html?from=into-the-mesh">Join the waitlist</a>
     </div>
   </section>
 
@@ -147,5 +147,5 @@ ${parts}
 
 const page = `${head}${style}${header}${main}${footer}`;
 if (/[\u2014]|&mdash;/.test(page.replace(/<!--[\s\S]*?-->/g, ""))) throw new Error("an em dash reached the page; reword the story");
-writeFileSync(join(root, "the-adapter.html"), page);
-console.log(`the-adapter.html written from ${STORY}: ${story.components.length} parts in ${story.parts.length} groups`);
+writeFileSync(join(root, "into-the-mesh.html"), page);
+console.log(`into-the-mesh.html written from ${STORY}: ${story.components.length} parts in ${story.parts.length} groups`);
