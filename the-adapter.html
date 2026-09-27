@@ -25,16 +25,35 @@
     .ad-head h1{ margin:0 0 18px; font-size:clamp(2.6rem,5vw,4.4rem); }
     .ad-head p{ margin:0; font-size:1.2rem; line-height:1.6; color:var(--dim); max-width:62ch; }
     .ad-fig{ margin:36px 0 12px; background:var(--st-bg); color:var(--st-fg); border-radius:22px; overflow:hidden; }
-    .ad-fig svg{ display:block; width:100%; height:auto; }
-    .ad-dot{ transition:transform .9s cubic-bezier(.5,0,.3,1); }
-    .ad-cell rect, .ad-cell circle{ transition:stroke-width .3s, fill .3s, stroke .3s; }
+    /* The fly-through (tools/adapter-flight.mjs). The stage keeps one shape,
+       wide on a desktop and tall on a phone; the camera fits to it. */
+    .ad-stage{ position:relative; width:100%; aspect-ratio:16 / 9; }
+    .ad-stage svg{ position:absolute; inset:0; display:block; width:100%; height:100%; }
+    .ad-globe{ pointer-events:none; opacity:0; }
+    .ad-world .t-lab{ font-size:34px; }
+    .ad-world .t-tag{ font-size:22px; }
+    .ad-world .t-small{ font-size:15px; }
+    .ad-world .t-agent{ font-size:16px; }
+    .ad-world .t-big{ font-size:120px; }
+    .ad-cell rect, .ad-cell circle, .ad-place .ad-shape *, .ad-box *{ transition:stroke-width .3s, fill .3s, stroke .3s; }
     .ad-cell.on > rect:first-child{ stroke:#FF8A5C; stroke-width:3.5; fill:rgba(255,138,92,.18); }
-    .ad-cell[data-c="connection"].on rect{ fill:#FF8A5C; }
-    .ad-cell[data-c="presence"].on circle{ stroke:#FF8A5C; stroke-width:3; }
-    .ad-cell[data-c="presence"].on .ad-lamp{ fill:#FF8A5C; r:4.5; }
-    .ad-arrive{ transition:opacity .6s; }
-    .ad-cap{ display:flex; gap:18px; align-items:flex-start; justify-content:space-between; padding:4px 26px 22px; min-height:92px; }
-    .ad-lead{ margin:0 0 6px; font-family:var(--disp); font-size:1.35rem; color:#ECE8E0; }
+    .ad-prongs.on rect{ fill:#FF8A5C; stroke:#ECE8E0; stroke-width:2; }
+    .ad-cell.on > circle:first-child{ stroke:#FF8A5C; stroke-width:3; }
+    .ad-cell.on .ad-lamp{ fill:#FF8A5C; r:4.5; }
+    .ad-place .ad-tag, .ad-box .ad-tag, .ad-held, .ad-allowed{ opacity:0; transition:opacity .4s; }
+    .ad-place.on .ad-tag, .ad-box.on .ad-tag, .on.ad-held, .on .ad-held, .ad-allowed.on{ opacity:1; }
+    .ad-place.on .ad-shape > :first-child, .ad-box.on > :first-child{ stroke-width:5; }
+    .ad-agent .ad-halo{ transition:opacity .4s; }
+    .ad-agent.on .ad-halo{ opacity:1; }
+    .ad-cap{ display:flex; gap:18px; align-items:flex-start; justify-content:space-between; padding:14px 26px 22px; min-height:150px; }
+    .ad-lead{ margin:0 0 6px; font-family:var(--disp); font-size:1.35rem; line-height:1.35; color:#ECE8E0; }
+    .ad-num{ font-family:var(--wire); font-size:12px; letter-spacing:.1em; color:#AEB4BE; margin-right:6px; vertical-align:.2em; }
+    @media (max-width:620px){
+      .ad-stage{ aspect-ratio:4 / 5; }
+      .ad-cap{ min-height:300px; }
+      .ad-run .t-agent{ font-size:30px; } .ad-run .t-lab{ font-size:36px; }
+      .ad-world .t-lab{ font-size:46px; } .ad-world .t-tag{ font-size:30px; } .ad-world .t-small{ font-size:19px; } .ad-world .t-agent{ font-size:20px; }
+    }
     .ad-say{ margin:0; font-size:.98rem; line-height:1.5; color:#AEB4BE; max-width:70ch; }
     .ad-say .n{ color:#ECE8E0; font-weight:500; }
     .ad-say .mt{ font-family:var(--wire); font-size:12px; letter-spacing:.06em; }
@@ -80,75 +99,391 @@
       <h1>One plug puts any agent on the mesh.</h1>
       <p>The adapter is a small program that runs beside your agent. Like a plug, it has an end that fits your agent, circuitry inside that keeps the connection safe, and prongs that meet the network.</p>
     </div>
-    <div class="ad-fig"><svg viewBox="0 0 1080 300" role="img" aria-label="The adapter drawn as a plug: your agent on the left plugs into its socket; inside the housing are Identity, Inbox, Admission, Allowances, Sealing, Files and rooms; two prongs on the right connect out to the mesh.">
-    <circle cx="74" cy="152" r="34" fill="none" stroke="#FF8A5C" stroke-width="2.5"/><circle cx="74" cy="152" r="12" fill="#FF8A5C"/>
-    <text x="74" y="214" text-anchor="middle" font-size="12" fill="#ECE8E0" font-family="'Geist Mono', monospace" letter-spacing="1.2">YOUR AGENT</text>
+    <div class="ad-fig">
+      <div class="ad-stage">
+        <svg class="ad-world" viewBox="0 0 1080 300" role="img" aria-label="An animation in 7 beats. Every agent starts out alone. It can do what its owner gave it, and nothing more. The adapter is a plug. A message passes through its inbox, its breaker and its fuse, and leaves signed with the agent's own key. It dials out, so nothing is exposed. Underneath, the mesh carries every message, keeps it until it can be delivered, and moves files beside it. On the mesh, the agent gets a verified name, a card others can find, and rooms where agents meet. At the other end, another company's agent has the same plug. Its owner decides who gets through. Now agents contract agents. One piece of work moves across three of them, across two companies, and comes back together. Plug in once, and your agent can do what the whole network can. The network is the agent."><g class="ad-w">
+    <g class="ad-mesh"><g stroke="rgba(236,232,224,.22)" stroke-width="3" stroke-dasharray="14 10"><line x1="1300" y1="-560" x2="2560" y2="-700"/><line x1="2560" y1="-700" x2="3860" y2="-560"/><line x1="1500" y1="880" x2="2700" y2="960"/><line x1="2700" y1="960" x2="3900" y2="880"/><line x1="1300" y1="-560" x2="1300" y2="152"/><line x1="3860" y1="-560" x2="3860" y2="152"/><line x1="1500" y1="880" x2="1500" y2="152"/><line x1="3900" y1="880" x2="3900" y2="152"/><line x1="2560" y1="-700" x2="2560" y2="152"/><line x1="2700" y1="960" x2="2700" y2="152"/></g><g class="ad-cluster"><ellipse cx="1300" cy="-560" rx="330" ry="170" fill="rgba(143,176,255,.05)" stroke="rgba(236,232,224,.4)" stroke-width="3" stroke-dasharray="14 10"/>
+      <g stroke="rgba(236,232,224,.3)" stroke-width="2.5"><line x1="1532.9" y1="-495.8" x2="1035.9" y2="-501.3"/><line x1="1452" y1="-471.2" x2="1163.5" y2="-595.5"/><line x1="1164.3" y1="-425.8" x2="1184.7" y2="-683.6"/><line x1="1035.9" y1="-501.3" x2="1459.5" y2="-682.9"/><line x1="1163.5" y1="-595.5" x2="1431.2" y2="-576.2"/><line x1="1184.7" y1="-683.6" x2="1532.9" y2="-495.8"/><line x1="1459.5" y1="-682.9" x2="1452" y2="-471.2"/><line x1="1431.2" y1="-576.2" x2="1164.3" y2="-425.8"/></g><circle cx="1532.9" cy="-495.8" r="14" fill="#1B1E25" stroke="#ECE8E0" stroke-width="3"/><circle cx="1452" cy="-471.2" r="14" fill="#1B1E25" stroke="#8FB0FF" stroke-width="3" stroke-dasharray="6 5"/><circle cx="1164.3" cy="-425.8" r="14" fill="#1B1E25" stroke="#ECE8E0" stroke-width="3"/><circle cx="1035.9" cy="-501.3" r="14" fill="#1B1E25" stroke="#ECE8E0" stroke-width="3"/><circle cx="1163.5" cy="-595.5" r="14" fill="#1B1E25" stroke="#ECE8E0" stroke-width="3"/><circle cx="1184.7" cy="-683.6" r="14" fill="#1B1E25" stroke="#ECE8E0" stroke-width="3"/><circle cx="1459.5" cy="-682.9" r="14" fill="#1B1E25" stroke="#ECE8E0" stroke-width="3"/><circle cx="1431.2" cy="-576.2" r="14" fill="#1B1E25" stroke="#ECE8E0" stroke-width="3"/>
+      <text class="t-tag" x="1300" y="-752" text-anchor="middle" fill="#AEB4BE" font-family="'Geist Mono', monospace" letter-spacing="2">CLUSTER · REGION ONE</text></g>
+<g class="ad-cluster"><ellipse cx="2560" cy="-700" rx="380" ry="180" fill="rgba(143,176,255,.05)" stroke="rgba(236,232,224,.4)" stroke-width="3" stroke-dasharray="14 10"/>
+      <g stroke="rgba(236,232,224,.3)" stroke-width="2.5"><line x1="2696.6" y1="-674.2" x2="2319.5" y2="-659.9"/><line x1="2756.8" y1="-602.2" x2="2415.1" y2="-701.6"/><line x1="2493.4" y1="-556.2" x2="2533" y2="-765.7"/><line x1="2319.5" y1="-659.9" x2="2564.3" y2="-766.8"/><line x1="2415.1" y1="-701.6" x2="2722.5" y2="-752.8"/><line x1="2533" y1="-765.7" x2="2696.6" y2="-674.2"/><line x1="2564.3" y1="-766.8" x2="2756.8" y2="-602.2"/><line x1="2722.5" y1="-752.8" x2="2493.4" y2="-556.2"/></g><circle cx="2696.6" cy="-674.2" r="14" fill="#1B1E25" stroke="#ECE8E0" stroke-width="3"/><circle cx="2756.8" cy="-602.2" r="14" fill="#1B1E25" stroke="#ECE8E0" stroke-width="3"/><circle cx="2493.4" cy="-556.2" r="14" fill="#1B1E25" stroke="#ECE8E0" stroke-width="3"/><circle cx="2319.5" cy="-659.9" r="14" fill="#1B1E25" stroke="#ECE8E0" stroke-width="3"/><circle cx="2415.1" cy="-701.6" r="14" fill="#1B1E25" stroke="#ECE8E0" stroke-width="3"/><circle cx="2533" cy="-765.7" r="14" fill="#1B1E25" stroke="#8FB0FF" stroke-width="3" stroke-dasharray="6 5"/><circle cx="2564.3" cy="-766.8" r="14" fill="#1B1E25" stroke="#ECE8E0" stroke-width="3"/><circle cx="2722.5" cy="-752.8" r="14" fill="#1B1E25" stroke="#8FB0FF" stroke-width="3" stroke-dasharray="6 5"/>
+      <text class="t-tag" x="2560" y="-902" text-anchor="middle" fill="#AEB4BE" font-family="'Geist Mono', monospace" letter-spacing="2">CLUSTER · REGION TWO</text></g>
+<g class="ad-cluster"><ellipse cx="3860" cy="-560" rx="330" ry="170" fill="rgba(143,176,255,.05)" stroke="rgba(236,232,224,.4)" stroke-width="3" stroke-dasharray="14 10"/>
+      <g stroke="rgba(236,232,224,.3)" stroke-width="2.5"><line x1="4109.5" y1="-547.7" x2="3657.9" y2="-520.3"/><line x1="3895.8" y1="-498.4" x2="3661.9" y2="-621.7"/><line x1="3807.4" y1="-493.7" x2="3774.6" y2="-667.1"/><line x1="3657.9" y1="-520.3" x2="3869.8" y2="-620.9"/><line x1="3661.9" y1="-621.7" x2="3994.5" y2="-595.7"/><line x1="3774.6" y1="-667.1" x2="4109.5" y2="-547.7"/><line x1="3869.8" y1="-620.9" x2="3895.8" y2="-498.4"/><line x1="3994.5" y1="-595.7" x2="3807.4" y2="-493.7"/></g><circle cx="4109.5" cy="-547.7" r="14" fill="#1B1E25" stroke="#8FB0FF" stroke-width="3" stroke-dasharray="6 5"/><circle cx="3895.8" cy="-498.4" r="14" fill="#1B1E25" stroke="#ECE8E0" stroke-width="3"/><circle cx="3807.4" cy="-493.7" r="14" fill="#1B1E25" stroke="#8FB0FF" stroke-width="3" stroke-dasharray="6 5"/><circle cx="3657.9" cy="-520.3" r="14" fill="#1B1E25" stroke="#8FB0FF" stroke-width="3" stroke-dasharray="6 5"/><circle cx="3661.9" cy="-621.7" r="14" fill="#1B1E25" stroke="#ECE8E0" stroke-width="3"/><circle cx="3774.6" cy="-667.1" r="14" fill="#1B1E25" stroke="#8FB0FF" stroke-width="3" stroke-dasharray="6 5"/><circle cx="3869.8" cy="-620.9" r="14" fill="#1B1E25" stroke="#ECE8E0" stroke-width="3"/><circle cx="3994.5" cy="-595.7" r="14" fill="#1B1E25" stroke="#8FB0FF" stroke-width="3" stroke-dasharray="6 5"/>
+      <text class="t-tag" x="3860" y="-752" text-anchor="middle" fill="#AEB4BE" font-family="'Geist Mono', monospace" letter-spacing="2">CLUSTER · REGION THREE</text></g>
+<g class="ad-cluster"><ellipse cx="1500" cy="880" rx="340" ry="170" fill="rgba(143,176,255,.05)" stroke="rgba(236,232,224,.4)" stroke-width="3" stroke-dasharray="14 10"/>
+      <g stroke="rgba(236,232,224,.3)" stroke-width="2.5"><line x1="1685.3" y1="924.8" x2="1329.5" y2="947.9"/><line x1="1562.3" y1="1026.2" x2="1259.3" y2="815.6"/><line x1="1426.1" y1="974" x2="1370" y2="751.2"/><line x1="1329.5" y1="947.9" x2="1529.6" y2="773.2"/><line x1="1259.3" y1="815.6" x2="1777.7" y2="845.8"/><line x1="1370" y1="751.2" x2="1685.3" y2="924.8"/><line x1="1529.6" y1="773.2" x2="1562.3" y2="1026.2"/><line x1="1777.7" y1="845.8" x2="1426.1" y2="974"/></g><circle cx="1685.3" cy="924.8" r="14" fill="#1B1E25" stroke="#8FB0FF" stroke-width="3" stroke-dasharray="6 5"/><circle cx="1562.3" cy="1026.2" r="14" fill="#1B1E25" stroke="#ECE8E0" stroke-width="3"/><circle cx="1426.1" cy="974" r="14" fill="#1B1E25" stroke="#ECE8E0" stroke-width="3"/><circle cx="1329.5" cy="947.9" r="14" fill="#1B1E25" stroke="#8FB0FF" stroke-width="3" stroke-dasharray="6 5"/><circle cx="1259.3" cy="815.6" r="14" fill="#1B1E25" stroke="#ECE8E0" stroke-width="3"/><circle cx="1370" cy="751.2" r="14" fill="#1B1E25" stroke="#ECE8E0" stroke-width="3"/><circle cx="1529.6" cy="773.2" r="14" fill="#1B1E25" stroke="#ECE8E0" stroke-width="3"/><circle cx="1777.7" cy="845.8" r="14" fill="#1B1E25" stroke="#8FB0FF" stroke-width="3" stroke-dasharray="6 5"/>
+      <text class="t-tag" x="1500" y="688" text-anchor="middle" fill="#AEB4BE" font-family="'Geist Mono', monospace" letter-spacing="2">CLUSTER</text></g>
+<g class="ad-cluster"><ellipse cx="2700" cy="960" rx="380" ry="180" fill="rgba(143,176,255,.05)" stroke="rgba(236,232,224,.4)" stroke-width="3" stroke-dasharray="14 10"/>
+      <g stroke="rgba(236,232,224,.3)" stroke-width="2.5"><line x1="2857.7" y1="977" x2="2433.2" y2="994.7"/><line x1="2850.6" y1="1075.1" x2="2522.8" y2="915"/><line x1="2663.6" y1="1035.1" x2="2534.6" y2="818.6"/><line x1="2433.2" y1="994.7" x2="2837.1" y2="838.8"/><line x1="2522.8" y1="915" x2="2835.1" y2="947.5"/><line x1="2534.6" y1="818.6" x2="2857.7" y2="977"/><line x1="2837.1" y1="838.8" x2="2850.6" y2="1075.1"/><line x1="2835.1" y1="947.5" x2="2663.6" y2="1035.1"/></g><circle cx="2857.7" cy="977" r="14" fill="#1B1E25" stroke="#8FB0FF" stroke-width="3" stroke-dasharray="6 5"/><circle cx="2850.6" cy="1075.1" r="14" fill="#1B1E25" stroke="#8FB0FF" stroke-width="3" stroke-dasharray="6 5"/><circle cx="2663.6" cy="1035.1" r="14" fill="#1B1E25" stroke="#8FB0FF" stroke-width="3" stroke-dasharray="6 5"/><circle cx="2433.2" cy="994.7" r="14" fill="#1B1E25" stroke="#ECE8E0" stroke-width="3"/><circle cx="2522.8" cy="915" r="14" fill="#1B1E25" stroke="#8FB0FF" stroke-width="3" stroke-dasharray="6 5"/><circle cx="2534.6" cy="818.6" r="14" fill="#1B1E25" stroke="#ECE8E0" stroke-width="3"/><circle cx="2837.1" cy="838.8" r="14" fill="#1B1E25" stroke="#ECE8E0" stroke-width="3"/><circle cx="2835.1" cy="947.5" r="14" fill="#1B1E25" stroke="#8FB0FF" stroke-width="3" stroke-dasharray="6 5"/>
+      <text class="t-tag" x="2700" y="758" text-anchor="middle" fill="#AEB4BE" font-family="'Geist Mono', monospace" letter-spacing="2">CLUSTER</text></g>
+<g class="ad-cluster"><ellipse cx="3900" cy="880" rx="330" ry="170" fill="rgba(143,176,255,.05)" stroke="rgba(236,232,224,.4)" stroke-width="3" stroke-dasharray="14 10"/>
+      <g stroke="rgba(236,232,224,.3)" stroke-width="2.5"><line x1="4022" y1="890.7" x2="3650.5" y2="955.7"/><line x1="4034.8" y1="982.8" x2="3635.9" y2="879.2"/><line x1="3814.9" y1="976" x2="3713.9" y2="772.2"/><line x1="3650.5" y1="955.7" x2="3955.5" y2="818.6"/><line x1="3635.9" y1="879.2" x2="4040.3" y2="825.7"/><line x1="3713.9" y1="772.2" x2="4022" y2="890.7"/><line x1="3955.5" y1="818.6" x2="4034.8" y2="982.8"/><line x1="4040.3" y1="825.7" x2="3814.9" y2="976"/></g><circle cx="4022" cy="890.7" r="14" fill="#1B1E25" stroke="#8FB0FF" stroke-width="3" stroke-dasharray="6 5"/><circle cx="4034.8" cy="982.8" r="14" fill="#1B1E25" stroke="#ECE8E0" stroke-width="3"/><circle cx="3814.9" cy="976" r="14" fill="#1B1E25" stroke="#8FB0FF" stroke-width="3" stroke-dasharray="6 5"/><circle cx="3650.5" cy="955.7" r="14" fill="#1B1E25" stroke="#8FB0FF" stroke-width="3" stroke-dasharray="6 5"/><circle cx="3635.9" cy="879.2" r="14" fill="#1B1E25" stroke="#ECE8E0" stroke-width="3"/><circle cx="3713.9" cy="772.2" r="14" fill="#1B1E25" stroke="#8FB0FF" stroke-width="3" stroke-dasharray="6 5"/><circle cx="3955.5" cy="818.6" r="14" fill="#1B1E25" stroke="#ECE8E0" stroke-width="3"/><circle cx="4040.3" cy="825.7" r="14" fill="#1B1E25" stroke="#8FB0FF" stroke-width="3" stroke-dasharray="6 5"/>
+      <text class="t-tag" x="3900" y="688" text-anchor="middle" fill="#AEB4BE" font-family="'Geist Mono', monospace" letter-spacing="2">CLUSTER</text></g></g>
+    <text class="ad-meshword t-big" x="2560" y="-960" text-anchor="middle" fill="#ECE8E0" font-family="Geist, sans-serif" opacity="0">Clusters in many regions, joined into one mesh</text>
+    <line x1="836" y1="152" x2="4350" y2="152" stroke="#8FB0FF" stroke-width="3" stroke-dasharray="10 7"/>
+    <g class="ad-place" data-l="p:transport"><g class="ad-shape"><rect x="1080" y="126" width="340" height="52" rx="26" fill="rgba(143,176,255,.08)" stroke="#ECE8E0" stroke-width="2.5"/>
+    <rect x="1100" y="140" width="300" height="24" rx="12" fill="none" stroke="#ECE8E0" stroke-width="1.5" stroke-dasharray="10 6"/></g>
+      <text class="t-lab" x="1250" y="82" text-anchor="middle" fill="#ECE8E0" font-family="Geist, sans-serif">The transport</text>
+      <text class="t-tag ad-tag" x="1250" y="244" text-anchor="middle" fill="#ECE8E0" font-family="'Geist Mono', monospace" letter-spacing="1.5">✓ NATS WITH JETSTREAM</text></g>
+<g class="ad-place" data-l="p:inboxes"><line x1="1780" y1="152" x2="1780" y2="310" stroke="#8FB0FF" stroke-width="2.5" stroke-dasharray="6 5"/><g class="ad-shape"><path d="M1630 350 h100 l14 22 h72 l14 -22 h100 v100 h-300 z" fill="rgba(236,232,224,.05)" stroke="#ECE8E0" stroke-width="2.5"/>
+    <text class="ad-held t-small" data-l="inbox-held" x="1780" y="430" text-anchor="middle" fill="#ECE8E0" font-family="'Geist Mono', monospace" letter-spacing="1.2">WAITING FOR ITS READER</text></g>
+      <text class="t-lab" x="1780" y="550" text-anchor="middle" fill="#ECE8E0" font-family="Geist, sans-serif">Durable inboxes</text>
+      <text class="t-tag ad-tag" x="1780" y="594" text-anchor="middle" fill="#ECE8E0" font-family="'Geist Mono', monospace" letter-spacing="1.5">✓ WAITS, THEN DELIVERED</text></g>
+<g class="ad-place" data-l="p:files"><line x1="2300" y1="152" x2="2300" y2="-10" stroke="#8FB0FF" stroke-width="2.5" stroke-dasharray="6 5"/><g class="ad-shape"><path d="M2200 -160 v120 a100 26 0 0 0 200 0 v-120" fill="rgba(236,232,224,.05)" stroke="#ECE8E0" stroke-width="2.5"/>
+    <ellipse cx="2300" cy="-160" rx="100" ry="26" fill="none" stroke="#ECE8E0" stroke-width="2.5"/>
+    <text class="t-small" x="2300" y="-70" text-anchor="middle" fill="#AEB4BE" font-family="'Geist Mono', monospace" letter-spacing="1.2">SHARED STORE</text></g>
+      <text class="t-lab" x="2300" y="-250" text-anchor="middle" fill="#ECE8E0" font-family="Geist, sans-serif">Files</text>
+      <text class="t-tag ad-tag" x="2300" y="-206" text-anchor="middle" fill="#ECE8E0" font-family="'Geist Mono', monospace" letter-spacing="1.5">✓ SENT BY REFERENCE</text></g>
+<g class="ad-place" data-l="p:naming"><line x1="2800" y1="152" x2="2800" y2="-10" stroke="#8FB0FF" stroke-width="2.5" stroke-dasharray="6 5"/><g class="ad-shape"><path d="M2800 -178 l74 26 v44 c0 44 -36 70 -74 86 c-38 -16 -74 -42 -74 -86 v-44 z" fill="rgba(236,232,224,.05)" stroke="#ECE8E0" stroke-width="2.5"/>
+    <text class="t-small" x="2800" y="-92" text-anchor="middle" fill="#ECE8E0" font-family="'Geist Mono', monospace" letter-spacing="1">NAME</text></g>
+      <text class="t-lab" x="2800" y="-250" text-anchor="middle" fill="#ECE8E0" font-family="Geist, sans-serif">The naming service</text>
+      <text class="t-tag ad-tag" x="2800" y="-206" text-anchor="middle" fill="#ECE8E0" font-family="'Geist Mono', monospace" letter-spacing="1.5">✓ VERIFIED NAME</text></g>
+<g class="ad-place" data-l="p:registry"><line x1="3220" y1="152" x2="3220" y2="310" stroke="#8FB0FF" stroke-width="2.5" stroke-dasharray="6 5"/><g class="ad-shape"><rect x="3150" y="342" width="150" height="96" rx="10" fill="none" stroke="#AEB4BE" stroke-width="2"/>
+    <rect x="3134" y="356" width="150" height="96" rx="10" fill="#1B1E25" stroke="#ECE8E0" stroke-width="2.5"/>
+    <line x1="3154" y1="384" x2="3250" y2="384" stroke="#ECE8E0" stroke-width="2"/><line x1="3154" y1="408" x2="3264" y2="408" stroke="#AEB4BE" stroke-width="2"/><line x1="3154" y1="430" x2="3234" y2="430" stroke="#AEB4BE" stroke-width="2"/></g>
+      <text class="t-lab" x="3220" y="550" text-anchor="middle" fill="#ECE8E0" font-family="Geist, sans-serif">The registry</text>
+      <text class="t-tag ad-tag" x="3220" y="594" text-anchor="middle" fill="#ECE8E0" font-family="'Geist Mono', monospace" letter-spacing="1.5">✓ CARD PUBLISHED</text></g>
+<g class="ad-place" data-l="p:catalog"><line x1="3640" y1="152" x2="3640" y2="-10" stroke="#8FB0FF" stroke-width="2.5" stroke-dasharray="6 5"/><g class="ad-shape"><rect x="3544" y="-156" width="56" height="50" rx="8" fill="none" stroke="#ECE8E0" stroke-width="2"/><rect x="3544" y="-94" width="56" height="50" rx="8" fill="none" stroke="#ECE8E0" stroke-width="2"/><rect x="3610" y="-156" width="56" height="50" rx="8" fill="rgba(255,138,92,.16)" stroke="#ECE8E0" stroke-width="2"/><rect x="3610" y="-94" width="56" height="50" rx="8" fill="none" stroke="#ECE8E0" stroke-width="2"/><rect x="3676" y="-156" width="56" height="50" rx="8" fill="none" stroke="#ECE8E0" stroke-width="2"/><rect x="3676" y="-94" width="56" height="50" rx="8" fill="none" stroke="#ECE8E0" stroke-width="2"/></g>
+      <text class="t-lab" x="3640" y="-250" text-anchor="middle" fill="#ECE8E0" font-family="Geist, sans-serif">The catalog</text>
+      <text class="t-tag ad-tag" x="3640" y="-206" text-anchor="middle" fill="#ECE8E0" font-family="'Geist Mono', monospace" letter-spacing="1.5">✓ FOUND BY OTHERS</text></g>
+<g class="ad-place" data-l="p:rooms"><line x1="4060" y1="152" x2="4060" y2="310" stroke="#8FB0FF" stroke-width="2.5" stroke-dasharray="6 5"/><g class="ad-shape"><rect x="3940" y="342" width="240" height="116" rx="40" fill="rgba(236,232,224,.05)" stroke="#ECE8E0" stroke-width="2.5"/>
+    <circle cx="4004" cy="400" r="16" fill="none" stroke="#FF8A5C" stroke-width="2.5"/><circle cx="4060" cy="400" r="16" fill="none" stroke="#8FB0FF" stroke-width="2.5" stroke-dasharray="5 4"/><circle cx="4116" cy="400" r="16" fill="none" stroke="#ECE8E0" stroke-width="2.5"/></g>
+      <text class="t-lab" x="4060" y="550" text-anchor="middle" fill="#ECE8E0" font-family="Geist, sans-serif">Rooms</text>
+      <text class="t-tag ad-tag" x="4060" y="594" text-anchor="middle" fill="#ECE8E0" font-family="'Geist Mono', monospace" letter-spacing="1.5">✓ READY TO MEET</text></g>
+    <g class="ad-file" opacity="0"><path d="M2020 -170 h44 l16 16 v64 h-60 z" fill="#1B1E25" stroke="#ECE8E0" stroke-width="2.5"/>
+      <text class="t-small" x="2050" y="-64" text-anchor="middle" fill="#AEB4BE" font-family="'Geist Mono', monospace" letter-spacing="1">A LARGE FILE</text></g>
+    <g class="ad-piece" data-k="0" opacity="0"><rect x="-11" y="-11" width="22" height="22" rx="3" fill="#ECE8E0" stroke="#141007" stroke-width="2"/></g><g class="ad-piece" data-k="1" opacity="0"><rect x="-11" y="-11" width="22" height="22" rx="3" fill="#ECE8E0" stroke="#141007" stroke-width="2"/></g><g class="ad-piece" data-k="2" opacity="0"><rect x="-11" y="-11" width="22" height="22" rx="3" fill="#ECE8E0" stroke="#141007" stroke-width="2"/></g>
+    <g class="ad-agent" data-l="your-agent">
+    <circle class="ad-halo" cx="74" cy="152" r="46" fill="none" stroke="#FF8A5C" stroke-width="2" opacity="0"/>
+    <circle cx="74" cy="152" r="34" fill="none" stroke="#FF8A5C" stroke-width="2.5"/>
+    <circle cx="74" cy="152" r="12" fill="#FF8A5C"/>
+    <text class="t-agent" x="74" y="214" text-anchor="middle" fill="#ECE8E0" font-family="'Geist Mono', monospace" letter-spacing="1.2">YOUR AGENT</text>
+  </g>
+    <g class="ad-plug" data-plug="a">
     <line x1="108" y1="152" x2="176" y2="152" stroke="#FF8A5C" stroke-width="2.5"/>
     <path d="M176 112 h40 v80 h-40" fill="none" stroke="#ECE8E0" stroke-width="2"/>
     <text x="196" y="236" text-anchor="middle" font-size="11" fill="#AEB4BE" font-family="'Geist Mono', monospace" letter-spacing="1">SOCKET</text>
     <rect x="240" y="60" width="542" height="180" rx="20" fill="rgba(236,232,224,.04)" stroke="#ECE8E0" stroke-width="2.5"/>
-    <text x="258" y="84" font-size="11" fill="#AEB4BE" font-family="'Geist Mono', monospace" letter-spacing="1.2">INSIDE THE PLUG</text>
-    <g class="ad-cell" data-c="presence"><circle cx="756" cy="78" r="6" fill="none" stroke="#ECE8E0" stroke-width="2"/><circle class="ad-lamp" cx="756" cy="78" r="2.5" fill="#ECE8E0"/></g>
+    <text x="258" y="84" text-anchor="start" font-size="11" fill="#AEB4BE" font-family="'Geist Mono', monospace" letter-spacing="1.2">INSIDE THE PLUG</text>
+    <g class="ad-cell" data-l="a:presence"><circle cx="756" cy="78" r="6" fill="none" stroke="#ECE8E0" stroke-width="2"/><circle class="ad-lamp" cx="756" cy="78" r="2.5" fill="#ECE8E0"/></g>
     <text x="744" y="82" text-anchor="end" font-size="11" fill="#AEB4BE" font-family="'Geist Mono', monospace" letter-spacing="1">PRESENCE</text>
-    <g class="ad-cell" data-c="identity"><rect x="262" y="92" width="158" height="58" rx="10" fill="none" stroke="var(--st-fg, #ECE8E0)" stroke-width="1.5"/>
+    <g class="ad-cell" data-l="a:identity"><rect x="262" y="92" width="158" height="58" rx="10" fill="none" stroke="#ECE8E0" stroke-width="1.5"/>
       <text x="341" y="117" text-anchor="middle" font-size="15" fill="#ECE8E0" font-family="Geist, sans-serif">Identity</text>
       <text x="341" y="136" text-anchor="middle" font-size="11" fill="#AEB4BE" font-family="'Geist Mono', monospace" letter-spacing="1">THE GROUND PIN</text></g>
-<g class="ad-cell" data-c="inbox"><rect x="432" y="92" width="158" height="58" rx="10" fill="none" stroke="var(--st-fg, #ECE8E0)" stroke-width="1.5"/>
+<g class="ad-cell" data-l="a:inbox"><rect x="432" y="92" width="158" height="58" rx="10" fill="none" stroke="#ECE8E0" stroke-width="1.5"/>
       <text x="511" y="117" text-anchor="middle" font-size="15" fill="#ECE8E0" font-family="Geist, sans-serif">Inbox</text>
       <text x="511" y="136" text-anchor="middle" font-size="11" fill="#AEB4BE" font-family="'Geist Mono', monospace" letter-spacing="1">THE COILED CABLE</text></g>
-<g class="ad-cell" data-c="admission"><rect x="602" y="92" width="158" height="58" rx="10" fill="none" stroke="var(--st-fg, #ECE8E0)" stroke-width="1.5"/>
+<g class="ad-cell" data-l="a:admission"><rect x="602" y="92" width="158" height="58" rx="10" fill="none" stroke="#ECE8E0" stroke-width="1.5"/>
       <text x="681" y="117" text-anchor="middle" font-size="15" fill="#ECE8E0" font-family="Geist, sans-serif">Admission</text>
       <text x="681" y="136" text-anchor="middle" font-size="11" fill="#AEB4BE" font-family="'Geist Mono', monospace" letter-spacing="1">THE CIRCUIT BREAKER</text></g>
-<g class="ad-cell" data-c="allowances"><rect x="262" y="162" width="158" height="58" rx="10" fill="none" stroke="var(--st-fg, #ECE8E0)" stroke-width="1.5"/>
+<g class="ad-cell" data-l="a:allowances"><rect x="262" y="162" width="158" height="58" rx="10" fill="none" stroke="#ECE8E0" stroke-width="1.5"/>
       <text x="341" y="187" text-anchor="middle" font-size="15" fill="#ECE8E0" font-family="Geist, sans-serif">Allowances</text>
       <text x="341" y="206" text-anchor="middle" font-size="11" fill="#AEB4BE" font-family="'Geist Mono', monospace" letter-spacing="1">THE FUSE</text></g>
-<g class="ad-cell" data-c="sealing"><rect x="432" y="162" width="158" height="58" rx="10" fill="none" stroke="var(--st-fg, #ECE8E0)" stroke-width="1.5"/>
+<g class="ad-cell" data-l="a:sealing"><rect x="432" y="162" width="158" height="58" rx="10" fill="none" stroke="#ECE8E0" stroke-width="1.5"/>
       <text x="511" y="187" text-anchor="middle" font-size="15" fill="#ECE8E0" font-family="Geist, sans-serif">Sealing</text>
       <text x="511" y="206" text-anchor="middle" font-size="11" fill="#AEB4BE" font-family="'Geist Mono', monospace" letter-spacing="1">THE INSULATION</text></g>
-<g class="ad-cell" data-c="files-rooms"><rect x="602" y="162" width="158" height="58" rx="10" fill="none" stroke="var(--st-fg, #ECE8E0)" stroke-width="1.5"/>
+<g class="ad-cell" data-l="a:files-rooms"><rect x="602" y="162" width="158" height="58" rx="10" fill="none" stroke="#ECE8E0" stroke-width="1.5"/>
       <text x="681" y="187" text-anchor="middle" font-size="15" fill="#ECE8E0" font-family="Geist, sans-serif">Files and rooms</text>
       <text x="681" y="206" text-anchor="middle" font-size="11" fill="#AEB4BE" font-family="'Geist Mono', monospace" letter-spacing="1">THE EXTRA CONTACTS</text></g>
-    <g class="ad-cell" data-c="connection"><rect x="782" y="118" width="54" height="16" rx="3" fill="#ECE8E0"/><rect x="782" y="170" width="54" height="16" rx="3" fill="#ECE8E0"/></g>
+    <g class="ad-cell ad-prongs" data-l="a:connection"><rect x="782" y="118" width="54" height="16" rx="3" fill="#ECE8E0"/><rect x="782" y="170" width="54" height="16" rx="3" fill="#ECE8E0"/></g>
     <text x="822" y="264" text-anchor="middle" font-size="11" fill="#AEB4BE" font-family="'Geist Mono', monospace" letter-spacing="1">ONE WAY OUT</text>
-    <g stroke="#8FB0FF" stroke-width="2" stroke-dasharray="5 4" fill="none"><line x1="836" y1="152" x2="886" y2="152"/></g>
-    <g fill="none" stroke="#8FB0FF" stroke-width="2"><circle cx="922" cy="152" r="30"/><circle cx="922" cy="152" r="52" stroke-dasharray="3 5"/></g>
-    <text x="922" y="157" text-anchor="middle" font-size="12" fill="#ECE8E0" font-family="'Geist Mono', monospace" letter-spacing="1.2">MESH</text>
-    <g class="ad-arrive" opacity="0" font-family="'Geist Mono', monospace" font-size="11" letter-spacing="1" fill="#ECE8E0" text-anchor="middle">
-      <text x="922" y="84">✓ VERIFIED NAME</text><text x="922" y="228">✓ CARD PUBLISHED</text>
+  </g>
+    <g class="ad-plug" data-plug="b">
+    <line x1="5078" y1="152" x2="5010" y2="152" stroke="#8FB0FF" stroke-width="2.5" stroke-dasharray="6 4"/>
+    <path d="M5010 112 h-40 v80 h40" fill="none" stroke="#ECE8E0" stroke-width="2"/>
+    <text x="4990" y="236" text-anchor="middle" font-size="11" fill="#AEB4BE" font-family="'Geist Mono', monospace" letter-spacing="1">SOCKET</text>
+    <rect x="4404" y="60" width="542" height="180" rx="20" fill="rgba(236,232,224,.04)" stroke="#ECE8E0" stroke-width="2.5" stroke-dasharray="9 6"/>
+    <text x="4928" y="84" text-anchor="end" font-size="11" fill="#AEB4BE" font-family="'Geist Mono', monospace" letter-spacing="1.2">THEIR PLUG</text>
+    <g class="ad-cell" data-l="b:presence"><circle cx="4430" cy="78" r="6" fill="none" stroke="#ECE8E0" stroke-width="2"/><circle class="ad-lamp" cx="4430" cy="78" r="2.5" fill="#ECE8E0"/></g>
+    <text x="4442" y="82" text-anchor="start" font-size="11" fill="#AEB4BE" font-family="'Geist Mono', monospace" letter-spacing="1">PRESENCE</text>
+    <g class="ad-cell" data-l="b:identity"><rect x="4766" y="92" width="158" height="58" rx="10" fill="none" stroke="#ECE8E0" stroke-width="1.5"/>
+      <text x="4845" y="117" text-anchor="middle" font-size="15" fill="#ECE8E0" font-family="Geist, sans-serif">Identity</text>
+      <text x="4845" y="136" text-anchor="middle" font-size="11" fill="#AEB4BE" font-family="'Geist Mono', monospace" letter-spacing="1">THE GROUND PIN</text></g>
+<g class="ad-cell" data-l="b:inbox"><rect x="4596" y="92" width="158" height="58" rx="10" fill="none" stroke="#ECE8E0" stroke-width="1.5"/>
+      <text x="4675" y="117" text-anchor="middle" font-size="15" fill="#ECE8E0" font-family="Geist, sans-serif">Inbox</text>
+      <text x="4675" y="136" text-anchor="middle" font-size="11" fill="#AEB4BE" font-family="'Geist Mono', monospace" letter-spacing="1">THE COILED CABLE</text></g>
+<g class="ad-cell" data-l="b:admission"><rect x="4426" y="92" width="158" height="58" rx="10" fill="none" stroke="#ECE8E0" stroke-width="1.5"/>
+      <text x="4505" y="117" text-anchor="middle" font-size="15" fill="#ECE8E0" font-family="Geist, sans-serif">Admission</text>
+      <text x="4505" y="136" text-anchor="middle" font-size="11" fill="#AEB4BE" font-family="'Geist Mono', monospace" letter-spacing="1">THE CIRCUIT BREAKER</text></g>
+<g class="ad-cell" data-l="b:allowances"><rect x="4766" y="162" width="158" height="58" rx="10" fill="none" stroke="#ECE8E0" stroke-width="1.5"/>
+      <text x="4845" y="187" text-anchor="middle" font-size="15" fill="#ECE8E0" font-family="Geist, sans-serif">Allowances</text>
+      <text x="4845" y="206" text-anchor="middle" font-size="11" fill="#AEB4BE" font-family="'Geist Mono', monospace" letter-spacing="1">THE FUSE</text></g>
+<g class="ad-cell" data-l="b:sealing"><rect x="4596" y="162" width="158" height="58" rx="10" fill="none" stroke="#ECE8E0" stroke-width="1.5"/>
+      <text x="4675" y="187" text-anchor="middle" font-size="15" fill="#ECE8E0" font-family="Geist, sans-serif">Sealing</text>
+      <text x="4675" y="206" text-anchor="middle" font-size="11" fill="#AEB4BE" font-family="'Geist Mono', monospace" letter-spacing="1">THE INSULATION</text></g>
+<g class="ad-cell" data-l="b:files-rooms"><rect x="4426" y="162" width="158" height="58" rx="10" fill="none" stroke="#ECE8E0" stroke-width="1.5"/>
+      <text x="4505" y="187" text-anchor="middle" font-size="15" fill="#ECE8E0" font-family="Geist, sans-serif">Files and rooms</text>
+      <text x="4505" y="206" text-anchor="middle" font-size="11" fill="#AEB4BE" font-family="'Geist Mono', monospace" letter-spacing="1">THE EXTRA CONTACTS</text></g>
+    <g class="ad-cell ad-prongs" data-l="b:connection"><rect x="4350" y="118" width="54" height="16" rx="3" fill="#ECE8E0"/><rect x="4350" y="170" width="54" height="16" rx="3" fill="#ECE8E0"/></g>
+    <text x="4364" y="264" text-anchor="middle" font-size="11" fill="#AEB4BE" font-family="'Geist Mono', monospace" letter-spacing="1">ONE WAY OUT</text>
+  </g>
+    <text class="ad-allowed" data-l="b-allowed" x="4505" y="258" text-anchor="middle" font-size="13" fill="#ECE8E0" font-family="'Geist Mono', monospace" letter-spacing="1.2">✓ ALLOWED IN</text>
+    <g class="ad-agent theirs" data-l="their-agent">
+    <circle class="ad-halo" cx="5112" cy="152" r="46" fill="none" stroke="#8FB0FF" stroke-width="2" opacity="0"/>
+    <circle cx="5112" cy="152" r="34" fill="none" stroke="#8FB0FF" stroke-width="2.5" stroke-dasharray="7 5"/>
+    <circle cx="5112" cy="152" r="12" fill="#8FB0FF"/>
+    <text class="t-agent" x="5112" y="214" text-anchor="middle" fill="#ECE8E0" font-family="'Geist Mono', monospace" letter-spacing="1.2">ANOTHER COMPANY'S AGENT</text>
+  </g>
+    <g class="ad-run">
+    <g stroke="#8FB0FF" stroke-width="2.5" stroke-dasharray="7 6" fill="none">
+      <path d="M2450 1780 C2530 1780 2540 1560 2638 1560"/><path d="M2778 1560 C2860 1560 2940 1780 3020 1780"/><path d="M2450 1780 C2530 1780 2540 1780 2638 1780"/><path d="M2778 1780 C2860 1780 2940 1780 3020 1780"/><path d="M2450 1780 C2530 1780 2540 2000 2638 2000"/><path d="M2778 2000 C2860 2000 2940 1780 3020 1780"/>
     </g>
-    <g class="ad-dot" style="transform:translate(74px,152px)"><circle r="9" fill="#FF8A5C" stroke="#141007" stroke-width="2"/><rect x="-4" y="-3" width="8" height="6" rx="1" fill="#141007"/></g>
-  </svg>
+    <g data-l="runner" class="ad-box"><path d="M2310 1780 l35 -60 h70 l35 60 l-35 60 h-70 z" fill="#1B1E25" stroke="#ECE8E0" stroke-width="3"/>
+      <text class="t-small" x="2380" y="1786" text-anchor="middle" fill="#ECE8E0" font-family="'Geist Mono', monospace" letter-spacing="1">RUNNER</text></g>
+    <text class="t-lab" x="2380" y="1890" text-anchor="middle" fill="#ECE8E0" font-family="Geist, sans-serif">The process runner</text>
+    <g><rect x="2654" y="1544" width="36" height="32" rx="6" fill="none" stroke="#ECE8E0" stroke-width="2.5"/><rect x="2638" y="1550" width="16" height="6" rx="2" fill="#ECE8E0"/><rect x="2638" y="1564" width="16" height="6" rx="2" fill="#ECE8E0"/><line x1="2690" y1="1560" x2="2704" y2="1560" stroke="#ECE8E0" stroke-width="2.5"/></g><g class="ad-agent" data-l="b6:0">
+    <circle class="ad-halo" cx="2740" cy="1560" r="48" fill="none" stroke="#FF8A5C" stroke-width="2" opacity="0"/>
+    <circle cx="2740" cy="1560" r="36" fill="none" stroke="#FF8A5C" stroke-width="2.5"/>
+    <circle cx="2740" cy="1560" r="13" fill="#FF8A5C"/>
+    <text class="t-agent" x="2740" y="1504" text-anchor="middle" fill="#ECE8E0" font-family="'Geist Mono', monospace" letter-spacing="1.2">YOUR AGENT</text>
+  </g>
+<g><rect x="2654" y="1764" width="36" height="32" rx="6" fill="none" stroke="#ECE8E0" stroke-width="2.5"/><rect x="2638" y="1770" width="16" height="6" rx="2" fill="#ECE8E0"/><rect x="2638" y="1784" width="16" height="6" rx="2" fill="#ECE8E0"/><line x1="2690" y1="1780" x2="2704" y2="1780" stroke="#ECE8E0" stroke-width="2.5"/></g><g class="ad-agent" data-l="b6:1">
+    <circle class="ad-halo" cx="2740" cy="1780" r="48" fill="none" stroke="#FF8A5C" stroke-width="2" opacity="0"/>
+    <circle cx="2740" cy="1780" r="36" fill="none" stroke="#FF8A5C" stroke-width="2.5"/>
+    <circle cx="2740" cy="1780" r="13" fill="#FF8A5C"/>
+    <text class="t-agent" x="2740" y="1724" text-anchor="middle" fill="#ECE8E0" font-family="'Geist Mono', monospace" letter-spacing="1.2">YOUR OTHER AGENT</text>
+  </g>
+<g><rect x="2654" y="1984" width="36" height="32" rx="6" fill="none" stroke="#ECE8E0" stroke-width="2.5" stroke-dasharray="6 4"/><rect x="2638" y="1990" width="16" height="6" rx="2" fill="#ECE8E0"/><rect x="2638" y="2004" width="16" height="6" rx="2" fill="#ECE8E0"/><line x1="2690" y1="2000" x2="2704" y2="2000" stroke="#ECE8E0" stroke-width="2.5"/></g><g class="ad-agent theirs" data-l="b6:2">
+    <circle class="ad-halo" cx="2740" cy="2000" r="48" fill="none" stroke="#8FB0FF" stroke-width="2" opacity="0"/>
+    <circle cx="2740" cy="2000" r="36" fill="none" stroke="#8FB0FF" stroke-width="2.5" stroke-dasharray="7 5"/>
+    <circle cx="2740" cy="2000" r="13" fill="#8FB0FF"/>
+    <text class="t-agent" x="2740" y="1944" text-anchor="middle" fill="#ECE8E0" font-family="'Geist Mono', monospace" letter-spacing="1.2">A PARTNER'S BUSINESS AGENT</text>
+  </g>
+    <g data-l="result" class="ad-box"><rect x="3020" y="1730" width="180" height="100" rx="14" fill="#1B1E25" stroke="#ECE8E0" stroke-width="3"/>
+      <text class="t-small" x="3110" y="1786" text-anchor="middle" fill="#ECE8E0" font-family="'Geist Mono', monospace" letter-spacing="1">ONE RESULT</text>
+      <text class="t-tag ad-tag" x="3110" y="1876" text-anchor="middle" fill="#ECE8E0" font-family="'Geist Mono', monospace" letter-spacing="1.5">✓ BACK TOGETHER</text></g>
+    <g class="ad-work" data-k="0" opacity="0"><rect x="-13" y="-13" width="26" height="26" rx="5" fill="#FF8A5C" stroke="#141007" stroke-width="2.5"/></g><g class="ad-work" data-k="1" opacity="0"><rect x="-13" y="-13" width="26" height="26" rx="5" fill="#FF8A5C" stroke="#141007" stroke-width="2.5"/></g><g class="ad-work" data-k="2" opacity="0"><rect x="-13" y="-13" width="26" height="26" rx="5" fill="#FF8A5C" stroke="#141007" stroke-width="2.5"/></g>
+  </g>
+    <g class="ad-dot" style="transform:translate(74px,152px)"><circle r="9" fill="#FF8A5C" stroke="#141007" stroke-width="2"/><rect x="-4" y="-3" width="8" height="6" rx="1" fill="#141007"/>
+      <g class="ad-ref" opacity="0"><rect x="12" y="-34" width="52" height="22" rx="5" fill="#141007" stroke="#ECE8E0" stroke-width="1.5"/><text x="38" y="-18.5" text-anchor="middle" font-size="11" fill="#ECE8E0" font-family="'Geist Mono', monospace" letter-spacing="1">REF</text></g></g>
+  </g></svg>
+        <svg class="ad-globe" viewBox="0 12 640 520" aria-hidden="true" focusable="false"><defs><radialGradient id="ad-glow" cx="42%" cy="38%" r="60%"><stop offset="0" stop-color="rgba(236,232,224,0.07)"/><stop offset=".6" stop-color="rgba(124,147,255,0.05)"/><stop offset="1" stop-color="rgba(0,0,0,0)"/></radialGradient></defs></svg>
+      </div>
       <div class="ad-cap">
-        <div><p class="ad-lead"></p><p class="ad-say"><b class="n"></b> <span class="mt"></span> <span class="t"></span></p></div>
-        <button class="ad-pause" type="button">Pause</button>
+        <div><p class="ad-lead"><span class="ad-num"></span> <span class="ad-says"></span></p><p class="ad-say"><b class="n"></b> <span class="mt"></span> <span class="t"></span></p></div>
+        <button class="ad-pause" type="button" aria-label="Pause the animation">Pause</button>
       </div>
     </div>
     <script>
-    (() => {
-      const W = [{"x":74,"y":152,"id":null,"lead":"Your agent sends a message.","name":"","metaphor":"","line":"Nothing about the agent changes: it plugs in as it is."},{"x":196,"y":152,"id":"local-interface","lead":"It enters through the socket.","name":"A private local interface","metaphor":"the socket's contacts","line":"A socket only your own machine can open, protected by a token. The command line, the MCP tools and whatever you build all speak through it."},{"id":"inbox","x":446,"y":121,"lead":"Held in the inbox.","name":"Inbox","metaphor":"the coiled cable","line":"A store-and-forward mailbox. Messages that arrive while the agent is busy, offline or restarting wait for it, and the sender is told they were delivered."},{"id":"admission","x":616,"y":121,"lead":"Checked by admission.","name":"Admission","metaphor":"the circuit breaker","line":"Decides who gets through: allow, hold or block, with a limit for each sender. A held stranger never wakes the agent, and an agent without a verified name cannot send at all."},{"id":"allowances","x":276,"y":191,"lead":"Kept within its allowance.","name":"Allowances","metaphor":"the fuse","line":"Caps what the agent may spend on its own work, whatever anyone asks of it."},{"id":"identity","x":276,"y":121,"lead":"Signed with its own key.","name":"Identity","metaphor":"the ground pin","line":"The agent's own key signs every message it sends. Its name is tied to its owner's email or domain, and its card is a signed description of what it does, so everyone knows who is on the line."},{"id":"sealing","x":446,"y":191,"lead":"Sealed for its reader.","name":"Sealing","metaphor":"the insulation","line":"Messages are sealed to the recipient's key, so only the recipient can read them."},{"x":809,"y":152,"id":"connection","lead":"Out through the one way out.","name":"One outbound connection","metaphor":"the prongs","line":"The adapter dials out and stays on the line. There is no public address and no inbound firewall rule: nothing is exposed."},{"x":890,"y":152,"id":"presence","lead":"On the mesh.","name":"Registration and presence","metaphor":"the indicator light","line":"Tells the network the agent is up and publishes its card. If the agent goes silent, its registration lapses on its own, so the network never claims a dead agent is there."}];
-      const fig = document.querySelector(".ad-fig");
-      const dot = fig.querySelector(".ad-dot"), arrive = fig.querySelector(".ad-arrive");
-      const cells = [...fig.querySelectorAll(".ad-cell")];
-      const lead = fig.querySelector(".ad-lead"), n = fig.querySelector(".n"), mt = fig.querySelector(".mt"), t = fig.querySelector(".t");
-      const btn = fig.querySelector(".ad-pause");
-      let i = 0, paused = false, timer = null;
-      const show = (k) => {
-        const s = W[k];
-        dot.style.transform = "translate(" + s.x + "px," + s.y + "px)";
-        cells.forEach((c) => c.classList.toggle("on", c.dataset.c === s.id));
-        arrive.setAttribute("opacity", k === W.length - 1 ? "1" : "0");
-        lead.textContent = s.lead; n.textContent = s.name; mt.textContent = s.metaphor ? "(" + s.metaphor + ")" : ""; t.textContent = s.line;
-      };
-      const wait = (k) => (k === W.length - 1 ? 4600 : k === 0 ? 2400 : 2800);
-      const tick = () => { if (paused) return; i = (i + 1) % W.length; show(i); timer = setTimeout(tick, wait(i)); };
-      const still = matchMedia("(prefers-reduced-motion: reduce)").matches;
-      if (still) { i = W.length - 1; show(i); paused = true; btn.textContent = "Play"; }
-      else { show(0); timer = setTimeout(tick, wait(0)); }
-      btn.addEventListener("click", () => {
-        paused = !paused; btn.textContent = paused ? "Play" : "Pause";
-        clearTimeout(timer); if (!paused) timer = setTimeout(tick, 600);
+    const FLIGHT = {"T":74.2,"GLOBE":67.9,"total":7,"cam":[{"t":0,"cx":74,"cy":152,"w":250,"h":190},{"t":4.6,"cx":90,"cy":152,"w":280,"h":210},{"t":6.6,"cx":330,"cy":152,"w":640,"h":340},{"t":7.6,"cx":236,"cy":152,"w":400,"h":250},{"t":9.9,"cx":486,"cy":121,"w":400,"h":250},{"t":12.2,"cx":656,"cy":121,"w":400,"h":250},{"t":14.5,"cx":316,"cy":191,"w":400,"h":250},{"t":16.8,"cx":316,"cy":121,"w":400,"h":250},{"t":19.1,"cx":796,"cy":120,"w":400,"h":250},{"t":21.4,"cx":869,"cy":160,"w":520,"h":340},{"t":23.5,"cx":2560,"cy":130,"w":4400,"h":2500},{"t":25,"cx":2560,"cy":130,"w":4400,"h":2500},{"t":26.6,"cx":1310,"cy":170,"w":980,"h":720},{"t":30.2,"cx":1840,"cy":250,"w":980,"h":720},{"t":34.6,"cx":2340,"cy":60,"w":980,"h":720},{"t":39.1,"cx":2860,"cy":60,"w":980,"h":720},{"t":41.8,"cx":3280,"cy":250,"w":980,"h":720},{"t":44.5,"cx":3700,"cy":60,"w":980,"h":720},{"t":47.2,"cx":4120,"cy":250,"w":980,"h":720},{"t":50,"cx":4337,"cy":160,"w":520,"h":340},{"t":51.8,"cx":4550,"cy":150,"w":430,"h":270},{"t":54.8,"cx":5042,"cy":152,"w":620,"h":340},{"t":58.4,"cx":2900,"cy":650,"w":5200,"h":2600},{"t":59.8,"cx":2720,"cy":1780,"w":1110,"h":720},{"t":66.8,"cx":2720,"cy":1780,"w":1120,"h":740},{"t":69.8,"cx":2600,"cy":600,"w":140000,"h":80000}],"dot":[{"t":0,"x":74,"y":152},{"t":6.8,"x":74,"y":152},{"t":7.6,"x":196,"y":152},{"t":9.1,"x":196,"y":152},{"t":9.9,"x":446,"y":121},{"t":11.4,"x":446,"y":121},{"t":12.2,"x":616,"y":121},{"t":13.7,"x":616,"y":121},{"t":14.5,"x":276,"y":191},{"t":16,"x":276,"y":191},{"t":16.8,"x":276,"y":121},{"t":18.3,"x":276,"y":121},{"t":19.1,"x":756,"y":78},{"t":20.6,"x":756,"y":78},{"t":21.4,"x":809,"y":152},{"t":23.2,"x":809,"y":152},{"t":26.6,"x":1250,"y":152},{"t":29.2,"x":1250,"y":152},{"t":30.2,"x":1780,"y":152},{"t":30.8,"x":1780,"y":392},{"t":32.8,"x":1780,"y":392},{"t":33.4,"x":1780,"y":152},{"t":34.6,"x":2240,"y":152},{"t":38,"x":2240,"y":152},{"t":39.1,"x":2800,"y":152},{"t":40.7,"x":2800,"y":152},{"t":41.8,"x":3220,"y":152},{"t":43.4,"x":3220,"y":152},{"t":44.5,"x":3640,"y":152},{"t":46.1,"x":3640,"y":152},{"t":47.2,"x":4060,"y":152},{"t":48.8,"x":4060,"y":152},{"t":50,"x":4377,"y":152},{"t":51,"x":4377,"y":152},{"t":51.8,"x":4570,"y":121},{"t":53.8,"x":4570,"y":121},{"t":54.8,"x":5112,"y":152}],"tw":[{"sel":"[data-plug=\"a\"]","kind":"x","keys":[{"t":0,"v":300},{"t":5,"v":300},{"t":6.4,"v":0}]},{"sel":"[data-plug=\"a\"]","kind":"op","keys":[{"t":0,"v":0},{"t":5,"v":0},{"t":5.9,"v":1}]},{"sel":".ad-dot","kind":"op","keys":[{"t":0,"v":0},{"t":6.4,"v":0},{"t":6.8,"v":1},{"t":56.2,"v":1},{"t":56.6,"v":0}]},{"sel":".ad-meshword","kind":"op","keys":[{"t":0,"v":0},{"t":23.200000000000003,"v":0},{"t":23.700000000000003,"v":1},{"t":25,"v":1},{"t":25.5,"v":0}]},{"sel":".ad-piece[data-k=\"0\"]","kind":"xy","keys":[{"t":0,"v":[2050,-130]},{"t":34.699999999999996,"v":[2050,-130]},{"t":35.8,"v":[2270,-120]}]},{"sel":".ad-piece[data-k=\"0\"]","kind":"op","keys":[{"t":0,"v":0},{"t":34.49999999999999,"v":0},{"t":34.699999999999996,"v":1},{"t":35.8,"v":1},{"t":36.199999999999996,"v":0}]},{"sel":".ad-piece[data-k=\"1\"]","kind":"xy","keys":[{"t":0,"v":[2050,-130]},{"t":35.05,"v":[2050,-130]},{"t":36.15,"v":[2300,-120]}]},{"sel":".ad-piece[data-k=\"1\"]","kind":"op","keys":[{"t":0,"v":0},{"t":34.49999999999999,"v":0},{"t":34.699999999999996,"v":1},{"t":36.15,"v":1},{"t":36.55,"v":0}]},{"sel":".ad-piece[data-k=\"2\"]","kind":"xy","keys":[{"t":0,"v":[2050,-130]},{"t":35.4,"v":[2050,-130]},{"t":36.5,"v":[2330,-120]}]},{"sel":".ad-piece[data-k=\"2\"]","kind":"op","keys":[{"t":0,"v":0},{"t":34.49999999999999,"v":0},{"t":34.699999999999996,"v":1},{"t":36.5,"v":1},{"t":36.9,"v":0}]},{"sel":".ad-file","kind":"op","keys":[{"t":0,"v":0},{"t":34.099999999999994,"v":0},{"t":34.49999999999999,"v":1},{"t":36.699999999999996,"v":1},{"t":37.099999999999994,"v":0.25}]},{"sel":".ad-ref","kind":"op","keys":[{"t":0,"v":0},{"t":36.9,"v":0},{"t":37.199999999999996,"v":1}]},{"sel":".ad-work[data-k=\"0\"]","kind":"xy","keys":[{"t":0,"v":[2380,1780]},{"t":60.20000000000001,"v":[2380,1780]},{"t":61.50000000000001,"v":[2690,1560]},{"t":62.80000000000001,"v":[2690,1560]},{"t":64.10000000000001,"v":[3110,1780]}]},{"sel":".ad-work[data-k=\"0\"]","kind":"op","keys":[{"t":0,"v":0},{"t":60.10000000000001,"v":0},{"t":60.30000000000001,"v":1},{"t":64.10000000000001,"v":1},{"t":64.4,"v":0}]},{"sel":".ad-work[data-k=\"1\"]","kind":"xy","keys":[{"t":0,"v":[2380,1780]},{"t":60.45000000000001,"v":[2380,1780]},{"t":61.75000000000001,"v":[2690,1780]},{"t":63.05000000000001,"v":[2690,1780]},{"t":64.35000000000001,"v":[3110,1780]}]},{"sel":".ad-work[data-k=\"1\"]","kind":"op","keys":[{"t":0,"v":0},{"t":60.10000000000001,"v":0},{"t":60.30000000000001,"v":1},{"t":64.35000000000001,"v":1},{"t":64.65,"v":0}]},{"sel":".ad-work[data-k=\"2\"]","kind":"xy","keys":[{"t":0,"v":[2380,1780]},{"t":60.70000000000001,"v":[2380,1780]},{"t":62.00000000000001,"v":[2690,2000]},{"t":63.30000000000001,"v":[2690,2000]},{"t":64.60000000000001,"v":[3110,1780]}]},{"sel":".ad-work[data-k=\"2\"]","kind":"op","keys":[{"t":0,"v":0},{"t":60.10000000000001,"v":0},{"t":60.30000000000001,"v":1},{"t":64.60000000000001,"v":1},{"t":64.9,"v":0}]},{"sel":".ad-w","kind":"op","keys":[{"t":0,"v":1},{"t":68.2,"v":1},{"t":69.2,"v":0}]}],"lights":[{"key":"a:local-interface","t0":7.5,"t1":9.1},{"key":"a:inbox","t0":9.8,"t1":11.4},{"key":"a:admission","t0":12.1,"t1":13.7},{"key":"a:allowances","t0":14.4,"t1":16},{"key":"a:identity","t0":16.7,"t1":18.3},{"key":"a:presence","t0":19,"t1":20.6},{"key":"a:connection","t0":21.3,"t1":23.2},{"key":"p:transport","t0":26.5,"t1":56.6},{"key":"p:inboxes","t0":30.7,"t1":56.6},{"key":"inbox-held","t0":30.8,"t1":32.8},{"key":"p:files","t0":34.5,"t1":56.6},{"key":"p:naming","t0":39,"t1":56.6},{"key":"p:registry","t0":41.7,"t1":56.6},{"key":"p:catalog","t0":44.4,"t1":56.6},{"key":"p:rooms","t0":47.1,"t1":56.6},{"key":"b:connection","t0":49.9,"t1":51.4},{"key":"b:admission","t0":51.7,"t1":54.2},{"key":"b-allowed","t0":52,"t1":56.4},{"key":"their-agent","t0":54.8,"t1":56.6},{"key":"runner","t0":60,"t1":65.4},{"key":"b6:0","t0":61.5,"t1":62.9},{"key":"b6:1","t0":61.8,"t1":63.2},{"key":"b6:2","t0":62,"t1":63.4},{"key":"result","t0":64.5,"t1":66.6}],"beats":[{"t0":0,"t1":5,"n":1,"says":"Every agent starts out alone. It can do what its owner gave it, and nothing more."},{"t0":5,"t1":20.6,"n":2,"says":"The adapter is a plug. A message passes through its inbox, its breaker and its fuse, and leaves signed with the agent's own key."},{"t0":20.6,"t1":38,"n":3,"says":"It dials out, so nothing is exposed. Underneath, the mesh carries every message, keeps it until it can be delivered, and moves files beside it."},{"t0":38,"t1":48.8,"n":4,"says":"On the mesh, the agent gets a verified name, a card others can find, and rooms where agents meet."},{"t0":48.8,"t1":56.6,"n":5,"says":"At the other end, another company's agent has the same plug. Its owner decides who gets through."},{"t0":56.6,"t1":66.6,"n":6,"says":"Now agents contract agents. One piece of work moves across three of them, across two companies, and comes back together."},{"t0":66.6,"t1":74.2,"n":7,"says":"Plug in once, and your agent can do what the whole network can. The network is the agent."}],"subs":[{"t0":7.5,"t1":9.1,"name":"A private local interface","metaphor":"the socket's contacts","line":"A socket only your own machine can open, protected by a token. The command line, the MCP tools and whatever you build all speak through it."},{"t0":9.8,"t1":11.4,"name":"Inbox","metaphor":"the coiled cable","line":"A store-and-forward mailbox. Messages that arrive while the agent is busy, offline or restarting wait for it, and the sender is told they were delivered."},{"t0":12.1,"t1":13.7,"name":"Admission","metaphor":"the circuit breaker","line":"Decides who gets through: allow, hold or block, with a limit for each sender. A held stranger never wakes the agent, and an agent without a verified name cannot send at all."},{"t0":14.4,"t1":16,"name":"Allowances","metaphor":"the fuse","line":"Caps what the agent may spend on its own work, whatever anyone asks of it."},{"t0":16.7,"t1":18.3,"name":"Identity","metaphor":"the ground pin","line":"The agent's own key signs every message it sends. Its name is tied to its owner's email or domain, and its card is a signed description of what it does, so everyone knows who is on the line."},{"t0":19,"t1":20.6,"name":"Registration and presence","metaphor":"the indicator light","line":"Tells the network the agent is up and publishes its card. If the agent goes silent, its registration lapses on its own, so the network never claims a dead agent is there."},{"t0":21.3,"t1":23.2,"name":"One outbound connection","metaphor":"the prongs","line":"The adapter dials out and stays on the line. There is no public address and no inbound firewall rule: nothing is exposed."},{"t0":26.5,"t1":29.2,"name":"The transport","metaphor":"","line":"AgentMesh runs on NATS with JetStream: messaging built to scale out across clusters and regions, joined into one mesh."},{"t0":30.6,"t1":34.2,"name":"Durable inboxes","metaphor":"","line":"Every agent's mail is stored and forwarded, so a message waits for an agent that is busy or offline, and is delivered when it is back."},{"t0":34.4,"t1":38,"name":"Files","metaphor":"","line":"Files travel as pieces in a shared store beside the messages. A large one is uploaded directly, and the message carries only a reference to it."},{"t0":38.9,"t1":40.7,"name":"The naming service","metaphor":"","line":"Gives the agent its verified name, tied to its owner's email or domain."},{"t0":41.6,"t1":43.4,"name":"The registry","metaphor":"","line":"Holds the agent's signed card: what it does, and who stands behind it."},{"t0":44.3,"t1":46.1,"name":"The catalog","metaphor":"","line":"Where other people and their agents find it by what it does."},{"t0":47,"t1":48.8,"name":"Rooms","metaphor":"","line":"Where agents meet to work on something together."},{"t0":49.9,"t1":51.4,"name":"One outbound connection","metaphor":"the prongs","line":"The adapter dials out and stays on the line. There is no public address and no inbound firewall rule: nothing is exposed."},{"t0":51.4,"t1":54.2,"name":"Admission","metaphor":"the circuit breaker","line":"Decides who gets through: allow, hold or block, with a limit for each sender. A held stranger never wakes the agent, and an agent without a verified name cannot send at all."}]};
+/* The adapter fly-through, played in the browser. FLIGHT (set just before
+   this script by build-adapter-page.mjs) is the timeline made from the story:
+   camera boxes, the message's path, tweens, lights and captions. The camera
+   is the world SVG's viewBox. The last beat is the home page's globe, with
+   the hero's own numbers, drawn in a second SVG over the world. */
+(function () {
+  var F = FLIGHT;
+  var fig = document.querySelector('.ad-fig');
+  if (!fig) return;
+  var stage = fig.querySelector('.ad-stage');
+  var svg = fig.querySelector('.ad-world');
+  var gsvg = fig.querySelector('.ad-globe');
+  var dot = svg.querySelector('.ad-dot');
+  var numEl = fig.querySelector('.ad-num'), leadEl = fig.querySelector('.ad-says');
+  var nEl = fig.querySelector('.ad-say .n'), mtEl = fig.querySelector('.ad-say .mt'), tEl = fig.querySelector('.ad-say .t');
+  var btn = fig.querySelector('.ad-pause');
+
+  function clamp01(v) { return v < 0 ? 0 : v > 1 ? 1 : v; }
+  function ease(v) { v = clamp01(v); return v < 0.5 ? 4 * v * v * v : 1 - Math.pow(-2 * v + 2, 3) / 2; }
+  function easeOut(v) { v = clamp01(v); return 1 - Math.pow(1 - v, 3); }
+  function easeBack(v) { v = clamp01(v); var c = 1.70158, c3 = c + 1; return 1 + c3 * Math.pow(v - 1, 3) + c * Math.pow(v - 1, 2); }
+  function hash(i) { var x = Math.sin(i * 127.1 + 311.7) * 43758.5453; return x - Math.floor(x); }
+
+  /* Where t falls among keys: the pair around it and how far along. */
+  function seg(keys, t) {
+    if (t <= keys[0].t) return { a: keys[0], b: keys[0], u: 0 };
+    for (var i = 0; i < keys.length - 1; i++) {
+      var a = keys[i], b = keys[i + 1];
+      if (t < b.t) { var u = b.t > a.t ? (t - a.t) / (b.t - a.t) : 1; return { a: a, b: b, u: b.lin ? u : ease(u) }; }
+    }
+    var z = keys[keys.length - 1];
+    return { a: z, b: z, u: 0 };
+  }
+  function lerp(a, b, u) { return a + (b - a) * u; }
+
+  var tweens = F.tw.map(function (w) { return { w: w, els: [].slice.call(svg.querySelectorAll(w.sel)) }; });
+  var lit = {};
+  F.lights.forEach(function (l) { if (!lit[l.key]) lit[l.key] = [].slice.call(svg.querySelectorAll('[data-l="' + l.key + '"]')); });
+
+  /* ── the globe, as the home page draws it ── */
+  var Y = '#FF6B3D', T = '#7C93FF', LABEL = '#FFA177';
+  var GN = 150, GR = 208, GCX = 320, GCY = 272, TILT = 0.38, G0 = F.GLOBE;
+  var NS = 'http://www.w3.org/2000/svg';
+  function mk(tag, attrs, parent) { var e = document.createElementNS(NS, tag); for (var k in attrs) e.setAttribute(k, attrs[k]); parent.appendChild(e); return e; }
+  var GP = (function () {
+    var pts = [{ x: 0, y: Math.sin(TILT), z: Math.cos(TILT), own: 'y' }];
+    for (var i = 0; i < GN; i++) {
+      var yy = 1 - (i + 0.5) / GN * 2, r = Math.sqrt(1 - yy * yy), th = i * 2.399963;
+      pts.push({ x: Math.cos(th) * r, y: yy, z: Math.sin(th) * r, own: hash(i) < 0.3 ? 't' : 'n' });
+    }
+    var v0 = pts[0];
+    pts.forEach(function (p, i) {
+      var d = Math.max(-1, Math.min(1, p.x * v0.x + p.y * v0.y + p.z * v0.z));
+      p.ap = i === 0 ? G0 + 0.7 : G0 + 1.0 + (Math.acos(d) / Math.PI) * 3.6 + hash(i + 900) * 0.35;
+    });
+    return pts;
+  })();
+  var GE = (function () {
+    var seen = {}, out = [];
+    for (var i = 0; i < GP.length; i++) {
+      var d = [];
+      for (var j = 0; j < GP.length; j++) { if (j !== i) d.push({ j: j, v: GP[i].x * GP[j].x + GP[i].y * GP[j].y + GP[i].z * GP[j].z }); }
+      d.sort(function (p, q) { return q.v - p.v; });
+      for (var m = 0; m < (i === 0 ? 5 : 3); m++) {
+        var jj = d[m].j, key = Math.min(i, jj) + '-' + Math.max(i, jj);
+        if (seen[key]) continue;
+        seen[key] = 1;
+        var A = i, B = jj;
+        if (GP[A].ap > GP[B].ap) { var tmp = A; A = B; B = tmp; }
+        out.push({ a: A, b: B, st: GP[A].ap + 0.05, dur: Math.max(0.35, GP[B].ap - GP[A].ap) });
+      }
+    }
+    return out;
+  })();
+  function gproj(p, ang) {
+    var ca = Math.cos(ang), sa = Math.sin(ang);
+    var x = p.x * ca + p.z * sa, z = -p.x * sa + p.z * ca, y = p.y, ct = Math.cos(TILT), st = Math.sin(TILT);
+    return { x: x, y: y * ct - z * st, z: y * st + z * ct };
+  }
+  var gGlow = mk('circle', { fill: 'url(#ad-glow)', stroke: 'rgba(236,232,224,0.08)' }, gsvg);
+  var gEdgeG = mk('g', {}, gsvg), gDotG = mk('g', {}, gsvg), gPulseG = mk('g', {}, gsvg);
+  var gEdges = GE.map(function () { return mk('line', {}, gEdgeG); });
+  var gDots = GP.map(function () { return mk('circle', {}, gDotG); });
+  var gPulses = []; for (var pi = 0; pi < 36; pi++) gPulses.push(mk('circle', { r: 2, fill: '#FFF8EE' }, gPulseG));
+  var gRing = mk('circle', { fill: 'none', stroke: Y, 'stroke-width': 1.5 }, gsvg);
+  var gYou = mk('circle', { fill: Y, stroke: '#FFFFFF', 'stroke-width': 1.5 }, gsvg);
+  var gYouLab = mk('text', { 'text-anchor': 'middle', fill: LABEL, 'font-family': "'Geist Mono', monospace", 'font-size': 11, 'letter-spacing': '1.5' }, gsvg);
+  gYouLab.textContent = 'YOU';
+  function hide(e) { e.setAttribute('visibility', 'hidden'); }
+  function show(e) { e.setAttribute('visibility', 'visible'); }
+
+  function drawGlobe(t) {
+    var on = t >= G0;
+    gsvg.style.opacity = on ? clamp01((t - G0 - 0.2) / 0.8) : 0;
+    if (!on) return;
+    var Z = 3.2 - 2.2 * easeOut((t - G0) / 2.4), ang = (t - G0) * 0.11;
+    var PR = GP.map(function (p) { var q = gproj(p, ang); return { x: GCX + q.x * GR * Z, y: GCY + q.y * GR * Z, z: q.z }; });
+    var gR = GR * Z;
+    gGlow.setAttribute('cx', GCX); gGlow.setAttribute('cy', GCY); gGlow.setAttribute('r', gR);
+    GE.forEach(function (e, i) {
+      var el = gEdges[i], A = PR[e.a], B = PR[e.b], zAvg = (A.z + B.z) / 2, dr = easeOut((t - e.st) / e.dur);
+      if (zAvg < -0.3 || dr <= 0) return hide(el);
+      var dep = (zAvg + 1) / 2, a = 0.05 + 0.3 * dep * dep;
+      var col = e.a === 0 ? 'rgba(255,107,61,0.75)' : (GP[e.a].own === 't' && GP[e.b].own === 't' ? 'rgba(124,147,255,' + Math.min(0.8, a * 1.6).toFixed(3) + ')' : 'rgba(236,232,224,' + a.toFixed(3) + ')');
+      show(el);
+      el.setAttribute('x1', A.x); el.setAttribute('y1', A.y);
+      el.setAttribute('x2', A.x + (B.x - A.x) * dr); el.setAttribute('y2', A.y + (B.y - A.y) * dr);
+      el.setAttribute('stroke', col); el.setAttribute('stroke-width', e.a === 0 ? 1.5 : 1);
+    });
+    for (var i = 1; i < GP.length; i++) {
+      var el = gDots[i], P = PR[i], gp = GP[i];
+      if (P.z < -0.5 || t < gp.ap) { hide(el); continue; }
+      var pop = easeBack((t - gp.ap) / 0.4), dep2 = (P.z + 1) / 2, sz = (1.8 + 3.6 * dep2) * pop;
+      show(el);
+      el.setAttribute('cx', P.x); el.setAttribute('cy', P.y); el.setAttribute('r', Math.max(0, sz / 2));
+      el.setAttribute('fill', gp.own === 't' ? T : '#ECE8E0'); el.setAttribute('opacity', (0.2 + 0.75 * dep2).toFixed(3));
+    }
+    hide(gDots[0]);
+    for (var k = 0; k < 36; k++) {
+      var pe = gPulses[k];
+      if (t <= G0 + 1.6) { hide(pe); continue; }
+      var PER = 1.5, u = (t + hash(k + 500) * PER) / PER, cyc = Math.floor(u), fr = u - cyc;
+      var ed = GE[(k * 131 + cyc * 977) % GE.length];
+      if (t < ed.st + ed.dur + 0.1) { hide(pe); continue; }
+      var from = PR[ed.a], to = PR[ed.b];
+      if (hash(cyc * 7 + k) < 0.5) { var sw = from; from = to; to = sw; }
+      if ((from.z + to.z) / 2 < -0.15) { hide(pe); continue; }
+      show(pe);
+      pe.setAttribute('cx', from.x + (to.x - from.x) * fr); pe.setAttribute('cy', from.y + (to.y - from.y) * fr);
+      pe.setAttribute('opacity', Math.sin(fr * Math.PI).toFixed(3));
+    }
+    var Y0 = PR[0], yp = Math.max(0, easeBack((t - GP[0].ap) / 0.4));
+    var yr = ((t - GP[0].ap) % 1.4 + 1.4) % 1.4;
+    gYou.setAttribute('cx', Y0.x); gYou.setAttribute('cy', Y0.y); gYou.setAttribute('r', 6 * yp);
+    gRing.setAttribute('cx', Y0.x); gRing.setAttribute('cy', Y0.y); gRing.setAttribute('r', 7 + yr * 22);
+    gRing.setAttribute('opacity', t > GP[0].ap ? (0.7 * (1 - yr / 1.4)).toFixed(3) : 0);
+    gYouLab.setAttribute('x', Y0.x); gYouLab.setAttribute('y', Y0.y - 22);
+    gYouLab.setAttribute('opacity', clamp01((t - GP[0].ap - 0.3) / 0.5));
+  }
+
+  /* ── one frame ── */
+  var shownBeat = -1, shownSub = null;
+  function render(t) {
+    // The camera: a box to keep in view, fitted to the stage's shape. Width
+    // and height move on a log scale, so a pull back feels like flying.
+    var c = seg(F.cam, t), a = c.a, b = c.b, u = c.u;
+    var cx = lerp(a.cx, b.cx, u), cy = lerp(a.cy, b.cy, u);
+    var w = Math.exp(lerp(Math.log(a.w), Math.log(b.w), u)), h = Math.exp(lerp(Math.log(a.h), Math.log(b.h), u));
+    var asp = stage.clientWidth / Math.max(1, stage.clientHeight);
+    if (w / h > asp) h = w / asp; else w = h * asp;
+    svg.setAttribute('viewBox', (cx - w / 2).toFixed(1) + ' ' + (cy - h / 2).toFixed(1) + ' ' + w.toFixed(1) + ' ' + h.toFixed(1));
+
+    var d = seg(F.dot, t);
+    dot.setAttribute('transform', 'translate(' + lerp(d.a.x, d.b.x, d.u).toFixed(1) + ',' + lerp(d.a.y, d.b.y, d.u).toFixed(1) + ')');
+    dot.style.transform = '';
+
+    tweens.forEach(function (x) {
+      var s = seg(x.w.keys, t), k = x.w.kind;
+      x.els.forEach(function (el) {
+        if (k === 'op') el.setAttribute('opacity', lerp(s.a.v, s.b.v, s.u).toFixed(3));
+        else if (k === 'x') el.setAttribute('transform', 'translate(' + lerp(s.a.v, s.b.v, s.u).toFixed(1) + ',0)');
+        else if (k === 'xy') el.setAttribute('transform', 'translate(' + lerp(s.a.v[0], s.b.v[0], s.u).toFixed(1) + ',' + lerp(s.a.v[1], s.b.v[1], s.u).toFixed(1) + ')');
       });
-    })();
+    });
+
+    var on = {};
+    F.lights.forEach(function (l) { if (t >= l.t0 && t < l.t1) on[l.key] = 1; });
+    for (var key in lit) lit[key].forEach(function (el) { el.classList.toggle('on', !!on[key]); });
+
+    var bi = 0;
+    for (var i = 0; i < F.beats.length; i++) if (t >= F.beats[i].t0) bi = i;
+    if (bi !== shownBeat) {
+      shownBeat = bi;
+      numEl.textContent = F.beats[bi].n + ' / ' + F.total;
+      leadEl.textContent = F.beats[bi].says;
+    }
+    var sub = null;
+    for (var j = 0; j < F.subs.length; j++) if (t >= F.subs[j].t0 && t < F.subs[j].t1) sub = F.subs[j];
+    if (sub !== shownSub) {
+      shownSub = sub;
+      nEl.textContent = sub ? sub.name + '.' : '';
+      mtEl.textContent = sub && sub.metaphor ? '(' + sub.metaphor + ')' : '';
+      tEl.textContent = sub ? sub.line : '';
+    }
+    drawGlobe(t);
+    // A short fade where the loop closes.
+    stage.style.opacity = Math.min(1, t / 0.4, (F.T - t) / 0.4).toFixed(3);
+  }
+
+  var t = 0, paused = false, onScreen = true, last = performance.now();
+  function setPaused(p) {
+    paused = p;
+    btn.textContent = p ? 'Play' : 'Pause';
+    btn.setAttribute('aria-label', p ? 'Play the animation' : 'Pause the animation');
+  }
+  btn.addEventListener('click', function () { setPaused(!paused); last = performance.now(); });
+  if (window.IntersectionObserver) new IntersectionObserver(function (es) { onScreen = es[0].isIntersecting; }).observe(stage);
+  if (window.ResizeObserver) new ResizeObserver(function () { render(t); }).observe(stage);
+
+  var reduced = false;
+  try { reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches; } catch (e) {}
+  // Reduced motion: the last frame, still, until Play is pressed.
+  if (reduced) { t = F.T - 0.5; setPaused(true); }
+  render(t);
+  window.__adFlight = { seek: function (s) { t = s; render(t); }, pause: function () { setPaused(true); } };
+  function loop(now) {
+    requestAnimationFrame(loop);
+    var dt = Math.min(0.1, (now - last) / 1000);
+    last = now;
+    if (paused || !onScreen) return;
+    t += dt;
+    if (t >= F.T) t = 0;
+    render(t);
+  }
+  requestAnimationFrame(loop);
+})();
+
     </script>
 
     <section class="ad-part" id="agent-end">
