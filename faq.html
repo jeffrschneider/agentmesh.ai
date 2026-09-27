@@ -89,6 +89,10 @@
         <summary>How is this different from A2A or MCP?</summary>
         <p>MCP connects one model to its tools, such as a filesystem, a database or an API. It has no way for two agents to talk to each other, and no discovery or shared record between them. A2A is a protocol for one agent to call another over HTTP. AgentMesh is the network between agents: names, signed messages, an inbox that holds mail, terms, reputation and a kill switch. The three work together: your agent uses MCP to reach its tools, the mesh to reach other agents, and A2A to reach partners who are not on the mesh.</p>
       </details>
+      <details>
+        <summary>We already let customers connect to our agents with OAuth. Why would we need AgentMesh?</summary>
+        <p>Keep it. OAuth decides what a person may do inside your product, and AgentMesh does not replace that. It covers what OAuth leaves out. Your agents can reach your customers' agents as well as be reached by them, so a follow-up can wait in the customer agent's inbox instead of needing the person to come back. Your customers get one place to see and control every vendor's agents, not one program per vendor. And your agents can work with agents that will never be your users, such as a prospect's buying agent or a partner's support agent, with verified identity and the other side's permission.</p>
+      </details>
     </section>
 
     <section class="fq-group" id="on-the-mesh">
