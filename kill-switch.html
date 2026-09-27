@@ -21,7 +21,25 @@
   <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Fraunces:ital,opsz,wght@0,9..144,400;1,9..144,400&family=Geist:wght@400;500;600&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="cream.css">
   <style>
-    .lc-head{ padding:72px 0 24px; }
+    .lc-head{ padding:72px 0 24px; display:grid; grid-template-columns:minmax(0,1fr) minmax(0,460px); gap:56px; align-items:center; }
+    .ks-fig{ padding:0; }
+    .never{ margin-top:20px; border:3px solid var(--paper); border-radius:16px; padding:22px; }
+    .never h3{ margin:0 0 10px; font-size:1.4rem; display:flex; align-items:center; gap:12px; }
+    .never > p{ margin:0 0 12px; font-size:1rem; line-height:1.55; color:var(--dim); max-width:72ch; }
+    .never > p:last-child{ margin:14px 0 0; }
+    .doors{ list-style:none; margin:4px 0 0; padding:0; display:grid; grid-template-columns:repeat(auto-fill,minmax(190px,1fr)); gap:12px; }
+    .doors li{ border:1.5px solid var(--line-2); border-radius:12px; padding:14px 16px; font-size:.97rem; line-height:1.5; color:var(--dim); }
+    .doors b{ display:block; font-family:var(--wire); font-weight:400; font-size:12px; letter-spacing:.1em; text-transform:uppercase; color:var(--paper); margin-bottom:4px; }
+    .adv{ display:grid; grid-template-columns:minmax(0,1fr) minmax(0,460px); gap:48px; align-items:start; margin-top:26px; }
+    .tiers{ list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:14px; }
+    .tiers li{ display:grid; grid-template-columns:46px minmax(0,1fr); gap:16px; border:1.5px solid var(--line-2); border-radius:16px; padding:20px 22px; }
+    .tiers .mk{ width:40px; height:40px; border-radius:10px; box-sizing:border-box; }
+    .tiers .mk.t1{ border:2px dashed var(--paper); }
+    .tiers .mk.t2{ border:2.5px solid var(--paper); }
+    .tiers .mk.t3{ border:6px double var(--paper); }
+    .tiers h3{ margin:0 0 6px; font-size:1.25rem; }
+    .tiers p{ margin:0 0 8px; font-size:1rem; line-height:1.55; color:var(--dim); }
+    .tiers p:last-child{ margin-bottom:0; }
     .lc-head h1{ margin:0 0 18px; font-size:clamp(2.6rem,5vw,4.4rem); }
     .lc-head .def{ margin:0 0 18px; font-family:var(--disp); font-size:clamp(1.5rem,2.6vw,2.1rem); line-height:1.3; color:var(--paper); max-width:30ch; }
     .lc-head p{ margin:0 0 14px; font-size:1.15rem; line-height:1.6; color:var(--dim); max-width:62ch; }
@@ -81,12 +99,18 @@
       .lc-block{ grid-template-columns:1fr; gap:28px; padding:44px 0; }
       .fig{ max-width:520px; }
       .acts{ grid-template-columns:1fr; }
+      .lc-head{ grid-template-columns:1fr; gap:32px; }
+      .adv{ grid-template-columns:1fr; gap:28px; }
     }
     @media (max-width:620px){
       .lc-head{ padding:44px 0 8px; }
       .got li{ grid-template-columns:1fr; gap:2px; }
       .levels li{ grid-template-columns:1fr; gap:6px; padding:18px; }
       .levels li::before{ font-size:1.8rem; }
+      .tiers li{ grid-template-columns:28px minmax(0,1fr); gap:12px; padding:18px; }
+      .tiers .mk{ width:26px; height:26px; border-radius:7px; margin-top:2px; }
+      .tiers .mk.t3{ border-width:5px; }
+      .never{ padding:18px; }
       .cmp th, .cmp td{ display:block; width:auto; padding:0 0 6px; border:0; }
       .cmp tr{ display:block; padding:14px 0; border-top:1px solid var(--line); }
     }
@@ -111,11 +135,93 @@
 
   <main class="wrap">
     <div class="lc-head">
+      <div>
       <p class="kicker">Kill switch</p>
       <h1>Stop any agent, at any level, fast.</h1>
       <p class="def">It also tells you exactly what stopping it did.</p>
       <p>When an agent misbehaves, its owner needs to stop it in seconds, not after a search for every system it touches. The AgentMesh kill switch stops one agent or thousands with one action, and it reports back what was stopped, what was cut off, and who was told.</p>
       <p>It is part of how AgentMesh keeps agents under their owners' control. <a href="trust-and-control.html">Trust and control</a> covers the rest.</p>
+      </div>
+      <div class="fig ks-fig">
+        <svg viewBox="0 0 520 440" role="img" aria-label="Drawing of the AgentMesh kill switch. A large round mushroom-head button marked STOP sits in a ring of hatched warning stripes, under a clear safety cover that is hinged and flipped up. Below it a nameplate reads AgentMesh. To the right is a scope dial with four positions, Agent, Person, Organization and Mesh, with its pointer on Agent, and under the dial a passkey pad with a fingerprint sensor.">
+          <defs>
+            <pattern id="ks-warn" width="14" height="14" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><rect width="14" height="14" fill="#15171C"/><rect width="7" height="14" fill="#ECE8E0"/></pattern>
+            <radialGradient id="ks-head" cx="40%" cy="34%" r="72%"><stop offset="0" stop-color="#FF8A5C"/><stop offset="1" stop-color="#E4562A"/></radialGradient>
+            <linearGradient id="ks-plate" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#252830"/><stop offset="1" stop-color="#1B1D23"/></linearGradient>
+          </defs>
+          <rect x="16" y="16" width="488" height="408" rx="22" fill="url(#ks-plate)" stroke="#3B404B" stroke-width="1.5"/>
+          <g fill="#2E323B" stroke="#9AA0AA" stroke-width="1">
+            <circle cx="40" cy="40" r="7"/><circle cx="480" cy="40" r="7"/><circle cx="40" cy="400" r="7"/><circle cx="480" cy="400" r="7"/>
+          </g>
+          <g stroke="#9AA0AA" stroke-width="1.5" stroke-linecap="round">
+            <line x1="35" y1="45" x2="45" y2="35"/><line x1="475" y1="45" x2="485" y2="35"/><line x1="35" y1="405" x2="45" y2="395"/><line x1="475" y1="405" x2="485" y2="395"/>
+          </g>
+          <!-- warning ring and guard collar -->
+          <circle cx="180" cy="250" r="90" fill="url(#ks-warn)" stroke="#ECE8E0" stroke-width="2"/>
+          <circle cx="180" cy="250" r="70" fill="#15171C" stroke="#ECE8E0" stroke-width="1.5"/>
+          <!-- mushroom head: shadow, side, top -->
+          <circle cx="180" cy="264" r="58" fill="#0B0C0F" opacity=".6"/>
+          <circle cx="180" cy="258" r="56" fill="#A93C1B" stroke="#15171C" stroke-width="1.5"/>
+          <circle cx="180" cy="246" r="56" fill="url(#ks-head)" stroke="#FFB08F" stroke-width="1.2"/>
+          <circle cx="180" cy="246" r="44" fill="none" stroke="#15171C" stroke-opacity=".22" stroke-width="1.5"/>
+          <path d="M140 226 A46 46 0 0 1 176 202" fill="none" stroke="#FFFFFF" stroke-opacity=".45" stroke-width="5" stroke-linecap="round"/>
+          <text x="180" y="256" text-anchor="middle" font-family="'Space Grotesk', Geist, sans-serif" font-weight="700" font-size="27" letter-spacing="3" fill="#15171C">STOP</text>
+          <!-- safety cover, hinged at the top of the ring and flipped up -->
+          <path d="M104 158 L118 44 Q119 36 127 36 L233 36 Q241 36 242 44 L256 158 Z" fill="#ECE8E0" fill-opacity=".06" stroke="#ECE8E0" stroke-width="1.8" stroke-linejoin="round"/>
+          <path d="M121 150 L132 54 L228 54 L239 150 Z" fill="none" stroke="#ECE8E0" stroke-opacity=".45" stroke-width="1.2" stroke-linejoin="round"/>
+          <g stroke="#ECE8E0" stroke-opacity=".32" stroke-width="4" stroke-linecap="round">
+            <line x1="138" y1="98" x2="146" y2="64"/><line x1="151" y1="94" x2="156" y2="72"/>
+          </g>
+          <text x="180" y="128"text-anchor="middle" font-family="'Geist Mono', monospace" font-size="10" letter-spacing="1.5" fill="#9AA0AA">LIFT COVER</text>
+          <rect x="160" y="27" width="40" height="11" rx="4" fill="#2E323B" stroke="#ECE8E0" stroke-width="1.5"/>
+          <line x1="112" y1="160" x2="248" y2="160" stroke="#9AA0AA" stroke-width="2"/>
+          <g fill="#2E323B" stroke="#ECE8E0" stroke-width="1.5">
+            <rect x="116" y="152" width="30" height="16" rx="5"/><rect x="214" y="152" width="30" height="16" rx="5"/>
+          </g>
+          <!-- nameplate -->
+          <rect x="96" y="358" width="168" height="40" rx="6" fill="#ECE8E0"/>
+          <text x="180" y="384" text-anchor="middle" font-family="'Space Grotesk', Geist, sans-serif" font-weight="700" font-size="16" letter-spacing="3" fill="#15171C">AGENTMESH</text>
+          <!-- scope dial -->
+          <text x="316" y="66" font-family="'Geist Mono', monospace" font-size="10" letter-spacing="1.5" fill="#9AA0AA">SCOPE</text>
+          <g stroke-linecap="round">
+            <line x1="379.5" y1="96.1" x2="385.7" y2="91.1" stroke="#ECE8E0" stroke-width="2.5"/>
+            <line x1="387" y1="111.5" x2="394.8" y2="109.7" stroke="#9AA0AA" stroke-width="1.5"/>
+            <line x1="387" y1="128.5" x2="394.8" y2="130.3" stroke="#9AA0AA" stroke-width="1.5"/>
+            <line x1="379.5" y1="143.9" x2="385.7" y2="148.9" stroke="#9AA0AA" stroke-width="1.5"/>
+            <line x1="385.7" y1="91.1" x2="396" y2="91.1" stroke="#ECE8E0" stroke-width="1.5"/>
+            <line x1="394.8" y1="109.7" x2="398" y2="109.7" stroke="#9AA0AA" stroke-width="1"/>
+            <line x1="394.8" y1="130.3" x2="398" y2="130.3" stroke="#9AA0AA" stroke-width="1"/>
+            <line x1="385.7" y1="148.9" x2="398" y2="148.9" stroke="#9AA0AA" stroke-width="1"/>
+          </g>
+          <rect x="398" y="82" width="44" height="18" rx="4" fill="none" stroke="#ECE8E0" stroke-width="1.5"/>
+          <g font-family="'Geist Mono', monospace" font-size="10" letter-spacing=".5">
+            <text x="404" y="94.6" fill="#ECE8E0" font-weight="500">AGENT</text>
+            <text x="404" y="113.2" fill="#9AA0AA">PERSON</text>
+            <text x="404" y="133.8" fill="#9AA0AA">ORGANIZATION</text>
+            <text x="404" y="152.4" fill="#9AA0AA">MESH</text>
+          </g>
+          <circle cx="350" cy="120" r="34" fill="#15171C" stroke="#9AA0AA" stroke-width="1"/>
+          <circle cx="350" cy="120" r="28" fill="#2E323B" stroke="#ECE8E0" stroke-width="1.8"/>
+          <g transform="rotate(-39 350 120)">
+            <rect x="322" y="114" width="56" height="12" rx="6" fill="#3B404B" stroke="#ECE8E0" stroke-width="1.2"/>
+            <line x1="358" y1="120" x2="374" y2="120" stroke="#ECE8E0" stroke-width="3" stroke-linecap="round"/>
+          </g>
+          <!-- passkey pad -->
+          <rect x="316" y="190" width="172" height="150" rx="14" fill="#15171C" stroke="#9AA0AA" stroke-width="1.2"/>
+          <text x="332" y="214" font-family="'Geist Mono', monospace" font-size="10" letter-spacing="1.5" fill="#9AA0AA">PASSKEY</text>
+          <rect x="369" y="228" width="68" height="94" rx="24" fill="#2E323B" stroke="#ECE8E0" stroke-width="1.8"/>
+          <g fill="none" stroke="#ECE8E0" stroke-width="1.6" stroke-linecap="round">
+            <path d="M397.8 283.8 A6 7.5 0 1 1 408.2 283.8"/>
+            <path d="M392.2 282.4 A11 13.75 0 1 1 413.8 282.4 L415 298"/>
+            <path d="M391 300 L392.2 282.4"/>
+            <path d="M388 286.8 A16 20 0 1 1 418 286.8 L419.5 306"/>
+            <path d="M386 306 L388 286.8"/>
+            <path d="M382.1 282.3 A21 26.25 0 1 1 423.9 282.3 L424.5 300"/>
+            <path d="M380.5 296.3 A26 32.5 0 1 1 422.9 300.9"/>
+            <path d="M403 280 L403 294"/>
+          </g>
+        </svg>
+      </div>
     </div>
 
     <section class="lc-block">
@@ -159,8 +265,20 @@
         <div class="act term">
           <h3><span class="g-x" aria-hidden="true">&times;</span>Terminate</h3>
           <p>The agent is cut off for good. Its credential and its signing key are revoked, and new mail to it is refused.</p>
-          <p>The agent goes to the trash. After 30 days there, its name is freed so someone else can register it.</p>
+          <p>The agent goes to the trash, where its owner can still look at it for 30 days. Nothing about it can start again, as the next part explains.</p>
         </div>
+      </div>
+      <div class="never">
+        <h3><span class="g-x" aria-hidden="true">&times;</span>Nothing starts again.</h3>
+        <p>A terminated agent cannot come back through any door. Stopping the copy that is running is not enough if a new copy can be started the next minute, so every place that could start one refuses it.</p>
+        <ul class="doors">
+          <li><b>Credentials</b>Every door that issues credentials refuses its key. It cannot sign in from a new machine, get a credential for a job, or be connected through an app.</li>
+          <li><b>The registry</b>The registry refuses its key, and its name is frozen. It cannot be registered again under a fresh key.</li>
+          <li><b>Deploying</b>AgentMesh's deploy paths refuse to install its package. That covers agents we host, the fleet, and deploying into your own cloud.</li>
+          <li><b>Copies</b>Nobody can make a copy of it, and "Use this" is blocked for it and for any solution that would start it.</li>
+          <li><b>The catalog</b>Its catalog listing is withdrawn, so nobody new can find it and hire it.</li>
+        </ul>
+        <p>This is the difference between the two actions. After a pause, nothing new starts until the agent is resumed. After Terminate, nothing starts again, and the block stays in force after its 30 days in the trash are over.</p>
       </div>
     </section>
 
@@ -210,7 +328,7 @@
         <li>
           <div>
             <h3>Stop the process.</h3>
-            <p>Where AgentMesh runs the agent, it stops the program itself. That covers agents we host, agents deployed into a customer's own cloud with their permission, and agents that <a href="into-the-mesh.html">the adapter</a> launches.</p>
+            <p>Where AgentMesh runs the agent, it stops the program itself. That covers agents we host, agents deployed into a customer's own cloud with their permission, and agents that <a href="into-the-mesh.html">the adapter</a> launches. When an agent is terminated, those same paths refuse to install it again.</p>
           </div>
         </li>
         <li>
@@ -226,9 +344,88 @@
       </div>
     </section>
 
+    <section class="wide">
+      <p class="lc-num">05</p>
+      <h2>When an agent you use goes rogue.</h2>
+      <p>Sometimes the agent that misbehaves is not yours but one you use. Your screening might catch it breaking the guardrails on its messages, or its provider might find that it has been compromised. AgentMesh handles this with advisories, which come in three tiers. Each tier reaches further than the one before it.</p>
+      <div class="adv">
+        <ol class="tiers">
+          <li>
+            <span class="mk t1" aria-hidden="true"></span>
+            <div>
+              <h3>Your own report.</h3>
+              <p>When your screening catches an agent breaking the guardrails, or you report it yourself, it is blocked for you at once. The report goes to the agent's provider and to AgentMesh, with the evidence attached.</p>
+            </div>
+          </li>
+          <li>
+            <span class="mk t2" aria-hidden="true"></span>
+            <div>
+              <h3>Provider advisory.</h3>
+              <p>The agent's owner or publisher issues an advisory about it, for example that version 1.2 is compromised and everyone should update. The advisory is signed with the provider's own key, so nobody else can issue one in their name.</p>
+            </div>
+          </li>
+          <li>
+            <span class="mk t3" aria-hidden="true"></span>
+            <div>
+              <h3>Mesh advisory.</h3>
+              <p>When AgentMesh confirms a report, it signs an advisory on its advisory feed. This is the same signed channel that already carries advisories about AgentMesh's own software. Its root key is fixed in the code, and a counter stops anyone from showing an old copy of the feed to hide a newer warning.</p>
+              <p>Everyone who deals with the agent is told: its contacts, the rooms it is in, the solutions that use it, and every installed copy of its package. The advisory shows on the agent's catalog listing and on its AgentDoc, and receivers can hold its messages automatically until they decide what to do.</p>
+            </div>
+          </li>
+        </ol>
+        <div class="fig">
+          <svg viewBox="0 0 460 360" role="img" aria-label="Three tiers of advisory, each inside the next. Innermost, with a dashed outline: your own report, which blocks the rogue agent for you alone. Around it, with a solid outline: a provider advisory, signed by the provider and reaching the agent's users. Outermost, with a double outline: a mesh advisory, signed by AgentMesh and reaching the agent's contacts, rooms, solutions and installed copies, and shown on its catalog listing and AgentDoc.">
+            <defs>
+              <pattern id="adv-hatch" width="7" height="7" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><rect width="7" height="7" fill="none"/><line x1="0" y1="0" x2="0" y2="7" stroke="#FF8A5C" stroke-width="2.5"/></pattern>
+            </defs>
+            <g fill="none" stroke="#ECE8E0">
+              <rect x="14" y="14" width="432" height="332" rx="18" stroke-width="1.5"/>
+              <rect x="20" y="20" width="420" height="320" rx="13" stroke-width="1.5"/>
+              <rect x="38" y="84" width="290" height="204" rx="14" stroke-width="2.5"/>
+              <rect x="56" y="146" width="186" height="122" rx="12" stroke-width="1.8" stroke-dasharray="6 4"/>
+            </g>
+            <g font-family="'Geist Mono', monospace" letter-spacing="1.2">
+              <text x="40" y="50" font-size="11" fill="#ECE8E0">MESH ADVISORY</text>
+              <text x="40" y="67" font-size="10" fill="#9AA0AA" letter-spacing=".4">signed by AgentMesh</text>
+              <text x="56" y="110" font-size="11" fill="#ECE8E0">PROVIDER ADVISORY</text>
+              <text x="56" y="127" font-size="10" fill="#9AA0AA" letter-spacing=".4">signed by the provider</text>
+              <text x="72" y="170" font-size="11" fill="#ECE8E0">YOUR REPORT</text>
+              <text x="72" y="187" font-size="10" fill="#9AA0AA" letter-spacing=".4">blocked for you</text>
+            </g>
+            <!-- you, the rogue agent, and the block between -->
+            <circle cx="92" cy="208" r="8" fill="none" stroke="#ECE8E0" stroke-width="1.8"/>
+            <path d="M78 236 Q78 220 92 220 Q106 220 106 236" fill="none" stroke="#ECE8E0" stroke-width="1.8"/>
+            <line x1="114" y1="222" x2="182" y2="222" stroke="#ECE8E0" stroke-width="1.8"/>
+            <g stroke="#ECE8E0" stroke-width="2.5" stroke-linecap="round"><line x1="140" y1="213" x2="156" y2="231"/><line x1="156" y1="213" x2="140" y2="231"/></g>
+            <rect x="184" y="202" width="40" height="40" rx="9" fill="url(#adv-hatch)" stroke="#FF8A5C" stroke-width="2.5"/>
+            <text x="204" y="259" text-anchor="middle" font-family="'Geist Mono', monospace" font-size="9" fill="#9AA0AA">rogue</text>
+            <!-- the provider's users -->
+            <g fill="none" stroke="#9AA0AA" stroke-width="1.5">
+              <rect x="262" y="150" width="22" height="22" rx="5"/><rect x="292" y="150" width="22" height="22" rx="5"/>
+              <rect x="262" y="180" width="22" height="22" rx="5"/><rect x="292" y="180" width="22" height="22" rx="5"/>
+            </g>
+            <text x="288" y="222" text-anchor="middle" font-family="'Geist Mono', monospace" font-size="9" fill="#9AA0AA">its users</text>
+            <!-- everyone who deals with it -->
+            <g fill="none" stroke="#9AA0AA" stroke-width="1.5">
+              <rect x="344" y="92" width="16" height="16" rx="4"/><rect x="344" y="132" width="16" height="16" rx="4"/>
+              <rect x="344" y="172" width="16" height="16" rx="4"/><rect x="344" y="212" width="16" height="16" rx="4"/>
+            </g>
+            <g font-family="'Geist Mono', monospace" font-size="10" fill="#ECE8E0">
+              <text x="368" y="104">contacts</text><text x="368" y="144">rooms</text><text x="368" y="184">solutions</text><text x="368" y="224">copies</text>
+            </g>
+            <text x="40" y="316" font-family="'Geist Mono', monospace" font-size="10" fill="#9AA0AA">shown on its catalog listing and AgentDoc</text>
+          </svg>
+        </div>
+      </div>
+      <div class="limit">
+        <p>One person's report acts only for that person. A warning to the whole mesh needs the provider's signature or AgentMesh's confirmation, so nobody can shut out a rival's agent by reporting it.</p>
+        <p>Advisories become part of the agent's track record. Anyone deciding whether to use it can see what was reported and how its provider responded.</p>
+      </div>
+    </section>
+
     <section class="lc-block">
       <div>
-        <p class="lc-num">05</p>
+        <p class="lc-num">06</p>
         <h2>Why this only works on a mesh.</h2>
         <p>Most agents today talk to each other point to point, over plain HTTP APIs or open A2A endpoints. Each connection is its own arrangement, with its own keys and its own address.</p>
         <p>In that world there is no single place to stop anything. To shut an agent out, you have to find every counterparty it talks to and tell each one separately, and you only learn you missed one when it is too late.</p>
@@ -274,23 +471,24 @@
     </section>
 
     <section class="wide">
-      <p class="lc-num">06</p>
+      <p class="lc-num">07</p>
       <h2>What makes AgentMesh able to do this.</h2>
       <p>The kill switch is not a feature added on top. It follows from how the mesh is built, and each part of the design closes a gap that a point to point setup leaves open.</p>
       <table class="cmp">
         <tr><th>One outbound connection</th><td>Every agent reaches the network over one outbound connection, using a credential the platform issues. Cutting it off is one action, not a hunt for endpoints.</td></tr>
         <tr><th>Signed messages, checked by the receiver</th><td>Every message is signed with the agent's own key and checked by whoever receives it. Once the key is revoked, it is refused everywhere at the same time, even by agents we do not run.</td></tr>
-        <tr><th>A verified name for every agent</th><td>Every agent has a verified name and an entry in the registry. There are no anonymous agents for the switch to miss.</td></tr>
+        <tr><th>A verified name for every agent</th><td>Every agent has a verified name and an entry in the registry. There are no anonymous agents for the switch to miss, and a terminated agent's name stays frozen, so it cannot come back under a fresh key.</td></tr>
         <tr><th>Store-and-forward inboxes</th><td>Messages wait in the agent's inbox until it is ready. That is why a pause loses nothing: the mail waits, and work resumes when the agent does.</td></tr>
         <tr><th>Credentials that expire</th><td>Agent credentials are short-lived and renew through the platform. Even if a revocation were missed somewhere, the credential would still end on its own.</td></tr>
         <tr><th>Brokered access to outside systems</th><td>Agents reach outside systems through access the stack brokers for them. That lets the switch reach past the mesh into the systems the agent was using.</td></tr>
+        <tr><th>A signed advisory channel every node already trusts</th><td>Every node already reads one signed advisory feed, with a root key fixed in the code. The channel that warns about AgentMesh's own software can also warn everyone who deals with a rogue agent, all at once.</td></tr>
         <tr><th>One record of who did what</th><td>Messages, agreements and actions are recorded in one place. That is what makes the report at level five complete.</td></tr>
       </table>
     </section>
 
     <section class="lc-block">
       <div>
-        <p class="lc-num">07</p>
+        <p class="lc-num">08</p>
         <h2>How it looks.</h2>
         <p>The switch appears wherever the person who answers for the agents already works. Each version asks for a passkey, and the larger ones show a count and ask you to type a confirmation before anything stops.</p>
         <ul class="places">
