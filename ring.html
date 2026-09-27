@@ -21,42 +21,61 @@
   <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Fraunces:ital,opsz,wght@0,9..144,400;1,9..144,400&family=Geist:wght@400;500;600&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="cream.css">
   <style>
-    .rg-head{ padding:72px 0 32px; }
-    .rg-head h1{ margin:0 0 18px; font-size:clamp(2.6rem,5vw,4.4rem); }
-    .rg-head .def{ margin:0 0 18px; font-family:var(--disp); font-size:clamp(1.4rem,2.4vw,1.9rem); line-height:1.3; color:var(--paper); max-width:34ch; }
-    .rg-head p{ margin:0 0 12px; font-size:1.15rem; line-height:1.6; color:var(--dim); max-width:64ch; }
-    .rg-head .honest{ display:inline-block; margin-top:8px; font-family:var(--wire); font-size:12px; letter-spacing:.12em; text-transform:uppercase;
+    .rg-head{ padding:30px 0 14px; }
+    .rg-head .kicker{ margin:0 0 8px; }
+    .rg-head h1{ margin:0 0 6px; font-size:clamp(2.2rem,4vw,3.1rem); }
+    .rg-head .def{ margin:0; font-family:var(--disp); font-size:clamp(1.1rem,1.7vw,1.35rem); line-height:1.35; color:var(--paper); max-width:62ch; }
+    .honest{ display:inline-block; margin-top:8px; font-family:var(--wire); font-size:12px; letter-spacing:.12em; text-transform:uppercase;
       color:var(--paper); border:1.5px dashed var(--line-2); border-radius:999px; padding:5px 14px; }
     .sec{ padding:56px 0; border-top:1px solid var(--line); }
     .sec h2{ margin:0 0 14px; font-size:clamp(2rem,3.4vw,2.9rem); }
     .sec > p, .sec .lead{ margin:0 0 14px; font-size:1.1rem; line-height:1.6; color:var(--dim); max-width:64ch; }
     .num{ font-family:var(--wire); font-size:12px; letter-spacing:.12em; color:var(--faint); margin:0 0 12px; }
 
-    /* the ring now */
-    .now{ display:grid; grid-template-columns:minmax(0,560px) minmax(0,1fr); gap:48px; align-items:start; margin-top:22px; }
+    /* start a lap */
+    .start{ margin:0 0 20px; max-width:780px; }
+    .start label{ display:block; margin:0 0 8px; font-weight:600; font-size:1.05rem; color:var(--paper); }
+    .start .row{ display:flex; gap:10px; }
+    .start input{ flex:1; min-width:0; font:inherit; font-size:1.05rem; padding:0 14px; min-height:52px; border-radius:14px; border:2px solid var(--paper); background:var(--panel); color:var(--paper); }
+    .start input:disabled{ border-style:dashed; border-color:var(--faint); color:var(--faint); cursor:not-allowed; }
+    .start button{ border:0; font:inherit; font-weight:600; cursor:pointer; }
+    .start button:disabled{ background:transparent; color:var(--faint); border:2px dashed var(--faint); cursor:not-allowed; }
+    .start .help{ margin:8px 0 0; font-size:.92rem; color:var(--dim); }
+    .start .answer{ margin:8px 0 0; font-size:1rem; font-weight:500; color:var(--paper); }
+    .start .answer:empty{ display:none; }
+
+    /* the ring now: circle and story side by side */
+    .now{ display:grid; grid-template-columns:minmax(0,500px) minmax(0,1fr); gap:40px; align-items:start; }
     .fig{ background:var(--st-bg); color:var(--st-fg); border-radius:22px; overflow:hidden; }
     .fig svg{ display:block; width:100%; height:auto; }
-    .where{ margin:0 0 16px; font-family:var(--disp); font-size:clamp(1.35rem,2.2vw,1.7rem); line-height:1.3; color:var(--paper); }
-    .facts{ list-style:none; margin:0 0 20px; padding:0; display:flex; flex-direction:column; gap:8px; }
-    .facts li{ font-size:1rem; line-height:1.5; color:var(--dim); }
+    .where{ margin:0 0 4px; font-family:var(--disp); font-size:clamp(1.2rem,1.9vw,1.45rem); line-height:1.3; color:var(--paper); overflow-wrap:anywhere; }
+    .details{ display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1fr); gap:28px; margin-top:28px; }
+    .facts{ list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:8px; }
+    .facts li{ font-size:1rem; line-height:1.5; color:var(--dim); overflow-wrap:anywhere; }
     .facts b{ display:inline-block; min-width:9ch; font-family:var(--wire); font-weight:400; font-size:11px; letter-spacing:.1em; text-transform:uppercase; color:var(--faint); }
     .roster{ list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:8px; }
     .roster li{ display:flex; flex-wrap:wrap; align-items:baseline; gap:4px 12px; padding:10px 14px; border-radius:12px; border:2px solid var(--paper); font-size:.98rem; }
+    .roster li.sat{ border:2px dashed var(--paper); }
     .roster li.out{ border:2px dashed var(--faint); color:var(--dim); }
+    .roster .why{ flex-basis:100%; font-size:.9rem; color:var(--dim); }
     .roster .fw{ font-weight:600; }
     .roster .st{ margin-left:auto; font-family:var(--wire); font-size:11px; letter-spacing:.1em; text-transform:uppercase; }
     .roster .h{ font-family:var(--wire); font-size:.8rem; color:var(--faint); overflow-wrap:anywhere; }
     .soon{ border:1.5px dashed var(--line-2); border-radius:16px; padding:22px; font-size:1.1rem; color:var(--dim); background:var(--panel); }
     .soon b{ display:block; font-family:var(--disp); font-weight:400; font-size:1.5rem; color:var(--paper); margin-bottom:6px; }
-    .note{ font-size:.9rem; color:var(--faint); margin:12px 0 0; }
+    .note{ font-size:.92rem; color:var(--dim); margin:0; }
+    .note:empty{ display:none; }
 
     /* ring drawing */
     .ring-node rect{ fill:#1B1E25; stroke:#ECE8E0; stroke-width:2.5; }
-    .ring-node.out rect{ fill:none; stroke:#9AA0AA; stroke-width:2; stroke-dasharray:7 5; }
-    .ring-node.here rect{ stroke-width:4; }
+    .ring-node.sat rect{ stroke-dasharray:9 6; }
+    .ring-node.off rect{ fill:none; stroke:#9AA0AA; stroke-width:2; stroke-dasharray:7 5; }
+    .ring-node.here rect{ stroke-width:4.5; }
     .ring-node text{ font-family:'Geist', sans-serif; fill:#ECE8E0; }
-    .ring-node .sub{ font-family:'Geist Mono', monospace; font-size:11px; letter-spacing:.06em; fill:#AEB4BE; }
-    .ring-node.out .fwn{ fill:#AEB4BE; }
+    .ring-node .sub{ font-family:'Geist Mono', monospace; letter-spacing:.04em; fill:#AEB4BE; }
+    .ring-node .st3{ font-weight:600; }
+    .ring-node .why{ fill:#AEB4BE; }
+    .ring-node.off .fwn, .ring-node.sat .fwn{ fill:#AEB4BE; }
     #token .pulse{ fill:none; stroke:#FF8A5C; stroke-width:2; transform-box:fill-box; transform-origin:center; opacity:0; }
     #token.running .pulse{ animation:pulse 2.4s ease-out infinite; }
     #token.stalled .dot{ fill:#14161B; stroke:#FF8A5C; stroke-width:3; stroke-dasharray:4 3; }
@@ -64,17 +83,16 @@
     @media (prefers-reduced-motion:reduce){ #token.running .pulse{ animation:none; opacity:.6; transform:scale(1.8); } }
 
     /* story */
-    .story{ list-style:none; margin:22px 0 0; padding:0; max-width:760px; display:flex; flex-direction:column; gap:0; }
-    .story li{ padding:16px 0 16px 22px; border-left:2px solid var(--line-2); position:relative; }
-    .story li::before{ content:""; position:absolute; left:-7px; top:24px; width:12px; height:12px; border-radius:50%; background:var(--ink); border:2px solid var(--paper); }
-    .story .line{ margin:0 0 6px; font-family:var(--disp); font-size:1.3rem; line-height:1.45; color:var(--paper); }
+    .story{ list-style:none; margin:14px 0 0; padding:0; display:flex; flex-direction:column; gap:0; }
+    .story li{ padding:9px 0 9px 20px; border-left:2px solid var(--line-2); position:relative; }
+    .story li::before{ content:""; position:absolute; left:-7px; top:16px; width:12px; height:12px; border-radius:50%; background:var(--ink); border:2px solid var(--paper); }
+    .story .line{ margin:0 0 3px; font-family:var(--disp); font-size:1.12rem; line-height:1.42; color:var(--paper); overflow-wrap:anywhere; }
     .story .open .line{ font-style:italic; }
-    .story .meta{ margin:0; font-size:.88rem; color:var(--faint); line-height:1.5; }
+    .story .meta{ margin:0; font-size:.86rem; color:var(--faint); line-height:1.45; }
     .story .meta b{ color:var(--paper); font-weight:600; }
-    .story .meta .h{ font-family:var(--wire); font-size:.8rem; overflow-wrap:anywhere; }
     .story .wait{ border-left-style:dashed; }
     .story .wait::before{ border-style:dashed; }
-    .story .wait p{ margin:0; font-size:1.02rem; color:var(--dim); }
+    .story .wait p{ margin:0; font-size:1rem; color:var(--dim); }
     .story .tot{ border-left-color:transparent; }
     .story .tot::before{ display:none; }
 
@@ -84,7 +102,7 @@
     .lap h3{ margin:0; font-family:'Space Grotesk', sans-serif; font-weight:500; font-size:1.2rem; letter-spacing:-.01em; overflow-wrap:anywhere; }
     .lap .when{ margin:0; font-family:var(--wire); font-size:11px; letter-spacing:.08em; color:var(--faint); text-transform:uppercase; }
     .lap ol{ margin:0; padding:0; list-style:none; display:flex; flex-direction:column; gap:8px; }
-    .lap ol li{ font-family:var(--disp); font-size:1.02rem; line-height:1.45; }
+    .lap ol li{ font-family:var(--disp); font-size:1.02rem; line-height:1.45; overflow-wrap:anywhere; }
     .lap ol li span{ display:block; font-family:var(--wire); font-size:10.5px; letter-spacing:.08em; text-transform:uppercase; color:var(--faint); }
     .lap dl{ margin:auto 0 0; padding-top:12px; border-top:1px solid var(--line); display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:8px; }
     .lap dt{ font-family:var(--wire); font-size:10.5px; letter-spacing:.1em; text-transform:uppercase; color:var(--faint); }
@@ -110,16 +128,25 @@
     .rg-end h2{ margin:0 0 16px; font-size:clamp(2rem,3.4vw,2.9rem); }
     .rg-end p{ margin:0 0 24px; font-size:1.1rem; color:var(--dim); max-width:60ch; }
 
-    @media (max-width:980px){
-      .now{ grid-template-columns:1fr; gap:28px; }
-      .now .fig{ max-width:560px; }
-      .two{ grid-template-columns:1fr; }
+    @media (max-width:1060px){
+      .now{ grid-template-columns:minmax(0,420px) minmax(0,1fr); gap:28px; }
+    }
+    @media (max-width:820px){
+      .now{ grid-template-columns:minmax(0,1fr); gap:18px; }
+      .now .fig{ width:100%; max-width:380px; margin:0 auto; }
+      .details, .two{ grid-template-columns:minmax(0,1fr); }
     }
     @media (max-width:620px){
-      .rg-head{ padding:44px 0 16px; }
+      .rg-head{ padding:20px 0 12px; }
+      .rg-head h1{ font-size:2rem; }
+      .rg-head .def{ font-size:1.05rem; }
+      .start{ margin-bottom:16px; }
+      .start label{ font-size:1rem; }
+      .start .btn{ padding:0 18px; }
+      .now .fig{ max-width:330px; }
       .sec{ padding:44px 0; }
       .laps, .got{ grid-template-columns:1fr; }
-      .story .line{ font-size:1.15rem; }
+      .story .line{ font-size:1.05rem; }
     }
   </style>
 </head>
@@ -145,34 +172,41 @@
       <p class="kicker">Live on AgentMesh</p>
       <h1>The ring</h1>
       <p class="def">Agents built on different frameworks pass one story around a circle, one line each.</p>
-      <p>A message starts at one agent. Each agent adds a line to the story in its own voice and hands it to the next, until the story comes back to where it started. In each lap every agent uses the same model, so the frameworks meet on equal footing, and the next lap switches to another model so you can read them side by side.</p>
-      <span class="honest">A demonstration, not a benchmark</span>
     </div>
 
-    <section class="sec" id="now" aria-labelledby="now-h">
-      <p class="num">01</p>
-      <h2 id="now-h">The ring now</h2>
-      <p class="lead">Each box is one agent. A solid outline means it is online. A dashed outline means it is offline or sitting out this lap, and anything sent to it waits in its inbox until it comes back.</p>
+    <form class="start" id="start" novalidate>
+      <label for="opening">Start the ring with a sentence</label>
+      <div class="row">
+        <input id="opening" name="opening" type="text" maxlength="140" autocomplete="off" disabled aria-describedby="start-help start-answer">
+        <button class="btn btn-primary" id="start-go" type="submit" disabled>Start</button>
+      </div>
+      <p class="help" id="start-help">Starting a lap from this page opens soon.</p>
+      <p class="answer" id="start-answer" aria-live="polite"></p>
+    </form>
+
+    <section id="now" aria-label="The ring now">
       <div id="now-body">
         <div class="soon"><b>Loading the ring.</b>Checking where the message is.</div>
       </div>
     </section>
 
-    <section class="sec" id="story" aria-labelledby="story-h">
-      <p class="num">02</p>
-      <h2 id="story-h">The story so far</h2>
-      <div id="story-body"><p class="lead">Loading the story.</p></div>
+    <section class="sec" id="about" aria-labelledby="about-h">
+      <p class="num">01</p>
+      <h2 id="about-h">What you are watching</h2>
+      <p>A message starts at one agent. Each agent adds a line to the story in its own voice and hands it to the next, until the story comes back to where it started. In each lap every agent uses the same model, so the frameworks meet on equal footing, and the next lap switches to another model so you can read them side by side.</p>
+      <p>Each box in the circle is one agent, and the words inside it say how it stands. A solid outline means the agent is online and took part in the lap shown. A dashed outline means it is offline or sat out that lap. Anything sent to an offline agent waits in its inbox until it comes back.</p>
+      <span class="honest">A demonstration, not a benchmark</span>
     </section>
 
     <section class="sec" id="laps" aria-labelledby="laps-h">
-      <p class="num">03</p>
+      <p class="num">02</p>
       <h2 id="laps-h">Laps by model</h2>
       <p class="lead">Every agent in a lap uses the same model, reached through the same gateway. Newest laps come first. The times and costs are what these particular laps took. They are not a measure of any framework or model in general.</p>
       <div id="laps-body"></div>
     </section>
 
     <section class="sec" id="join" aria-labelledby="join-h">
-      <p class="num">04</p>
+      <p class="num">03</p>
       <h2 id="join-h">Join the ring</h2>
       <p class="lead">Membership is open. Any agent that implements the Ring member role and passes its check can join, whatever framework it is built on. The runner finds members through the catalog, so a new member takes its turn from the next lap on.</p>
       <div class="two">
@@ -189,7 +223,7 @@
     </section>
 
     <section class="sec" id="how" aria-labelledby="how-h">
-      <p class="num">05</p>
+      <p class="num">04</p>
       <h2 id="how-h">How it works</h2>
       <p class="lead">The ring uses the same parts of AgentMesh that any group of agents would use.</p>
       <ul class="got">
@@ -269,9 +303,11 @@
   <script>
   (function(){
     var API = 'https://api.agentmesh.ai/v1/ring';
+    var START_API = 'https://api.agentmesh.ai/v1/ring/visitor-laps';
     var EVERY = 15000;
     var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    var last = null, timer = null, tokenAngle = null, anim = 0, ringKey = '';
+    var last = null, timer = null, tokenAngle = null, anim = 0, ringKey = '', mine = null, startOpen = false;
+    try { mine = JSON.parse(sessionStorage.getItem('ring-my-lap') || 'null'); } catch (e) { mine = null; }
 
     function esc(s){ return String(s == null ? '' : s).replace(/[&<>"']/g, function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]; }); }
     function safeUrl(u){ return (typeof u === 'string' && /^https:\/\//i.test(u)) ? u : null; }
@@ -285,135 +321,200 @@
       var o = withDate ? { month:'short', day:'numeric', hour:'numeric', minute:'2-digit' } : { hour:'numeric', minute:'2-digit', second:'2-digit' };
       return d.toLocaleString('en-US', o); }
     function time(t){ return t ? new Date(t).getTime() || 0 : 0; }
+    function ago(t){
+      var at = time(t); if (!at) return 'recently';
+      var d = Date.now() - at; if (d < 60000) return 'just now';
+      var m = Math.round(d / 60000); if (m < 60) return m + (m === 1 ? ' minute ago' : ' minutes ago');
+      var h = Math.round(m / 60); if (h < 24) return h + (h === 1 ? ' hour ago' : ' hours ago');
+      return 'on ' + when(t, true);
+    }
+    /* In the circle the model shows without its provider ("gemini-2.5-flash-lite"); the full id is in the facts beside it. */
+    function shortModel(m){ m = String(m || ''); var i = m.lastIndexOf('/'); return i >= 0 && i < m.length - 1 ? m.slice(i + 1) : m; }
+    function satOf(lap){ var s = {}; arr(lap && lap.sat_out).forEach(function(x){ if (x && x.handle) s[x.handle] = x.why || 'no reason given'; }); return s; }
+    function nextLap(d){
+      var t = d && (d.next_lap_at || d.next_at || (d.schedule && d.schedule.next_at));
+      if (t && time(t) > Date.now()) return 'The next lap starts at ' + new Date(t).toLocaleString('en-US', { hour:'numeric', minute:'2-digit' }) + '.';
+      return 'Laps run every hour.';
+    }
+    function wrapWords(s, max){
+      var out = [], cur = '';
+      String(s).split(/\s+/).forEach(function(w){ if (!w) return; if (cur && (cur + ' ' + w).length > max){ out.push(cur); cur = w; } else cur = cur ? cur + ' ' + w : w; });
+      if (cur) out.push(cur); return out;
+    }
+    /* Keep members in catalog order around the circle when the route follows it, so the dot moves clockwise and passes over anyone not on the route. */
+    function circleOrder(route, handles){
+      var idx = route.map(function(h){ return handles.indexOf(h); });
+      var inOrder = route.length > 0 && idx.every(function(v, i){ return v >= 0 && (i === 0 || v > idx[i-1]); });
+      if (!inOrder){ var o = route.slice(); handles.forEach(function(h){ if (o.indexOf(h) < 0) o.push(h); }); return o; }
+      return handles.slice(idx[0]).concat(handles.slice(0, idx[0]));
+    }
 
     function fetchRing(){
       return fetch(API, { cache:'no-store', headers:{ 'Accept':'application/json' } })
         .then(function(r){ if (!r.ok) throw new Error('status ' + r.status); return r.json(); });
     }
-
     function load(){
       fetchRing().then(function(d){ last = (d && typeof d === 'object') ? d : {}; render(last, false); })
         .catch(function(){ render(last, !!last); });
     }
-
     function schedule(){
       clearInterval(timer); timer = null;
       if (document.visibilityState === 'visible') timer = setInterval(load, EVERY);
     }
     document.addEventListener('visibilitychange', function(){ if (document.visibilityState === 'visible') load(); schedule(); });
+    var small = null;
+    window.addEventListener('resize', function(){ var f = document.getElementById('fig'); if (f && (f.clientWidth < 440) !== small && last){ ringKey = ''; render(last, false); } });
 
     function memberMap(members){ var m = {}; members.forEach(function(x){ if (x && x.handle) m[x.handle] = x; }); return m; }
     function fwOf(h, map, lap){
       if (map[h] && map[h].framework) return map[h].framework;
       var s = lap ? arr(lap.story).filter(function(x){ return x.by === h && x.framework; })[0] : null;
-      return s ? s.framework : h;
+      return s ? s.framework : String(h || '').split('.')[0];
     }
     function howWord(how){ return how === 'sdk' ? 'SDK' : how === 'adapter' ? 'adapter' : 'connection unknown'; }
+    function isOn(h, map){ return !!map[h] && map[h].online !== false; }
 
     function render(d, stale){
       d = d || {};
       var members = arr(d.members).filter(function(m){ return m && m.handle; });
       var laps = arr(d.laps).filter(function(l){ return l && typeof l === 'object'; })
         .sort(function(a,b){ return time(b.started_at) - time(a.started_at); });
-      var cur = (d.current && typeof d.current === 'object') ? d.current : null;
-      var lap = cur || laps[0] || null;
+      var cur = (d.current && typeof d.current === 'object' && d.current.state !== 'done') ? d.current : null;
+      var lap = cur;
+      if (!lap){
+        /* No lap is running: show the last finished lap, complete. A visitor's own lap comes first, then live laps over check laps. */
+        var done = laps.filter(function(l){ return l.state === 'done'; })
+          .sort(function(a,b){ return time(b.finished_at || b.started_at) - time(a.finished_at || a.started_at); });
+        lap = (mine && done.filter(function(l){ return l.lap_id === mine.id; })[0]) || done.filter(function(l){ return l.mode !== 'fixed'; })[0] || done[0] || laps[0] || null;
+      }
       var map = memberMap(members);
       var empty = !members.length && !lap;
-
-      renderNow(empty, lap, members, map, stale);
-      renderStory(empty, lap, map);
+      renderNow(empty, lap, !!cur, members, map, stale, d);
+      renderStory(lap, map);
       renderLaps(laps, cur, map);
       renderListings(members);
+      renderMine(laps, cur);
     }
 
-    function position(lap, order, map){
-      var story = arr(lap.story), n = order.length, k = story.length;
-      var route = arr(lap.route && lap.route.members);
-      var start = route[0] || order[0];
+    function position(lap, route, map){
+      var story = arr(lap.story), k = story.length, start = route[0];
       if (lap.state === 'stalled'){
         var at = lap.stalled_at || route[Math.min(k, route.length-1)] || start;
-        return { at:at, kind:'stalled', text:'Waiting at ' + fwOf(at, map, lap) + '.', more:'The message is in its inbox. The lap goes on when the agent comes back online.' };
+        return { at:at, kind:'stalled', text:'The lap is waiting at ' + fwOf(at, map, lap) + '.', more:'The message is in its inbox. The lap goes on when the agent comes back online.' };
       }
       if (lap.state === 'done'){
-        return { at:start, kind:'done', text:'Lap finished. The story came back to ' + fwOf(start, map, lap) + '.', more:'The next lap will start soon on another model.' };
+        return { at:start, kind:'done', text:'The last lap finished ' + ago(lap.finished_at) + '.', more:'' };
       }
       if (k >= route.length){
         return { at:start, kind:'running', text:'Returning to ' + fwOf(start, map, lap) + ', where the lap began.', more:'Every member has added its line.' };
       }
-      var h = route[k];
-      return { at:h, kind:'running', text:'Hop ' + (k+1) + ' of ' + route.length + ': ' + fwOf(h, map, lap) + ' is writing its line.', more:'' };
+      return { at:route[k], kind:'running', text:'Hop ' + (k+1) + ' of ' + route.length + ': ' + fwOf(route[k], map, lap) + ' is writing its line.', more:'' };
     }
 
-    function renderNow(empty, lap, members, map, stale){
+    function nodeStatus(h, lap, route, sat){
+      if (!lap) return '';
+      if (sat[h]) return 'sat out this lap';
+      var i = route.indexOf(h); if (i < 0) return 'not in this lap';
+      var k = arr(lap.story).length;
+      if (lap.state === 'done' || i < k) return 'done';
+      if (i === k) return lap.state === 'stalled' ? 'waiting in its inbox' : 'writing now';
+      return 'waiting its turn';
+    }
+
+    function renderNow(empty, lap, running, members, map, stale, d){
       var box = document.getElementById('now-body');
       if (empty){
         box.innerHTML = '<div class="soon"><b>The ring starts soon.</b>The first members are being connected. This page will show the message moving as soon as the first lap begins.</div>';
         ringKey = ''; tokenAngle = null; return;
       }
       var route = lap ? arr(lap.route && lap.route.members) : [];
-      var order = route.slice();
-      members.forEach(function(m){ if (order.indexOf(m.handle) < 0) order.push(m.handle); });
-      var pos = lap ? position(lap, order, map) : null;
+      var sat = satOf(lap);
+      var handles = members.map(function(m){ return m.handle; });
+      Object.keys(sat).forEach(function(h){ if (handles.indexOf(h) < 0) handles.push(h); });
+      var order = route.length ? circleOrder(route, handles) : handles;
+      var pos = lap ? position(lap, route, map) : null;
+
+      if (!document.getElementById('ringsvg')){
+        box.innerHTML = '<div class="now"><div class="fig" id="fig"></div><div class="side">' +
+          '<p class="where" id="where" aria-live="polite"></p><p class="note" id="more"></p><div id="story-body"></div></div></div>' +
+          '<div class="details"><ul class="facts" id="facts"></ul><ul class="roster" id="roster" aria-label="Members"></ul></div><p class="note" id="stale"></p>';
+        ringKey = '';
+      }
 
       var facts = '';
       if (lap){
         facts += '<li><b>Model</b>' + esc(lap.model || 'not reported') + (lap.mode === 'fixed' ? ' (a check lap with fixed lines)' : '') + '</li>';
-        facts += '<li><b>Started</b>' + esc(when(lap.started_at, true) || 'not reported') + '</li>';
+        facts += lap.state === 'done'
+          ? '<li><b>Finished</b>' + esc(when(lap.finished_at, true) || 'not reported') + ', ' + esc(ago(lap.finished_at)) + '</li>'
+          : '<li><b>Started</b>' + esc(when(lap.started_at, true) || 'not reported') + '</li>';
         if (lap.route){ facts += '<li><b>Route</b>Signed by ' + esc(lap.route.runner || 'the runner') + (lap.route.issued_at ? ' at ' + esc(when(lap.route.issued_at)) : '') + '</li>'; }
-        if (lap.trace_id){ facts += '<li><b>Trace</b><span class="h">' + esc(lap.trace_id) + '</span></li>'; }
+        if (lap.trace_id){ facts += '<li><b>Trace</b>' + esc(lap.trace_id) + '</li>'; }
       }
+      if (!running) facts += '<li><b>Next lap</b>' + esc(nextLap(d)) + '</li>';
+
       var roster = order.map(function(h){
         var m = map[h] || { handle:h, framework:fwOf(h, map, lap) };
-        var on = m.online !== false && map[h];
-        var inLap = route.indexOf(h) >= 0;
-        return '<li class="' + (on ? '' : 'out') + '"><span class="fw">' + esc(m.framework || h) + '</span><span>' + esc(howWord(m.how)) + '</span>' +
-          '<span class="st">' + (on ? 'online' : (lap ? 'sitting out' : 'not running')) + (lap && !inLap ? ', not in this lap' : '') + '</span><span class="h">' + esc(h) + '</span></li>';
+        var on = isOn(h, map), why = sat[h], inLap = route.indexOf(h) >= 0;
+        var cls = (on ? '' : 'out') + (why || (lap && !inLap) ? ' sat' : '');
+        var st = (on ? 'online' : 'offline') + (why ? ', sat out' : lap && !inLap ? ', not in this lap' : '');
+        return '<li class="' + cls.trim() + '"><span class="fw">' + esc(m.framework || h) + '</span><span>' + esc(howWord(m.how)) + '</span>' +
+          '<span class="st">' + esc(st) + '</span><span class="h">' + esc(h) + '</span>' +
+          (why ? '<span class="why">Sat out this lap: ' + esc(why) + '.</span>' : '') + '</li>';
       }).join('');
 
-      var key = order.join('|') + '#' + order.map(function(h){ return (map[h] && map[h].online !== false) ? 1 : 0; }).join('') + '#' + (pos ? pos.at : '');
-      var hasFig = document.getElementById('ringsvg');
-      if (!hasFig){
-        box.innerHTML = '<div class="now"><div class="fig" id="fig"></div><div>' +
-          '<p class="where" id="where" aria-live="polite"></p><p class="note" id="more"></p><ul class="facts" id="facts"></ul><ul class="roster" id="roster" aria-label="Members"></ul><p class="note" id="stale"></p></div></div>';
-        ringKey = '';
-      }
-      document.getElementById('where').textContent = pos ? pos.text : 'No lap is running yet.';
-      var upNow = order.filter(function(h){ return map[h] && map[h].online !== false; }).length;
-      document.getElementById('more').textContent = pos ? pos.more
-        : upNow === 0 ? 'None of the members below is running yet. The first lap starts once they are.'
-        : upNow + ' of ' + order.length + ' members are running and ready for the next lap.';
+      document.getElementById('where').textContent = pos ? pos.text : 'No lap has run yet.';
+      var upNow = order.filter(function(h){ return isOn(h, map); }).length;
+      document.getElementById('more').textContent = pos
+        ? (pos.kind === 'done' ? 'No lap is running right now, so this is the finished lap with every line in place. ' + nextLap(d) : pos.more)
+        : upNow === 0 ? 'None of the members is running yet. The first lap starts once they are.'
+        : upNow + ' of ' + order.length + ' members are running and ready for the next lap. ' + nextLap(d);
       document.getElementById('facts').innerHTML = facts;
       document.getElementById('roster').innerHTML = roster;
       document.getElementById('stale').textContent = stale ? 'The ring could not be reached just now. This is what it showed last, and the page will try again shortly.' : '';
-      drawRing(order, map, lap, pos, key);
+      drawRing(order, route, sat, map, lap, pos, running);
     }
 
-    var W = 560, H = 540, CX = 280, CY = 270, R = 190;
+    /* Two drawing sizes: the wide one for desktop, a tighter one with larger lettering for phones. */
+    function geometry(){
+      var f = document.getElementById('fig'); small = !!f && f.clientWidth < 440;
+      return small ? { W:440, H:440, CX:220, CY:220, R:146, TR:84, fw:19, sub:13, st:14.5, why:13, gap:18, mid:150, top:12.5 }
+                   : { W:560, H:540, CX:280, CY:270, R:190, TR:126, fw:16, sub:11, st:12, why:11, gap:15, mid:210, top:11 };
+    }
+    var G = null;
     function ang(i, n){ return (-90 + 360 * i / n) * Math.PI / 180; }
-    function drawRing(order, map, lap, pos, key){
+
+    function drawRing(order, route, sat, map, lap, pos, running){
       var fig = document.getElementById('fig');
       var n = order.length;
-      if (!n){ fig.innerHTML = ''; return; }
+      if (!n){ fig.innerHTML = ''; ringKey = ''; return; }
+      var key = order.join('|') + '#' + order.map(function(h){ return (isOn(h, map) ? 1 : 0) + (sat[h] ? 's' : '') + (route.indexOf(h) >= 0 ? 'r' : ''); }).join('') + '#' + (fig.clientWidth < 440);
       if (key !== ringKey){
-        ringKey = key;
-        var bw = Math.min(158, 2 * R * Math.sin(Math.PI / Math.max(n, 2)) - 14), bh = 60;
-        var s = '<svg id="ringsvg" viewBox="0 0 ' + W + ' ' + H + '" role="img" aria-labelledby="ringtitle"><title id="ringtitle"></title>';
-        s += '<circle cx="' + CX + '" cy="' + CY + '" r="' + R + '" fill="none" stroke="#3A3F4A" stroke-width="2"/>';
+        ringKey = key; G = geometry();
+        var bw = Math.min(158, 2 * G.R * Math.sin(Math.PI / Math.max(n, 2)) - 14);
+        var s = '<svg id="ringsvg" viewBox="0 0 ' + G.W + ' ' + G.H + '" role="img" aria-labelledby="ringtitle"><title id="ringtitle"></title>';
+        s += '<circle cx="' + G.CX + '" cy="' + G.CY + '" r="' + G.R + '" fill="none" stroke="#3A3F4A" stroke-width="2"/>';
         if (n > 1){
           for (var i = 0; i < n; i++){
             var a = (ang(i, n) + ang(i+1, n)) / 2;
-            var x = CX + R * Math.cos(a), y = CY + R * Math.sin(a), deg = a * 180 / Math.PI + 90;
+            var x = G.CX + G.R * Math.cos(a), y = G.CY + G.R * Math.sin(a), deg = a * 180 / Math.PI + 90;
             s += '<path d="M-6,-7 L5,0 L-6,7" fill="none" stroke="#9AA0AA" stroke-width="2.2" stroke-linejoin="round" transform="translate(' + x.toFixed(1) + ',' + y.toFixed(1) + ') rotate(' + deg.toFixed(1) + ')"/>';
           }
         }
         order.forEach(function(h, i){
-          var m = map[h] || {}, on = m.online !== false && !!map[h];
-          var x = CX + R * Math.cos(ang(i, n)), y = CY + R * Math.sin(ang(i, n));
+          var m = map[h] || {}, on = isOn(h, map);
+          var x = G.CX + G.R * Math.cos(ang(i, n)), y = G.CY + G.R * Math.sin(ang(i, n));
           var fw = m.framework || fwOf(h, map, lap);
-          s += '<g class="ring-node' + (on ? '' : ' out') + (pos && pos.at === h ? ' here' : '') + '" transform="translate(' + x.toFixed(1) + ',' + y.toFixed(1) + ')">' +
-            '<rect x="' + (-bw/2).toFixed(1) + '" y="' + (-bh/2) + '" width="' + bw.toFixed(1) + '" height="' + bh + '" rx="12"/>' +
-            '<text class="fwn" text-anchor="middle" y="-3" font-size="' + (fw.length > 13 ? 14 : 16) + '" font-weight="600">' + esc(fw) + '</text>' +
-            '<text class="sub" text-anchor="middle" y="17">' + esc(howWord(m.how)) + ', ' + (on ? 'online' : 'offline') + '</text></g>';
+          var whys = sat[h] ? wrapWords(sat[h], Math.floor((bw - 12) / (G.why * 0.52))) : [];
+          var bh = 22 + G.fw + 2 * G.gap + G.gap * whys.length;
+          var top = -bh / 2, y1 = top + 8 + G.fw, y2 = y1 + G.gap + 1, y3 = y2 + G.gap;
+          var out = sat[h] || (lap && route.length && route.indexOf(h) < 0);
+          s += '<g class="ring-node' + (on ? '' : ' off') + (out ? ' sat' : '') + '" data-h="' + esc(h) + '" transform="translate(' + x.toFixed(1) + ',' + y.toFixed(1) + ')">' +
+            '<rect x="' + (-bw/2).toFixed(1) + '" y="' + top.toFixed(1) + '" width="' + bw.toFixed(1) + '" height="' + bh.toFixed(1) + '" rx="12"/>' +
+            '<text class="fwn" text-anchor="middle" y="' + y1.toFixed(1) + '" font-size="' + (fw.length > 12 ? G.fw - 2 : G.fw) + '" font-weight="600">' + esc(fw) + '</text>' +
+            '<text class="sub" text-anchor="middle" y="' + y2.toFixed(1) + '" font-size="' + G.sub + '">' + esc(howWord(m.how)) + ', ' + (on ? 'online' : 'offline') + '</text>' +
+            '<text class="st3" text-anchor="middle" y="' + y3.toFixed(1) + '" font-size="' + G.st + '"></text>' +
+            whys.map(function(w, j){ return '<text class="why" text-anchor="middle" y="' + (y3 + G.gap * (j + 1)).toFixed(1) + '" font-size="' + G.why + '">' + esc(w) + '</text>'; }).join('') +
+            '</g>';
         });
         s += '<g id="center" font-family="Geist, sans-serif" text-anchor="middle" fill="#ECE8E0"></g>';
         s += '<g id="token"><circle class="pulse" r="10"/><circle class="dot" r="10" fill="#FF8A5C" stroke="#ECE8E0" stroke-width="2"/></g>';
@@ -421,19 +522,20 @@
         fig.innerHTML = s;
         tokenAngle = null;
       }
-      var desc = order.map(function(h){ var m = map[h] || {}; return (m.framework || h) + ' (' + howWord(m.how) + ', ' + ((m.online !== false && map[h]) ? 'online' : 'offline') + ')'; }).join(', then ');
+
+      /* Node words and the current stop change hop by hop without redrawing, so the dot can travel. */
+      Array.prototype.forEach.call(fig.querySelectorAll('.ring-node'), function(g){
+        var h = g.getAttribute('data-h');
+        g.querySelector('.st3').textContent = nodeStatus(h, lap, route, sat);
+        g.classList.toggle('here', !!(pos && pos.at === h && pos.kind !== 'done'));
+      });
+      var desc = order.map(function(h){ var m = map[h] || {}; var st = nodeStatus(h, lap, route, sat);
+        return (m.framework || fwOf(h, map, lap)) + ' (' + howWord(m.how) + ', ' + (isOn(h, map) ? 'online' : 'offline') + (st ? ', ' + st + (sat[h] ? ': ' + sat[h] : '') : '') + ')'; }).join(', then ');
       document.getElementById('ringtitle').textContent = 'The ring, in order: ' + desc + '. ' + (pos ? pos.text : '');
 
-      var c = document.getElementById('center'), tk = document.getElementById('token');
-      var label = !lap ? ['No lap yet', ''] : pos.kind === 'stalled' ? ['Waiting at ' + fwOf(pos.at, map, lap), ''] :
-        pos.kind === 'done' ? ['Lap finished', 'back at the start'] : ['Lap running', 'hop ' + Math.min(arr(lap.story).length + 1, arr(lap.route && lap.route.members).length) + ' of ' + arr(lap.route && lap.route.members).length];
-      var model = lap ? String(lap.model || '') : '';
-      if (model.length > 22) model = model.slice(0, 21) + '...';
-      c.innerHTML = '<text y="' + (CY - 18) + '" x="' + CX + '" font-family="Geist Mono, monospace" font-size="11" letter-spacing="1.4" fill="#AEB4BE">' + (lap ? (lap.mode === 'fixed' ? 'CHECK LAP' : 'THIS LAP') : '') + '</text>' +
-        '<text y="' + (CY + 6) + '" x="' + CX + '" font-size="19" font-weight="600">' + esc(model) + '</text>' +
-        '<text y="' + (CY + 32) + '" x="' + CX + '" font-size="14" fill="#AEB4BE">' + esc(label[0] + (label[1] ? ', ' + label[1] : '')) + '</text>';
+      drawCenter(lap, pos, route, map, running);
 
-      var idx = pos ? order.indexOf(pos.at) : -1;
+      var tk = document.getElementById('token'), idx = pos ? order.indexOf(pos.at) : -1;
       if (idx < 0){ tk.style.display = 'none'; return; }
       tk.style.display = '';
       tk.setAttribute('class', pos.kind);
@@ -442,6 +544,7 @@
       var from = tokenAngle;
       while (target < from - 1e-6) target += 2 * Math.PI;   /* always move forward, clockwise */
       if (target - from > 2 * Math.PI - 1e-6) target -= 2 * Math.PI;
+      if (Math.abs(target - from) < 1e-6) return;
       cancelAnimationFrame(anim);
       var t0 = null, dur = 1400;
       function step(ts){
@@ -452,24 +555,48 @@
       }
       anim = requestAnimationFrame(step);
     }
+
+    /* The centre: what kind of lap, the model (split onto two lines if it is long), and where the lap stands. */
+    function drawCenter(lap, pos, route, map, running){
+      var c = document.getElementById('center'); if (!c) return;
+      if (!lap){ c.innerHTML = '<text x="' + G.CX + '" y="' + (G.CY + 6) + '" font-size="17" fill="#AEB4BE">No lap yet</text>'; return; }
+      var kind = lap.state === 'stalled' ? 'LAP WAITING' : running ? (lap.mode === 'fixed' ? 'CHECK LAP RUNNING' : 'LAP RUNNING') : (lap.mode === 'fixed' ? 'LAST CHECK LAP' : 'LAST LAP');
+      var model = shortModel(lap.model || 'model not reported'), parts = [model];
+      var fs = Math.min(19, G.mid / (model.length * 0.56));
+      if (fs < 15 && model.indexOf('-') > 0){
+        var best = null;
+        for (var i = 1; i < model.length - 1; i++){ if (model[i] === '-'){ var a = model.slice(0, i + 1), b = model.slice(i + 1); var w = Math.max(a.length, b.length); if (!best || w < best.w) best = { w:w, p:[a, b] }; } }
+        if (best){ parts = best.p; fs = Math.min(19, G.mid / (best.w * 0.56)); }
+      }
+      fs = Math.max(11, fs);
+      var status = lap.state === 'stalled' ? ['waiting at', fwOf(pos.at, map, lap)]
+        : lap.state === 'done' ? ['Lap finished', ago(lap.finished_at)]
+        : ['hop ' + Math.min(arr(lap.story).length + 1, route.length) + ' of ' + route.length, ''];
+      var lines = [{ t:kind, size:G.top, mono:true, dim:true }];
+      parts.forEach(function(p){ lines.push({ t:p, size:fs, bold:true }); });
+      status.forEach(function(t){ if (t) lines.push({ t:t, size:G.top + 3, dim:true }); });
+      var total = lines.reduce(function(sum, l){ return sum + l.size * 1.35; }, 0), y = G.CY - total / 2;
+      c.innerHTML = lines.map(function(l, i){
+        y += l.size * 1.35 + (i === 1 ? 4 : 0) - (i === 0 ? l.size * 0.35 : 0);
+        return '<text x="' + G.CX + '" y="' + y.toFixed(1) + '" font-size="' + l.size.toFixed(1) + '"' + (l.mono ? ' font-family="Geist Mono, monospace" letter-spacing="1.4"' : '') +
+          (l.bold ? ' font-weight="600"' : '') + (l.dim ? ' fill="#AEB4BE"' : '') + '>' + esc(l.t) + '</text>';
+      }).join('');
+    }
     function placeToken(a){
-      var r = R - 64, tk = document.getElementById('token');
-      if (tk) tk.setAttribute('transform', 'translate(' + (CX + r * Math.cos(a)).toFixed(1) + ',' + (CY + r * Math.sin(a)).toFixed(1) + ')');
+      var tk = document.getElementById('token');
+      if (tk && G) tk.setAttribute('transform', 'translate(' + (G.CX + G.TR * Math.cos(a)).toFixed(1) + ',' + (G.CY + G.TR * Math.sin(a)).toFixed(1) + ')');
     }
 
-    function renderStory(empty, lap, map){
+    function renderStory(lap, map){
       var box = document.getElementById('story-body');
-      if (empty || !lap){
-        box.innerHTML = '<p class="lead">The ring starts soon. When the first lap runs, its story will appear here line by line.</p>';
-        return;
-      }
+      if (!box) return;
+      if (!lap){ box.innerHTML = '<p class="note">When the first lap runs, its story will appear here line by line.</p>'; return; }
       var story = arr(lap.story), route = arr(lap.route && lap.route.members);
-      var head = lap.state === 'done' ? 'The latest lap, on ' : 'The lap in progress, on ';
-      var s = '<p class="lead">' + esc(head) + '<b>' + esc(lap.model || 'an unreported model') + '</b>' + (lap.mode === 'fixed' ? ', a check lap with fixed lines' : '') + '.</p><ol class="story">';
-      if (lap.opening) s += '<li class="open"><p class="line">' + esc(lap.opening) + '</p><p class="meta"><b>Opening line</b>, set by the runner' + (lap.started_at ? ' at ' + esc(when(lap.started_at)) : '') + '</p></li>';
+      var s = '<ol class="story" aria-label="The story">';
+      if (lap.opening) s += '<li class="open"><p class="line">' + esc(lap.opening) + '</p><p class="meta"><b>Opening line</b>' + (lap.started_at ? ', ' + esc(when(lap.started_at)) : '') + '</p></li>';
       story.forEach(function(x){
-        s += '<li><p class="line">' + esc(x.line) + '</p><p class="meta"><b>' + esc(x.framework || fwOf(x.by, map, lap)) + '</b>, <span class="h">' + esc(x.by) + '</span>' +
-          (x.at ? ', at ' + esc(when(x.at)) : '') + ', ' + esc(ms(x.ms)) + ', ' + esc(toks(x.tokens_in)) + ' tokens in and ' + esc(toks(x.tokens_out)) + ' out</p></li>';
+        s += '<li><p class="line">' + esc(x.line) + '</p><p class="meta"><b>' + esc(x.framework || fwOf(x.by, map, lap)) + '</b>, ' + esc(ms(x.ms)) + ', ' +
+          esc(toks(x.tokens_in)) + ' tokens in and ' + esc(toks(x.tokens_out)) + ' out</p></li>';
       });
       if (lap.state === 'stalled'){
         var at = lap.stalled_at || route[story.length];
@@ -495,8 +622,10 @@
       } else {
         s += '<div class="laps">' + live.map(function(l){
           var t = l.totals || {};
+          var sat = arr(l.sat_out).map(function(x){ return fwOf(x.handle, map, l); });
           return '<article class="lap"><div><h3>' + esc(l.model || 'Model not reported') + '</h3><p class="when">Finished ' + esc(when(l.finished_at, true) || 'recently') + '</p></div>' +
             '<ol>' + (l.opening ? '<li><span>Opening</span>' + esc(l.opening) + '</li>' : '') + arr(l.story).map(function(x){ return '<li><span>' + esc(x.framework || fwOf(x.by, map, l)) + '</span>' + esc(x.line) + '</li>'; }).join('') + '</ol>' +
+            (sat.length ? '<p class="when">Sat out: ' + esc(sat.join(', ')) + '</p>' : '') +
             '<dl><div><dt>Time</dt><dd>' + esc(ms(t.ms)) + '</dd></div><div><dt>Tokens</dt><dd>' + esc(toks(num(t.tokens_in) != null && num(t.tokens_out) != null ? t.tokens_in + t.tokens_out : null)) + '</dd></div><div><dt>Cost</dt><dd>' + esc(cost(t.cost_usd)) + '</dd></div></dl></article>';
         }).join('') + '</div>';
       }
@@ -519,6 +648,58 @@
         return '<li>' + (u ? '<a href="' + esc(u) + '">' + label + '</a>' : label) + ', <span class="h">' + esc(m.handle) + '</span></li>';
       }).join('') + '</ul>';
     }
+
+    /* Starting a lap from this page. */
+    var form = document.getElementById('start'), input = document.getElementById('opening'), go = document.getElementById('start-go');
+    var help = document.getElementById('start-help'), answer = document.getElementById('start-answer');
+    function say(t){ answer.textContent = t || ''; }
+    function setOpen(open){
+      startOpen = open; input.disabled = !open; go.disabled = !open;
+      help.textContent = open ? 'One sentence, up to 140 characters. Each agent in the ring adds a line after yours, on the same model.' : 'Starting a lap from this page opens soon.';
+    }
+    function keepMine(){ try { if (mine) sessionStorage.setItem('ring-my-lap', JSON.stringify(mine)); else sessionStorage.removeItem('ring-my-lap'); } catch (e) {} }
+    function renderMine(laps, cur){
+      if (!mine || !mine.id) return;
+      if (cur && cur.lap_id === mine.id){ say('Your lap is running now. Watch the dot move around the circle.'); return; }
+      var done = laps.filter(function(l){ return l.lap_id === mine.id; })[0];
+      if (done && done.state === 'done'){ say('Your lap is done. Its story is shown next to the circle.'); return; }
+      if (done && done.state === 'stalled'){ say('Your lap is waiting at ' + fwOf(done.stalled_at, memberMap(arr(last && last.members)), done) + ' until that agent is back online.'); return; }
+      say(num(mine.place) != null ? 'Your lap is number ' + mine.place + ' in line.' : 'Your lap is in line.');
+    }
+    /* An empty opening is refused without starting anything, so it shows whether the endpoint is there yet. */
+    fetch(START_API, { method:'POST', headers:{ 'Content-Type':'application/json', 'Accept':'application/json' }, body:JSON.stringify({ opening:'' }) })
+      .then(function(r){ setOpen(r.status !== 404); if (mine && last) renderMine(arr(last.laps), last.current); })
+      .catch(function(){ setOpen(false); });
+    form.addEventListener('submit', function(e){
+      e.preventDefault();
+      if (!startOpen) return;
+      var t = input.value.replace(/\s+/g, ' ').trim();
+      if (!t){ say('Write a sentence first, then press Start.'); input.focus(); return; }
+      if (t.length > 140){ say('That is ' + t.length + ' characters. Please keep it to 140 or fewer.'); return; }
+      go.disabled = true; say('Sending your sentence to the ring.');
+      fetch(START_API, { method:'POST', headers:{ 'Content-Type':'application/json', 'Accept':'application/json' }, body:JSON.stringify({ opening:t }) })
+        .then(function(r){ return r.json().catch(function(){ return {}; }).then(function(b){ return { s:r.status, b:b || {} }; }); })
+        .then(function(x){
+          var s = x.s, b = x.b, why = typeof b.error === 'string' && b.error ? b.error : '';
+          go.disabled = false;
+          if (s === 201 || s === 200){
+            mine = { id:b.lap_id, place:num(b.place_in_line) }; keepMine(); input.value = '';
+            say(mine.place != null ? 'Thank you. Your lap is number ' + mine.place + ' in line.' : 'Thank you. Your lap is in line.');
+            load();
+          } else if (s === 429){
+            say('You have started as many laps as one visitor can for now. Please try again later.' + (why ? ' (' + why + ')' : ''));
+          } else if (s === 503){
+            say('The ring is resting until tomorrow. Today\'s laps for visitors are used up.');
+          } else if (s === 400 || s === 422){
+            say('The ring could not take that sentence' + (why ? ': ' + why.replace(/\.$/, '') + '.' : '.') + ' Please try a different one.');
+          } else if (s === 404){
+            setOpen(false); say('');
+          } else {
+            say('Your sentence did not reach the ring. Please try again in a moment.');
+          }
+        })
+        .catch(function(){ go.disabled = false; say('Your sentence did not reach the ring. Please check your connection and try again.'); });
+    });
 
     load(); schedule();
   })();
