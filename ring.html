@@ -35,9 +35,13 @@
     /* start a lap */
     .start{ margin:0 0 20px; max-width:780px; }
     .start label{ display:block; margin:0 0 8px; font-weight:600; font-size:1.05rem; color:var(--paper); }
-    .start .row{ display:flex; gap:10px; }
-    .start input{ flex:1; min-width:0; font:inherit; font-size:1.05rem; padding:0 14px; min-height:52px; border-radius:14px; border:2px solid var(--paper); background:var(--panel); color:var(--paper); }
+    .start .row{ display:flex; flex-wrap:wrap; gap:10px; }
+    .start input{ flex:1 1 280px; min-width:0; font:inherit; font-size:1.05rem; padding:0 14px; min-height:52px; border-radius:14px; border:2px solid var(--paper); background:var(--panel); color:var(--paper); }
     .start input:disabled{ border-style:dashed; border-color:var(--faint); color:var(--faint); cursor:not-allowed; }
+    .start select{ flex:0 1 auto; min-width:0; font:inherit; font-size:1rem; font-weight:500; padding:0 12px; min-height:52px; border-radius:14px; border:2px solid var(--paper); background:var(--panel); color:var(--paper); cursor:pointer; }
+    .start select:disabled{ border-style:dashed; border-color:var(--faint); color:var(--faint); cursor:not-allowed; }
+    .start .help:empty{ display:none; }
+    .start .help + .help{ margin-top:2px; }
     .start button{ border:0; font:inherit; font-weight:600; cursor:pointer; }
     .start button:disabled{ background:transparent; color:var(--faint); border:2px dashed var(--faint); cursor:not-allowed; }
     .start .help{ margin:8px 0 0; font-size:.92rem; color:var(--dim); }
@@ -76,6 +80,20 @@
     .ring-node .st3{ font-weight:600; }
     .ring-node .why{ fill:#AEB4BE; }
     .ring-node.off .fwn, .ring-node.sat .fwn{ fill:#AEB4BE; }
+    /* pub/sub star: the runner in the middle, one spoke per member. Each spoke's state is its line style and its words, never colour alone. */
+    .spoke{ fill:none; stroke:#3A3F4A; stroke-width:2; }
+    .spoke.wait{ stroke:#9AA0AA; stroke-width:2.2; stroke-dasharray:7 7; }
+    .spoke.idle{ stroke:#9AA0AA; stroke-width:2; stroke-dasharray:2 8; stroke-linecap:round; }
+    .spoke.ans{ stroke:#ECE8E0; stroke-width:3.5; }
+    .spoke.late{ stroke:#ECE8E0; stroke-width:3.5; stroke-dasharray:1 7; stroke-linecap:round; }
+    .spoke.miss{ stroke:#9AA0AA; stroke-width:2; stroke-dasharray:3 9; }
+    #ringsvg.flow .spoke.wait{ animation:flow 1s linear infinite; }
+    @keyframes flow{ to{ stroke-dashoffset:-14; } }
+    .hub rect{ fill:#14161B; stroke:#FF8A5C; stroke-width:3; }
+    .pkt{ fill:#FF8A5C; stroke:#ECE8E0; stroke-width:1.5; }
+    .ring-node.ans rect{ stroke-width:4; }
+    #ringsvg.star .ring-node.off rect{ fill:#14161B; }
+    @media (prefers-reduced-motion:reduce){ #ringsvg.flow .spoke.wait{ animation:none; } }
     #token .pulse{ fill:none; stroke:#FF8A5C; stroke-width:2; transform-box:fill-box; transform-origin:center; opacity:0; }
     #token.running .pulse{ animation:pulse 2.4s ease-out infinite; }
     #token.stalled .dot{ fill:#14161B; stroke:#FF8A5C; stroke-width:3; stroke-dasharray:4 3; }
@@ -95,6 +113,19 @@
     .story .wait p{ margin:0; font-size:1rem; color:var(--dim); }
     .story .tot{ border-left-color:transparent; }
     .story .tot::before{ display:none; }
+    /* pub/sub answers, side by side in the order they arrived */
+    .story .pub p{ margin:0; font-size:1rem; color:var(--dim); }
+    .answers{ list-style:none; margin:4px 0 6px; padding:0; display:grid; grid-template-columns:repeat(auto-fill,minmax(200px,1fr)); gap:10px; }
+    .answers li{ border:2px solid var(--paper); border-radius:12px; padding:9px 12px; min-width:0; }
+    .story .answers li::before{ display:none; }
+    .answers li.late{ border-style:dashed; }
+    .answers li.waiting{ border:2px dashed var(--faint); }
+    .answers li.waiting p{ margin:0; font-size:.95rem; color:var(--dim); }
+    .answers .line{ margin:0 0 4px; font-family:var(--disp); font-size:1rem; line-height:1.38; color:var(--paper); overflow-wrap:anywhere; }
+    .answers .meta{ margin:0; font-size:.84rem; line-height:1.45; color:var(--faint); }
+    .answers .meta b{ color:var(--paper); font-weight:600; }
+    .answers .tag{ display:inline-block; margin-left:6px; padding:0 7px; border:1.5px dashed currentColor; border-radius:999px; font-family:var(--wire); font-size:10.5px; letter-spacing:.1em; text-transform:uppercase; color:var(--paper); }
+    .lap ol li .late{ display:inline; font-family:var(--wire); font-size:10.5px; letter-spacing:.08em; text-transform:uppercase; color:var(--paper); }
 
     /* laps by model */
     .laps{ display:grid; grid-template-columns:repeat(auto-fill,minmax(300px,1fr)); gap:18px; margin-top:22px; }
@@ -177,10 +208,15 @@
     <form class="start" id="start" novalidate>
       <label for="opening">Start the ring with a sentence</label>
       <div class="row">
-        <input id="opening" name="opening" type="text" maxlength="140" autocomplete="off" disabled aria-describedby="start-help start-answer">
+        <input id="opening" name="opening" type="text" maxlength="140" autocomplete="off" disabled aria-describedby="start-help transport-help start-answer">
+        <select id="transport" name="transport" aria-label="How the lap goes round" aria-describedby="transport-help" disabled>
+          <option value="point-to-point" selected>Point-to-point</option>
+          <option value="pubsub" disabled>Pub/sub</option>
+        </select>
         <button class="btn btn-primary" id="start-go" type="submit" disabled>Start</button>
       </div>
       <p class="help" id="start-help">Starting a lap from this page opens soon.</p>
+      <p class="help" id="transport-help">Pub/sub opens when the reference agents subscribe.</p>
       <p class="answer" id="start-answer" aria-live="polite"></p>
     </form>
 
@@ -374,6 +410,19 @@
     function howWord(how){ return how === 'sdk' ? 'SDK' : how === 'adapter' ? 'adapter' : 'connection unknown'; }
     function isOn(h, map){ return !!map[h] && map[h].online !== false; }
 
+    /* Pub/sub laps: no route; the runner publishes one event and every subscriber answers. */
+    function isPub(lap){ return !!lap && lap.transport === 'pubsub'; }
+    function subsOf(lap){ return arr(lap && lap.subscribers).filter(function(s){ return s && s.handle; }); }
+    function lapMembers(lap){ return isPub(lap) ? subsOf(lap).map(function(s){ return s.handle; }) : arr(lap && lap.route && lap.route.members); }
+    function answerOf(lap, h){ return arr(lap && lap.story).filter(function(x){ return x.by === h; })[0] || null; }
+    function after(v){ v = num(v); return v == null ? '' : '+' + ms(v); }
+    function expectedOf(lap){ return subsOf(lap).filter(function(s){ return s.expected !== false; }).map(function(s){ return s.handle; }); }
+    function pubCounts(lap){
+      var exp = expectedOf(lap), story = arr(lap.story);
+      var onTime = story.filter(function(x){ return !x.late; }).length;
+      return { expected:exp.length, answered:exp.filter(function(h){ return !!answerOf(lap, h); }).length, onTime:onTime, late:story.length - onTime };
+    }
+
     function render(d, stale){
       d = d || {};
       var members = arr(d.members).filter(function(m){ return m && m.handle; });
@@ -393,11 +442,18 @@
       renderStory(lap, map);
       renderLaps(laps, cur, map);
       renderListings(members);
+      setTransports(members);
       renderMine(laps, cur);
     }
 
     function position(lap, route, map){
       var story = arr(lap.story), k = story.length, start = route[0];
+      if (isPub(lap)){
+        var c = pubCounts(lap);
+        if (lap.state === 'stalled') return { at:null, kind:'stalled', text:'No member answered the round.', more:'The lap closed without a line. A member that was offline can still answer when it comes back, and its line is marked late.' };
+        if (lap.state === 'done') return { at:null, kind:'done', text:'The last lap finished ' + ago(lap.finished_at) + '.', more:'' };
+        return { at:null, kind:'running', text:'Pub/sub: the runner published one event to ' + c.expected + (c.expected === 1 ? ' member' : ' members') + '. ' + c.answered + ' of ' + c.expected + ' answered.', more:'Every member writes at the same time. The lap closes when all have answered, or after two minutes.' };
+      }
       if (lap.state === 'stalled'){
         var at = lap.stalled_at || route[Math.min(k, route.length-1)] || start;
         return { at:at, kind:'stalled', text:'The lap is waiting at ' + fwOf(at, map, lap) + '.', more:'The message is in its inbox. The lap goes on when the agent comes back online.' };
@@ -414,6 +470,14 @@
     function nodeStatus(h, lap, route, sat){
       if (!lap) return '';
       if (sat[h]) return 'sat out this lap';
+      if (isPub(lap)){
+        var sub = subsOf(lap).filter(function(s){ return s.handle === h; })[0];
+        if (!sub) return 'not in this lap';
+        var a = answerOf(lap, h);
+        if (a) return (a.late ? 'late ' : 'answered ') + after(a.after_ms);
+        if (lap.state === 'running') return sub.expected === false ? 'may answer late' : 'writing now';
+        return sub.expected === false ? 'offline, no answer' : 'no answer';
+      }
       var i = route.indexOf(h); if (i < 0) return 'not in this lap';
       var k = arr(lap.story).length;
       if (lap.state === 'done' || i < k) return 'done';
@@ -427,11 +491,13 @@
         box.innerHTML = '<div class="soon"><b>The ring starts soon.</b>The first members are being connected. This page will show the message moving as soon as the first lap begins.</div>';
         ringKey = ''; tokenAngle = null; return;
       }
-      var route = lap ? arr(lap.route && lap.route.members) : [];
+      var pub = isPub(lap);
+      var route = lap ? lapMembers(lap) : [];
       var sat = satOf(lap);
       var handles = members.map(function(m){ return m.handle; });
       Object.keys(sat).forEach(function(h){ if (handles.indexOf(h) < 0) handles.push(h); });
-      var order = route.length ? circleOrder(route, handles) : handles;
+      route.forEach(function(h){ if (handles.indexOf(h) < 0) handles.push(h); });
+      var order = route.length && !pub ? circleOrder(route, handles) : handles;
       var pos = lap ? position(lap, route, map) : null;
 
       if (!document.getElementById('ringsvg')){
@@ -447,6 +513,8 @@
         facts += lap.state === 'done'
           ? '<li><b>Finished</b>' + esc(when(lap.finished_at, true) || 'not reported') + ', ' + esc(ago(lap.finished_at)) + '</li>'
           : '<li><b>Started</b>' + esc(when(lap.started_at, true) || 'not reported') + '</li>';
+        if (pub){ facts += '<li><b>Transport</b>Pub/sub: one event signed by ring.demo@agentmesh.ai on its own feed, answered by every member at once</li>'; }
+        else { facts += '<li><b>Transport</b>Point-to-point: the story is handed from member to member</li>'; }
         if (lap.route){ facts += '<li><b>Route</b>Signed by ' + esc(lap.route.runner || 'the runner') + (lap.route.issued_at ? ' at ' + esc(when(lap.route.issued_at)) : '') + '</li>'; }
         if (lap.trace_id){ facts += '<li><b>Trace</b>' + esc(lap.trace_id) + '</li>'; }
       }
@@ -471,7 +539,8 @@
       document.getElementById('facts').innerHTML = facts;
       document.getElementById('roster').innerHTML = roster;
       document.getElementById('stale').textContent = stale ? 'The ring could not be reached just now. This is what it showed last, and the page will try again shortly.' : '';
-      drawRing(order, route, sat, map, lap, pos, running);
+      if (pub) drawStar(order, route, sat, map, lap, pos, running);
+      else drawRing(order, route, sat, map, lap, pos, running);
     }
 
     /* Two drawing sizes: the wide one for desktop, a tighter one with larger lettering for phones. */
@@ -487,7 +556,7 @@
       var fig = document.getElementById('fig');
       var n = order.length;
       if (!n){ fig.innerHTML = ''; ringKey = ''; return; }
-      var key = order.join('|') + '#' + order.map(function(h){ return (isOn(h, map) ? 1 : 0) + (sat[h] ? 's' : '') + (route.indexOf(h) >= 0 ? 'r' : ''); }).join('') + '#' + (fig.clientWidth < 440);
+      var key = 'ring|' + order.join('|') + '#' + order.map(function(h){ return (isOn(h, map) ? 1 : 0) + (sat[h] ? 's' : '') + (route.indexOf(h) >= 0 ? 'r' : ''); }).join('') + '#' + (fig.clientWidth < 440);
       if (key !== ringKey){
         ringKey = key; G = geometry();
         var bw = Math.min(158, 2 * G.R * Math.sin(Math.PI / Math.max(n, 2)) - 14);
@@ -557,21 +626,23 @@
     }
 
     /* The centre: what kind of lap, the model (split onto two lines if it is long), and where the lap stands. */
-    function drawCenter(lap, pos, route, map, running){
+    function drawCenter(lap, pos, route, map, running, o){
       var c = document.getElementById('center'); if (!c) return;
       if (!lap){ c.innerHTML = '<text x="' + G.CX + '" y="' + (G.CY + 6) + '" font-size="17" fill="#AEB4BE">No lap yet</text>'; return; }
-      var kind = lap.state === 'stalled' ? 'LAP WAITING' : running ? (lap.mode === 'fixed' ? 'CHECK LAP RUNNING' : 'LAP RUNNING') : (lap.mode === 'fixed' ? 'LAST CHECK LAP' : 'LAST LAP');
+      o = o || {};
+      var mid = o.mid || G.mid;
+      var kind = o.kind || (lap.state === 'stalled' ? 'LAP WAITING' : running ? (lap.mode === 'fixed' ? 'CHECK LAP RUNNING' : 'LAP RUNNING') : (lap.mode === 'fixed' ? 'LAST CHECK LAP' : 'LAST LAP'));
       var model = shortModel(lap.model || 'model not reported'), parts = [model];
-      var fs = Math.min(19, G.mid / (model.length * 0.56));
+      var fs = Math.min(19, mid / (model.length * 0.56));
       if (fs < 15 && model.indexOf('-') > 0){
         var best = null;
         for (var i = 1; i < model.length - 1; i++){ if (model[i] === '-'){ var a = model.slice(0, i + 1), b = model.slice(i + 1); var w = Math.max(a.length, b.length); if (!best || w < best.w) best = { w:w, p:[a, b] }; } }
-        if (best){ parts = best.p; fs = Math.min(19, G.mid / (best.w * 0.56)); }
+        if (best){ parts = best.p; fs = Math.min(19, mid / (best.w * 0.56)); }
       }
       fs = Math.max(11, fs);
-      var status = lap.state === 'stalled' ? ['waiting at', fwOf(pos.at, map, lap)]
+      var status = o.status || (lap.state === 'stalled' ? ['waiting at', fwOf(pos.at, map, lap)]
         : lap.state === 'done' ? ['Lap finished', ago(lap.finished_at)]
-        : ['hop ' + Math.min(arr(lap.story).length + 1, route.length) + ' of ' + route.length, ''];
+        : ['hop ' + Math.min(arr(lap.story).length + 1, route.length) + ' of ' + route.length, '']);
       var lines = [{ t:kind, size:G.top, mono:true, dim:true }];
       parts.forEach(function(p){ lines.push({ t:p, size:fs, bold:true }); });
       status.forEach(function(t){ if (t) lines.push({ t:t, size:G.top + 3, dim:true }); });
@@ -587,6 +658,108 @@
       if (tk && G) tk.setAttribute('transform', 'translate(' + (G.CX + G.TR * Math.cos(a)).toFixed(1) + ',' + (G.CY + G.TR * Math.sin(a)).toFixed(1) + ')');
     }
 
+    /* A pub/sub lap is a star: the runner in the middle, the members around it. A dot runs out along
+       every spoke when the event is published, and back along a spoke when that member answers. */
+    var starSeen = { lap:null, answered:{} };
+    function drawStar(order, subs, sat, map, lap, pos, running){
+      var fig = document.getElementById('fig');
+      var n = order.length;
+      if (!n){ fig.innerHTML = ''; ringKey = ''; return; }
+      var key = 'star|' + lap.lap_id + '|' + order.join('|') + '#' + order.map(function(h){ return (isOn(h, map) ? 1 : 0) + (sat[h] ? 's' : '') + (subs.indexOf(h) >= 0 ? 'r' : ''); }).join('') + '#' + (fig.clientWidth < 440);
+      var hubW, hubH;
+      function at(h){ var i = order.indexOf(h); return [G.CX + G.R * Math.cos(ang(i, n)), G.CY + G.R * Math.sin(ang(i, n))]; }
+      if (key !== ringKey){
+        ringKey = key; G = geometry();
+        hubW = small ? 112 : 188; hubH = small ? 104 : 116;
+        var bw = Math.min(158, 2 * G.R * Math.sin(Math.PI / Math.max(n, 2)) - 14);
+        var s = '<svg id="ringsvg" viewBox="0 0 ' + G.W + ' ' + G.H + '" role="img" aria-labelledby="ringtitle"><title id="ringtitle"></title>';
+        subs.forEach(function(h){
+          if (order.indexOf(h) < 0) return; var p = at(h);
+          s += '<line class="spoke" data-h="' + esc(h) + '" x1="' + G.CX + '" y1="' + G.CY + '" x2="' + p[0].toFixed(1) + '" y2="' + p[1].toFixed(1) + '"/>';
+        });
+        order.forEach(function(h, i){
+          var m = map[h] || {}, on = isOn(h, map);
+          var x = G.CX + G.R * Math.cos(ang(i, n)), y = G.CY + G.R * Math.sin(ang(i, n));
+          var fw = m.framework || fwOf(h, map, lap);
+          var whys = sat[h] ? wrapWords(sat[h], Math.floor((bw - 12) / (G.why * 0.52))) : [];
+          var bh = 22 + G.fw + 2 * G.gap + G.gap * whys.length;
+          var top = -bh / 2, y1 = top + 8 + G.fw, y2 = y1 + G.gap + 1, y3 = y2 + G.gap;
+          var out = sat[h] || subs.indexOf(h) < 0;
+          s += '<g class="ring-node' + (on ? '' : ' off') + (out ? ' sat' : '') + '" data-h="' + esc(h) + '" transform="translate(' + x.toFixed(1) + ',' + y.toFixed(1) + ')">' +
+            '<rect x="' + (-bw/2).toFixed(1) + '" y="' + top.toFixed(1) + '" width="' + bw.toFixed(1) + '" height="' + bh.toFixed(1) + '" rx="12"/>' +
+            '<text class="fwn" text-anchor="middle" y="' + y1.toFixed(1) + '" font-size="' + (fw.length > 12 ? G.fw - 2 : G.fw) + '" font-weight="600">' + esc(fw) + '</text>' +
+            '<text class="sub" text-anchor="middle" y="' + y2.toFixed(1) + '" font-size="' + G.sub + '">' + esc(howWord(m.how)) + ', ' + (on ? 'online' : 'offline') + '</text>' +
+            '<text class="st3" text-anchor="middle" y="' + y3.toFixed(1) + '" font-size="' + G.st + '"></text>' +
+            whys.map(function(w, j){ return '<text class="why" text-anchor="middle" y="' + (y3 + G.gap * (j + 1)).toFixed(1) + '" font-size="' + G.why + '">' + esc(w) + '</text>'; }).join('') +
+            '</g>';
+        });
+        s += '<g class="hub"><rect x="' + (G.CX - hubW/2) + '" y="' + (G.CY - hubH/2) + '" width="' + hubW + '" height="' + hubH + '" rx="14"/></g>';
+        s += '<g id="center" font-family="Geist, sans-serif" text-anchor="middle" fill="#ECE8E0"></g><g id="pkts"></g></svg>';
+        fig.innerHTML = s;
+        fig.setAttribute('data-hub', hubW);
+      }
+      hubW = +fig.getAttribute('data-hub') || 180;
+      var svg = document.getElementById('ringsvg');
+      svg.setAttribute('class', 'star' + (lap.state === 'running' && !reduce ? ' flow' : ''));
+      var exp = expectedOf(lap);
+      Array.prototype.forEach.call(fig.querySelectorAll('.spoke'), function(l){
+        var h = l.getAttribute('data-h'), a = answerOf(lap, h);
+        l.setAttribute('class', 'spoke ' + (a ? (a.late ? 'late' : 'ans') : lap.state === 'running' ? (exp.indexOf(h) >= 0 ? 'wait' : 'idle') : 'miss'));
+      });
+      Array.prototype.forEach.call(fig.querySelectorAll('.ring-node'), function(g){
+        var h = g.getAttribute('data-h');
+        g.querySelector('.st3').textContent = nodeStatus(h, lap, subs, sat);
+        g.classList.toggle('ans', !!answerOf(lap, h));
+        g.classList.remove('here');
+      });
+      var c = pubCounts(lap);
+      var desc = order.map(function(h){ var m = map[h] || {}; var st = nodeStatus(h, lap, subs, sat);
+        return (m.framework || fwOf(h, map, lap)) + ' (' + (isOn(h, map) ? 'online' : 'offline') + (st ? ', ' + st + (sat[h] ? ': ' + sat[h] : '') : '') + ')'; }).join(', ');
+      document.getElementById('ringtitle').textContent = 'A pub/sub lap drawn as a star: the runner in the middle published one event to ' + subs.length + ' members around it. ' + desc + '. ' + (pos ? pos.text : '');
+      var status = lap.state === 'running' ? [c.answered + ' of ' + c.expected + ' answered', '']
+        : lap.state === 'stalled' ? ['no answers', ''] : ['Lap finished', ago(lap.finished_at)];
+      drawCenter(lap, pos, subs, map, running, { mid:hubW - 18, status:status,
+        kind:lap.state === 'running' ? (small ? 'RUNNING' : 'PUB/SUB RUNNING') : small ? 'PUB/SUB' : 'LAST PUB/SUB LAP' });
+      /* The runner's box grows to its words. */
+      try {
+        var bb = document.getElementById('center').getBBox(), hr = fig.querySelector('.hub rect');
+        var hh = Math.max(small ? 96 : 104, bb.height + 22), hw = Math.max(hubW, bb.width + 22);
+        hr.setAttribute('x', (G.CX - hw / 2).toFixed(1)); hr.setAttribute('width', hw.toFixed(1));
+        hr.setAttribute('y', (bb.y + bb.height / 2 - hh / 2).toFixed(1)); hr.setAttribute('height', hh.toFixed(1));
+      } catch (e) {}
+
+      /* The dots. On the first look at a running lap they go out to everyone still to answer; after that, one comes back per new answer. */
+      var fresh = starSeen.lap !== lap.lap_id;
+      if (fresh) starSeen = { lap:lap.lap_id, answered:{} };
+      var back = arr(lap.story).filter(function(x){ return x.by && !starSeen.answered[x.by] && subs.indexOf(x.by) >= 0; });
+      back.forEach(function(x){ starSeen.answered[x.by] = true; });
+      if (reduce) return;
+      var hub = [G.CX, G.CY];
+      if (fresh){
+        if (lap.state === 'running') subs.forEach(function(h, i){ if (!answerOf(lap, h)) packet(hub, at(h), i * 90); });
+      } else {
+        back.forEach(function(x, i){ packet(at(x.by), hub, i * 260); });
+      }
+    }
+    function packet(from, to, delay){
+      var g = document.getElementById('pkts'); if (!g) return;
+      var dot = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+      dot.setAttribute('r', small ? 8 : 7); dot.setAttribute('class', 'pkt');
+      dot.setAttribute('cx', from[0].toFixed(1)); dot.setAttribute('cy', from[1].toFixed(1));
+      dot.style.opacity = '0'; g.appendChild(dot);
+      var t0 = null, dur = 1100;
+      function step(ts){
+        if (!dot.isConnected) return;
+        if (t0 == null) t0 = ts + delay;
+        var p = Math.max(0, Math.min(1, (ts - t0) / dur)), e = p < .5 ? 2*p*p : 1 - Math.pow(-2*p + 2, 2) / 2;
+        dot.style.opacity = ts < t0 ? '0' : '1';
+        dot.setAttribute('cx', (from[0] + (to[0] - from[0]) * e).toFixed(1));
+        dot.setAttribute('cy', (from[1] + (to[1] - from[1]) * e).toFixed(1));
+        if (p < 1) requestAnimationFrame(step); else dot.remove();
+      }
+      requestAnimationFrame(step);
+    }
+
     function renderStory(lap, map){
       var box = document.getElementById('story-body');
       if (!box) return;
@@ -594,6 +767,7 @@
       var story = arr(lap.story), route = arr(lap.route && lap.route.members);
       var s = '<ol class="story" aria-label="The story">';
       if (lap.opening) s += '<li class="open"><p class="line">' + esc(lap.opening) + '</p><p class="meta"><b>Opening line</b>' + (lap.started_at ? ', ' + esc(when(lap.started_at)) : '') + '</p></li>';
+      if (isPub(lap)){ box.innerHTML = s + pubStory(lap, map) + '</ol>'; return; }
       story.forEach(function(x){
         s += '<li><p class="line">' + esc(x.line) + '</p><p class="meta"><b>' + esc(x.framework || fwOf(x.by, map, lap)) + '</b>, ' + esc(ms(x.ms)) + ', ' +
           esc(toks(x.tokens_in)) + ' tokens in and ' + esc(toks(x.tokens_out)) + ' out</p></li>';
@@ -610,6 +784,31 @@
       box.innerHTML = s + '</ol>';
     }
 
+    /* A pub/sub lap's answers, side by side in the order they reached the runner, each with its time after the event. */
+    function pubStory(lap, map){
+      var subs = subsOf(lap), story = arr(lap.story), c = pubCounts(lap);
+      var s = '<li class="pub"><p><b>' + (lap.state === 'running' ? 'Published' : 'The runner published') + '</b> one event to ' + subs.length + (subs.length === 1 ? ' member' : ' members') + (lap.started_at ? ' at ' + esc(when(lap.started_at)) : '') + '. Answers appear in the order they arrived.</p>';
+      var cards = story.map(function(x){
+        return '<li class="' + (x.late ? 'late' : '') + '"><p class="line">' + esc(x.line) + '</p><p class="meta"><b>' + esc(x.framework || fwOf(x.by, map, lap)) + '</b> ' +
+          esc(after(x.after_ms) || 'time not reported') + (x.late ? '<span class="tag">late</span>' : '') + ', ' + esc(toks(x.tokens_in)) + ' in, ' + esc(toks(x.tokens_out)) + ' out</p></li>';
+      });
+      if (lap.state === 'running'){
+        subs.forEach(function(sub){
+          if (answerOf(lap, sub.handle)) return;
+          cards.push('<li class="waiting"><p><b>' + esc(fwOf(sub.handle, map, lap)) + '</b> ' + (sub.expected === false ? 'is offline. Its answer comes when it is back, marked late.' : 'is writing.') + '</p></li>');
+        });
+      }
+      if (cards.length) s += '<ol class="answers" aria-label="Answers in arrival order">' + cards.join('') + '</ol>';
+      s += '</li>';
+      if (lap.state !== 'running' && lap.totals){
+        var t = lap.totals;
+        var who = c.answered === c.expected ? 'Every member that was online answered.' : c.answered + ' of ' + c.expected + ' answered before the lap closed.';
+        s += '<li class="tot"><p class="meta">' + esc(who) + (c.late ? ' ' + c.late + (c.late === 1 ? ' answer came' : ' answers came') + ' late.' : '') +
+          ' The slowest on-time answer took ' + esc(ms(t.ms)) + '. The lap used ' + esc(toks(t.tokens_in)) + ' tokens in and ' + esc(toks(t.tokens_out)) + ' out, and cost ' + esc(cost(t.cost_usd)) + '.</p></li>';
+      }
+      return s;
+    }
+
     function renderLaps(laps, cur, map){
       var box = document.getElementById('laps-body');
       var live = laps.filter(function(l){ return l.mode !== 'fixed' && l.state === 'done'; })
@@ -623,8 +822,8 @@
         s += '<div class="laps">' + live.map(function(l){
           var t = l.totals || {};
           var sat = arr(l.sat_out).map(function(x){ return fwOf(x.handle, map, l); });
-          return '<article class="lap"><div><h3>' + esc(l.model || 'Model not reported') + '</h3><p class="when">Finished ' + esc(when(l.finished_at, true) || 'recently') + '</p></div>' +
-            '<ol>' + (l.opening ? '<li><span>Opening</span>' + esc(l.opening) + '</li>' : '') + arr(l.story).map(function(x){ return '<li><span>' + esc(x.framework || fwOf(x.by, map, l)) + '</span>' + esc(x.line) + '</li>'; }).join('') + '</ol>' +
+          return '<article class="lap"><div><h3>' + esc(l.model || 'Model not reported') + '</h3><p class="when">' + (isPub(l) ? 'Pub/sub, finished ' : 'Finished ') + esc(when(l.finished_at, true) || 'recently') + '</p></div>' +
+            '<ol>' + (l.opening ? '<li><span>Opening</span>' + esc(l.opening) + '</li>' : '') + arr(l.story).map(function(x){ return '<li><span>' + esc(x.framework || fwOf(x.by, map, l)) + (x.late ? ', <b class="late">late</b>' : '') + '</span>' + esc(x.line) + '</li>'; }).join('') + '</ol>' +
             (sat.length ? '<p class="when">Sat out: ' + esc(sat.join(', ')) + '</p>' : '') +
             '<dl><div><dt>Time</dt><dd>' + esc(ms(t.ms)) + '</dd></div><div><dt>Tokens</dt><dd>' + esc(toks(num(t.tokens_in) != null && num(t.tokens_out) != null ? t.tokens_in + t.tokens_out : null)) + '</dd></div><div><dt>Cost</dt><dd>' + esc(cost(t.cost_usd)) + '</dd></div></dl></article>';
         }).join('') + '</div>';
@@ -632,8 +831,9 @@
       if (other.length){
         s += '<div class="other"><h3>Other recent laps</h3><p>Check laps pass fixed lines around the ring to confirm every member still answers, so they are not compared above. Laps that have not finished are listed here too.</p><ul>' +
           other.map(function(l){
-            var what = l.mode === 'fixed' ? 'Check lap' : l.state === 'stalled' ? 'Waiting at ' + fwOf(l.stalled_at, map, l) : l.state === 'running' ? 'Running' : 'Finished';
-            if (l.mode === 'fixed') what += l.state === 'done' ? ', every member answered' : l.state === 'stalled' ? ', waiting at ' + fwOf(l.stalled_at, map, l) : ', running';
+            var what = l.mode === 'fixed' ? 'Check lap' : l.state === 'stalled' ? (isPub(l) ? 'No answers' : 'Waiting at ' + fwOf(l.stalled_at, map, l)) : l.state === 'running' ? 'Running' : 'Finished';
+            if (l.mode === 'fixed') what += l.state === 'done' ? (isPub(l) ? ', answered' : ', every member answered') : l.state === 'stalled' ? (isPub(l) ? ', no answers' : ', waiting at ' + fwOf(l.stalled_at, map, l)) : ', running';
+            if (isPub(l)) what = 'Pub/sub. ' + what;
             return '<li><b>' + esc(l.model || 'Model not reported') + '</b><span>' + esc(what) + '</span><span>' + esc(when(l.started_at, true)) + '</span>' + (l.totals && l.state === 'done' ? '<span>' + esc(ms(l.totals.ms)) + '</span>' : '') + '</li>';
           }).join('') + '</ul></div>';
       }
@@ -652,17 +852,31 @@
     /* Starting a lap from this page. */
     var form = document.getElementById('start'), input = document.getElementById('opening'), go = document.getElementById('start-go');
     var help = document.getElementById('start-help'), answer = document.getElementById('start-answer');
+    var pick = document.getElementById('transport'), pickHelp = document.getElementById('transport-help'), pubOpen = false;
     function say(t){ answer.textContent = t || ''; }
     function setOpen(open){
-      startOpen = open; input.disabled = !open; go.disabled = !open;
+      startOpen = open; input.disabled = !open; go.disabled = !open; pick.disabled = !open;
       help.textContent = open ? 'One sentence, up to 140 characters. Each agent in the ring adds a line after yours, on the same model.' : 'Starting a lap from this page opens soon.';
     }
+    /* Pub/sub can be chosen once at least one member subscribes to the runner's rounds. */
+    function setTransports(members){
+      pubOpen = members.some(function(m){ return m && m.pubsub === true; });
+      pick.querySelector('option[value="pubsub"]').disabled = !pubOpen;
+      if (!pubOpen && pick.value === 'pubsub') pick.value = 'point-to-point';
+      pickHelp.textContent = pubOpen ? '' : 'Pub/sub opens when the reference agents subscribe.';
+    }
+    pick.addEventListener('change', function(){
+      help.textContent = !startOpen ? help.textContent : pick.value === 'pubsub'
+        ? 'One sentence, up to 140 characters. The runner publishes it once and every agent answers at the same time, on the same model.'
+        : 'One sentence, up to 140 characters. Each agent in the ring adds a line after yours, on the same model.';
+    });
     function keepMine(){ try { if (mine) sessionStorage.setItem('ring-my-lap', JSON.stringify(mine)); else sessionStorage.removeItem('ring-my-lap'); } catch (e) {} }
     function renderMine(laps, cur){
       if (!mine || !mine.id) return;
-      if (cur && cur.lap_id === mine.id){ say('Your lap is running now. Watch the dot move around the circle.'); return; }
+      if (cur && cur.lap_id === mine.id){ say(isPub(cur) ? 'Your lap is running now. Watch the answers come back to the runner.' : 'Your lap is running now. Watch the dot move around the circle.'); return; }
       var done = laps.filter(function(l){ return l.lap_id === mine.id; })[0];
       if (done && done.state === 'done'){ say('Your lap is done. Its story is shown next to the circle.'); return; }
+      if (done && done.state === 'stalled' && isPub(done)){ say('Your lap closed without an answer. A member that was offline can still answer when it is back.'); return; }
       if (done && done.state === 'stalled'){ say('Your lap is waiting at ' + fwOf(done.stalled_at, memberMap(arr(last && last.members)), done) + ' until that agent is back online.'); return; }
       say(num(mine.place) != null ? 'Your lap is number ' + mine.place + ' in line.' : 'Your lap is in line.');
     }
@@ -677,7 +891,8 @@
       if (!t){ say('Write a sentence first, then press Start.'); input.focus(); return; }
       if (t.length > 140){ say('That is ' + t.length + ' characters. Please keep it to 140 or fewer.'); return; }
       go.disabled = true; say('Sending your sentence to the ring.');
-      fetch(START_API, { method:'POST', headers:{ 'Content-Type':'application/json', 'Accept':'application/json' }, body:JSON.stringify({ opening:t }) })
+      var how = pick.value === 'pubsub' && pubOpen ? 'pubsub' : 'point-to-point';
+      fetch(START_API, { method:'POST', headers:{ 'Content-Type':'application/json', 'Accept':'application/json' }, body:JSON.stringify({ opening:t, transport:how }) })
         .then(function(r){ return r.json().catch(function(){ return {}; }).then(function(b){ return { s:r.status, b:b || {} }; }); })
         .then(function(x){
           var s = x.s, b = x.b, why = typeof b.error === 'string' && b.error ? b.error : '';
@@ -690,6 +905,9 @@
             say('You have started as many laps as one visitor can for now. Please try again later.' + (why ? ' (' + why + ')' : ''));
           } else if (s === 503){
             say('The ring is resting until tomorrow. Today\'s laps for visitors are used up.');
+          } else if (s === 409){
+            say((why || 'Pub/sub is not open yet.') + ' Choose Point-to-point to start a lap now.');
+            if (last) setTransports(arr(last.members));
           } else if (s === 400 || s === 422){
             say('The ring could not take that sentence' + (why ? ': ' + why.replace(/\.$/, '') + '.' : '.') + ' Please try a different one.');
           } else if (s === 404){
