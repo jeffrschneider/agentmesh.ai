@@ -152,7 +152,7 @@
     <section class="sec" id="now" aria-labelledby="now-h">
       <p class="num">01</p>
       <h2 id="now-h">The ring now</h2>
-      <p class="lead">Each box is one agent. A solid outline means it is online. A dashed outline means it is sitting out, and anything sent to it waits in its inbox until it comes back.</p>
+      <p class="lead">Each box is one agent. A solid outline means it is online. A dashed outline means it is offline or sitting out this lap, and anything sent to it waits in its inbox until it comes back.</p>
       <div id="now-body">
         <div class="soon"><b>Loading the ring.</b>Checking where the message is.</div>
       </div>
@@ -367,7 +367,7 @@
         var on = m.online !== false && map[h];
         var inLap = route.indexOf(h) >= 0;
         return '<li class="' + (on ? '' : 'out') + '"><span class="fw">' + esc(m.framework || h) + '</span><span>' + esc(howWord(m.how)) + '</span>' +
-          '<span class="st">' + (on ? 'online' : 'sitting out') + (lap && !inLap ? ', not in this lap' : '') + '</span><span class="h">' + esc(h) + '</span></li>';
+          '<span class="st">' + (on ? 'online' : (lap ? 'sitting out' : 'not running')) + (lap && !inLap ? ', not in this lap' : '') + '</span><span class="h">' + esc(h) + '</span></li>';
       }).join('');
 
       var key = order.join('|') + '#' + order.map(function(h){ return (map[h] && map[h].online !== false) ? 1 : 0; }).join('') + '#' + (pos ? pos.at : '');
@@ -378,7 +378,10 @@
         ringKey = '';
       }
       document.getElementById('where').textContent = pos ? pos.text : 'No lap is running yet.';
-      document.getElementById('more').textContent = pos ? pos.more : 'The members below are ready for the first lap.';
+      var upNow = order.filter(function(h){ return map[h] && map[h].online !== false; }).length;
+      document.getElementById('more').textContent = pos ? pos.more
+        : upNow === 0 ? 'None of the members below is running yet. The first lap starts once they are.'
+        : upNow + ' of ' + order.length + ' members are running and ready for the next lap.';
       document.getElementById('facts').innerHTML = facts;
       document.getElementById('roster').innerHTML = roster;
       document.getElementById('stale').textContent = stale ? 'The ring could not be reached just now. This is what it showed last, and the page will try again shortly.' : '';
@@ -410,7 +413,7 @@
           s += '<g class="ring-node' + (on ? '' : ' out') + (pos && pos.at === h ? ' here' : '') + '" transform="translate(' + x.toFixed(1) + ',' + y.toFixed(1) + ')">' +
             '<rect x="' + (-bw/2).toFixed(1) + '" y="' + (-bh/2) + '" width="' + bw.toFixed(1) + '" height="' + bh + '" rx="12"/>' +
             '<text class="fwn" text-anchor="middle" y="-3" font-size="' + (fw.length > 13 ? 14 : 16) + '" font-weight="600">' + esc(fw) + '</text>' +
-            '<text class="sub" text-anchor="middle" y="17">' + esc(howWord(m.how)) + ', ' + (on ? 'online' : 'sitting out') + '</text></g>';
+            '<text class="sub" text-anchor="middle" y="17">' + esc(howWord(m.how)) + ', ' + (on ? 'online' : 'offline') + '</text></g>';
         });
         s += '<g id="center" font-family="Geist, sans-serif" text-anchor="middle" fill="#ECE8E0"></g>';
         s += '<g id="token"><circle class="pulse" r="10"/><circle class="dot" r="10" fill="#FF8A5C" stroke="#ECE8E0" stroke-width="2"/></g>';
@@ -418,7 +421,7 @@
         fig.innerHTML = s;
         tokenAngle = null;
       }
-      var desc = order.map(function(h){ var m = map[h] || {}; return (m.framework || h) + ' (' + howWord(m.how) + ', ' + ((m.online !== false && map[h]) ? 'online' : 'sitting out') + ')'; }).join(', then ');
+      var desc = order.map(function(h){ var m = map[h] || {}; return (m.framework || h) + ' (' + howWord(m.how) + ', ' + ((m.online !== false && map[h]) ? 'online' : 'offline') + ')'; }).join(', then ');
       document.getElementById('ringtitle').textContent = 'The ring, in order: ' + desc + '. ' + (pos ? pos.text : '');
 
       var c = document.getElementById('center'), tk = document.getElementById('token');
