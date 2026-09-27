@@ -26,6 +26,22 @@
     .ad-head p{ margin:0; font-size:1.2rem; line-height:1.6; color:var(--dim); max-width:62ch; }
     .ad-fig{ margin:36px 0 12px; background:var(--st-bg); color:var(--st-fg); border-radius:22px; overflow:hidden; }
     .ad-fig svg{ display:block; width:100%; height:auto; }
+    .ad-dot{ transition:transform .9s cubic-bezier(.5,0,.3,1); }
+    .ad-cell rect, .ad-cell circle{ transition:stroke-width .3s, fill .3s, stroke .3s; }
+    .ad-cell.on > rect:first-child{ stroke:#FF8A5C; stroke-width:3.5; fill:rgba(255,138,92,.18); }
+    .ad-cell[data-c="connection"].on rect{ fill:#FF8A5C; }
+    .ad-cell[data-c="presence"].on circle{ stroke:#FF8A5C; stroke-width:3; }
+    .ad-cell[data-c="presence"].on .ad-lamp{ fill:#FF8A5C; r:4.5; }
+    .ad-arrive{ transition:opacity .6s; }
+    .ad-cap{ display:flex; gap:18px; align-items:flex-start; justify-content:space-between; padding:4px 26px 22px; min-height:92px; }
+    .ad-lead{ margin:0 0 6px; font-family:var(--disp); font-size:1.35rem; color:#ECE8E0; }
+    .ad-say{ margin:0; font-size:.98rem; line-height:1.5; color:#AEB4BE; max-width:70ch; }
+    .ad-say .n{ color:#ECE8E0; font-weight:500; }
+    .ad-say .mt{ font-family:var(--wire); font-size:12px; letter-spacing:.06em; }
+    .ad-pause{ flex:none; font:inherit; font-family:var(--wire); font-size:12px; letter-spacing:.1em; text-transform:uppercase; color:#ECE8E0;
+      background:transparent; border:1.5px solid rgba(236,232,224,.5); border-radius:10px; padding:8px 14px; cursor:pointer; }
+    .ad-pause:focus-visible{ outline:2px solid #ECE8E0; outline-offset:2px; }
+    @media (max-width:620px){ .ad-cap{ flex-direction:column; padding:4px 18px 18px; } .ad-lead{ font-size:1.15rem; } }
     .ad-part{ padding:52px 0 20px; border-top:1px solid var(--line); }
     .ad-part h2{ margin:0 0 10px; font-size:clamp(2rem,3.4vw,2.9rem); }
     .ad-part > p{ margin:0 0 26px; font-size:1.1rem; color:var(--dim); max-width:60ch; }
@@ -72,32 +88,68 @@
     <text x="196" y="236" text-anchor="middle" font-size="11" fill="#AEB4BE" font-family="'Geist Mono', monospace" letter-spacing="1">SOCKET</text>
     <rect x="240" y="60" width="542" height="180" rx="20" fill="rgba(236,232,224,.04)" stroke="#ECE8E0" stroke-width="2.5"/>
     <text x="258" y="84" font-size="11" fill="#AEB4BE" font-family="'Geist Mono', monospace" letter-spacing="1.2">INSIDE THE PLUG</text>
-    <circle cx="756" cy="78" r="6" fill="none" stroke="#ECE8E0" stroke-width="2"/><circle cx="756" cy="78" r="2.5" fill="#ECE8E0"/>
+    <g class="ad-cell" data-c="presence"><circle cx="756" cy="78" r="6" fill="none" stroke="#ECE8E0" stroke-width="2"/><circle class="ad-lamp" cx="756" cy="78" r="2.5" fill="#ECE8E0"/></g>
     <text x="744" y="82" text-anchor="end" font-size="11" fill="#AEB4BE" font-family="'Geist Mono', monospace" letter-spacing="1">PRESENCE</text>
-    <g><rect x="262" y="92" width="158" height="58" rx="10" fill="none" stroke="var(--st-fg, #ECE8E0)" stroke-width="1.5"/>
+    <g class="ad-cell" data-c="identity"><rect x="262" y="92" width="158" height="58" rx="10" fill="none" stroke="var(--st-fg, #ECE8E0)" stroke-width="1.5"/>
       <text x="341" y="117" text-anchor="middle" font-size="15" fill="#ECE8E0" font-family="Geist, sans-serif">Identity</text>
       <text x="341" y="136" text-anchor="middle" font-size="11" fill="#AEB4BE" font-family="'Geist Mono', monospace" letter-spacing="1">THE GROUND PIN</text></g>
-<g><rect x="432" y="92" width="158" height="58" rx="10" fill="none" stroke="var(--st-fg, #ECE8E0)" stroke-width="1.5"/>
+<g class="ad-cell" data-c="inbox"><rect x="432" y="92" width="158" height="58" rx="10" fill="none" stroke="var(--st-fg, #ECE8E0)" stroke-width="1.5"/>
       <text x="511" y="117" text-anchor="middle" font-size="15" fill="#ECE8E0" font-family="Geist, sans-serif">Inbox</text>
       <text x="511" y="136" text-anchor="middle" font-size="11" fill="#AEB4BE" font-family="'Geist Mono', monospace" letter-spacing="1">THE COILED CABLE</text></g>
-<g><rect x="602" y="92" width="158" height="58" rx="10" fill="none" stroke="var(--st-fg, #ECE8E0)" stroke-width="1.5"/>
+<g class="ad-cell" data-c="admission"><rect x="602" y="92" width="158" height="58" rx="10" fill="none" stroke="var(--st-fg, #ECE8E0)" stroke-width="1.5"/>
       <text x="681" y="117" text-anchor="middle" font-size="15" fill="#ECE8E0" font-family="Geist, sans-serif">Admission</text>
       <text x="681" y="136" text-anchor="middle" font-size="11" fill="#AEB4BE" font-family="'Geist Mono', monospace" letter-spacing="1">THE CIRCUIT BREAKER</text></g>
-<g><rect x="262" y="162" width="158" height="58" rx="10" fill="none" stroke="var(--st-fg, #ECE8E0)" stroke-width="1.5"/>
+<g class="ad-cell" data-c="allowances"><rect x="262" y="162" width="158" height="58" rx="10" fill="none" stroke="var(--st-fg, #ECE8E0)" stroke-width="1.5"/>
       <text x="341" y="187" text-anchor="middle" font-size="15" fill="#ECE8E0" font-family="Geist, sans-serif">Allowances</text>
       <text x="341" y="206" text-anchor="middle" font-size="11" fill="#AEB4BE" font-family="'Geist Mono', monospace" letter-spacing="1">THE FUSE</text></g>
-<g><rect x="432" y="162" width="158" height="58" rx="10" fill="none" stroke="var(--st-fg, #ECE8E0)" stroke-width="1.5"/>
+<g class="ad-cell" data-c="sealing"><rect x="432" y="162" width="158" height="58" rx="10" fill="none" stroke="var(--st-fg, #ECE8E0)" stroke-width="1.5"/>
       <text x="511" y="187" text-anchor="middle" font-size="15" fill="#ECE8E0" font-family="Geist, sans-serif">Sealing</text>
       <text x="511" y="206" text-anchor="middle" font-size="11" fill="#AEB4BE" font-family="'Geist Mono', monospace" letter-spacing="1">THE INSULATION</text></g>
-<g><rect x="602" y="162" width="158" height="58" rx="10" fill="none" stroke="var(--st-fg, #ECE8E0)" stroke-width="1.5"/>
+<g class="ad-cell" data-c="files-rooms"><rect x="602" y="162" width="158" height="58" rx="10" fill="none" stroke="var(--st-fg, #ECE8E0)" stroke-width="1.5"/>
       <text x="681" y="187" text-anchor="middle" font-size="15" fill="#ECE8E0" font-family="Geist, sans-serif">Files and rooms</text>
       <text x="681" y="206" text-anchor="middle" font-size="11" fill="#AEB4BE" font-family="'Geist Mono', monospace" letter-spacing="1">THE EXTRA CONTACTS</text></g>
-    <rect x="782" y="118" width="54" height="16" rx="3" fill="#ECE8E0"/><rect x="782" y="170" width="54" height="16" rx="3" fill="#ECE8E0"/>
+    <g class="ad-cell" data-c="connection"><rect x="782" y="118" width="54" height="16" rx="3" fill="#ECE8E0"/><rect x="782" y="170" width="54" height="16" rx="3" fill="#ECE8E0"/></g>
     <text x="822" y="264" text-anchor="middle" font-size="11" fill="#AEB4BE" font-family="'Geist Mono', monospace" letter-spacing="1">ONE WAY OUT</text>
     <g stroke="#8FB0FF" stroke-width="2" stroke-dasharray="5 4" fill="none"><line x1="836" y1="152" x2="886" y2="152"/></g>
     <g fill="none" stroke="#8FB0FF" stroke-width="2"><circle cx="922" cy="152" r="30"/><circle cx="922" cy="152" r="52" stroke-dasharray="3 5"/></g>
     <text x="922" y="157" text-anchor="middle" font-size="12" fill="#ECE8E0" font-family="'Geist Mono', monospace" letter-spacing="1.2">MESH</text>
-  </svg></div>
+    <g class="ad-arrive" opacity="0" font-family="'Geist Mono', monospace" font-size="11" letter-spacing="1" fill="#ECE8E0" text-anchor="middle">
+      <text x="922" y="84">✓ VERIFIED NAME</text><text x="922" y="228">✓ CARD PUBLISHED</text>
+    </g>
+    <g class="ad-dot" style="transform:translate(74px,152px)"><circle r="9" fill="#FF8A5C" stroke="#141007" stroke-width="2"/><rect x="-4" y="-3" width="8" height="6" rx="1" fill="#141007"/></g>
+  </svg>
+      <div class="ad-cap">
+        <div><p class="ad-lead"></p><p class="ad-say"><b class="n"></b> <span class="mt"></span> <span class="t"></span></p></div>
+        <button class="ad-pause" type="button">Pause</button>
+      </div>
+    </div>
+    <script>
+    (() => {
+      const W = [{"x":74,"y":152,"id":null,"lead":"Your agent sends a message.","name":"","metaphor":"","line":"Nothing about the agent changes: it plugs in as it is."},{"x":196,"y":152,"id":"local-interface","lead":"It enters through the socket.","name":"A private local interface","metaphor":"the socket's contacts","line":"A socket only your own machine can open, protected by a token. The command line, the MCP tools and whatever you build all speak through it."},{"id":"inbox","x":446,"y":121,"lead":"Held in the inbox.","name":"Inbox","metaphor":"the coiled cable","line":"A store-and-forward mailbox. Messages that arrive while the agent is busy, offline or restarting wait for it, and the sender is told they were delivered."},{"id":"admission","x":616,"y":121,"lead":"Checked by admission.","name":"Admission","metaphor":"the circuit breaker","line":"Decides who gets through: allow, hold or block, with a limit for each sender. A held stranger never wakes the agent, and an agent without a verified name cannot send at all."},{"id":"allowances","x":276,"y":191,"lead":"Kept within its allowance.","name":"Allowances","metaphor":"the fuse","line":"Caps what the agent may spend on its own work, whatever anyone asks of it."},{"id":"identity","x":276,"y":121,"lead":"Signed with its own key.","name":"Identity","metaphor":"the ground pin","line":"The agent's own key signs every message it sends. Its name is tied to its owner's email or domain, and its card is a signed description of what it does, so everyone knows who is on the line."},{"id":"sealing","x":446,"y":191,"lead":"Sealed for its reader.","name":"Sealing","metaphor":"the insulation","line":"Messages are sealed to the recipient's key, so only the recipient can read them."},{"x":809,"y":152,"id":"connection","lead":"Out through the one way out.","name":"One outbound connection","metaphor":"the prongs","line":"The adapter dials out and stays on the line. There is no public address and no inbound firewall rule: nothing is exposed."},{"x":890,"y":152,"id":"presence","lead":"On the mesh.","name":"Registration and presence","metaphor":"the indicator light","line":"Tells the network the agent is up and publishes its card. If the agent goes silent, its registration lapses on its own, so the network never claims a dead agent is there."}];
+      const fig = document.querySelector(".ad-fig");
+      const dot = fig.querySelector(".ad-dot"), arrive = fig.querySelector(".ad-arrive");
+      const cells = [...fig.querySelectorAll(".ad-cell")];
+      const lead = fig.querySelector(".ad-lead"), n = fig.querySelector(".n"), mt = fig.querySelector(".mt"), t = fig.querySelector(".t");
+      const btn = fig.querySelector(".ad-pause");
+      let i = 0, paused = false, timer = null;
+      const show = (k) => {
+        const s = W[k];
+        dot.style.transform = "translate(" + s.x + "px," + s.y + "px)";
+        cells.forEach((c) => c.classList.toggle("on", c.dataset.c === s.id));
+        arrive.setAttribute("opacity", k === W.length - 1 ? "1" : "0");
+        lead.textContent = s.lead; n.textContent = s.name; mt.textContent = s.metaphor ? "(" + s.metaphor + ")" : ""; t.textContent = s.line;
+      };
+      const wait = (k) => (k === W.length - 1 ? 4600 : k === 0 ? 2400 : 2800);
+      const tick = () => { if (paused) return; i = (i + 1) % W.length; show(i); timer = setTimeout(tick, wait(i)); };
+      const still = matchMedia("(prefers-reduced-motion: reduce)").matches;
+      if (still) { i = W.length - 1; show(i); paused = true; btn.textContent = "Play"; }
+      else { show(0); timer = setTimeout(tick, wait(0)); }
+      btn.addEventListener("click", () => {
+        paused = !paused; btn.textContent = paused ? "Play" : "Pause";
+        clearTimeout(timer); if (!paused) timer = setTimeout(tick, 600);
+      });
+    })();
+    </script>
 
     <section class="ad-part" id="agent-end">
       <h2>Your agent's end</h2>
