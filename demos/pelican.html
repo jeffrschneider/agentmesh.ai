@@ -312,7 +312,7 @@
     }
     function num(f, i){ return (f && typeof f.n === 'number') ? f.n : i; }
     function who(f){
-      if (f.source === 'visitor') return f.by ? f.by + ', a visitor' : 'a visitor to this page';
+      if (f.source === 'visitor') return (f.by && f.by !== 'a visitor') ? f.by + ', a visitor' : 'a visitor to this page';
       if (f.source === 'operator') return f.by || 'the AgentMesh team';
       return f.by || 'an agent';
     }
