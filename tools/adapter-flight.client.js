@@ -148,6 +148,7 @@
     var w = Math.exp(lerp(Math.log(a.w), Math.log(b.w), u)), h = Math.exp(lerp(Math.log(a.h), Math.log(b.h), u));
     var asp = stage.clientWidth / Math.max(1, stage.clientHeight);
     if (w / h > asp) h = w / asp; else w = h * asp;
+    w *= 1.06; h *= 1.06; // a little margin, so labels at a box's edge never touch the stage's
     svg.setAttribute('viewBox', (cx - w / 2).toFixed(1) + ' ' + (cy - h / 2).toFixed(1) + ' ' + w.toFixed(1) + ' ' + h.toFixed(1));
 
     var d = seg(F.dot, t);

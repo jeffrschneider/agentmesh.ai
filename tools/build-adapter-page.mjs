@@ -44,7 +44,7 @@ const style = `<style>
     .ad-fig{ margin:36px 0 12px; background:var(--st-bg); color:var(--st-fg); border-radius:22px; overflow:hidden; }
     /* The fly-through (tools/adapter-flight.mjs). The stage keeps one shape,
        wide on a desktop and tall on a phone; the camera fits to it. */
-    .ad-stage{ position:relative; width:100%; aspect-ratio:16 / 9; }
+    .ad-stage{ position:relative; width:100%; aspect-ratio:21 / 9; }
     .ad-stage svg{ position:absolute; inset:0; display:block; width:100%; height:100%; }
     .ad-globe{ pointer-events:none; opacity:0; }
     .ad-world .t-lab{ font-size:34px; }
@@ -62,12 +62,12 @@ const style = `<style>
     .ad-place.on .ad-shape > :first-child, .ad-box.on > :first-child{ stroke-width:5; }
     .ad-agent .ad-halo{ transition:opacity .4s; }
     .ad-agent.on .ad-halo{ opacity:1; }
-    .ad-cap{ display:flex; gap:18px; align-items:flex-start; justify-content:space-between; padding:14px 26px 22px; min-height:150px; }
+    .ad-cap{ display:flex; gap:18px; align-items:flex-start; justify-content:space-between; padding:10px 26px 16px; min-height:112px; }
     .ad-lead{ margin:0 0 6px; font-family:var(--disp); font-size:1.35rem; line-height:1.35; color:#ECE8E0; }
     .ad-num{ font-family:var(--wire); font-size:12px; letter-spacing:.1em; color:#AEB4BE; margin-right:6px; vertical-align:.2em; }
     @media (max-width:620px){
-      .ad-stage{ aspect-ratio:4 / 5; }
-      .ad-cap{ min-height:300px; }
+      .ad-stage{ aspect-ratio:1 / 1; }
+      .ad-cap{ min-height:250px; }
       .ad-run .t-agent{ font-size:30px; } .ad-run .t-lab{ font-size:36px; }
       .ad-world .t-lab{ font-size:46px; } .ad-world .t-tag{ font-size:30px; } .ad-world .t-small{ font-size:19px; } .ad-world .t-agent{ font-size:20px; }
     }
