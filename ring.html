@@ -217,6 +217,7 @@
       </div>
       <p class="help" id="start-help">Starting a lap from this page opens soon.</p>
       <p class="help" id="transport-help">Pub/sub opens when the reference agents subscribe.</p>
+      <p class="help" id="agent-help">You can also start a lap from your own agent: send a sentence to ring.demo@agentmesh.ai.</p>
       <p class="answer" id="start-answer" aria-live="polite"></p>
     </form>
 
@@ -515,6 +516,7 @@
           : '<li><b>Started</b>' + esc(when(lap.started_at, true) || 'not reported') + '</li>';
         if (pub){ facts += '<li><b>Transport</b>Pub/sub: one event signed by ring.demo@agentmesh.ai on its own feed, answered by every member at once</li>'; }
         else { facts += '<li><b>Transport</b>Point-to-point: the story is handed from member to member</li>'; }
+        if (startedBy(lap)){ facts += '<li><b>Started by</b>' + esc(startedBy(lap)) + '</li>'; }
         if (lap.route){ facts += '<li><b>Route</b>Signed by ' + esc(lap.route.runner || 'the runner') + (lap.route.issued_at ? ' at ' + esc(when(lap.route.issued_at)) : '') + '</li>'; }
         if (lap.trace_id){ facts += '<li><b>Trace</b>' + esc(lap.trace_id) + '</li>'; }
       }
@@ -809,6 +811,16 @@
       return s;
     }
 
+    /* Who started a lap, in words. A lap from an agent never names the agent. */
+    function startedBy(l){
+      if (!l) return '';
+      if (l.source === 'agent') return l.started_by || "a person's agent";
+      if (l.source === 'visitor') return 'a visitor on this page';
+      if (l.source === 'scheduled') return 'the schedule';
+      if (l.source === 'operator') return 'the AgentMesh team';
+      return '';
+    }
+
     function renderLaps(laps, cur, map){
       var box = document.getElementById('laps-body');
       var live = laps.filter(function(l){ return l.mode !== 'fixed' && l.state === 'done'; })
@@ -822,7 +834,7 @@
         s += '<div class="laps">' + live.map(function(l){
           var t = l.totals || {};
           var sat = arr(l.sat_out).map(function(x){ return fwOf(x.handle, map, l); });
-          return '<article class="lap"><div><h3>' + esc(l.model || 'Model not reported') + '</h3><p class="when">' + (isPub(l) ? 'Pub/sub, finished ' : 'Finished ') + esc(when(l.finished_at, true) || 'recently') + '</p></div>' +
+          return '<article class="lap"><div><h3>' + esc(l.model || 'Model not reported') + '</h3><p class="when">' + (isPub(l) ? 'Pub/sub, finished ' : 'Finished ') + esc(when(l.finished_at, true) || 'recently') + '</p>' + (l.source === 'agent' ? '<p class="when">Started by ' + esc(startedBy(l)) + '</p>' : '') + '</div>' +
             '<ol>' + (l.opening ? '<li><span>Opening</span>' + esc(l.opening) + '</li>' : '') + arr(l.story).map(function(x){ return '<li><span>' + esc(x.framework || fwOf(x.by, map, l)) + (x.late ? ', <b class="late">late</b>' : '') + '</span>' + esc(x.line) + '</li>'; }).join('') + '</ol>' +
             (sat.length ? '<p class="when">Sat out: ' + esc(sat.join(', ')) + '</p>' : '') +
             '<dl><div><dt>Time</dt><dd>' + esc(ms(t.ms)) + '</dd></div><div><dt>Tokens</dt><dd>' + esc(toks(num(t.tokens_in) != null && num(t.tokens_out) != null ? t.tokens_in + t.tokens_out : null)) + '</dd></div><div><dt>Cost</dt><dd>' + esc(cost(t.cost_usd)) + '</dd></div></dl></article>';
@@ -834,6 +846,7 @@
             var what = l.mode === 'fixed' ? 'Check lap' : l.state === 'stalled' ? (isPub(l) ? 'No answers' : 'Waiting at ' + fwOf(l.stalled_at, map, l)) : l.state === 'running' ? 'Running' : 'Finished';
             if (l.mode === 'fixed') what += l.state === 'done' ? (isPub(l) ? ', answered' : ', every member answered') : l.state === 'stalled' ? (isPub(l) ? ', no answers' : ', waiting at ' + fwOf(l.stalled_at, map, l)) : ', running';
             if (isPub(l)) what = 'Pub/sub. ' + what;
+            if (l.source === 'agent') what += ', started by ' + startedBy(l);
             return '<li><b>' + esc(l.model || 'Model not reported') + '</b><span>' + esc(what) + '</span><span>' + esc(when(l.started_at, true)) + '</span>' + (l.totals && l.state === 'done' ? '<span>' + esc(ms(l.totals.ms)) + '</span>' : '') + '</li>';
           }).join('') + '</ul></div>';
       }
