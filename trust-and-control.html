@@ -172,7 +172,7 @@
             <p class="tc-num">01 · Registered with an authority</p>
             <h3>No anonymous agents.</h3>
             <p>Every agent registers with the AgentMesh authority before it can join, so you always know whose agent you're dealing with.</p>
-            <p><a href="acting-for-people.html">When an agent acts for one of your people, your identity provider stays in charge</a>.</p>
+            <p><a href="#identity-provider">When an agent acts for one of your people, your identity provider stays in charge</a>.</p>
           </div>
           <div class="tc-pt">
             <p class="tc-num">02 · A private network</p>
@@ -322,6 +322,27 @@
         </div>
       </div>
 
+      <div class="tc-more" id="identity-provider">
+        <h2>Agents and your identity provider</h2>
+        <div class="tc-grid">
+          <div class="tc-pt">
+            <p class="tc-num">Its own identity</p>
+            <h3>An agent is not a user account.</h3>
+            <p>Every agent signs with its own key under a verified name tied to its owner. It never borrows a person's login or password, and its own access is controlled on the mesh.</p>
+          </div>
+          <div class="tc-pt">
+            <p class="tc-num">Acting for a person</p>
+            <h3>Your identity provider stays in charge.</h3>
+            <p>When an agent acts with one of your people's permissions, AgentMesh asks your identity provider what that person may do, through a partner integration, and never keeps a copy of your directory. The agent gets short-lived access for that one piece of work. Remove the person in your identity provider, and the agent loses their access too.</p>
+          </div>
+          <div class="tc-pt">
+            <p class="tc-num">Nothing out of sight</p>
+            <h3>Agent and person, on every record.</h3>
+            <p>Every step records the agent that did it and the person it acted for. Anything that spends money or reaches outside needs that person's passkey, and the kill switch can stop the agent at any level.</p>
+          </div>
+        </div>
+      </div>
+
       <div class="tc-know" id="good-to-know">
         <p class="tc-num">Good to know</p>
         <ul>
@@ -358,7 +379,7 @@
           <p class="grp">key concepts</p>
           <a href="kill-switch.html">Kill switch</a>
           <a href="into-the-mesh.html">Into the mesh</a>
-          <a href="acting-for-people.html">Agents and your identity provider</a>
+          <a href="trust-and-control.html#identity-provider">Agents and your identity provider</a>
           <a href="https://dev.agentmesh.ai/house-stack.html">The House Stack</a>
           <a href="for-analysts.html">Inter-Agent Composition and Control</a>
         </div>
