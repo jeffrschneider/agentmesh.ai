@@ -12,7 +12,7 @@
   var gsvg = fig.querySelector('.ad-globe');
   var dot = svg.querySelector('.ad-dot');
   var numEl = fig.querySelector('.ad-num'), leadEl = fig.querySelector('.ad-says');
-  var nEl = fig.querySelector('.ad-say .n'), mtEl = fig.querySelector('.ad-say .mt'), tEl = fig.querySelector('.ad-say .t');
+  var nEl = fig.querySelector('.ad-say .n'), tEl = fig.querySelector('.ad-say .t');
   var btn = fig.querySelector('.ad-pause');
 
   function clamp01(v) { return v < 0 ? 0 : v > 1 ? 1 : v; }
@@ -180,7 +180,6 @@
     if (sub !== shownSub) {
       shownSub = sub;
       nEl.textContent = sub ? sub.name + '.' : '';
-      mtEl.textContent = sub && sub.metaphor ? '(' + sub.metaphor + ')' : '';
       tEl.textContent = sub ? sub.line : '';
     }
     drawGlobe(t);

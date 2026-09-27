@@ -73,7 +73,6 @@ const style = `<style>
     }
     .ad-say{ margin:0; font-size:.98rem; line-height:1.5; color:#AEB4BE; max-width:70ch; }
     .ad-say .n{ color:#ECE8E0; font-weight:500; }
-    .ad-say .mt{ font-family:var(--wire); font-size:12px; letter-spacing:.06em; }
     .ad-pause{ flex:none; font:inherit; font-family:var(--wire); font-size:12px; letter-spacing:.1em; text-transform:uppercase; color:#ECE8E0;
       background:transparent; border:1.5px solid rgba(236,232,224,.5); border-radius:10px; padding:8px 14px; cursor:pointer; }
     .ad-pause:focus-visible{ outline:2px solid #ECE8E0; outline-offset:2px; }
@@ -105,7 +104,7 @@ const parts = story.parts.map((p) => {
       <h2>${esc(p.name)}</h2>
       <p>${esc(p.line)}</p>
       <div class="ad-cards">
-${comps.map((c) => `        <div class="ad-card" id="${esc(c.id)}"><h3>${esc(c.name)}</h3><span class="m">${esc(c.metaphor)}</span><p>${esc(c.line)}</p></div>`).join("\n")}
+${comps.map((c) => `        <div class="ad-card" id="${esc(c.id)}"><h3>${esc(c.name)}</h3><p>${esc(c.line)}</p></div>`).join("\n")}
       </div>
     </section>`;
 }).join("\n\n");
@@ -122,7 +121,7 @@ const main = `<main class="wrap">
         <svg class="ad-globe" viewBox="0 12 640 520" aria-hidden="true" focusable="false"><defs><radialGradient id="ad-glow" cx="42%" cy="38%" r="60%"><stop offset="0" stop-color="rgba(236,232,224,0.07)"/><stop offset=".6" stop-color="rgba(124,147,255,0.05)"/><stop offset="1" stop-color="rgba(0,0,0,0)"/></radialGradient></defs></svg>
       </div>
       <div class="ad-cap">
-        <div><p class="ad-lead"><span class="ad-num"></span> <span class="ad-says"></span></p><p class="ad-say"><b class="n"></b> <span class="mt"></span> <span class="t"></span></p></div>
+        <div><p class="ad-lead"><span class="ad-num"></span> <span class="ad-says"></span></p><p class="ad-say"><b class="n"></b> <span class="t"></span></p></div>
         <button class="ad-pause" type="button" aria-label="Pause the animation">Pause</button>
       </div>
     </div>

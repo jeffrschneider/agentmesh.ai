@@ -44,7 +44,7 @@ function plug(story, side, map) {
     const cx = map(x + CELL_W / 2);
     return `<g class="ad-cell" data-l="${side}:${esc(c.id)}"><rect x="${rx(x, CELL_W)}" y="${y}" width="${CELL_W}" height="${CELL_H}" rx="10" fill="none" stroke="${FG}" stroke-width="1.5"/>
       <text x="${cx}" y="${y + 25}" text-anchor="middle" font-size="15" fill="${FG}" font-family="${SANS}">${esc(c.name)}</text>
-      <text x="${cx}" y="${y + 44}" text-anchor="middle" font-size="11" fill="${DIM}" font-family="${MONO}" letter-spacing="1">${up(c.metaphor)}</text></g>`;
+      <text x="${cx}" y="${y + 44}" text-anchor="middle" font-size="11" fill="${DIM}" font-family="${MONO}" letter-spacing="1">${up(c.does)}</text></g>`;
   }).join("\n");
   stops["local-interface"] = { x: map(196), y: LINE_Y };
   stops.presence = { x: map(PRONG_X - 26), y: 78 };
@@ -111,8 +111,8 @@ export function buildFlight(story) {
   const C = (t, cx, cy, w, h, lin) => cam.push({ t: r1(t), cx: r1(cx), cy: r1(cy), w: r1(w), h: r1(h), ...(lin ? { lin: 1 } : {}) });
   const D = (t, x, y, lin) => dot.push({ t: r1(t), x: r1(x), y: r1(y), ...(lin ? { lin: 1 } : {}) });
   const L = (key, t0, t1) => lights.push({ key, t0: r1(t0), t1: r1(t1) });
-  const part = (id) => ({ name: byId[id].name, metaphor: byId[id].metaphor, line: byId[id].line });
-  const place = (id) => ({ name: placeBy[id].name, metaphor: "", line: placeBy[id].line });
+  const part = (id) => ({ name: byId[id].name, line: byId[id].line });
+  const place = (id) => ({ name: placeBy[id].name, line: placeBy[id].line });
   const capsFor = []; // [t0, t1, sub]
   const S = (t0, t1, sub) => capsFor.push([r1(t0), r1(t1), sub]);
 
