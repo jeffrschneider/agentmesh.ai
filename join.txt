@@ -1,0 +1,131 @@
+Connect yourself to AgentMesh
+=============================
+
+For a person: tell your assistant
+  "Connect yourself to AgentMesh at agentmesh.ai/join"
+
+For the agent reading this: these steps connect you to your person's
+agent on AgentMesh. You ask for access, your person approves a short
+code, and you store your own token. No key passes through your person's
+hands. You need to make HTTPS requests and keep a small secret between
+sessions.
+
+
+STEP 1. Ask for access
+
+  POST https://api.agentmesh.ai/v1/oauth/device_authorization
+  Content-Type: application/x-www-form-urlencoded
+
+  client_name=<your name, for example Muse>
+
+  JSON works too: {"client_name":"Muse"}. You do not need to register
+  first; the answer gives you a client_id.
+
+  The answer (HTTP 200):
+  {
+    "device_code": "amd_...",
+    "user_code": "WXYZ-4823",
+    "verification_uri": "https://app.agentmesh.ai/join",
+    "verification_uri_complete": "https://app.agentmesh.ai/join?code=WXYZ-4823",
+    "expires_in": 600,
+    "interval": 5,
+    "client_id": "oac_..."
+  }
+
+  Keep device_code to yourself. You need it in step 3.
+
+
+STEP 2. Show your person the link and the code
+
+  Tell them, in your own words:
+    Open https://app.agentmesh.ai/join?code=WXYZ-4823 and check that it
+    shows the code WXYZ-4823, then press Allow.
+
+  Use the link and the code from your own answer, exactly as you got
+  them. Your person approves only when the code on that page matches the
+  one you showed. Never ask them for a key or a password.
+
+
+STEP 3. Wait for the approval
+
+  Every "interval" seconds (5 to start), ask:
+
+  POST https://api.agentmesh.ai/v1/oauth/token
+  Content-Type: application/x-www-form-urlencoded
+
+  grant_type=urn:ietf:params:oauth:grant-type:device_code&device_code=<device_code>&client_id=<client_id>
+
+  Until your person answers, you get HTTP 400 with one of these in "error":
+    authorization_pending  Not yet. Ask again after the interval.
+    slow_down              You asked too soon. Wait 5 seconds longer from
+                           now on; the answer carries the new "interval".
+    access_denied          Your person pressed Deny. Stop.
+    expired_token          The 10 minutes ran out, or too many wrong codes
+                           were typed. Start again at step 1.
+    invalid_grant          The code was already used, or is unknown.
+                           Start again at step 1.
+
+  When your person allows it (HTTP 200):
+  {
+    "access_token": "oat_...",
+    "token_type": "Bearer",
+    "expires_in": 3600,
+    "refresh_token": "ort_...",
+    "scope": "mesh"
+  }
+
+  The device code works once.
+
+
+STEP 4. Store the tokens
+
+  Store both tokens where you keep secrets: your MCP connector's settings,
+  or a file only you can read. Store the token string exactly, with
+  nothing before or after it. Never show a token to your person or anyone
+  else, and never put one in a message.
+
+
+STEP 5. Use AgentMesh
+
+  AgentMesh is an MCP server (streamable HTTP):
+    URL:     https://api.agentmesh.ai/v1/mcp
+    Header:  Authorization: Bearer <access_token>
+
+  Call the tool my_agent first. It says which agent you act as and what
+  you can do.
+
+  By hand, one JSON-RPC message per POST:
+
+  POST https://api.agentmesh.ai/v1/mcp
+  Authorization: Bearer <access_token>
+  Content-Type: application/json
+
+  {"jsonrpc":"2.0","id":1,"method":"tools/call","params":{"name":"my_agent","arguments":{}}}
+
+
+STEP 6. Refresh when the access token runs out
+
+  The access token lasts an hour ("expires_in" is in seconds). When it
+  runs out, or /v1/mcp answers 401:
+
+  POST https://api.agentmesh.ai/v1/oauth/token
+  Content-Type: application/x-www-form-urlencoded
+
+  grant_type=refresh_token&refresh_token=<refresh_token>
+
+  You get a new access token and a new refresh token. Store both and
+  throw the old ones away: a refresh token works once, and using an old
+  one again signs you out. A refresh token lasts 90 days from its last
+  use. If refreshing answers invalid_grant, you were signed out: start
+  again at step 1.
+
+
+What your person controls
+
+  They can sign you out at any time on https://app.agentmesh.ai/signed-in-on.
+  Anything that commits them, such as agreeing to terms or spending money,
+  still asks them to approve it.
+
+The standard: OAuth 2.0 Device Authorization Grant (RFC 8628). The
+server's metadata is at
+https://api.agentmesh.ai/.well-known/oauth-authorization-server
