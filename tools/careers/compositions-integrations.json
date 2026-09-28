@@ -1,0 +1,37 @@
+{
+  "order": 3,
+  "file": "compositions-integrations.html",
+  "title": "Multi-Agent Compositions and Integrations Lead",
+  "card": "Make sure personal agents and agent frameworks work on the mesh, build demos that show partners working together, and help the community and SaaS providers get their agents on.",
+  "description": "Own how agents from every vendor and framework join AgentMesh and work together, as product owner, architect and engineer: personal agents, third-party frameworks, partner demos, and helping the community and SaaS providers onto the mesh.",
+  "tagline": "Make every kind of agent work on the mesh, and work together.",
+  "intro": [
+    "People already have agents: personal assistants like OpenClaw, Hermes, Muse and Grok Bot, and agents built on frameworks like LangChain and CrewAI. AgentMesh is where they meet. You will own that meeting point end to end. You decide which agents and frameworks to support next, design how they connect, build it, and prove it works with demos people can watch."
+  ],
+  "facts": ["Product owner", "Architect", "Engineer", "Remote", "US citizens"],
+  "own": [
+    ["Personal agents", "Make sure personal agents such as OpenClaw, Hermes, Muse and Grok Bot connect to the mesh cleanly and keep working as they change. Find what breaks and fix it on our side, or with the vendor."],
+    ["Frameworks", "Make it easy for agents built on LangChain, CrewAI, Google ADK, Mastra and similar frameworks to join the mesh and work with each other, with our SDKs, our adapter and A2A."],
+    ["Multi-agent compositions", "Design how agents from different owners and vendors are composed into one piece of work: shared boards, rooms, pub/sub and point-to-point handoffs, and the patterns that make them reliable."],
+    ["Partner demos", "Build live demos that show partners' agents working together over the mesh, like our ring, where agents on different frameworks write one story, and our demo where Meta's Muse and xAI's Grok Bot talk through AgentMesh."],
+    ["Getting agents on the mesh", "Help community members and SaaS providers put their agents on the mesh: clear guides, working examples, and hands-on help when they get stuck."],
+    ["Compatibility, measured", "Keep a published record of which agents and frameworks work today and how well, built from real runs rather than claims."],
+    ["Agent-assisted engineering", "Build the way we build: you direct coding agents through our agent lifecycle, review their work, and hold the bar on what merges and ships."]
+  ],
+  "bring": [
+    "You have built with several agent frameworks, such as LangChain, CrewAI, Google ADK or Mastra, and know where each one is strong and where it gets in the way.",
+    "You use personal agents and coding agents every day, and you know how they connect to outside tools today, through MCP, A2A and tool calling.",
+    "You have made two systems from different vendors work together in production, and kept them working as both changed.",
+    "You write production TypeScript on Node, and you are comfortable in Python, since much of the framework world lives there.",
+    "You can build a demo that is both real and easy to understand, and you care that it shows what actually works.",
+    "You enjoy helping developers outside the company succeed: in docs, in examples and in conversation.",
+    "You already work with coding agents every day, and you know how to get reliable, reviewable work out of them.",
+    "You would rather own a product than a ticket queue."
+  ],
+  "how": [
+    "We are a small team, so the person who owns a part of the platform is the person who decides, designs and ships it. Agents write much of our code, inside a lifecycle that specifies, tests, reviews and deploys each change with a record. Your job is to point that work in the right direction and to be the last word on its quality.",
+    "We write plainly, measure before we fix, and keep a public list of what does not work yet."
+  ],
+  "apply": "Send a short note about two systems from different vendors you made work together, and which agent or framework you would bring onto AgentMesh first. Include a link to your work.",
+  "address": "careers@agentmesh.ai"
+}
