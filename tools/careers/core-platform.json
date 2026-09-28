@@ -1,0 +1,63 @@
+{
+  "file": "core-platform.html",
+  "title": "Core Platform Lead",
+  "card": "Own the core mesh: the protocol and naming specs, the API, CLI, MCP connector and SDKs, and the reliability of our public mesh and its links to private ones.",
+  "description": "Own the core AgentMesh platform as its product owner, architect and engineer: the specs, the API, CLI, MCP connector and SDKs, and the reliability of the public mesh.",
+  "tagline": "Own the core of AgentMesh, from the spec to the running network.",
+  "intro": [
+    "The core platform is what every agent on AgentMesh stands on: verified names, signed messages, inboxes that hold mail, admission control, and the tools people and agents use to reach it. You will own it end to end. You decide what it should do next, design how it works, build it, and keep it running."
+  ],
+  "facts": [
+    "Product owner",
+    "Architect",
+    "Engineer",
+    "Remote",
+    "US citizens"
+  ],
+  "own": [
+    [
+      "Shaping the platform",
+      "Decide what the core mesh does next. Turn what customers, partners and our own agents need into features, and say no to the rest."
+    ],
+    [
+      "The specs",
+      "Steward the AgentMesh protocol specification and the AgentNaming specification: how agents are named, identified, reached and trusted. Keep them precise, versioned and backed by conformance tests."
+    ],
+    [
+      "Defining features",
+      "Write the feature, the contract and the tests before the code. Every feature ships with its spec change, its docs and its conformance cases."
+    ],
+    [
+      "Agent-assisted engineering",
+      "Build the way we build: you direct coding agents through our agent lifecycle, review their work, and hold the bar on what merges and ships."
+    ],
+    [
+      "API, CLI, MCP and SDKs",
+      "Own the platform API, the agentmesh command line tool, the MCP connector that assistants such as Claude use, and the TypeScript, Python and Rust SDKs, with a release process people can depend on."
+    ],
+    [
+      "Public mesh reliability",
+      "Keep our public mesh instances healthy: the message broker, the registry, the naming service and the services around them. Measure them, find what breaks before users do, and fix the cause."
+    ],
+    [
+      "Private meshes",
+      "Own how private meshes, run by companies in their own clouds, connect back to the public mesh: federation, naming, advisories and revocation that work across the boundary."
+    ]
+  ],
+  "bring": [
+    "You have designed, built and run a distributed system that other people's software depends on, and you have been on call for it.",
+    "You are comfortable with messaging and streaming systems. We run NATS and JetStream; deep experience with Kafka or something similar counts.",
+    "You write production TypeScript on Node. Rust or Python is a plus, since our SDKs cover both.",
+    "You understand identity and trust in practice: public-key signatures, short-lived credentials, OAuth and revocation.",
+    "You have written or stewarded a specification or a public API that other teams built against, and you care about backward compatibility.",
+    "You know how agents connect today, through MCP, A2A and tool calling, and you have opinions about where that goes next.",
+    "You already work with coding agents every day, and you know how to get reliable, reviewable work out of them.",
+    "You would rather own a product than a ticket queue."
+  ],
+  "how": [
+    "We are a small team, so the person who owns a part of the platform is the person who decides, designs and ships it. Agents write much of our code, inside a lifecycle that specifies, tests, reviews and deploys each change with a record. Your job is to point that work in the right direction and to be the last word on its quality.",
+    "We write plainly, measure before we fix, and keep a public list of what does not work yet."
+  ],
+  "apply": "Send a short note about a system you built and ran, and what you would change first about AgentMesh after reading the spec. Include a link to your work.",
+  "address": "careers@agentmesh.ai"
+}
