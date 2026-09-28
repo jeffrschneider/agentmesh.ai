@@ -18,64 +18,44 @@
 <meta name="robots" content="noindex">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wdth,wght@12..96,75..100,400..700&family=Instrument+Sans:wdth,wght@75..100,400..700&family=Martian+Mono:wdth,wght@75..112.5,400..600&display=swap">
+<link rel="stylesheet" href="site.css">
 <style>
-  /* Same token system as adoption.html / business.html so this joins the funnel unchanged. */
-  :root{
-    --ink:#0A1417; --panel:#0F1D22; --panel-2:#12242A; --line:#1C2E33;
-    --paper:#E7EFEC; --dim:#7C918C; --faint:#4A5D5A;
-    --signal:#F2A93B;   /* amber: the model, the new problem */
-    --verify:#43D6A6;   /* mint: tools, plugins, the answer */
-    --address:#6BA8FF;  /* blue: the context window */
-    --broadcast:#B69CFF;/* violet: memory */
-    --accent:#6BA8FF;   /* this page's chrome leads blue; adoption leads amber */
-    --accent-soft:rgba(107,168,255,.15);
-    --disp:'Space Grotesk', sans-serif;
-    --body:'IBM Plex Sans', system-ui, sans-serif;
-    --wire:'IBM Plex Mono', ui-monospace, monospace;
-  }
-  *{ box-sizing:border-box; }
-  html,body{ margin:0; height:100%; }
-  body{ background:var(--ink); color:var(--paper); font-family:var(--body);
-    font-size:16px; line-height:1.55; -webkit-font-smoothing:antialiased;
-    background-image:
-      linear-gradient(var(--line) 1px, transparent 1px),
-      linear-gradient(90deg, var(--line) 1px, transparent 1px);
-    background-size:64px 64px; background-position:-1px -1px;
-    display:flex; flex-direction:column; }
-  body::before{ content:""; position:fixed; inset:0; z-index:0; pointer-events:none;
-    background:
-      radial-gradient(80% 45% at 30% 0%, rgba(107,168,255,.09), transparent 60%),
-      linear-gradient(180deg, rgba(10,20,23,.72), var(--ink) 62%); }
+  /* Page tokens. The stage leads with blue; buttons and the stage strip use amber as on the home page.
+     Inside the canvas the site tokens are re-pointed at the dark stage, in both themes. */
+  :root, .canvas{ --accent:var(--blue); --accent-ink:var(--blue); --accent-soft:color-mix(in srgb,var(--accent) 15%,transparent); }
+  .canvas{ --bg:var(--stage); --surface:var(--stage); --surface-2:var(--stage-2);
+    --line:var(--stage-line); --line-strong:var(--stage-line);
+    --fg:var(--stage-fg); --muted:var(--stage-dim); --faint:color-mix(in srgb,var(--stage-dim) 64%,var(--stage));
+    --amber:var(--st-yours); --amber-ink:var(--st-yours); --mint:var(--st-ok); --mint-ink:var(--st-ok);
+    --blue:var(--st-theirs); --violet:var(--st-mesh); color:var(--fg); }
+  .canvas :focus-visible{ outline-color:var(--st-yours); }
+  :where(.canvas svg text){ font-stretch:75%; } /* Martian Mono runs wide; the stage boxes were drawn for a narrower mono */
 
-  /* ── frame ── */
-  .topbar{ position:relative; z-index:5; border-bottom:1px solid var(--line);
-    background:rgba(10,20,23,.9); }
-  .topbar .bar{ max-width:1360px; margin:0 auto; padding:0 32px; height:60px;
-    display:flex; align-items:center; gap:26px; position:relative; }
-  .brand{ font-family:var(--wire); font-weight:600; font-size:.82rem; letter-spacing:.02em;
-    display:flex; align-items:center; gap:9px; color:var(--paper); text-decoration:none; }
-  .brand .mark{ flex:none; }
-  .brand span.wm{ font-family:'Space Grotesk', sans-serif; font-weight:500;
-    font-size:1.02rem; letter-spacing:-.01em; }
-  .brand span.wm b{ font-weight:700; }
-  .brand:hover span.wm b{ color:#F2A93B; }
+  /* the stage strip under the top bar: the four stages, as words, with a tick when passed */
+  .stagebar{ border-bottom:1px solid var(--line); }
+  .stagebar .wrap{ max-width:1360px; display:flex; align-items:center; gap:16px; padding-block:10px; }
+  .scrub{ display:flex; gap:8px; min-width:0; overflow-x:auto; scrollbar-width:none; }
+  .scrub::-webkit-scrollbar{ display:none; }
+  .scrub button{ flex:none; font-family:var(--mono); font-stretch:87.5%; font-size:.66rem; font-weight:500; letter-spacing:.02em;
+    color:var(--muted); background:var(--surface); border:1px solid var(--line); border-radius:999px;
+    padding:7px 13px; cursor:pointer; white-space:nowrap; transition:color .18s, border-color .18s, background-color .18s; }
+  .scrub button:hover{ color:var(--fg); border-color:var(--line-strong); }
+  .scrub button.on{ color:var(--on-amber); background:var(--amber); border-color:var(--amber-line); font-weight:600; }
+  .scrub button.done{ color:var(--mint-ink); border-color:color-mix(in srgb,var(--mint-ink) 45%,transparent); }
+  .scrub button.done::before{ content:"\2713\00a0"; }
 
-  .scrub{ position:absolute; left:50%; transform:translateX(-50%); display:flex; gap:8px; }
-  .scrub button{ font-family:var(--wire); font-size:.74rem; letter-spacing:.02em;
-    color:var(--dim); background:none; border:1px solid var(--line); border-radius:999px;
-    padding:6px 14px; cursor:pointer; transition:color .18s, border-color .18s, background .18s; }
-  .scrub button:hover{ color:var(--paper); }
-  .scrub button.on{ color:var(--ink); background:var(--accent); border-color:var(--accent); font-weight:600; }
-  .scrub button.done{ color:var(--verify); border-color:rgba(67,214,166,.4); }
+  .stagegrid{ height:calc(100svh - 120px); min-height:600px; }
+  .panel, .narr{ box-shadow:var(--shadow); }
+  .narr h1{ font-weight:600; letter-spacing:-.015em; }
 
-  .stagegrid{ position:relative; z-index:1; flex:1; max-width:1360px; width:100%;
+  .stagegrid{ position:relative; z-index:1; max-width:1360px; width:100%;
     margin:0 auto; padding:22px 32px 26px; display:grid;
-    grid-template-columns:1fr 320px; grid-template-rows:1fr auto; gap:18px; min-height:0; }
+    grid-template-columns:1fr 320px; grid-template-rows:1fr auto; gap:18px; }
 
   /* ── canvas ── */
-  .canvas{ grid-row:1; grid-column:1; position:relative; border:1px solid var(--line);
-    border-radius:12px; background:linear-gradient(180deg, rgba(15,29,34,.6), rgba(10,20,23,.3));
+  .canvas{ grid-row:1; grid-column:1; position:relative; border:1px solid var(--stage-line);
+    border-radius:12px; background-color:var(--stage); background-image:radial-gradient(var(--stage-dot) 1px,transparent 1.3px); background-size:22px 22px;
     overflow:hidden; min-height:420px; }
   .canvas svg{ position:absolute; inset:0; width:100%; height:100%; }
 
@@ -83,47 +63,47 @@
   .el.on{ opacity:1; transform:none; }
   .el.instant{ transition:none; }
 
-  .wire-ask{ stroke:var(--signal); stroke-width:1.8; fill:none; }
-  .wire-reply{ stroke:var(--verify); stroke-width:1.6; fill:none; stroke-dasharray:5 5; }
+  .wire-ask{ stroke:var(--amber); stroke-width:1.8; fill:none; }
+  .wire-reply{ stroke:var(--mint); stroke-width:1.6; fill:none; stroke-dasharray:5 5; }
   g.el path.draw{ stroke-dashoffset:0; }
   @media (prefers-reduced-motion: no-preference){
     g.el:not(.on) path.draw{ stroke-dashoffset:var(--len, 300); }
     g.el.on path.draw{ transition:stroke-dashoffset .9s ease .15s; }
   }
 
-  .title-big{ font-family:var(--disp); font-size:60px; font-weight:700; fill:var(--paper); letter-spacing:.01em; }
-  .title-sub{ font-family:var(--wire); font-size:17px; fill:var(--dim); letter-spacing:.14em; }
-  .syn-head{ font-family:var(--disp); font-size:34px; font-weight:700; fill:var(--paper); }
-  .syn-line{ font-family:var(--body); font-size:19px; fill:var(--paper); }
-  .node-label{ font-family:var(--wire); font-size:17px; font-weight:600; fill:var(--paper); }
-  .node-sub{ font-family:var(--wire); font-size:14px; fill:var(--dim); }
-  .frame-label{ font-family:var(--wire); font-size:13px; font-weight:600;
+  .title-big{ font-family:var(--display); font-stretch:100%; font-size:60px; font-weight:700; fill:var(--fg); letter-spacing:.01em; }
+  .title-sub{ font-family:var(--mono); font-size:17px; fill:var(--muted); letter-spacing:.14em; }
+  .syn-head{ font-family:var(--display); font-stretch:100%; font-size:34px; font-weight:700; fill:var(--fg); }
+  .syn-line{ font-family:var(--body); font-stretch:100%; font-size:19px; fill:var(--fg); }
+  .node-label{ font-family:var(--mono); font-size:17px; font-weight:600; fill:var(--fg); }
+  .node-sub{ font-family:var(--mono); font-size:14px; fill:var(--muted); }
+  .frame-label{ font-family:var(--mono); font-size:13px; font-weight:600;
     letter-spacing:.14em; fill:var(--faint); }
-  .wire-label{ font-family:var(--wire); font-size:12.5px; fill:var(--signal); }
-  .wire-label.mint{ fill:var(--verify); }
+  .wire-label{ font-family:var(--mono); font-size:12.5px; fill:var(--amber); }
+  .wire-label.mint{ fill:var(--mint); }
 
   /* the context gauge: the one genuinely animated organ */
   #gauge{ transition:width 1.6s ease, fill .5s ease; }
-  #gauge.hot{ fill:rgba(242,169,59,.45); }
+  #gauge.hot{ fill:color-mix(in srgb,var(--amber) 45%,transparent); }
 
   /* ── callout ── */
   .callout{ position:absolute; z-index:4; max-width:330px; padding:14px 16px 15px;
-    background:var(--panel-2); border:1px solid rgba(242,169,59,.5); border-left:3px solid var(--signal);
-    border-radius:8px; box-shadow:0 14px 40px rgba(0,0,0,.5);
+    background:var(--surface-2); border:1px solid color-mix(in srgb,var(--amber) 50%,transparent); border-left:3px solid var(--amber);
+    border-radius:8px; box-shadow:0 14px 40px rgba(0,0,0,.45);
     opacity:0; transform:translateY(10px); pointer-events:none;
     transition:opacity .45s ease, transform .45s ease; }
   .callout.on{ opacity:1; transform:none; }
-  .callout .co-eyebrow{ font-family:var(--wire); font-size:.68rem; letter-spacing:.14em;
-    color:var(--signal); margin-bottom:6px; }
-  .callout p{ margin:0; font-size:.92rem; line-height:1.5; color:var(--paper); }
-  .callout.mint{ border-color:rgba(67,214,166,.5); border-left-color:var(--verify); }
-  .callout.mint .co-eyebrow{ color:var(--verify); }
+  .callout .co-eyebrow{ font-family:var(--mono); font-size:.68rem; letter-spacing:.14em;
+    color:var(--amber-ink); margin-bottom:6px; }
+  .callout p{ margin:0; font-size:.92rem; line-height:1.5; color:var(--fg); }
+  .callout.mint{ border-color:color-mix(in srgb,var(--mint) 50%,transparent); border-left-color:var(--mint-ink); }
+  .callout.mint .co-eyebrow{ color:var(--mint-ink); }
 
   /* ── right panel: the parts list ── */
   .panel{ grid-row:1 / span 2; grid-column:2; border:1px solid var(--line); border-radius:12px;
-    background:var(--panel); padding:20px 20px 16px; overflow-y:auto; min-height:0; }
-  .panel h2{ font-family:var(--wire); font-size:.72rem; font-weight:600; letter-spacing:.16em;
-    color:var(--dim); margin:0 0 4px; }
+    background:var(--surface); padding:20px 20px 16px; overflow-y:auto; min-height:0; }
+  .panel h2{ font-family:var(--mono); font-size:.72rem; font-weight:600; letter-spacing:.16em;
+    color:var(--muted); margin:0 0 4px; }
   .panel .panel-sub{ font-size:.8rem; color:var(--faint); margin:0 0 14px; }
   .capgroup{ display:none; }
   .capgroup.on{ display:block; }
@@ -131,12 +111,12 @@
     background:none; border:none; border-top:1px solid var(--line); padding:11px 0 9px;
     text-align:left; }
   .capgroup:first-of-type .cg-head{ border-top:none; padding-top:2px; }
-  .cg-head:focus-visible{ outline:2px solid var(--accent); outline-offset:2px; border-radius:4px; }
-  .cg-label{ font-family:var(--wire); font-size:.68rem; letter-spacing:.12em; color:var(--faint); }
-  .capgroup.open .cg-label{ color:var(--dim); }
-  .cg-count{ margin-left:auto; font-family:var(--wire); font-size:.68rem; color:var(--verify); }
+  .cg-head:focus-visible{ outline:2px solid var(--amber-ink); outline-offset:2px; border-radius:4px; }
+  .cg-label{ font-family:var(--mono); font-size:.68rem; letter-spacing:.12em; color:var(--faint); }
+  .capgroup.open .cg-label{ color:var(--muted); }
+  .cg-count{ margin-left:auto; font-family:var(--mono); font-size:.68rem; color:var(--mint-ink); }
   .chev{ flex:none; width:7px; height:7px; margin-top:-3px;
-    border-right:1.5px solid var(--dim); border-bottom:1.5px solid var(--dim);
+    border-right:1.5px solid var(--muted); border-bottom:1.5px solid var(--muted);
     transform:rotate(45deg); transition:transform .2s ease; }
   .capgroup.open .chev{ transform:rotate(-135deg); margin-top:3px; }
   .cg-body{ display:none; padding-bottom:10px; }
@@ -146,58 +126,77 @@
   .cap.on{ opacity:1; transform:none; }
   .cap .box{ flex:none; width:13px; height:13px; border:1.5px solid var(--faint); border-radius:3px;
     position:relative; top:2px; transition:border-color .3s, background .3s; }
-  .cap.on .box{ border-color:var(--verify); background:rgba(67,214,166,.12); }
+  .cap.on .box{ border-color:var(--mint-ink); background:color-mix(in srgb,var(--mint) 12%,transparent); }
   .cap.on .box::after{ content:""; position:absolute; inset:2px 2px 3px;
-    border-right:2px solid var(--verify); border-bottom:2px solid var(--verify);
+    border-right:2px solid var(--mint-ink); border-bottom:2px solid var(--mint-ink);
     transform:rotate(40deg) scale(.85); border-radius:1px; }
-  .cap .cap-name{ font-size:.9rem; font-weight:500; color:var(--paper); }
-  .cap .cap-why{ font-size:.8rem; color:var(--dim); display:block; margin-top:1px; }
-  .panel.complete{ border-color:rgba(67,214,166,.45);
-    box-shadow:0 0 0 1px rgba(67,214,166,.15), 0 0 40px rgba(67,214,166,.06) inset; }
+  .cap .cap-name{ font-size:.9rem; font-weight:500; color:var(--fg); }
+  .cap .cap-why{ font-size:.8rem; color:var(--muted); display:block; margin-top:1px; }
+  .panel.complete{ border-color:var(--mint-ink);
+    box-shadow:0 0 0 1px color-mix(in srgb,var(--mint) 15%,transparent), 0 0 40px color-mix(in srgb,var(--mint) 6%,transparent) inset; }
 
   /* ── bottom band ── */
-  .band{ grid-row:2; grid-column:1; border:1px solid var(--line); border-radius:12px;
-    background:var(--panel); padding:18px 22px; display:flex; gap:22px; align-items:flex-start; }
-  .band .stageno{ font-family:var(--wire); font-size:.72rem; letter-spacing:.14em;
-    color:var(--accent); white-space:nowrap; padding-top:6px; }
-  .band .bt{ flex:1; min-width:0; }
-  .band h1{ font-size:1.3rem; margin:0 0 4px; }
-  .band p{ margin:0; color:var(--dim); font-size:.95rem; max-width:64ch; }
-  .band .cta{ display:inline-block; margin-top:10px; font-family:var(--wire); font-size:.85rem;
-    font-weight:600; color:var(--ink); background:var(--accent); border-radius:8px;
+  .narr{ grid-row:2; grid-column:1; border:1px solid var(--line); border-radius:12px;
+    background:var(--surface); padding:18px 22px; display:flex; gap:22px; align-items:flex-start; }
+  .narr .stageno{ font-family:var(--mono); font-size:.72rem; letter-spacing:.14em;
+    color:var(--accent-ink); white-space:nowrap; padding-top:6px; }
+  .narr .bt{ flex:1; min-width:0; }
+  .narr h1{ font-size:1.3rem; margin:0 0 4px; }
+  .narr p{ margin:0; color:var(--muted); font-size:.95rem; max-width:64ch; }
+  .narr .cta{ display:inline-block; margin-top:10px; font-family:var(--mono); font-size:.85rem;
+    font-weight:600; color:var(--on-amber); background:var(--amber); border-radius:8px;
     padding:9px 16px; text-decoration:none; }
-  .band .cta:hover{ background:#8dbcff; }
-  .band .cta[hidden]{ display:none; }
+  .narr .cta:hover{ filter:brightness(1.06); }
+  .narr .cta[hidden]{ display:none; }
   .controls{ flex:none; display:flex; gap:10px; align-items:center; padding-top:4px; }
-  .controls .beatno{ font-family:var(--wire); font-size:.72rem; color:var(--faint); margin-right:4px; }
-  .controls button{ font-family:var(--wire); font-size:.82rem; font-weight:600; cursor:pointer;
+  .controls .beatno{ font-family:var(--mono); font-size:.72rem; color:var(--faint); margin-right:4px; }
+  .controls button{ font-family:var(--mono); font-size:.82rem; font-weight:600; cursor:pointer;
     border-radius:8px; padding:9px 18px; border:1px solid var(--line);
-    background:var(--panel-2); color:var(--paper); transition:background .18s, border-color .18s; }
-  .controls button:hover{ border-color:var(--dim); }
-  .controls button.primary{ background:var(--accent); border-color:var(--accent); color:var(--ink); }
-  .controls button.primary:hover{ background:#8dbcff; }
+    background:var(--surface-2); color:var(--fg); transition:background .18s, border-color .18s; }
+  .controls button:hover{ border-color:var(--muted); }
+  .controls button.primary{ background:var(--amber); border-color:var(--amber-line); color:var(--on-amber); }
+  .controls button.primary:hover{ filter:brightness(1.06); }
   .controls button:disabled{ opacity:.35; cursor:default; }
-  .controls button:focus-visible{ outline:2px solid var(--accent); outline-offset:3px; }
+  .controls button:focus-visible{ outline:2px solid var(--amber-ink); outline-offset:3px; }
 
   @media (max-width: 1000px){
-    .stagegrid{ grid-template-columns:1fr; grid-template-rows:auto auto auto; padding:16px; }
+    .stagegrid{ grid-template-columns:1fr; grid-template-rows:auto auto auto; padding:16px; height:auto; min-height:0; }
     .panel{ grid-row:3; grid-column:1; max-height:340px; }
-    .band{ grid-row:2; flex-wrap:wrap; }
+    .narr{ grid-row:2; flex-wrap:wrap; }
     .canvas{ min-height:360px; }
+    .narr{ flex-direction:column; gap:10px; padding:16px; }
+    .narr .stageno{ padding-top:0; }
+    .controls{ flex-wrap:wrap; gap:8px; }
+    .controls button{ padding:9px 14px; }
   }
 </style>
 </head>
 <body>
 
-<header class="topbar"><div class="bar">
-  <a class="brand" href="/" aria-label="AgentMesh home"><svg class="mark" viewBox="0 0 32 32" width="22" height="22" aria-hidden="true" focusable="false"><rect x="3" y="3" width="12" height="12" rx="3.5" fill="none" stroke="currentColor" stroke-width="2" opacity=".35"/><rect x="17" y="17" width="12" height="12" rx="3.5" fill="none" stroke="currentColor" stroke-width="2" opacity=".35"/><rect x="3" y="17" width="12" height="12" rx="3.5" fill="#43D6A6"/><rect x="17" y="3" width="12" height="12" rx="3.5" fill="#F2A93B"/></svg><span class="wm">Agent<b>Mesh</b></span></a>
+<header class="topbar" id="topbar">
+  <div class="wrap bar">
+    <a class="brand" href="index.html" aria-label="AgentMesh home"><svg class="mark" viewBox="0 0 32 32" width="24" height="24" aria-hidden="true" focusable="false"><rect class="o" x="3" y="3" width="12" height="12" rx="3.5"/><rect class="o" x="17" y="17" width="12" height="12" rx="3.5"/><rect class="m" x="3" y="17" width="12" height="12" rx="3.5"/><rect class="a" x="17" y="3" width="12" height="12" rx="3.5"/></svg><span>Agent<b>Mesh</b></span></a>
+    <nav class="nav" aria-label="Main">
+      <a href="put-your-agent-on-the-mesh.html">How it works</a>
+      <a href="trust-and-control.html">Trust</a>
+      <a href="integrations.html">Integrations</a>
+      <a href="learn.html">Learn</a>
+      <a href="https://dev.agentmesh.ai/">Docs</a>
+    </nav>
+    <div class="acts">
+      <a class="signin" href="https://personal.agentmesh.ai">Sign in</a>
+      <a class="wl" href="waitlist.html?from=header">Join the waitlist</a>
+    </div>
+  </div>
+</header>
+<div class="stagebar"><div class="wrap">
   <nav class="scrub" id="scrub" aria-label="Stages">
     <button data-stage="0">1 · The parts</button>
     <button data-stage="1">2 · Workflow</button>
     <button data-stage="2">3 · Harness</button>
     <button data-stage="3">4 · Oriented</button>
   </nav>
-</div></header>
+</div></div>
 
 <div class="stagegrid">
 
@@ -213,7 +212,7 @@
 
       <!-- ═══ scene 1: the shared anatomy ═══ -->
       <g class="el" data-el="an-body">
-        <rect x="220" y="84" width="540" height="468" rx="14" fill="rgba(107,168,255,.02)"
+        <rect x="220" y="84" width="540" height="468" rx="14" fill="color-mix(in srgb,var(--blue) 2%,transparent)"
           stroke="var(--faint)" stroke-width="1.2" stroke-dasharray="6 6"/>
         <text x="240" y="118" class="frame-label" font-size="20">AN AGENT</text>
       </g>
@@ -226,12 +225,12 @@
         <line x1="490" y1="398" x2="490" y2="426" stroke="var(--faint)" stroke-dasharray="2 3"/>
       </g>
       <g class="el" data-el="an-model">
-        <circle cx="490" cy="235" r="60" fill="var(--panel-2)" stroke="var(--signal)" stroke-width="2"/>
+        <circle cx="490" cy="235" r="60" fill="var(--surface-2)" stroke="var(--amber)" stroke-width="2"/>
         <text x="490" y="232" text-anchor="middle" class="node-label">LLM</text>
         <text x="490" y="252" text-anchor="middle" class="node-sub" font-size="12.5">the brain</text>
       </g>
       <g class="el" data-el="an-instr">
-        <rect x="250" y="200" width="130" height="70" rx="8" fill="var(--panel-2)" stroke="var(--paper)" stroke-width="1.3" opacity=".9"/>
+        <rect x="250" y="200" width="130" height="70" rx="8" fill="var(--surface-2)" stroke="var(--fg)" stroke-width="1.3" opacity=".9"/>
         <line x1="266" y1="222" x2="364" y2="222" stroke="var(--faint)"/>
         <line x1="266" y1="238" x2="364" y2="238" stroke="var(--faint)"/>
         <line x1="266" y1="254" x2="344" y2="254" stroke="var(--faint)"/>
@@ -239,21 +238,21 @@
         <text x="315" y="316" text-anchor="middle" class="node-sub">job &amp; rules</text>
       </g>
       <g class="el" data-el="an-tools">
-        <rect x="632" y="180" width="32" height="32" rx="6" fill="var(--panel-2)" stroke="var(--verify)" stroke-width="1.6"/>
-        <rect x="632" y="222" width="32" height="32" rx="6" fill="var(--panel-2)" stroke="var(--verify)" stroke-width="1.6"/>
-        <rect x="632" y="264" width="32" height="32" rx="6" fill="var(--panel-2)" stroke="var(--verify)" stroke-width="1.6"/>
+        <rect x="632" y="180" width="32" height="32" rx="6" fill="var(--surface-2)" stroke="var(--mint)" stroke-width="1.6"/>
+        <rect x="632" y="222" width="32" height="32" rx="6" fill="var(--surface-2)" stroke="var(--mint)" stroke-width="1.6"/>
+        <rect x="632" y="264" width="32" height="32" rx="6" fill="var(--surface-2)" stroke="var(--mint)" stroke-width="1.6"/>
         <text x="648" y="330" text-anchor="middle" class="node-label" font-size="15">Tools</text>
         <text x="648" y="348" text-anchor="middle" class="node-sub">hands</text>
       </g>
       <g class="el" data-el="an-ctx">
         <text x="300" y="352" class="frame-label">CONTEXT WINDOW</text>
-        <rect x="300" y="362" width="380" height="34" rx="7" fill="rgba(107,168,255,.06)" stroke="var(--address)" stroke-width="1.6"/>
-        <rect x="303" y="365" width="130" height="28" rx="5" fill="rgba(107,168,255,.35)"/>
+        <rect x="300" y="362" width="380" height="34" rx="7" fill="color-mix(in srgb,var(--blue) 6%,transparent)" stroke="var(--blue)" stroke-width="1.6"/>
+        <rect x="303" y="365" width="130" height="28" rx="5" fill="color-mix(in srgb,var(--blue) 35%,transparent)"/>
         <text x="300" y="418" class="node-sub">working memory</text>
       </g>
       <g class="el" data-el="an-mem">
-        <path d="M 430 442 v 44 a 60 12 0 0 0 120 0 v -44" fill="var(--panel-2)" stroke="var(--broadcast)" stroke-width="1.6"/>
-        <ellipse cx="490" cy="442" rx="60" ry="12" fill="var(--panel-2)" stroke="var(--broadcast)" stroke-width="1.6"/>
+        <path d="M 430 442 v 44 a 60 12 0 0 0 120 0 v -44" fill="var(--surface-2)" stroke="var(--violet)" stroke-width="1.6"/>
+        <ellipse cx="490" cy="442" rx="60" ry="12" fill="var(--surface-2)" stroke="var(--violet)" stroke-width="1.6"/>
         <text x="490" y="524" text-anchor="middle" class="node-label" font-size="15">Memory</text>
         <text x="490" y="542" text-anchor="middle" class="node-sub">outlives the session</text>
       </g>
@@ -262,26 +261,26 @@
         <line x1="666" y1="196" x2="766" y2="174" stroke="var(--faint)" stroke-dasharray="2 3"/>
         <line x1="666" y1="238" x2="766" y2="238" stroke="var(--faint)" stroke-dasharray="2 3"/>
         <line x1="666" y1="280" x2="766" y2="302" stroke="var(--faint)" stroke-dasharray="2 3"/>
-        <rect x="770" y="150" width="150" height="48" rx="8" fill="var(--panel-2)" stroke="var(--address)" stroke-width="1.4"/>
+        <rect x="770" y="150" width="150" height="48" rx="8" fill="var(--surface-2)" stroke="var(--blue)" stroke-width="1.4"/>
         <text x="845" y="170" text-anchor="middle" class="node-label" font-size="15">CRM</text>
         <text x="845" y="188" text-anchor="middle" class="node-sub" font-size="12.5">system of record</text>
-        <rect x="770" y="214" width="150" height="48" rx="8" fill="var(--panel-2)" stroke="var(--address)" stroke-width="1.4"/>
+        <rect x="770" y="214" width="150" height="48" rx="8" fill="var(--surface-2)" stroke="var(--blue)" stroke-width="1.4"/>
         <text x="845" y="234" text-anchor="middle" class="node-label" font-size="15">Knowledge base</text>
         <text x="845" y="252" text-anchor="middle" class="node-sub" font-size="12.5">company knowledge</text>
-        <rect x="770" y="278" width="150" height="48" rx="8" fill="var(--panel-2)" stroke="var(--address)" stroke-width="1.4"/>
+        <rect x="770" y="278" width="150" height="48" rx="8" fill="var(--surface-2)" stroke="var(--blue)" stroke-width="1.4"/>
         <text x="845" y="298" text-anchor="middle" class="node-label" font-size="15">Data warehouse</text>
         <text x="845" y="316" text-anchor="middle" class="node-sub" font-size="12.5">the data</text>
       </g>
 
       <!-- ═══ scene 2: the workflow agent ═══ -->
       <g class="el" data-el="wf-frame">
-        <rect x="64" y="120" width="852" height="380" rx="12" fill="rgba(107,168,255,.02)"
+        <rect x="64" y="120" width="852" height="380" rx="12" fill="color-mix(in srgb,var(--blue) 2%,transparent)"
           stroke="var(--faint)" stroke-width="1.2" stroke-dasharray="6 6"/>
         <text x="84" y="152" class="frame-label" font-size="20">A WORKFLOW AGENT</text>
       </g>
       <g class="el" data-el="wf-author">
-        <circle cx="490" cy="185" r="13" fill="none" stroke="var(--paper)" stroke-width="2"/>
-        <path d="M 469 228 Q 490 204 511 228" fill="none" stroke="var(--paper)" stroke-width="2" stroke-linecap="round"/>
+        <circle cx="490" cy="185" r="13" fill="none" stroke="var(--fg)" stroke-width="2"/>
+        <path d="M 469 228 Q 490 204 511 228" fill="none" stroke="var(--fg)" stroke-width="2" stroke-linecap="round"/>
         <text x="514" y="190" class="node-sub">the author · writes the graph</text>
         <line x1="478" y1="230" x2="200" y2="272" stroke="var(--faint)" stroke-dasharray="2 4"/>
         <line x1="486" y1="234" x2="384" y2="272" stroke="var(--faint)" stroke-dasharray="2 4"/>
@@ -289,83 +288,83 @@
         <line x1="502" y1="230" x2="784" y2="272" stroke="var(--faint)" stroke-dasharray="2 4"/>
       </g>
       <g class="el" data-el="wf-n1">
-        <rect x="100" y="280" width="150" height="80" rx="9" fill="var(--panel-2)" stroke="var(--address)" stroke-width="1.5"/>
+        <rect x="100" y="280" width="150" height="80" rx="9" fill="var(--surface-2)" stroke="var(--blue)" stroke-width="1.5"/>
         <text x="175" y="305" text-anchor="middle" class="node-label">Extract</text>
         <text x="175" y="321" text-anchor="middle" class="node-sub" font-size="12.5">parse the intake</text>
         <text x="175" y="347" text-anchor="middle" class="node-sub" fill="var(--faint)" font-size="12.5">llm · fixed tools</text>
       </g>
       <g class="el" data-el="wf-n2">
-        <rect x="306" y="280" width="150" height="80" rx="9" fill="var(--panel-2)" stroke="var(--address)" stroke-width="1.5"/>
+        <rect x="306" y="280" width="150" height="80" rx="9" fill="var(--surface-2)" stroke="var(--blue)" stroke-width="1.5"/>
         <text x="381" y="305" text-anchor="middle" class="node-label">Classify</text>
         <text x="381" y="321" text-anchor="middle" class="node-sub" font-size="12.5">route by type</text>
         <text x="381" y="347" text-anchor="middle" class="node-sub" fill="var(--faint)" font-size="12.5">llm · fixed tools</text>
       </g>
       <g class="el" data-el="wf-n3">
-        <rect x="512" y="280" width="150" height="80" rx="9" fill="var(--panel-2)" stroke="var(--address)" stroke-width="1.5"/>
+        <rect x="512" y="280" width="150" height="80" rx="9" fill="var(--surface-2)" stroke="var(--blue)" stroke-width="1.5"/>
         <text x="587" y="305" text-anchor="middle" class="node-label">Draft</text>
         <text x="587" y="321" text-anchor="middle" class="node-sub" font-size="12.5">write the reply</text>
         <text x="587" y="347" text-anchor="middle" class="node-sub" fill="var(--faint)" font-size="12.5">llm · fixed tools</text>
       </g>
       <g class="el" data-el="wf-n4">
-        <rect x="718" y="280" width="150" height="80" rx="9" fill="var(--panel-2)" stroke="var(--address)" stroke-width="1.5"/>
+        <rect x="718" y="280" width="150" height="80" rx="9" fill="var(--surface-2)" stroke="var(--blue)" stroke-width="1.5"/>
         <text x="793" y="305" text-anchor="middle" class="node-label">File</text>
         <text x="793" y="321" text-anchor="middle" class="node-sub" font-size="12.5">update the system</text>
         <text x="793" y="347" text-anchor="middle" class="node-sub" fill="var(--faint)" font-size="12.5">llm · fixed tools</text>
       </g>
       <g class="el" data-el="wf-arrows">
         <path class="wire-ask draw" style="--len:60" stroke-dasharray="60" d="M 252 320 C 270 320, 286 320, 300 320"/>
-        <polygon points="300,314 310,320 300,326" fill="var(--signal)"/>
+        <polygon points="300,314 310,320 300,326" fill="var(--amber)"/>
         <path class="wire-ask draw" style="--len:60" stroke-dasharray="60" d="M 458 320 C 476 320, 492 320, 506 320"/>
-        <polygon points="506,314 516,320 506,326" fill="var(--signal)"/>
+        <polygon points="506,314 516,320 506,326" fill="var(--amber)"/>
         <path class="wire-ask draw" style="--len:60" stroke-dasharray="60" d="M 664 320 C 682 320, 698 320, 712 320"/>
-        <polygon points="712,314 722,320 712,326" fill="var(--signal)"/>
+        <polygon points="712,314 722,320 712,326" fill="var(--amber)"/>
       </g>
       <g class="el" data-el="wf-branch">
         <path class="wire-ask draw" style="--len:60" stroke-dasharray="60" d="M 381 362 C 381 380, 381 396, 381 412"/>
-        <polygon points="375,412 381,422 387,412" fill="var(--signal)"/>
-        <rect x="306" y="426" width="150" height="56" rx="9" fill="var(--panel-2)" stroke="var(--dim)" stroke-width="1.3"/>
+        <polygon points="375,412 381,422 387,412" fill="var(--amber)"/>
+        <rect x="306" y="426" width="150" height="56" rx="9" fill="var(--surface-2)" stroke="var(--muted)" stroke-width="1.3"/>
         <text x="381" y="450" text-anchor="middle" class="node-label">Escalate</text>
         <text x="381" y="466" text-anchor="middle" class="node-sub">to a person</text>
       </g>
       <g class="el" data-el="wf-break">
         <path class="wire-ask draw" style="--len:230" stroke-dasharray="6 5" d="M 130 470 C 200 468, 290 420, 352 374"/>
-        <line x1="352" y1="360" x2="370" y2="378" stroke="var(--signal)" stroke-width="2.4" stroke-linecap="round"/>
-        <line x1="370" y1="360" x2="352" y2="378" stroke="var(--signal)" stroke-width="2.4" stroke-linecap="round"/>
+        <line x1="352" y1="360" x2="370" y2="378" stroke="var(--amber)" stroke-width="2.4" stroke-linecap="round"/>
+        <line x1="370" y1="360" x2="352" y2="378" stroke="var(--amber)" stroke-width="2.4" stroke-linecap="round"/>
         <text x="96" y="490" class="wire-label">a case the author never saw</text>
       </g>
 
       <!-- ═══ scene 3: the harness agent ═══ -->
       <g class="el" data-el="h-frame">
-        <rect x="64" y="84" width="852" height="468" rx="12" fill="rgba(107,168,255,.02)"
+        <rect x="64" y="84" width="852" height="468" rx="12" fill="color-mix(in srgb,var(--blue) 2%,transparent)"
           stroke="var(--faint)" stroke-width="1.2" stroke-dasharray="6 6"/>
         <text x="84" y="116" class="frame-label" font-size="20">A HARNESS AGENT</text>
       </g>
       <g class="el" data-el="h-loop">
-        <circle cx="400" cy="280" r="140" fill="none" stroke="var(--dim)" stroke-width="1.5" stroke-dasharray="10 8"/>
-        <polygon points="396,132 412,140 396,148" fill="var(--dim)"/>
-        <polygon points="404,412 388,420 404,428" fill="var(--dim)"/>
-        <polygon points="252,284 260,268 268,284" fill="var(--dim)"/>
+        <circle cx="400" cy="280" r="140" fill="none" stroke="var(--muted)" stroke-width="1.5" stroke-dasharray="10 8"/>
+        <polygon points="396,132 412,140 396,148" fill="var(--muted)"/>
+        <polygon points="404,412 388,420 404,428" fill="var(--muted)"/>
+        <polygon points="252,284 260,268 268,284" fill="var(--muted)"/>
         <text x="400" y="126" text-anchor="middle" class="node-sub">look</text>
         <text x="550" y="284" class="node-sub">think</text>
         <text x="400" y="408" text-anchor="middle" class="node-sub">act</text>
         <text x="276" y="284" class="node-sub">repeat</text>
       </g>
       <g class="el" data-el="h-person">
-        <circle cx="165" cy="152" r="13" fill="none" stroke="var(--paper)" stroke-width="2"/>
-        <path d="M 141 200 Q 165 174 189 200" fill="none" stroke="var(--paper)" stroke-width="2" stroke-linecap="round"/>
-        <path d="M 197 182 C 228 178, 260 180, 294 184" fill="none" stroke="var(--verify)" stroke-width="1.5" stroke-dasharray="2 5" stroke-linecap="round"/>
+        <circle cx="165" cy="152" r="13" fill="none" stroke="var(--fg)" stroke-width="2"/>
+        <path d="M 141 200 Q 165 174 189 200" fill="none" stroke="var(--fg)" stroke-width="2" stroke-linecap="round"/>
+        <path d="M 197 182 C 228 178, 260 180, 294 184" fill="none" stroke="var(--mint)" stroke-width="1.5" stroke-dasharray="2 5" stroke-linecap="round"/>
         <text x="165" y="224" text-anchor="middle" class="node-sub" font-size="12.5">personal · a human</text>
         <text x="165" y="240" text-anchor="middle" class="node-sub" font-size="12.5">at the wheel, turn by turn</text>
       </g>
       <g class="el" data-el="h-task">
-        <rect x="85" y="256" width="166" height="44" rx="9" fill="var(--panel-2)" stroke="var(--dim)" stroke-width="1.4"/>
+        <rect x="85" y="256" width="166" height="44" rx="9" fill="var(--surface-2)" stroke="var(--muted)" stroke-width="1.4"/>
         <text x="168" y="274" text-anchor="middle" class="node-label" font-size="15">Task · hour six</text>
         <text x="168" y="290" text-anchor="middle" class="node-sub" font-size="12.5">still running</text>
         <line x1="253" y1="278" x2="266" y2="281" stroke="var(--faint)" stroke-dasharray="2 3"/>
         <text x="180" y="318" text-anchor="middle" class="node-sub" font-size="12.5">started by a person or agent</text>
       </g>
       <g class="el" data-el="h-model">
-        <circle cx="400" cy="280" r="58" fill="var(--panel-2)" stroke="var(--signal)" stroke-width="2"/>
+        <circle cx="400" cy="280" r="58" fill="var(--surface-2)" stroke="var(--amber)" stroke-width="2"/>
         <text x="400" y="277" text-anchor="middle" class="node-label">LLM</text>
         <text x="400" y="293" text-anchor="middle" class="node-sub" font-size="12">owns the loop</text>
       </g>
@@ -373,63 +372,63 @@
         <path d="M 542 268 C 580 240, 620 210, 656 196" fill="none" stroke="var(--faint)" stroke-dasharray="2 3"/>
         <path d="M 544 280 C 580 274, 620 260, 656 253" fill="none" stroke="var(--faint)" stroke-dasharray="2 3"/>
         <path d="M 542 292 C 580 300, 620 306, 656 311" fill="none" stroke="var(--faint)" stroke-dasharray="2 3"/>
-        <rect x="660" y="180" width="26" height="26" rx="5" fill="var(--panel-2)" stroke="var(--verify)" stroke-width="1.5"/>
-        <rect x="660" y="240" width="26" height="26" rx="5" fill="var(--panel-2)" stroke="var(--verify)" stroke-width="1.5"/>
-        <rect x="660" y="298" width="26" height="26" rx="5" fill="var(--panel-2)" stroke="var(--verify)" stroke-width="1.5"/>
+        <rect x="660" y="180" width="26" height="26" rx="5" fill="var(--surface-2)" stroke="var(--mint)" stroke-width="1.5"/>
+        <rect x="660" y="240" width="26" height="26" rx="5" fill="var(--surface-2)" stroke="var(--mint)" stroke-width="1.5"/>
+        <rect x="660" y="298" width="26" height="26" rx="5" fill="var(--surface-2)" stroke="var(--mint)" stroke-width="1.5"/>
         <text x="673" y="348" text-anchor="middle" class="node-label" font-size="15">Tools</text>
         <text x="673" y="362" text-anchor="middle" class="node-sub">chosen at run time</text>
       </g>
       <g class="el" data-el="h-ctx">
         <text x="350" y="470" class="frame-label">CONTEXT WINDOW</text>
-        <rect x="180" y="480" width="500" height="30" rx="6" fill="rgba(107,168,255,.06)" stroke="var(--address)" stroke-width="1.5"/>
-        <rect id="gauge" x="183" y="483" width="80" height="24" rx="4" fill="rgba(107,168,255,.35)"/>
+        <rect x="180" y="480" width="500" height="30" rx="6" fill="color-mix(in srgb,var(--blue) 6%,transparent)" stroke="var(--blue)" stroke-width="1.5"/>
+        <rect id="gauge" x="183" y="483" width="80" height="24" rx="4" fill="color-mix(in srgb,var(--blue) 35%,transparent)"/>
         <line x1="400" y1="422" x2="400" y2="476" stroke="var(--faint)" stroke-dasharray="2 3"/>
       </g>
       <g class="el" data-el="h-memfile">
         <path class="wire-reply draw" style="--len:100" d="M 686 494 C 715 492, 742 488, 770 484"/>
         <text x="652" y="474" class="wire-label mint">compact &amp; spill</text>
-        <path d="M 776 468 v 30 a 34 8 0 0 0 68 0 v -30" fill="var(--panel-2)" stroke="var(--broadcast)" stroke-width="1.4"/>
-        <ellipse cx="810" cy="468" rx="34" ry="8" fill="var(--panel-2)" stroke="var(--broadcast)" stroke-width="1.4"/>
+        <path d="M 776 468 v 30 a 34 8 0 0 0 68 0 v -30" fill="var(--surface-2)" stroke="var(--violet)" stroke-width="1.4"/>
+        <ellipse cx="810" cy="468" rx="34" ry="8" fill="var(--surface-2)" stroke="var(--violet)" stroke-width="1.4"/>
         <text x="810" y="540" text-anchor="middle" class="node-sub">memory files</text>
       </g>
       <g class="el" data-el="h-subs">
-        <circle cx="120" cy="395" r="24" fill="none" stroke="var(--dim)" stroke-width="1.2" stroke-dasharray="6 6"/>
-        <circle cx="120" cy="395" r="7" fill="none" stroke="var(--signal)" stroke-width="1.4"/>
-        <circle cx="185" cy="395" r="24" fill="none" stroke="var(--dim)" stroke-width="1.2" stroke-dasharray="6 6"/>
-        <circle cx="185" cy="395" r="7" fill="none" stroke="var(--signal)" stroke-width="1.4"/>
+        <circle cx="120" cy="395" r="24" fill="none" stroke="var(--muted)" stroke-width="1.2" stroke-dasharray="6 6"/>
+        <circle cx="120" cy="395" r="7" fill="none" stroke="var(--amber)" stroke-width="1.4"/>
+        <circle cx="185" cy="395" r="24" fill="none" stroke="var(--muted)" stroke-width="1.2" stroke-dasharray="6 6"/>
+        <circle cx="185" cy="395" r="7" fill="none" stroke="var(--amber)" stroke-width="1.4"/>
         <text x="152" y="440" text-anchor="middle" class="node-label" font-size="15">Subagents</text>
         <text x="152" y="454" text-anchor="middle" class="node-sub">fresh, clean windows</text>
       </g>
 
       <!-- ═══ scene 4: the oriented harness ═══ -->
       <g class="el" data-el="p-frame">
-        <rect x="64" y="84" width="852" height="468" rx="12" fill="rgba(107,168,255,.02)"
+        <rect x="64" y="84" width="852" height="468" rx="12" fill="color-mix(in srgb,var(--blue) 2%,transparent)"
           stroke="var(--faint)" stroke-width="1.2" stroke-dasharray="6 6"/>
         <text x="84" y="116" class="frame-label" font-size="20">AN ORIENTED HARNESS AGENT</text>
       </g>
       <g class="el" data-el="p-loop">
-        <circle cx="360" cy="300" r="125" fill="none" stroke="var(--dim)" stroke-width="1.5" stroke-dasharray="10 8"/>
-        <rect x="470" y="278" width="28" height="44" rx="4" fill="var(--ink)" stroke="var(--dim)" stroke-width="1.3"/>
+        <circle cx="360" cy="300" r="125" fill="none" stroke="var(--muted)" stroke-width="1.5" stroke-dasharray="10 8"/>
+        <rect x="470" y="278" width="28" height="44" rx="4" fill="var(--bg)" stroke="var(--muted)" stroke-width="1.3"/>
         <text x="484" y="342" text-anchor="middle" class="node-sub">plugin slot</text>
       </g>
       <g class="el" data-el="p-model">
-        <circle cx="360" cy="300" r="52" fill="var(--panel-2)" stroke="var(--signal)" stroke-width="2"/>
+        <circle cx="360" cy="300" r="52" fill="var(--surface-2)" stroke="var(--amber)" stroke-width="2"/>
         <text x="360" y="297" text-anchor="middle" class="node-label">LLM</text>
         <text x="360" y="313" text-anchor="middle" class="node-sub" font-size="12.5">same loop</text>
       </g>
       <g class="el" data-el="p-plugin">
-        <rect x="618" y="256" width="14" height="48" rx="3" fill="var(--panel-2)" stroke="var(--verify)" stroke-width="1.6"/>
-        <rect x="630" y="196" width="220" height="168" rx="10" fill="var(--panel-2)" stroke="var(--verify)" stroke-width="1.8"/>
+        <rect x="618" y="256" width="14" height="48" rx="3" fill="var(--surface-2)" stroke="var(--mint)" stroke-width="1.6"/>
+        <rect x="630" y="196" width="220" height="168" rx="10" fill="var(--surface-2)" stroke="var(--mint)" stroke-width="1.8"/>
         <text x="740" y="226" text-anchor="middle" class="node-label">domain-expert</text>
         <text x="740" y="246" text-anchor="middle" class="node-sub" font-size="12.5">an agent plugin</text>
-        <rect x="656" y="262" width="9" height="9" rx="2" fill="none" stroke="var(--verify)" stroke-width="1.3"/>
-        <text x="674" y="271" class="node-sub" fill="var(--paper)">skills</text>
-        <rect x="656" y="286" width="9" height="9" rx="2" fill="none" stroke="var(--verify)" stroke-width="1.3"/>
-        <text x="674" y="295" class="node-sub" fill="var(--paper)">tools &amp; MCP</text>
-        <rect x="656" y="310" width="9" height="9" rx="2" fill="none" stroke="var(--verify)" stroke-width="1.3"/>
-        <text x="674" y="319" class="node-sub" fill="var(--paper)">instructions</text>
-        <rect x="656" y="334" width="9" height="9" rx="2" fill="none" stroke="var(--verify)" stroke-width="1.3"/>
-        <text x="674" y="343" class="node-sub" fill="var(--paper)">guardrails</text>
+        <rect x="656" y="262" width="9" height="9" rx="2" fill="none" stroke="var(--mint)" stroke-width="1.3"/>
+        <text x="674" y="271" class="node-sub" fill="var(--fg)">skills</text>
+        <rect x="656" y="286" width="9" height="9" rx="2" fill="none" stroke="var(--mint)" stroke-width="1.3"/>
+        <text x="674" y="295" class="node-sub" fill="var(--fg)">tools &amp; MCP</text>
+        <rect x="656" y="310" width="9" height="9" rx="2" fill="none" stroke="var(--mint)" stroke-width="1.3"/>
+        <text x="674" y="319" class="node-sub" fill="var(--fg)">instructions</text>
+        <rect x="656" y="334" width="9" height="9" rx="2" fill="none" stroke="var(--mint)" stroke-width="1.3"/>
+        <text x="674" y="343" class="node-sub" fill="var(--fg)">guardrails</text>
       </g>
       <g class="el" data-el="p-wire">
         <path class="wire-reply draw" style="--len:130" d="M 614 274 C 578 280, 540 290, 504 297"/>
@@ -439,18 +438,18 @@
         <line x1="212" y1="186" x2="256" y2="216" stroke="var(--faint)" stroke-dasharray="2 3"/>
         <line x1="188" y1="276" x2="235" y2="288" stroke="var(--faint)" stroke-dasharray="2 3"/>
         <line x1="212" y1="366" x2="258" y2="386" stroke="var(--faint)" stroke-dasharray="2 3"/>
-        <rect x="100" y="160" width="112" height="26" rx="13" fill="rgba(67,214,166,.08)" stroke="var(--verify)" stroke-width="1.2"/>
-        <text x="156" y="177" text-anchor="middle" class="node-sub" fill="var(--verify)">domain tools</text>
-        <rect x="76" y="262" width="112" height="26" rx="13" fill="rgba(67,214,166,.08)" stroke="var(--verify)" stroke-width="1.2"/>
-        <text x="132" y="279" text-anchor="middle" class="node-sub" fill="var(--verify)">domain rules</text>
-        <rect x="100" y="352" width="112" height="26" rx="13" fill="rgba(67,214,166,.08)" stroke="var(--verify)" stroke-width="1.2"/>
-        <text x="156" y="369" text-anchor="middle" class="node-sub" fill="var(--verify)">playbooks</text>
+        <rect x="100" y="160" width="112" height="26" rx="13" fill="color-mix(in srgb,var(--mint) 8%,transparent)" stroke="var(--mint)" stroke-width="1.2"/>
+        <text x="156" y="177" text-anchor="middle" class="node-sub" fill="var(--mint)">domain tools</text>
+        <rect x="76" y="262" width="112" height="26" rx="13" fill="color-mix(in srgb,var(--mint) 8%,transparent)" stroke="var(--mint)" stroke-width="1.2"/>
+        <text x="132" y="279" text-anchor="middle" class="node-sub" fill="var(--mint)">domain rules</text>
+        <rect x="100" y="352" width="112" height="26" rx="13" fill="color-mix(in srgb,var(--mint) 8%,transparent)" stroke="var(--mint)" stroke-width="1.2"/>
+        <text x="156" y="369" text-anchor="middle" class="node-sub" fill="var(--mint)">playbooks</text>
       </g>
       <g class="el" data-el="p-skills">
         <line x1="360" y1="427" x2="360" y2="443" stroke="var(--faint)" stroke-dasharray="2 3"/>
-        <rect x="285" y="437" width="180" height="58" rx="8" fill="var(--panel-2)" stroke="var(--faint)" stroke-width="1.1"/>
-        <rect x="280" y="441" width="180" height="58" rx="8" fill="var(--panel-2)" stroke="var(--dim)" stroke-width="1.2"/>
-        <rect x="275" y="445" width="180" height="58" rx="8" fill="var(--panel-2)" stroke="var(--verify)" stroke-width="1.5"/>
+        <rect x="285" y="437" width="180" height="58" rx="8" fill="var(--surface-2)" stroke="var(--faint)" stroke-width="1.1"/>
+        <rect x="280" y="441" width="180" height="58" rx="8" fill="var(--surface-2)" stroke="var(--muted)" stroke-width="1.2"/>
+        <rect x="275" y="445" width="180" height="58" rx="8" fill="var(--surface-2)" stroke="var(--mint)" stroke-width="1.5"/>
         <text x="365" y="470" text-anchor="middle" class="node-label" font-size="14">review-a-contract</text>
         <text x="365" y="486" text-anchor="middle" class="node-sub" font-size="12.5">a skill · on demand</text>
         <text x="365" y="530" text-anchor="middle" class="node-sub">Skills · procedural know-how</text>
@@ -458,52 +457,52 @@
       <!-- ═══ the synopsis card ═══ -->
       <g class="el" data-el="synopsis">
         <text x="230" y="160" class="syn-head">In short</text>
-        <rect x="230" y="206" width="13" height="13" rx="3" fill="var(--paper)"/>
+        <rect x="230" y="206" width="13" height="13" rx="3" fill="var(--fg)"/>
         <text x="258" y="219" class="syn-line">Every agent is built from the same five parts.</text>
-        <rect x="230" y="266" width="13" height="13" rx="3" fill="var(--address)"/>
+        <rect x="230" y="266" width="13" height="13" rx="3" fill="var(--blue)"/>
         <text x="258" y="279" class="syn-line">Workflow agents hard-wire the steps, and break when the world shifts.</text>
-        <rect x="230" y="326" width="13" height="13" rx="3" fill="var(--signal)"/>
+        <rect x="230" y="326" width="13" height="13" rx="3" fill="var(--amber)"/>
         <text x="258" y="339" class="syn-line">Harness agents own the loop, and make managing context the craft.</text>
-        <rect x="230" y="386" width="13" height="13" rx="3" fill="var(--verify)"/>
+        <rect x="230" y="386" width="13" height="13" rx="3" fill="var(--mint)"/>
         <text x="258" y="399" class="syn-line">Oriented agents load their expertise as skills and plugins.</text>
-        <rect x="230" y="446" width="13" height="13" rx="3" fill="var(--broadcast)"/>
+        <rect x="230" y="446" width="13" height="13" rx="3" fill="var(--violet)"/>
         <text x="258" y="459" class="syn-line">The harness is a commodity. The expertise you write down is what compounds.</text>
       </g>
 
       <!-- ═══ the pendulum ═══ -->
       <g class="el" data-el="pen-1">
-        <rect x="132" y="270" width="48" height="32" rx="6" fill="var(--panel-2)" stroke="var(--address)" stroke-width="1.4"/>
-        <rect x="188" y="270" width="48" height="32" rx="6" fill="var(--panel-2)" stroke="var(--address)" stroke-width="1.4"/>
-        <rect x="244" y="270" width="48" height="32" rx="6" fill="var(--panel-2)" stroke="var(--address)" stroke-width="1.4"/>
-        <line x1="180" y1="286" x2="188" y2="286" stroke="var(--signal)" stroke-width="1.6"/>
-        <line x1="236" y1="286" x2="244" y2="286" stroke="var(--signal)" stroke-width="1.6"/>
+        <rect x="132" y="270" width="48" height="32" rx="6" fill="var(--surface-2)" stroke="var(--blue)" stroke-width="1.4"/>
+        <rect x="188" y="270" width="48" height="32" rx="6" fill="var(--surface-2)" stroke="var(--blue)" stroke-width="1.4"/>
+        <rect x="244" y="270" width="48" height="32" rx="6" fill="var(--surface-2)" stroke="var(--blue)" stroke-width="1.4"/>
+        <line x1="180" y1="286" x2="188" y2="286" stroke="var(--amber)" stroke-width="1.6"/>
+        <line x1="236" y1="286" x2="244" y2="286" stroke="var(--amber)" stroke-width="1.6"/>
         <text x="212" y="352" text-anchor="middle" class="frame-label">AUTHORED</text>
         <text x="212" y="372" text-anchor="middle" class="node-sub">task-oriented · brittle</text>
       </g>
       <g class="el" data-el="pen-2">
-        <circle cx="490" cy="286" r="44" fill="none" stroke="var(--dim)" stroke-width="1.4" stroke-dasharray="8 7"/>
-        <circle cx="490" cy="286" r="12" fill="none" stroke="var(--signal)" stroke-width="1.6"/>
+        <circle cx="490" cy="286" r="44" fill="none" stroke="var(--muted)" stroke-width="1.4" stroke-dasharray="8 7"/>
+        <circle cx="490" cy="286" r="12" fill="none" stroke="var(--amber)" stroke-width="1.6"/>
         <text x="490" y="352" text-anchor="middle" class="frame-label">GENERAL</text>
         <text x="490" y="372" text-anchor="middle" class="node-sub">flexible · unoriented</text>
       </g>
       <g class="el" data-el="pen-3">
-        <circle cx="760" cy="286" r="44" fill="none" stroke="var(--dim)" stroke-width="1.4" stroke-dasharray="8 7"/>
-        <circle cx="760" cy="286" r="12" fill="none" stroke="var(--signal)" stroke-width="1.6"/>
-        <rect x="798" y="272" width="12" height="28" rx="3" fill="var(--ink)" stroke="var(--verify)" stroke-width="1.3"/>
-        <rect x="814" y="274" width="30" height="24" rx="4" fill="var(--panel-2)" stroke="var(--verify)" stroke-width="1.4"/>
-        <text x="760" y="352" text-anchor="middle" class="frame-label" fill="var(--verify)">ORIENTED</text>
+        <circle cx="760" cy="286" r="44" fill="none" stroke="var(--muted)" stroke-width="1.4" stroke-dasharray="8 7"/>
+        <circle cx="760" cy="286" r="12" fill="none" stroke="var(--amber)" stroke-width="1.6"/>
+        <rect x="798" y="272" width="12" height="28" rx="3" fill="var(--bg)" stroke="var(--mint)" stroke-width="1.3"/>
+        <rect x="814" y="274" width="30" height="24" rx="4" fill="var(--surface-2)" stroke="var(--mint)" stroke-width="1.4"/>
+        <text x="760" y="352" text-anchor="middle" class="frame-label" fill="var(--mint)">ORIENTED</text>
         <text x="760" y="372" text-anchor="middle" class="node-sub">general body · swappable purpose</text>
       </g>
       <g class="el" data-el="pen-arrows">
         <path class="wire-reply draw" style="--len:140" d="M 300 250 C 340 218, 400 218, 440 248"/>
-        <polygon points="434,240 446,252 430,254" fill="var(--verify)"/>
+        <polygon points="434,240 446,252 430,254" fill="var(--mint)"/>
         <path class="wire-reply draw" style="--len:140" d="M 570 250 C 610 218, 670 218, 710 248"/>
-        <polygon points="704,240 716,252 700,254" fill="var(--verify)"/>
+        <polygon points="704,240 716,252 700,254" fill="var(--mint)"/>
       </g>
 
       <!-- ═══ the close: inside, then between ═══ -->
       <g class="el" data-el="out-agent">
-        <rect x="370" y="240" width="240" height="120" rx="12" fill="var(--panel-2)" stroke="var(--paper)" stroke-width="1.5"/>
+        <rect x="370" y="240" width="240" height="120" rx="12" fill="var(--surface-2)" stroke="var(--fg)" stroke-width="1.5"/>
         <text x="490" y="296" text-anchor="middle" class="node-label">AN AGENT</text>
         <text x="490" y="314" text-anchor="middle" class="node-sub">any composition inside</text>
       </g>
@@ -511,12 +510,12 @@
         <line x1="376" y1="209" x2="410" y2="240" stroke="var(--faint)" stroke-dasharray="2 3"/>
         <line x1="490" y1="202" x2="490" y2="236" stroke="var(--faint)" stroke-dasharray="2 3"/>
         <line x1="604" y1="209" x2="570" y2="240" stroke="var(--faint)" stroke-dasharray="2 3"/>
-        <rect x="304" y="170" width="86" height="26" rx="13" fill="var(--ink)" stroke="var(--verify)" stroke-width="1.3"/>
-        <text x="347" y="187" text-anchor="middle" class="node-sub" fill="var(--verify)">name</text>
-        <rect x="447" y="150" width="86" height="26" rx="13" fill="var(--ink)" stroke="var(--verify)" stroke-width="1.3"/>
-        <text x="490" y="167" text-anchor="middle" class="node-sub" fill="var(--verify)">inbox</text>
-        <rect x="590" y="170" width="86" height="26" rx="13" fill="var(--ink)" stroke="var(--verify)" stroke-width="1.3"/>
-        <text x="633" y="187" text-anchor="middle" class="node-sub" fill="var(--verify)">manifest</text>
+        <rect x="304" y="170" width="86" height="26" rx="13" fill="var(--bg)" stroke="var(--mint)" stroke-width="1.3"/>
+        <text x="347" y="187" text-anchor="middle" class="node-sub" fill="var(--mint)">name</text>
+        <rect x="447" y="150" width="86" height="26" rx="13" fill="var(--bg)" stroke="var(--mint)" stroke-width="1.3"/>
+        <text x="490" y="167" text-anchor="middle" class="node-sub" fill="var(--mint)">inbox</text>
+        <rect x="590" y="170" width="86" height="26" rx="13" fill="var(--bg)" stroke="var(--mint)" stroke-width="1.3"/>
+        <text x="633" y="187" text-anchor="middle" class="node-sub" fill="var(--mint)">manifest</text>
       </g>
       <g class="el" data-el="out-wires">
         <line x1="366" y1="300" x2="110" y2="300" stroke="var(--faint)" stroke-width="1.2" stroke-dasharray="3 6"/>
@@ -582,7 +581,7 @@
 
   </aside>
 
-  <div class="band">
+  <div class="narr">
     <span class="stageno" id="stageno">THE PARTS</span>
     <div class="bt">
       <h1 id="b-title"></h1>
@@ -828,5 +827,61 @@
   render();
 })();
 </script>
+
+<footer class="foot">
+  <div class="wrap">
+    <div class="fcols">
+      <div>
+        <p class="fgrp">Product</p>
+        <a href="put-your-agent-on-the-mesh.html">Put your agent on the mesh</a>
+        <a href="how-agents-work-together.html">How agents work together</a>
+        <a href="trust-and-control.html">Trust and control</a>
+        <a href="integrations.html">Integrations</a>
+        <a href="learn.html">Learn</a>
+        <a href="demos/">Demos</a>
+      </div>
+      <div>
+        <p class="fgrp">Key concepts</p>
+        <a href="into-the-mesh.html">Into the mesh</a>
+        <a href="kill-switch.html">Kill switch</a>
+        <a href="trust-and-control.html#identity-provider">Agents and your identity provider</a>
+        <a href="https://dev.agentmesh.ai/house-stack.html">The House Stack</a>
+        <a href="for-analysts.html">Inter-Agent Composition and Control</a>
+      </div>
+      <div>
+        <p class="fgrp">Company</p>
+        <a href="about.html">About us</a>
+        <a href="careers/">Careers</a>
+        <a href="for-analysts.html">For analysts</a>
+        <a href="for-saas-vendors.html">For SaaS vendors</a>
+        <a href="plans.html">Plans</a>
+        <a href="faq.html">FAQ</a>
+        <a href="privacy.html">Privacy</a>
+        <a href="terms.html">Terms</a>
+      </div>
+      <div>
+        <p class="fgrp">Developers</p>
+        <a href="https://dev.agentmesh.ai/">Docs</a>
+        <a href="https://dev.agentmesh.ai/spec.html">The spec</a>
+        <a href="https://dev.agentmesh.ai/standards.html">The standards</a>
+        <a href="https://status.agentmesh.ai">Status</a>
+        <a href="https://advisory.agentmesh.ai">Advisories</a>
+      </div>
+      <div>
+        <p class="fgrp">Account</p>
+        <a href="https://personal.agentmesh.ai">Sign in</a>
+        <a href="waitlist.html?from=footer">Join the waitlist</a>
+        <a href="https://agentcatalog.com">Find agents</a>
+      </div>
+    </div>
+    <div class="fbase">
+      <a class="brand" href="index.html" aria-label="AgentMesh home"><svg class="mark" viewBox="0 0 32 32" width="22" height="22" aria-hidden="true" focusable="false"><rect class="o" x="3" y="3" width="12" height="12" rx="3.5"/><rect class="o" x="17" y="17" width="12" height="12" rx="3.5"/><rect class="m" x="3" y="17" width="12" height="12" rx="3.5"/><rect class="a" x="17" y="3" width="12" height="12" rx="3.5"/></svg><span>Agent<b>Mesh</b></span></a>
+      <span>A network custom built for agents</span>
+      <span class="site">agentmesh.ai</span>
+    </div>
+    <p class="copy">&copy; AgentMesh, Inc.</p>
+  </div>
+</footer>
+<script>(function(){var b=document.getElementById('topbar');function s(){b.classList.toggle('stuck',window.scrollY>8)}window.addEventListener('scroll',s,{passive:true});s();})();</script>
 </body>
 </html>

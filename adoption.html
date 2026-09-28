@@ -18,64 +18,44 @@
 <meta name="robots" content="noindex">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wdth,wght@12..96,75..100,400..700&family=Instrument+Sans:wdth,wght@75..100,400..700&family=Martian+Mono:wdth,wght@75..112.5,400..600&display=swap">
+<link rel="stylesheet" href="site.css">
 <style>
-  /* Same token system as business.html so this page can join the funnel unchanged. */
-  :root{
-    --ink:#0A1417; --panel:#0F1D22; --panel-2:#12242A; --line:#1C2E33;
-    --paper:#E7EFEC; --dim:#7C918C; --faint:#4A5D5A;
-    --signal:#F2A93B;   /* amber: the ask, the new problem */
-    --verify:#43D6A6;   /* mint: the answer, verified */
-    --address:#6BA8FF;  /* blue: company task agents */
-    --broadcast:#B69CFF;/* violet: the outside world */
-    --disp:'Space Grotesk', sans-serif;
-    --body:'IBM Plex Sans', system-ui, sans-serif;
-    --wire:'IBM Plex Mono', ui-monospace, monospace;
-  }
-  *{ box-sizing:border-box; }
-  html,body{ margin:0; height:100%; }
-  body{ background:var(--ink); color:var(--paper); font-family:var(--body);
-    font-size:16px; line-height:1.55; -webkit-font-smoothing:antialiased;
-    background-image:
-      linear-gradient(var(--line) 1px, transparent 1px),
-      linear-gradient(90deg, var(--line) 1px, transparent 1px);
-    background-size:64px 64px; background-position:-1px -1px;
-    display:flex; flex-direction:column; }
-  body::before{ content:""; position:fixed; inset:0; z-index:0; pointer-events:none;
-    background:
-      radial-gradient(80% 45% at 30% 0%, rgba(242,169,59,.08), transparent 60%),
-      linear-gradient(180deg, rgba(10,20,23,.72), var(--ink) 62%); }
+  /* Page tokens. The stage leads with amber; buttons and the stage strip use amber as on the home page.
+     Inside the canvas the site tokens are re-pointed at the dark stage, in both themes. */
+  :root, .canvas{ --accent:var(--amber); --accent-ink:var(--amber-ink); --accent-soft:color-mix(in srgb,var(--accent) 15%,transparent); }
+  .canvas{ --bg:var(--stage); --surface:var(--stage); --surface-2:var(--stage-2);
+    --line:var(--stage-line); --line-strong:var(--stage-line);
+    --fg:var(--stage-fg); --muted:var(--stage-dim); --faint:color-mix(in srgb,var(--stage-dim) 64%,var(--stage));
+    --amber:var(--st-yours); --amber-ink:var(--st-yours); --mint:var(--st-ok); --mint-ink:var(--st-ok);
+    --blue:var(--st-theirs); --violet:var(--st-mesh); color:var(--fg); }
+  .canvas :focus-visible{ outline-color:var(--st-yours); }
+  :where(.canvas svg text){ font-stretch:75%; } /* Martian Mono runs wide; the stage boxes were drawn for a narrower mono */
 
-  /* ── frame ── */
-  .topbar{ position:relative; z-index:5; border-bottom:1px solid var(--line);
-    background:rgba(10,20,23,.9); }
-  .topbar .bar{ max-width:1360px; margin:0 auto; padding:0 32px; height:60px;
-    display:flex; align-items:center; gap:26px; }
-  .brand{ font-family:var(--wire); font-weight:600; font-size:.82rem; letter-spacing:.02em;
-    display:flex; align-items:center; gap:9px; color:var(--paper); text-decoration:none; }
-  .brand .mark{ flex:none; }
-  .brand span.wm{ font-family:'Space Grotesk', sans-serif; font-weight:500;
-    font-size:1.02rem; letter-spacing:-.01em; }
-  .brand span.wm b{ font-weight:700; }
-  .brand:hover span.wm b{ color:#F2A93B; }
+  /* the stage strip under the top bar: the four stages, as words, with a tick when passed */
+  .stagebar{ border-bottom:1px solid var(--line); }
+  .stagebar .wrap{ max-width:1360px; display:flex; align-items:center; gap:16px; padding-block:10px; }
+  .scrub{ display:flex; gap:8px; min-width:0; overflow-x:auto; scrollbar-width:none; }
+  .scrub::-webkit-scrollbar{ display:none; }
+  .scrub button{ flex:none; font-family:var(--mono); font-stretch:87.5%; font-size:.66rem; font-weight:500; letter-spacing:.02em;
+    color:var(--muted); background:var(--surface); border:1px solid var(--line); border-radius:999px;
+    padding:7px 13px; cursor:pointer; white-space:nowrap; transition:color .18s, border-color .18s, background-color .18s; }
+  .scrub button:hover{ color:var(--fg); border-color:var(--line-strong); }
+  .scrub button.on{ color:var(--on-amber); background:var(--amber); border-color:var(--amber-line); font-weight:600; }
+  .scrub button.done{ color:var(--mint-ink); border-color:color-mix(in srgb,var(--mint-ink) 45%,transparent); }
+  .scrub button.done::before{ content:"\2713\00a0"; }
 
-  /* stage scrubber, centered in the bar */
-  .topbar .bar{ position:relative; }
-  .scrub{ position:absolute; left:50%; transform:translateX(-50%); display:flex; gap:8px; }
-  .scrub button{ font-family:var(--wire); font-size:.74rem; letter-spacing:.02em;
-    color:var(--dim); background:none; border:1px solid var(--line); border-radius:999px;
-    padding:6px 14px; cursor:pointer; transition:color .18s, border-color .18s, background .18s; }
-  .scrub button:hover{ color:var(--paper); }
-  .scrub button.on{ color:var(--ink); background:var(--signal); border-color:var(--signal); font-weight:600; }
-  .scrub button.done{ color:var(--verify); border-color:rgba(67,214,166,.4); }
+  .stagegrid{ height:calc(100svh - 120px); min-height:600px; }
+  .panel, .narr{ box-shadow:var(--shadow); }
+  .narr h1{ font-weight:600; letter-spacing:-.015em; }
 
-  .stagegrid{ position:relative; z-index:1; flex:1; max-width:1360px; width:100%;
+  .stagegrid{ position:relative; z-index:1; max-width:1360px; width:100%;
     margin:0 auto; padding:22px 32px 26px; display:grid;
-    grid-template-columns:1fr 320px; grid-template-rows:1fr auto; gap:18px; min-height:0; }
+    grid-template-columns:1fr 320px; grid-template-rows:1fr auto; gap:18px; }
 
   /* ── canvas ── */
-  .canvas{ grid-row:1; grid-column:1; position:relative; border:1px solid var(--line);
-    border-radius:12px; background:linear-gradient(180deg, rgba(15,29,34,.6), rgba(10,20,23,.3));
+  .canvas{ grid-row:1; grid-column:1; position:relative; border:1px solid var(--stage-line);
+    border-radius:12px; background-color:var(--stage); background-image:radial-gradient(var(--stage-dot) 1px,transparent 1.3px); background-size:22px 22px;
     overflow:hidden; min-height:420px; }
   .canvas svg{ position:absolute; inset:0; width:100%; height:100%; }
 
@@ -85,40 +65,40 @@
   .el.instant{ transition:none; }
 
   /* wires draw themselves */
-  .wire-ask{ stroke:var(--signal); stroke-width:1.8; fill:none; }
-  .wire-reply{ stroke:var(--verify); stroke-width:1.6; fill:none; stroke-dasharray:5 5; }
-  .wire-steer{ stroke:var(--verify); stroke-width:1.6; fill:none; stroke-dasharray:2 5; stroke-linecap:round; }
+  .wire-ask{ stroke:var(--amber); stroke-width:1.8; fill:none; }
+  .wire-reply{ stroke:var(--mint); stroke-width:1.6; fill:none; stroke-dasharray:5 5; }
+  .wire-steer{ stroke:var(--mint); stroke-width:1.6; fill:none; stroke-dasharray:2 5; stroke-linecap:round; }
   g.el path.draw{ stroke-dashoffset:0; }
   @media (prefers-reduced-motion: no-preference){
     g.el:not(.on) path.draw{ stroke-dashoffset:var(--len, 300); }
     g.el.on path.draw{ transition:stroke-dashoffset .9s ease .15s; }
   }
 
-  .node-label{ font-family:var(--wire); font-size:12.5px; font-weight:600; fill:var(--paper); }
-  .node-sub{ font-family:var(--wire); font-size:10px; fill:var(--dim); }
-  .frame-label{ font-family:var(--wire); font-size:10.5px; font-weight:600;
+  .node-label{ font-family:var(--mono); font-size:12.5px; font-weight:600; fill:var(--fg); }
+  .node-sub{ font-family:var(--mono); font-size:10px; fill:var(--muted); }
+  .frame-label{ font-family:var(--mono); font-size:10.5px; font-weight:600;
     letter-spacing:.14em; fill:var(--faint); }
-  .wire-label{ font-family:var(--wire); font-size:9.5px; fill:var(--signal); }
-  .wire-label.mint{ fill:var(--verify); }
+  .wire-label{ font-family:var(--mono); font-size:9.5px; fill:var(--amber); }
+  .wire-label.mint{ fill:var(--mint); }
 
   /* ── callout ── */
   .callout{ position:absolute; z-index:4; max-width:330px; padding:14px 16px 15px;
-    background:var(--panel-2); border:1px solid rgba(242,169,59,.5); border-left:3px solid var(--signal);
-    border-radius:8px; box-shadow:0 14px 40px rgba(0,0,0,.5);
+    background:var(--surface-2); border:1px solid color-mix(in srgb,var(--amber) 50%,transparent); border-left:3px solid var(--amber);
+    border-radius:8px; box-shadow:0 14px 40px rgba(0,0,0,.45);
     opacity:0; transform:translateY(10px); pointer-events:none;
     transition:opacity .45s ease, transform .45s ease; }
   .callout.on{ opacity:1; transform:none; }
-  .callout .co-eyebrow{ font-family:var(--wire); font-size:.68rem; letter-spacing:.14em;
-    color:var(--signal); margin-bottom:6px; }
-  .callout p{ margin:0; font-size:.92rem; line-height:1.5; color:var(--paper); }
-  .callout.mint{ border-color:rgba(67,214,166,.5); border-left-color:var(--verify); }
-  .callout.mint .co-eyebrow{ color:var(--verify); }
+  .callout .co-eyebrow{ font-family:var(--mono); font-size:.68rem; letter-spacing:.14em;
+    color:var(--amber-ink); margin-bottom:6px; }
+  .callout p{ margin:0; font-size:.92rem; line-height:1.5; color:var(--fg); }
+  .callout.mint{ border-color:color-mix(in srgb,var(--mint) 50%,transparent); border-left-color:var(--mint-ink); }
+  .callout.mint .co-eyebrow{ color:var(--mint-ink); }
 
   /* ── right panel: the growing checklist ── */
   .panel{ grid-row:1 / span 2; grid-column:2; border:1px solid var(--line); border-radius:12px;
-    background:var(--panel); padding:20px 20px 16px; overflow-y:auto; min-height:0; }
-  .panel h2{ font-family:var(--wire); font-size:.72rem; font-weight:600; letter-spacing:.16em;
-    color:var(--dim); margin:0 0 4px; }
+    background:var(--surface); padding:20px 20px 16px; overflow-y:auto; min-height:0; }
+  .panel h2{ font-family:var(--mono); font-size:.72rem; font-weight:600; letter-spacing:.16em;
+    color:var(--muted); margin:0 0 4px; }
   .panel .panel-sub{ font-size:.8rem; color:var(--faint); margin:0 0 14px; }
   .capgroup{ display:none; }
   .capgroup.on{ display:block; }
@@ -126,12 +106,12 @@
     background:none; border:none; border-top:1px solid var(--line); padding:11px 0 9px;
     text-align:left; }
   .capgroup:first-of-type .cg-head{ border-top:none; padding-top:2px; }
-  .cg-head:focus-visible{ outline:2px solid var(--signal); outline-offset:2px; border-radius:4px; }
-  .cg-label{ font-family:var(--wire); font-size:.68rem; letter-spacing:.12em; color:var(--faint); }
-  .capgroup.open .cg-label{ color:var(--dim); }
-  .cg-count{ margin-left:auto; font-family:var(--wire); font-size:.68rem; color:var(--verify); }
+  .cg-head:focus-visible{ outline:2px solid var(--amber-ink); outline-offset:2px; border-radius:4px; }
+  .cg-label{ font-family:var(--mono); font-size:.68rem; letter-spacing:.12em; color:var(--faint); }
+  .capgroup.open .cg-label{ color:var(--muted); }
+  .cg-count{ margin-left:auto; font-family:var(--mono); font-size:.68rem; color:var(--mint-ink); }
   .chev{ flex:none; width:7px; height:7px; margin-top:-3px;
-    border-right:1.5px solid var(--dim); border-bottom:1.5px solid var(--dim);
+    border-right:1.5px solid var(--muted); border-bottom:1.5px solid var(--muted);
     transform:rotate(45deg); transition:transform .2s ease; }
   .capgroup.open .chev{ transform:rotate(-135deg); margin-top:3px; }
   .cg-body{ display:none; padding-bottom:10px; }
@@ -141,62 +121,81 @@
   .cap.on{ opacity:1; transform:none; }
   .cap .box{ flex:none; width:13px; height:13px; border:1.5px solid var(--faint); border-radius:3px;
     position:relative; top:2px; transition:border-color .3s, background .3s; }
-  .cap.on .box{ border-color:var(--verify); background:rgba(67,214,166,.12); }
+  .cap.on .box{ border-color:var(--mint-ink); background:color-mix(in srgb,var(--mint) 12%,transparent); }
   .cap.on .box::after{ content:""; position:absolute; inset:2px 2px 3px;
-    border-right:2px solid var(--verify); border-bottom:2px solid var(--verify);
+    border-right:2px solid var(--mint-ink); border-bottom:2px solid var(--mint-ink);
     transform:rotate(40deg) scale(.85); border-radius:1px; }
-  .cap .cap-name{ font-size:.86rem; font-weight:500; color:var(--paper); }
-  .cap .cap-why{ font-size:.76rem; color:var(--dim); display:block; margin-top:1px; }
+  .cap .cap-name{ font-size:.86rem; font-weight:500; color:var(--fg); }
+  .cap .cap-why{ font-size:.76rem; color:var(--muted); display:block; margin-top:1px; }
   /* the security spine: shielded items glow together on the security beat */
   .cap .shield{ color:var(--faint); margin-left:6px; position:relative; top:1px; }
-  .panel.security .cap .shield{ color:var(--signal);
-    filter:drop-shadow(0 0 4px rgba(242,169,59,.55)); }
-  .panel.complete{ border-color:rgba(67,214,166,.45);
-    box-shadow:0 0 0 1px rgba(67,214,166,.15), 0 0 40px rgba(67,214,166,.06) inset; }
+  .panel.security .cap .shield{ color:var(--amber-ink);
+    filter:drop-shadow(0 0 4px color-mix(in srgb,var(--amber) 55%,transparent)); }
+  .panel.complete{ border-color:var(--mint-ink);
+    box-shadow:0 0 0 1px color-mix(in srgb,var(--mint) 15%,transparent), 0 0 40px color-mix(in srgb,var(--mint) 6%,transparent) inset; }
 
   /* ── bottom band: title + narration + controls ── */
-  .band{ grid-row:2; grid-column:1; border:1px solid var(--line); border-radius:12px;
-    background:var(--panel); padding:18px 22px; display:flex; gap:22px; align-items:flex-start; }
-  .band .stageno{ font-family:var(--wire); font-size:.72rem; letter-spacing:.14em;
-    color:var(--signal); white-space:nowrap; padding-top:6px; }
-  .band .bt{ flex:1; min-width:0; }
-  .band h1{ font-size:1.3rem; margin:0 0 4px; }
-  .band p{ margin:0; color:var(--dim); font-size:.92rem; max-width:64ch; }
-  .band .cta{ display:inline-block; margin-top:10px; font-family:var(--wire); font-size:.85rem;
-    font-weight:600; color:var(--ink); background:var(--signal); border-radius:8px;
+  .narr{ grid-row:2; grid-column:1; border:1px solid var(--line); border-radius:12px;
+    background:var(--surface); padding:18px 22px; display:flex; gap:22px; align-items:flex-start; }
+  .narr .stageno{ font-family:var(--mono); font-size:.72rem; letter-spacing:.14em;
+    color:var(--amber-ink); white-space:nowrap; padding-top:6px; }
+  .narr .bt{ flex:1; min-width:0; }
+  .narr h1{ font-size:1.3rem; margin:0 0 4px; }
+  .narr p{ margin:0; color:var(--muted); font-size:.92rem; max-width:64ch; }
+  .narr .cta{ display:inline-block; margin-top:10px; font-family:var(--mono); font-size:.85rem;
+    font-weight:600; color:var(--on-amber); background:var(--amber); border-radius:8px;
     padding:9px 16px; text-decoration:none; }
-  .band .cta:hover{ background:#f7bb5e; }
-  .band .cta[hidden]{ display:none; }
+  .narr .cta:hover{ filter:brightness(1.06); }
+  .narr .cta[hidden]{ display:none; }
   .controls{ flex:none; display:flex; gap:10px; align-items:center; padding-top:4px; }
-  .controls .beatno{ font-family:var(--wire); font-size:.72rem; color:var(--faint); margin-right:4px; }
-  .controls button{ font-family:var(--wire); font-size:.82rem; font-weight:600; cursor:pointer;
+  .controls .beatno{ font-family:var(--mono); font-size:.72rem; color:var(--faint); margin-right:4px; }
+  .controls button{ font-family:var(--mono); font-size:.82rem; font-weight:600; cursor:pointer;
     border-radius:8px; padding:9px 18px; border:1px solid var(--line);
-    background:var(--panel-2); color:var(--paper); transition:background .18s, border-color .18s; }
-  .controls button:hover{ border-color:var(--dim); }
-  .controls button.primary{ background:var(--signal); border-color:var(--signal); color:var(--ink); }
-  .controls button.primary:hover{ background:#f7bb5e; }
+    background:var(--surface-2); color:var(--fg); transition:background .18s, border-color .18s; }
+  .controls button:hover{ border-color:var(--muted); }
+  .controls button.primary{ background:var(--amber); border-color:var(--amber-line); color:var(--on-amber); }
+  .controls button.primary:hover{ filter:brightness(1.06); }
   .controls button:disabled{ opacity:.35; cursor:default; }
-  .controls button:focus-visible{ outline:2px solid var(--signal); outline-offset:3px; }
+  .controls button:focus-visible{ outline:2px solid var(--amber-ink); outline-offset:3px; }
 
   @media (max-width: 1000px){
-    .stagegrid{ grid-template-columns:1fr; grid-template-rows:auto auto auto; padding:16px; }
+    .stagegrid{ grid-template-columns:1fr; grid-template-rows:auto auto auto; padding:16px; height:auto; min-height:0; }
     .panel{ grid-row:3; grid-column:1; max-height:340px; }
-    .band{ grid-row:2; flex-wrap:wrap; }
+    .narr{ grid-row:2; flex-wrap:wrap; }
     .canvas{ min-height:360px; }
+    .narr{ flex-direction:column; gap:10px; padding:16px; }
+    .narr .stageno{ padding-top:0; }
+    .controls{ flex-wrap:wrap; gap:8px; }
+    .controls button{ padding:9px 14px; }
   }
 </style>
 </head>
 <body>
 
-<header class="topbar"><div class="bar">
-  <a class="brand" href="/" aria-label="AgentMesh home"><svg class="mark" viewBox="0 0 32 32" width="22" height="22" aria-hidden="true" focusable="false"><rect x="3" y="3" width="12" height="12" rx="3.5" fill="none" stroke="currentColor" stroke-width="2" opacity=".35"/><rect x="17" y="17" width="12" height="12" rx="3.5" fill="none" stroke="currentColor" stroke-width="2" opacity=".35"/><rect x="3" y="17" width="12" height="12" rx="3.5" fill="#43D6A6"/><rect x="17" y="3" width="12" height="12" rx="3.5" fill="#F2A93B"/></svg><span class="wm">Agent<b>Mesh</b></span></a>
+<header class="topbar" id="topbar">
+  <div class="wrap bar">
+    <a class="brand" href="index.html" aria-label="AgentMesh home"><svg class="mark" viewBox="0 0 32 32" width="24" height="24" aria-hidden="true" focusable="false"><rect class="o" x="3" y="3" width="12" height="12" rx="3.5"/><rect class="o" x="17" y="17" width="12" height="12" rx="3.5"/><rect class="m" x="3" y="17" width="12" height="12" rx="3.5"/><rect class="a" x="17" y="3" width="12" height="12" rx="3.5"/></svg><span>Agent<b>Mesh</b></span></a>
+    <nav class="nav" aria-label="Main">
+      <a href="put-your-agent-on-the-mesh.html">How it works</a>
+      <a href="trust-and-control.html">Trust</a>
+      <a href="integrations.html">Integrations</a>
+      <a href="learn.html">Learn</a>
+      <a href="https://dev.agentmesh.ai/">Docs</a>
+    </nav>
+    <div class="acts">
+      <a class="signin" href="https://personal.agentmesh.ai">Sign in</a>
+      <a class="wl" href="waitlist.html?from=header">Join the waitlist</a>
+    </div>
+  </div>
+</header>
+<div class="stagebar"><div class="wrap">
   <nav class="scrub" id="scrub" aria-label="Stages">
     <button data-stage="0">1 · Personal</button>
     <button data-stage="1">2 · Task</button>
     <button data-stage="2">3 · Internal A2A</button>
     <button data-stage="3">4 · External A2A</button>
   </nav>
-</div></header>
+</div></div>
 
 <div class="stagegrid">
 
@@ -205,30 +204,30 @@
 
       <!-- ═══ stage 1: a person and their agent ═══ -->
       <g class="el" data-el="person">
-        <circle cx="86" cy="272" r="15" fill="none" stroke="var(--paper)" stroke-width="2"/>
-        <path d="M 62 322 Q 86 292 110 322" fill="none" stroke="var(--paper)" stroke-width="2" stroke-linecap="round"/>
+        <circle cx="86" cy="272" r="15" fill="none" stroke="var(--fg)" stroke-width="2"/>
+        <path d="M 62 322 Q 86 292 110 322" fill="none" stroke="var(--fg)" stroke-width="2" stroke-linecap="round"/>
         <text x="86" y="348" text-anchor="middle" class="node-sub">a person</text>
       </g>
       <g class="el" data-el="pa-link">
-        <line x1="118" y1="300" x2="158" y2="300" stroke="var(--verify)" stroke-width="1.6" stroke-dasharray="2 5" stroke-linecap="round"/>
+        <line x1="118" y1="300" x2="158" y2="300" stroke="var(--mint)" stroke-width="1.6" stroke-dasharray="2 5" stroke-linecap="round"/>
       </g>
       <g class="el" data-el="pagent">
-        <rect x="158" y="276" width="118" height="48" rx="9" fill="var(--panel-2)" stroke="var(--verify)" stroke-width="1.6"/>
+        <rect x="158" y="276" width="118" height="48" rx="9" fill="var(--surface-2)" stroke="var(--mint)" stroke-width="1.6"/>
         <text x="217" y="297" text-anchor="middle" class="node-label">Their agent</text>
         <text x="217" y="313" text-anchor="middle" class="node-sub">personal · works for them</text>
       </g>
 
       <!-- a second person, and the first agent-to-agent conversation -->
       <g class="el" data-el="person2">
-        <circle cx="86" cy="442" r="15" fill="none" stroke="var(--paper)" stroke-width="2"/>
-        <path d="M 62 492 Q 86 462 110 492" fill="none" stroke="var(--paper)" stroke-width="2" stroke-linecap="round"/>
+        <circle cx="86" cy="442" r="15" fill="none" stroke="var(--fg)" stroke-width="2"/>
+        <path d="M 62 492 Q 86 462 110 492" fill="none" stroke="var(--fg)" stroke-width="2" stroke-linecap="round"/>
         <text x="86" y="518" text-anchor="middle" class="node-sub">a colleague</text>
       </g>
       <g class="el" data-el="pa2-link">
-        <line x1="118" y1="470" x2="158" y2="470" stroke="var(--verify)" stroke-width="1.6" stroke-dasharray="2 5" stroke-linecap="round"/>
+        <line x1="118" y1="470" x2="158" y2="470" stroke="var(--mint)" stroke-width="1.6" stroke-dasharray="2 5" stroke-linecap="round"/>
       </g>
       <g class="el" data-el="pagent2">
-        <rect x="158" y="446" width="118" height="48" rx="9" fill="var(--panel-2)" stroke="var(--verify)" stroke-width="1.6"/>
+        <rect x="158" y="446" width="118" height="48" rx="9" fill="var(--surface-2)" stroke="var(--mint)" stroke-width="1.6"/>
         <text x="217" y="467" text-anchor="middle" class="node-label">Their agent</text>
         <text x="217" y="483" text-anchor="middle" class="node-sub">personal · theirs</text>
       </g>
@@ -241,39 +240,39 @@
 
       <!-- ═══ stage 2: the company and its task agents ═══ -->
       <g class="el" data-el="companyframe">
-        <rect x="330" y="82" width="360" height="470" rx="12" fill="rgba(107,168,255,.03)"
+        <rect x="330" y="82" width="360" height="470" rx="12" fill="color-mix(in srgb,var(--blue) 3%,transparent)"
           stroke="var(--faint)" stroke-width="1.2" stroke-dasharray="6 6"/>
         <text x="350" y="114" class="frame-label" font-size="16">COMPANY AGENTS</text>
       </g>
       <g class="el" data-el="t-triage">
-        <rect x="368" y="140" width="126" height="48" rx="9" fill="var(--panel-2)" stroke="var(--address)" stroke-width="1.5"/>
+        <rect x="368" y="140" width="126" height="48" rx="9" fill="var(--surface-2)" stroke="var(--blue)" stroke-width="1.5"/>
         <text x="431" y="161" text-anchor="middle" class="node-label">Triage</text>
         <text x="431" y="177" text-anchor="middle" class="node-sub">support tickets</text>
       </g>
       <g class="el" data-el="t-drafts">
-        <rect x="368" y="266" width="126" height="48" rx="9" fill="var(--panel-2)" stroke="var(--address)" stroke-width="1.5"/>
+        <rect x="368" y="266" width="126" height="48" rx="9" fill="var(--surface-2)" stroke="var(--blue)" stroke-width="1.5"/>
         <text x="431" y="287" text-anchor="middle" class="node-label">Drafts</text>
         <text x="431" y="303" text-anchor="middle" class="node-sub">customer email</text>
       </g>
       <g class="el" data-el="t-review">
-        <rect x="368" y="392" width="126" height="48" rx="9" fill="var(--panel-2)" stroke="var(--address)" stroke-width="1.5"/>
+        <rect x="368" y="392" width="126" height="48" rx="9" fill="var(--surface-2)" stroke="var(--blue)" stroke-width="1.5"/>
         <text x="431" y="413" text-anchor="middle" class="node-label">Review</text>
         <text x="431" y="429" text-anchor="middle" class="node-sub">code &amp; contracts</text>
       </g>
 
       <!-- ═══ stage 3: more agents, and wires between them ═══ -->
       <g class="el" data-el="t-sales">
-        <rect x="536" y="140" width="126" height="48" rx="9" fill="var(--panel-2)" stroke="var(--address)" stroke-width="1.5"/>
+        <rect x="536" y="140" width="126" height="48" rx="9" fill="var(--surface-2)" stroke="var(--blue)" stroke-width="1.5"/>
         <text x="599" y="161" text-anchor="middle" class="node-label">Sales</text>
         <text x="599" y="177" text-anchor="middle" class="node-sub">quotes &amp; deals</text>
       </g>
       <g class="el" data-el="t-pricing">
-        <rect x="536" y="266" width="126" height="48" rx="9" fill="var(--panel-2)" stroke="var(--address)" stroke-width="1.5"/>
+        <rect x="536" y="266" width="126" height="48" rx="9" fill="var(--surface-2)" stroke="var(--blue)" stroke-width="1.5"/>
         <text x="599" y="287" text-anchor="middle" class="node-label">Pricing</text>
         <text x="599" y="303" text-anchor="middle" class="node-sub">margin rules</text>
       </g>
       <g class="el" data-el="t-finance">
-        <rect x="536" y="392" width="126" height="48" rx="9" fill="var(--panel-2)" stroke="var(--address)" stroke-width="1.5"/>
+        <rect x="536" y="392" width="126" height="48" rx="9" fill="var(--surface-2)" stroke="var(--blue)" stroke-width="1.5"/>
         <text x="599" y="413" text-anchor="middle" class="node-label">Finance</text>
         <text x="599" y="429" text-anchor="middle" class="node-sub">the ledger</text>
       </g>
@@ -292,12 +291,12 @@
 
       <!-- ═══ stage 4: the outside world ═══ -->
       <g class="el" data-el="providerframe">
-        <rect x="742" y="82" width="212" height="180" rx="12" fill="rgba(182,156,255,.04)"
+        <rect x="742" y="82" width="212" height="180" rx="12" fill="color-mix(in srgb,var(--violet) 4%,transparent)"
           stroke="var(--faint)" stroke-width="1.2" stroke-dasharray="6 6"/>
         <text x="760" y="110" class="frame-label">A PROVIDER</text>
       </g>
       <g class="el" data-el="p-research">
-        <rect x="774" y="140" width="148" height="48" rx="9" fill="var(--panel-2)" stroke="var(--broadcast)" stroke-width="1.5"/>
+        <rect x="774" y="140" width="148" height="48" rx="9" fill="var(--surface-2)" stroke="var(--violet)" stroke-width="1.5"/>
         <text x="848" y="161" text-anchor="middle" class="node-label">Research</text>
         <text x="848" y="177" text-anchor="middle" class="node-sub">theirs · for hire</text>
       </g>
@@ -308,12 +307,12 @@
         <text x="694" y="198" class="wire-label mint">deliver</text>
       </g>
       <g class="el" data-el="customerframe">
-        <rect x="742" y="372" width="212" height="180" rx="12" fill="rgba(182,156,255,.04)"
+        <rect x="742" y="372" width="212" height="180" rx="12" fill="color-mix(in srgb,var(--violet) 4%,transparent)"
           stroke="var(--faint)" stroke-width="1.2" stroke-dasharray="6 6"/>
         <text x="760" y="400" class="frame-label">A CUSTOMER</text>
       </g>
       <g class="el" data-el="c-agent">
-        <rect x="774" y="430" width="148" height="48" rx="9" fill="var(--panel-2)" stroke="var(--broadcast)" stroke-width="1.5"/>
+        <rect x="774" y="430" width="148" height="48" rx="9" fill="var(--surface-2)" stroke="var(--violet)" stroke-width="1.5"/>
         <text x="848" y="451" text-anchor="middle" class="node-label">Their agent</text>
         <text x="848" y="467" text-anchor="middle" class="node-sub">buying from you</text>
       </g>
@@ -387,7 +386,7 @@
 
   </aside>
 
-  <div class="band">
+  <div class="narr">
     <span class="stageno" id="stageno">STAGE 1 OF 4</span>
     <div class="bt">
       <h1 id="b-title"></h1>
@@ -598,5 +597,61 @@
   render();
 })();
 </script>
+
+<footer class="foot">
+  <div class="wrap">
+    <div class="fcols">
+      <div>
+        <p class="fgrp">Product</p>
+        <a href="put-your-agent-on-the-mesh.html">Put your agent on the mesh</a>
+        <a href="how-agents-work-together.html">How agents work together</a>
+        <a href="trust-and-control.html">Trust and control</a>
+        <a href="integrations.html">Integrations</a>
+        <a href="learn.html">Learn</a>
+        <a href="demos/">Demos</a>
+      </div>
+      <div>
+        <p class="fgrp">Key concepts</p>
+        <a href="into-the-mesh.html">Into the mesh</a>
+        <a href="kill-switch.html">Kill switch</a>
+        <a href="trust-and-control.html#identity-provider">Agents and your identity provider</a>
+        <a href="https://dev.agentmesh.ai/house-stack.html">The House Stack</a>
+        <a href="for-analysts.html">Inter-Agent Composition and Control</a>
+      </div>
+      <div>
+        <p class="fgrp">Company</p>
+        <a href="about.html">About us</a>
+        <a href="careers/">Careers</a>
+        <a href="for-analysts.html">For analysts</a>
+        <a href="for-saas-vendors.html">For SaaS vendors</a>
+        <a href="plans.html">Plans</a>
+        <a href="faq.html">FAQ</a>
+        <a href="privacy.html">Privacy</a>
+        <a href="terms.html">Terms</a>
+      </div>
+      <div>
+        <p class="fgrp">Developers</p>
+        <a href="https://dev.agentmesh.ai/">Docs</a>
+        <a href="https://dev.agentmesh.ai/spec.html">The spec</a>
+        <a href="https://dev.agentmesh.ai/standards.html">The standards</a>
+        <a href="https://status.agentmesh.ai">Status</a>
+        <a href="https://advisory.agentmesh.ai">Advisories</a>
+      </div>
+      <div>
+        <p class="fgrp">Account</p>
+        <a href="https://personal.agentmesh.ai">Sign in</a>
+        <a href="waitlist.html?from=footer">Join the waitlist</a>
+        <a href="https://agentcatalog.com">Find agents</a>
+      </div>
+    </div>
+    <div class="fbase">
+      <a class="brand" href="index.html" aria-label="AgentMesh home"><svg class="mark" viewBox="0 0 32 32" width="22" height="22" aria-hidden="true" focusable="false"><rect class="o" x="3" y="3" width="12" height="12" rx="3.5"/><rect class="o" x="17" y="17" width="12" height="12" rx="3.5"/><rect class="m" x="3" y="17" width="12" height="12" rx="3.5"/><rect class="a" x="17" y="3" width="12" height="12" rx="3.5"/></svg><span>Agent<b>Mesh</b></span></a>
+      <span>A network custom built for agents</span>
+      <span class="site">agentmesh.ai</span>
+    </div>
+    <p class="copy">&copy; AgentMesh, Inc.</p>
+  </div>
+</footer>
+<script>(function(){var b=document.getElementById('topbar');function s(){b.classList.toggle('stuck',window.scrollY>8)}window.addEventListener('scroll',s,{passive:true});s();})();</script>
 </body>
 </html>
