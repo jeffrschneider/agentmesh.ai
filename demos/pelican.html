@@ -94,9 +94,44 @@
     .pl-end h2{ margin:0 0 16px; font-size:clamp(2rem,3.4vw,2.9rem); }
     .pl-end p{ margin:0 0 24px; font-size:1.1rem; color:var(--dim); max-width:60ch; }
 
+    /* the film player */
+    .pl-head{ padding:22px 0 14px; }
+    .pl-head .def{ margin:0 0 4px; }
+    .pic{ max-height:calc(100vh - 400px); min-height:260px; }
+    .pic .layer{ position:absolute; inset:0; opacity:0; transition:opacity .35s ease; }
+    .pic .layer.on{ opacity:1; }
+    .pic .layer > svg, .pic .layer > img{ display:block; width:100%; height:100%; object-fit:contain; }
+    .filmcap{ display:flex; align-items:flex-start; gap:12px; margin:12px 0 0; min-height:3.3em; }
+    .capbox{ flex:1 1 auto; min-width:0; }
+    .filmcap .cap{ font-size:clamp(1.1rem,1.6vw,1.3rem); }
+    .caret{ display:inline-block; width:2px; height:1em; margin-left:2px; vertical-align:-.12em; background:currentColor; }
+    .model{ margin:3px 0 0; font-family:var(--wire); font-size:12px; letter-spacing:.04em; color:var(--dim); overflow-wrap:anywhere; }
+    .model.wait{ visibility:hidden; }
+    .replay, .play, .speed button{ font:inherit; cursor:pointer; }
+    .replay{ flex:0 0 auto; min-height:40px; padding:0 14px; border-radius:12px; border:2px solid var(--paper); background:var(--panel); color:var(--paper); font-weight:600; font-size:.95rem; }
+    .player{ display:flex; flex-wrap:wrap; align-items:center; gap:10px; margin:12px 0 0; }
+    .player .scrub{ flex:1 1 240px; min-width:0; }
+    .play{ display:inline-flex; align-items:center; gap:9px; min-height:44px; padding:0 18px 0 16px; border-radius:12px; border:2px solid #15171C; background:#15171C; color:#F3EFE6; font-weight:600; font-size:1rem; }
+    .play .ico{ width:0; height:0; border-style:solid; border-width:7px 0 7px 12px; border-color:transparent transparent transparent currentColor; }
+    .play.on .ico{ width:12px; height:14px; border:0; border-left:4px solid currentColor; border-right:4px solid currentColor; }
+    .speed{ display:inline-flex; border:2px solid var(--paper); border-radius:12px; overflow:hidden; }
+    .speed button{ min-height:40px; padding:0 11px; border:0; border-left:1.5px solid var(--line-2); background:var(--panel); color:var(--paper); font-family:var(--wire); font-size:12px; letter-spacing:.04em; }
+    .speed button:first-child{ border-left:0; }
+    .speed button[aria-pressed="true"]{ background:#15171C; color:#F3EFE6; font-weight:500; text-decoration:underline; text-underline-offset:3px; }
+    .play:focus-visible, .replay:focus-visible, .speed button:focus-visible, .share button:focus-visible{ outline:2px solid var(--rust); outline-offset:3px; }
+    .share{ display:flex; flex-wrap:wrap; gap:10px; margin:12px 0 0; }
+    .share .btn{ min-height:44px; padding:0 16px; font:inherit; font-size:.95rem; font-weight:600; background:var(--panel); cursor:pointer; }
+    .share .btn:disabled{ border-style:dashed; color:var(--faint); cursor:progress; }
+    .share-note{ margin:8px 0 0; font-size:.92rem; color:var(--paper); overflow-wrap:anywhere; }
+    .share-note:empty{ display:none; }
+    .sr{ position:absolute; width:1px; height:1px; margin:-1px; padding:0; overflow:hidden; clip:rect(0 0 0 0); white-space:nowrap; border:0; }
+    .measure{ position:fixed; left:-10000px; top:0; width:400px; height:400px; visibility:hidden; pointer-events:none; }
+    .measure svg{ width:400px; height:400px; }
+    @media (prefers-reduced-motion: reduce){ .pic .layer{ transition:none; } }
+
     @media (max-width:900px){
       .stage{ grid-template-columns:minmax(0,1fr); gap:22px; }
-      .pic{ aspect-ratio:4 / 3; }
+      .pic{ aspect-ratio:4 / 3; max-height:none; }
     }
     @media (max-width:620px){
       .pl-head{ padding:20px 0 14px; }
@@ -140,23 +175,42 @@
         <div class="pic" id="pic">
           <div class="soon" id="soon"><b>Loading the pelican.</b><span>Fetching the newest picture.</span></div>
         </div>
+        <div class="filmcap" id="filmcap" hidden>
+          <div class="capbox">
+            <p class="cap" id="cap"></p>
+            <p class="model" id="model"></p>
+          </div>
+          <button class="replay" id="replay" type="button" hidden>Replay</button>
+        </div>
+        <p class="sr" id="cap-sr" aria-live="polite"></p>
         <div class="timeline" id="timeline" hidden>
-          <div class="scrub">
-            <button class="step" id="prev" type="button" aria-label="Previous frame">&#8249;</button>
-            <input type="range" id="scrub" min="0" max="0" value="0" step="1" aria-label="Frame">
-            <button class="step" id="next" type="button" aria-label="Next frame">&#8250;</button>
+          <div class="player">
+            <button class="play" id="play" type="button"><span class="ico" aria-hidden="true"></span><span id="play-t">Play</span></button>
+            <div class="speed" id="speed" role="group" aria-label="Speed">
+              <button type="button" data-s="1" aria-pressed="true">1x</button>
+              <button type="button" data-s="2" aria-pressed="false">2x</button>
+              <button type="button" data-s="4" aria-pressed="false">4x</button>
+              <button type="button" data-s="t" aria-pressed="false">Timelapse</button>
+            </div>
+            <div class="scrub">
+              <button class="step" id="prev" type="button" aria-label="Previous frame">&#8249;</button>
+              <input type="range" id="scrub" min="0" max="0" value="0" step="1" aria-label="Frame">
+              <button class="step" id="next" type="button" aria-label="Next frame">&#8250;</button>
+            </div>
           </div>
           <p class="pos" id="pos"></p>
+          <p class="cap-meta" id="cap-meta"></p>
+          <p class="older" id="older"></p>
+          <div class="share">
+            <button class="btn btn-ghost" id="copy" type="button">Copy link</button>
+            <button class="btn btn-ghost" id="dl" type="button">Download animated SVG</button>
+          </div>
+          <p class="share-note" id="share-note" aria-live="polite"></p>
           <ol class="thumbs" id="thumbs" aria-label="Every frame on this branch"></ol>
         </div>
       </div>
 
       <div class="side">
-        <div>
-          <p class="cap" id="cap" aria-live="polite"></p>
-          <p class="cap-meta" id="cap-meta"></p>
-          <p class="older" id="older"></p>
-        </div>
 
         <div class="field" id="branch-box" hidden>
           <label for="branch">Branch</label>
@@ -192,7 +246,7 @@
       <ul class="got">
         <li><b>Agents act for their people</b>Most additions come from people's own agents. A person tells their agent what to add, and the agent sends the sentence over AgentMesh to pelican.demo@agentmesh.ai. You can also type one on this page.</li>
         <li><b>Any model can draw</b>An agent may draw its frame with its own model. If it does not, our agent draws it. Every caption says which model drew the frame.</li>
-        <li><b>Every drawing is screened</b>Each sentence is screened before it is drawn, and each drawing is cleaned before it is shown, so a frame is only ever a picture. This page shows each frame as an image.</li>
+        <li><b>Every drawing is screened</b>Each sentence is screened before it is drawn, and each drawing is cleaned before it is shown, so a frame is only ever a picture. This page checks each drawing again before it animates it, and shows any drawing that fails that check as a plain image.</li>
         <li><b>One addition at a time</b>Each branch draws one addition at a time, in the order they arrived. The rest wait in line, and the line is shown beside the picture.</li>
         <li><b>Frames never change</b>Once a frame is drawn it stays as it is. The timeline lets you go back to any earlier frame, all the way to the first pelican.</li>
         <li><b>Branch from anywhere</b>If you would rather the picture had gone another way, pick an earlier frame and branch from it. Your addition starts a new branch, and the original carries on.</li>
@@ -274,15 +328,21 @@
     var API = 'https://api.agentmesh.ai/v1/pelican';
     var EXTEND_API = 'https://api.agentmesh.ai/v1/pelican/extend';
     var EVERY = 10000;
+    var SVGNS = 'http://www.w3.org/2000/svg', XLINK = 'http://www.w3.org/1999/xlink', XMLNSNS = 'http://www.w3.org/2000/xmlns/', XMLNS_XML = 'http://www.w3.org/XML/1998/namespace';
     var data = null, missing = false, failed = false, timer = null;
     var branchId = null, selId = null, follow = true, forkFrom = null, mine = null, sending = false;
-    var thumbKey = '', branchKey = '';
+    var thumbKey = '', branchKey = '', wantPlay = false;
+    var mq = window.matchMedia ? window.matchMedia('(prefers-reduced-motion: reduce)') : null;
+    var reduced = !!(mq && mq.matches);
 
     function $(id){ return document.getElementById(id); }
     function arr(x){ return Array.isArray(x) ? x : []; }
     function esc(s){ return String(s == null ? '' : s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;'); }
     function sentence(s){ s = String(s || '').trim(); if (!s) return ''; s = s.charAt(0).toUpperCase() + s.slice(1); return /[.!?]$/.test(s) ? s : s + '.'; }
-    /* Frames are shown only through <img src>, and only from the pelican API itself. */
+    function clamp(x){ return x < 0 ? 0 : x > 1 ? 1 : x; }
+    function ease(p){ return p < .5 ? 4 * p * p * p : 1 - Math.pow(-2 * p + 2, 3) / 2; }
+    function noop(){}
+    /* Frames come only from the pelican API itself. */
     function safeSvg(u){
       try { var x = new URL(u, API); return (x.protocol === 'https:' && x.hostname === 'api.agentmesh.ai') ? x.href : null; }
       catch(e){ return null; }
@@ -295,6 +355,396 @@
       if (s < 86400) { var h = Math.round(s / 3600); return h + (h === 1 ? ' hour ago' : ' hours ago'); }
       return 'on ' + d.toLocaleDateString('en-US', { month:'long', day:'numeric' });
     }
+
+    /* ---------- the client check: a strict allowlist that mirrors the server's ---------- */
+    var ALLOW = {};
+    ('svg g defs title desc symbol use path rect circle ellipse line polyline polygon text tspan textPath ' +
+     'linearGradient radialGradient stop pattern clipPath mask marker filter feBlend feColorMatrix feComponentTransfer ' +
+     'feComposite feConvolveMatrix feDiffuseLighting feDisplacementMap feDistantLight feDropShadow feFlood feFuncA feFuncB ' +
+     'feFuncG feFuncR feGaussianBlur feMerge feMergeNode feMorphology feOffset fePointLight feSpecularLighting feSpotLight ' +
+     'feTile feTurbulence style animate animateTransform animateMotion set mpath').split(' ').forEach(function(n){ ALLOW[n] = 1; });
+    var SMIL = { animate:1, animateTransform:1, animateMotion:1, set:1 };
+    var CLOCK = '(?:\\d+(?:\\.\\d+)?|\\.\\d+)(?:h|min|s|ms)?|\\d+:\\d{2}(?::\\d{2})?(?:\\.\\d+)?';
+    /* begin and end may hold offsets, indefinite, or another animation's begin or end; never an event. */
+    var TIME_RE = new RegExp('^(?:[+-]?\\s*(?:' + CLOCK + ')|indefinite|[A-Za-z_][\\w:.-]*\\.(?:begin|end)(?:\\s*[+-]\\s*(?:' + CLOCK + '))?)$');
+    var BAD_URL = /url\s*\(\s*(?!['"]?\s*#)/i;
+    var BAD_VAL = /javascript:|vbscript:|data:/i;
+    var BAD_CSS = /@import|expression\s*\(|behavior\s*:|-moz-binding|<\//i;
+    function checkTree(root){
+      var why = '';
+      (function walk(el){
+        if (why) return;
+        if (el.namespaceURI !== SVGNS || !ALLOW[el.localName]) { why = 'element ' + el.localName; return; }
+        for (var i = 0; i < el.attributes.length && !why; i++){
+          var a = el.attributes[i], n = a.name.toLowerCase(), ln = (a.localName || n).toLowerCase(), v = a.value;
+          if (a.namespaceURI === XMLNSNS || n === 'xmlns' || n.indexOf('xmlns:') === 0) continue;
+          if (a.namespaceURI && a.namespaceURI !== XLINK && a.namespaceURI !== XMLNS_XML) why = 'attribute ' + n;
+          else if (a.namespaceURI === XMLNS_XML && ln !== 'space' && ln !== 'lang') why = 'attribute ' + n;
+          else if (/^on/.test(ln)) why = 'handler ' + n;
+          else if (ln === 'href' && !/^\s*#/.test(v)) why = 'link ' + n;
+          else if (BAD_URL.test(v) || BAD_VAL.test(v)) why = 'value of ' + n;
+          else if (ln === 'style' && BAD_CSS.test(v)) why = 'style attribute';
+        }
+        if (why) return;
+        if (el.localName === 'style'){ var t = el.textContent || ''; if (BAD_CSS.test(t) || BAD_URL.test(t) || BAD_VAL.test(t)) { why = 'style element'; return; } }
+        if (SMIL[el.localName]){
+          var an = (el.getAttribute('attributeName') || '').trim().toLowerCase();
+          if (an === 'href' || an === 'xlink:href' || an === 'style' || /^on/.test(an) || /:href$/.test(an)) { why = 'animation of ' + an; return; }
+          ['begin', 'end'].forEach(function(k){
+            if (!why && el.hasAttribute(k)) el.getAttribute(k).split(';').forEach(function(tok){ tok = tok.trim(); if (tok && !TIME_RE.test(tok)) why = k + ' ' + tok; });
+          });
+          if (why) return;
+        }
+        for (var c = el.firstElementChild; c && !why; c = c.nextElementSibling) walk(c);
+      })(root);
+      return why;
+    }
+    function viewBoxOf(root){
+      var v = (root.getAttribute('viewBox') || '').trim().split(/[\s,]+/).map(Number);
+      if (v.length === 4 && v.every(isFinite) && v[2] > 0 && v[3] > 0) return { x:v[0], y:v[1], w:v[2], h:v[3] };
+      var w = parseFloat(root.getAttribute('width')), h = parseFloat(root.getAttribute('height'));
+      return (w > 0 && h > 0) ? { x:0, y:0, w:w, h:h } : { x:0, y:0, w:400, h:400 };
+    }
+    function parseSafe(text){
+      if (typeof text !== 'string' || !text || text.length > 3000000) return { ok:false, why:'size' };
+      if (/<!DOCTYPE|<!ENTITY|<\?xml-stylesheet/i.test(text)) return { ok:false, why:'doctype' };
+      var doc;
+      try { doc = new DOMParser().parseFromString(text, 'image/svg+xml'); } catch(e){ return { ok:false, why:'parse' }; }
+      if (!doc || doc.getElementsByTagName('parsererror').length) return { ok:false, why:'parse' };
+      var root = doc.documentElement;
+      if (!root || root.namespaceURI !== SVGNS || root.localName !== 'svg') return { ok:false, why:'root' };
+      var why = checkTree(root);
+      return why ? { ok:false, why:why } : { ok:true, root:root, vb:viewBoxOf(root) };
+    }
+
+    /* ids get a prefix per use, and every reference to them follows */
+    function reEsc(s){ return s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); }
+    function prefixIds(root, pre){
+      var map = {}, keys = [], all = [root].concat([].slice.call(root.querySelectorAll('*')));
+      all.forEach(function(el){ var id = el.getAttribute('id'); if (id){ map[id] = pre + id; keys.push(id); el.setAttribute('id', pre + id); } });
+      if (!keys.length) return;
+      all.forEach(function(el){
+        [].slice.call(el.attributes).forEach(function(a){
+          var ln = (a.localName || a.name).toLowerCase(), v = a.value, nv = v;
+          if (ln === 'id') return;
+          if (ln === 'href'){ var k = v.trim().slice(1); if (map[k]) nv = '#' + map[k]; }
+          else if (ln === 'begin' || ln === 'end') nv = v.split(';').map(function(tok){ return tok.replace(/^(\s*)([A-Za-z_][\w:.-]*?)\.(begin|end)/, function(m, s, k, w){ return map[k] ? s + map[k] + '.' + w : m; }); }).join(';');
+          nv = nv.replace(/url\(\s*(['"]?)#([^'")\s]+)\1\s*\)/g, function(m, q, k){ return map[k] ? 'url(#' + map[k] + ')' : m; });
+          if (nv !== v) el.setAttributeNS(a.namespaceURI, a.name, nv);
+        });
+        if (el.localName === 'style'){
+          var t = el.textContent;
+          keys.forEach(function(k){ t = t.replace(new RegExp('#' + reEsc(k) + '(?![\\w-])', 'g'), '#' + map[k]); });
+          el.textContent = t;
+        }
+      });
+    }
+    /* a style element inside a frame only ever styles that frame */
+    function scopeCss(text, scope){
+      var sh; try { sh = new CSSStyleSheet(); sh.replaceSync(text); } catch(e){ return ''; }
+      var out = [];
+      [].forEach.call(sh.cssRules, function(r){
+        if (r.type === 1) out.push(r.selectorText.split(',').map(function(s){ s = s.trim(); return /^(svg|:root)(?![\w-])/.test(s) ? s.replace(/^(svg|:root)/, scope) : scope + ' ' + s; }).join(', ') + '{' + r.style.cssText + '}');
+        else if (r.type === 7) out.push(r.cssText);
+      });
+      var css = out.join('\n');
+      return (BAD_URL.test(css) || BAD_CSS.test(css)) ? '' : css;
+    }
+    var ROOT_SKIP = { width:1, height:1, viewbox:1, x:1, y:1, preserveaspectratio:1, id:1, 'class':1, version:1, baseprofile:1 };
+    /* the frame's children in a <g> that carries the root's own presentation attributes */
+    function frameGroup(doc, parsed, pre, scope){
+      var g = doc.createElementNS(SVGNS, 'g'), root = parsed.root;
+      [].forEach.call(root.attributes, function(a){
+        var n = a.name.toLowerCase();
+        if (ROOT_SKIP[n] || a.namespaceURI === XMLNSNS || n === 'xmlns' || n.indexOf('xmlns:') === 0) return;
+        g.setAttributeNS(a.namespaceURI, a.name, a.value);
+      });
+      [].forEach.call(root.childNodes, function(c){ if (c.nodeType === 1 || c.nodeType === 3) g.appendChild(doc.importNode(c, true)); });
+      prefixIds(g, pre);
+      [].slice.call(g.querySelectorAll('style')).forEach(function(s){ var css = scopeCss(s.textContent, scope); if (css) s.textContent = css; else s.parentNode.removeChild(s); });
+      return g;
+    }
+    var layerSeq = 0;
+    function buildInline(parsed, label){
+      var id = 'pl' + (++layerSeq);
+      var svg = document.createElementNS(SVGNS, 'svg');
+      svg.setAttribute('id', id);
+      svg.setAttribute('viewBox', [parsed.vb.x, parsed.vb.y, parsed.vb.w, parsed.vb.h].join(' '));
+      svg.setAttribute('preserveAspectRatio', 'xMidYMid meet');
+      svg.setAttribute('role', 'img');
+      svg.setAttribute('aria-label', label);
+      svg.appendChild(frameGroup(document, parsed, id + '-', '#' + id));
+      return svg;
+    }
+
+    /* ---------- the clock: every tween runs on it, so Pause and speed hold everywhere ---------- */
+    var clock = { t:0, rate:1, paused:false }, lastNow = null, waiters = [];
+    function tick(now){
+      if (lastNow !== null && !clock.paused) clock.t += Math.min(100, now - lastNow) * clock.rate;
+      lastNow = now;
+      var ws = waiters; waiters = [];
+      ws.forEach(function(w){ if (!w(clock.t)) waiters.push(w); });
+      requestAnimationFrame(tick);
+    }
+    requestAnimationFrame(tick);
+    function tween(ms, fn, r){
+      return new Promise(function(res){
+        var t0 = null;
+        waiters.push(function(t){
+          if (r.dead){ res(false); return true; }
+          if (t0 === null) t0 = t;
+          var p = ms <= 0 ? 1 : Math.min(1, (t - t0) / ms);
+          fn(p);
+          if (p >= 1){ res(true); return true; }
+          return false;
+        });
+      });
+    }
+    function all2(a, b){ return Promise.all([a, b]).then(function(x){ return x[0] && x[1]; }); }
+
+    /* ---------- camera and draw-in ---------- */
+    var NORENDER = { defs:1, clipPath:1, mask:1, pattern:1, marker:1, symbol:1, filter:1, linearGradient:1, radialGradient:1 };
+    var NOTPART = { animate:1, animateTransform:1, animateMotion:1, set:1, mpath:1, title:1, desc:1, style:1, stop:1 };
+    var SHAPE = { path:1, rect:1, circle:1, ellipse:1, line:1, polyline:1, polygon:1, text:1, use:1 };
+    var canScale = !!(window.CSS && CSS.supports && CSS.supports('scale', '1'));
+    function hiddenAnc(el, top){ for (var p = el; p && p !== top; p = p.parentNode) if (NORENDER[p.localName]) return true; return false; }
+    /* the outermost parts marked new (data-pel-new) or changed (data-pel-changed) in this frame */
+    function markedTops(svg, attr){
+      var marked = [].filter.call(svg.querySelectorAll('[' + attr + ']'), function(el){ return el.getAttribute(attr) !== '0' && !NOTPART[el.localName] && !hiddenAnc(el, svg); });
+      return marked.filter(function(el){ for (var p = el.parentNode; p && p !== svg; p = p.parentNode) if (marked.indexOf(p) >= 0) return false; return true; });
+    }
+    function newTops(svg){ return markedTops(svg, 'data-pel-new'); }
+    function focusTops(svg){ var t = newTops(svg); return t.length ? t : markedTops(svg, 'data-pel-changed'); }
+    function boxOf(svg, els){
+      var sc = svg.getScreenCTM(); if (!sc) return null;
+      var inv = sc.inverse(), x0 = Infinity, y0 = Infinity, x1 = -Infinity, y1 = -Infinity;
+      els.forEach(function(el){
+        var b, m;
+        try { b = el.getBBox(); m = inv.multiply(el.getScreenCTM()); } catch(e){ return; }
+        if (!b || !m || (b.width === 0 && b.height === 0)) return;
+        [[b.x, b.y], [b.x + b.width, b.y], [b.x, b.y + b.height], [b.x + b.width, b.y + b.height]].forEach(function(c){
+          var p = new DOMPoint(c[0], c[1]).matrixTransform(m);
+          x0 = Math.min(x0, p.x); y0 = Math.min(y0, p.y); x1 = Math.max(x1, p.x); y1 = Math.max(y1, p.y);
+        });
+      });
+      return isFinite(x0) ? { x:x0, y:y0, w:Math.max(1, x1 - x0), h:Math.max(1, y1 - y0) } : null;
+    }
+    function expand(b, asp){
+      var o = { x:b.x, y:b.y, w:b.w, h:b.h };
+      if (o.w / o.h < asp){ var w = o.h * asp; o.x -= (w - o.w) / 2; o.w = w; }
+      else { var h = o.w / asp; o.y -= (h - o.h) / 2; o.h = h; }
+      return o;
+    }
+    function fitBox(b, full, asp){
+      var pad = Math.max(b.w, b.h) * .2 + full.w * .03;
+      var o = { x:b.x - pad, y:b.y - pad, w:b.w + 2 * pad, h:b.h + 2 * pad };
+      if (o.w < full.w * .3){ o.x -= (full.w * .3 - o.w) / 2; o.w = full.w * .3; }
+      if (o.h < full.h * .3){ o.y -= (full.h * .3 - o.h) / 2; o.h = full.h * .3; }
+      o = expand(o, asp);
+      var fa = expand(full, asp);
+      if (o.w >= fa.w * .78) return null;
+      /* keep the shot on the picture itself, not on the empty margin around it */
+      o.x = o.w <= full.w ? Math.min(Math.max(o.x, full.x), full.x + full.w - o.w) : full.x + (full.w - o.w) / 2;
+      o.y = o.h <= full.h ? Math.min(Math.max(o.y, full.y), full.y + full.h - o.h) : full.y + (full.h - o.h) / 2;
+      return o;
+    }
+    function lerpBox(a, b, p){ return { x:a.x + (b.x - a.x) * p, y:a.y + (b.y - a.y) * p, w:a.w + (b.w - a.w) * p, h:a.h + (b.h - a.h) * p }; }
+    function setVB(svg, b){ svg.setAttribute('viewBox', [b.x, b.y, b.w, b.h].map(function(n){ return +n.toFixed(2); }).join(' ')); }
+    function numOr(v, d){ var n = parseFloat(v); return isFinite(n) ? n : d; }
+    var PROPS = ['stroke-dasharray', 'stroke-dashoffset', 'fill-opacity', 'opacity', 'scale', 'transform-box', 'transform-origin'];
+    /* parts that changed (say, wheels that now spin) get a pulse: a dashed ring and a scale bump, not colour alone */
+    function pulseParts(svg, tops, box){
+      var pad = Math.max(box.w, box.h) * .08 + 4, ring = document.createElementNS(SVGNS, 'g');
+      ring.setAttribute('pointer-events', 'none'); ring.setAttribute('opacity', '0');
+      [['#FFFFFF', 7, 'none'], ['#15171C', 3, '9 6']].forEach(function(s){
+        var r = document.createElementNS(SVGNS, 'rect');
+        r.setAttribute('x', box.x - pad); r.setAttribute('y', box.y - pad); r.setAttribute('width', box.w + 2 * pad); r.setAttribute('height', box.h + 2 * pad);
+        r.setAttribute('rx', pad); r.setAttribute('fill', 'none'); r.setAttribute('stroke', s[0]); r.setAttribute('stroke-width', s[1]);
+        r.setAttribute('stroke-dasharray', s[2]); r.setAttribute('vector-effect', 'non-scaling-stroke');
+        ring.appendChild(r);
+      });
+      svg.appendChild(ring);
+      /* changed parts usually move on their own (a spinning wheel), so the pulse scales a wrapper, never the part */
+      var wraps = canScale ? tops.map(function(el){
+        var g = document.createElementNS(SVGNS, 'g'); el.parentNode.insertBefore(g, el); g.appendChild(el);
+        g.style.setProperty('transform-box', 'fill-box'); g.style.setProperty('transform-origin', 'center');
+        return g;
+      }) : [];
+      return {
+        box: box, kind: 'changed',
+        set: function(p){
+          ring.setAttribute('opacity', String(p < .15 ? p / .15 : p > .8 ? (1 - p) / .2 : 1));
+          var s = 1 + .1 * Math.sin(Math.PI * clamp(p < .5 ? p / .5 : (p - .5) / .5));
+          wraps.forEach(function(g){ g.style.setProperty('scale', String(s)); });
+        },
+        restore: function(){
+          if (ring.parentNode) ring.parentNode.removeChild(ring);
+          wraps.forEach(function(g){ if (g.parentNode && g.firstChild){ g.parentNode.insertBefore(g.firstChild, g); g.parentNode.removeChild(g); } });
+          wraps = [];
+        }
+      };
+    }
+    function prepParts(svg){
+      var tops = newTops(svg), box;
+      if (!tops.length){
+        tops = markedTops(svg, 'data-pel-changed'); if (!tops.length) return null;
+        box = boxOf(svg, tops); return box ? pulseParts(svg, tops, box) : null;
+      }
+      box = boxOf(svg, tops); if (!box) return null;
+      var leaves = [];
+      tops.forEach(function(t){
+        if (SHAPE[t.localName]) { leaves.push(t); return; }
+        var sub = [].filter.call(t.querySelectorAll('*'), function(x){ return SHAPE[x.localName] && !hiddenAnc(x, t); });
+        if (sub.length) sub.forEach(function(x){ if (leaves.indexOf(x) < 0) leaves.push(x); }); else leaves.push(t);
+      });
+      var items = leaves.map(function(el){
+        var cs = getComputedStyle(el), len = 0;
+        var stroked = cs.stroke && cs.stroke !== 'none' && numOr(cs.strokeWidth, 0) > 0 && typeof el.getTotalLength === 'function' && el.localName !== 'text' && el.localName !== 'use';
+        if (stroked){ try { len = el.hasAttribute('pathLength') ? numOr(el.getAttribute('pathLength'), 0) : el.getTotalLength(); } catch(e){ len = 0; } if (!(len > 0) || !isFinite(len)) stroked = false; }
+        /* scaling from the centre only suits parts with no transform of their own */
+        var own = el.hasAttribute('transform') || (cs.transform && cs.transform !== 'none') || [].some.call(el.children, function(c){ return c.localName === 'animateTransform' || c.localName === 'animateMotion'; });
+        return { el:el, stroked:stroked, len:len + 1, fo:numOr(cs.fillOpacity, 1), op:numOr(cs.opacity, 1), scale:canScale && !own,
+          saved:PROPS.map(function(k){ return [k, el.style.getPropertyValue(k), el.style.getPropertyPriority(k)]; }) };
+      });
+      var n = items.length;
+      return {
+        box: box, kind: 'new',
+        set: function(p){
+          items.forEach(function(it, k){
+            var w0 = n > 1 ? .35 * k / (n - 1) : 0, lp = ease(clamp((p / .7 - w0) / .65)), s = it.el.style;
+            if (it.stroked){
+              s.setProperty('stroke-dasharray', it.len + ' ' + it.len);
+              s.setProperty('stroke-dashoffset', String(it.len * (1 - lp)));
+              s.setProperty('fill-opacity', String(it.fo * clamp((p - .5) / .5)));
+            } else {
+              s.setProperty('opacity', String(it.op * lp));
+              if (it.scale){ s.setProperty('transform-box', 'fill-box'); s.setProperty('transform-origin', 'center'); s.setProperty('scale', String(.55 + .45 * lp)); }
+            }
+          });
+        },
+        restore: function(){ items.forEach(function(it){ it.saved.forEach(function(k){ if (k[1]) it.el.style.setProperty(k[0], k[1], k[2]); else it.el.style.removeProperty(k[0]); }); }); }
+      };
+    }
+
+    /* ---------- the stage ---------- */
+    var stageFor = null, run = null, parsedCache = {}, speed = '1';
+    function getParsed(f){
+      var src = safeSvg(f && f.svg_url); if (!src) return Promise.resolve(null);
+      if (parsedCache[f.frame_id]) return parsedCache[f.frame_id];
+      /* a slow frame falls back to a plain image rather than stalling the film */
+      var ctl = window.AbortController ? new AbortController() : null, to = ctl ? setTimeout(function(){ ctl.abort(); }, 8000) : 0;
+      var p = fetch(src, { headers:{ 'Accept':'image/svg+xml' }, signal: ctl ? ctl.signal : undefined })
+        .then(function(r){ if (!r.ok) throw new Error('status ' + r.status); return r.text(); })
+        .then(function(t){ clearTimeout(to); return t; })
+        .then(function(t){ return parseSafe(t); })
+        .catch(function(){ delete parsedCache[f.frame_id]; return null; });
+      parsedCache[f.frame_id] = p;
+      return p;
+    }
+    function skipCam(){ return reduced || speed === 't'; }
+    function aspect(){ var p = $('pic'); return (p.clientWidth || 16) / (p.clientHeight || 10); }
+    function mountLayer(node, mode){
+      var pic = $('pic'), soon = pic.querySelector('.soon'); if (soon) pic.removeChild(soon);
+      var olds = [].slice.call(pic.querySelectorAll('.layer'));
+      var layer = document.createElement('div'); layer.className = 'layer'; layer.setAttribute('data-mode', mode);
+      layer.appendChild(node); pic.appendChild(layer);
+      if (reduced){ layer.classList.add('on'); olds.forEach(function(o){ o.remove(); }); }
+      else { void layer.offsetWidth; layer.classList.add('on'); olds.forEach(function(o){ setTimeout(function(){ o.remove(); }, 420); }); }
+      return layer;
+    }
+    function finishRun(r){ if (r.fin) return; r.fin = true; r.dead = true; r.done.forEach(function(fn){ try { fn(); } catch(e){} }); }
+    function stopRun(){ if (run) finishRun(run); }
+
+    /* caption: "atlas added: a walrus in a sidecar", with the model named small below */
+    function capOf(f, i){
+      var n = num(f, i);
+      if (f.source === 'seed' || !f.parent) return { line:'The original pelican riding a bicycle.', model:'', full:'Frame ' + n + ': the original pelican riding a bicycle.', first:true };
+      var ins = String(f.instruction || '').trim();
+      return { line:who(f) + ' added: ' + ins, model:f.model ? 'drawn by ' + f.model : '', full:'Frame ' + n + ': ' + who(f) + ' added: ' + ins + (f.model ? ', drawn by ' + f.model : '') + '.' };
+    }
+    function setCap(cp, n){
+      var cap = $('cap'), model = $('model');
+      $('filmcap').hidden = false;
+      if (n < 0){ cap.textContent = cp.line; model.textContent = cp.model; model.className = 'model'; }
+      else {
+        cap.textContent = cp.line.slice(0, n);
+        var c = document.createElement('span'); c.className = 'caret'; c.setAttribute('aria-hidden', 'true'); cap.appendChild(c);
+        model.textContent = cp.model || ' '; model.className = 'model wait';
+      }
+      $('replay').hidden = reduced || !!cp.first;
+    }
+    function typeCap(cp, ms, r){ var L = cp.line.length; return tween(ms, function(p){ setCap(cp, Math.ceil(p * L)); }, r); }
+
+    /* show a frame; with animate, play its addition: camera in, draw-in, pull back while the caption types */
+    function showFrame(line, idx, animate){
+      stopRun();
+      var f = line[idx], r = run = { dead:false, done:[] }, cp = capOf(f, idx);
+      stageFor = f.frame_id;
+      $('cap-sr').textContent = cp.full;
+      setCap(cp, animate ? 0 : -1);
+      r.done.push(function(){ setCap(cp, -1); });
+      return getParsed(f).then(function(parsed){
+        if (r.dead) return false;
+        var svg = null, node;
+        if (parsed && parsed.ok){ svg = buildInline(parsed, cp.full); node = svg; }
+        else {
+          node = document.createElement('img'); node.decoding = 'async'; node.alt = cp.full;
+          var src = safeSvg(f.svg_url); if (src) node.src = src;
+        }
+        mountLayer(node, svg ? 'inline' : 'img');
+        if (svg && reduced && svg.pauseAnimations) svg.pauseAnimations();
+        if (!animate){ finishRun(r); return true; }
+        return playAddition(r, svg, parsed && parsed.ok ? parsed.vb : null, cp);
+      });
+    }
+    function playAddition(r, svg, full, cp){
+      var parts = svg ? prepParts(svg) : null, cam = null, fullA = null;
+      if (parts){ parts.set(0); r.done.push(parts.restore); }
+      if (svg) r.done.push(function(){ setVB(svg, full); });
+      if (parts && !skipCam()){ var asp = aspect(); fullA = expand(full, asp); cam = fitBox(parts.box, full, asp); }
+      if (svg){ svg.setAttribute('data-cam', cam ? 'zoom' : 'none'); svg.setAttribute('data-parts', parts ? parts.kind : 'none'); }
+      /* let the crossfade finish (it runs on real time) before the camera moves */
+      var p = new Promise(function(res){ setTimeout(function(){ res(!r.dead); }, reduced ? 0 : 380); });
+      if (cam) p = p.then(function(ok){ return ok && tween(800, function(q){ setVB(svg, lerpBox(fullA, cam, ease(q))); }, r); });
+      if (parts) p = p.then(function(ok){ return ok && (cam ? tween(1500, parts.set, r) : all2(tween(1500, parts.set, r), typeCap(cp, 1200, r))); });
+      if (cam) p = p.then(function(ok){ return ok && all2(tween(800, function(q){ setVB(svg, lerpBox(cam, fullA, ease(q))); }, r), typeCap(cp, 800, r)); });
+      if (!parts) p = p.then(function(ok){ return ok && typeCap(cp, 900, r); });
+      return p.then(function(ok){ if (!ok) return false; finishRun(r); return true; });
+    }
+
+    /* ---------- the film ---------- */
+    var filmOn = false, filmRun = null;
+    function playBtn(){
+      var on = filmOn && !clock.paused;
+      $('play').classList.toggle('on', on);
+      $('play-t').textContent = on ? 'Pause' : 'Play';
+      $('play').setAttribute('aria-label', on ? 'Pause the film' : 'Play the film, from the original pelican to the newest');
+    }
+    function stopFilm(){ if (filmRun) filmRun.dead = true; filmOn = false; clock.paused = false; playBtn(); }
+    function selectShow(line, i, animate){
+      selId = line[i].frame_id; follow = i === line.length - 1;
+      var pr = showFrame(line, i, animate);
+      render(); setHash();
+      return pr;
+    }
+    function playFilm(endIdx, fromStart){
+      stopFilm();
+      var line = lineage(branchById(branchId)); if (!line.length) return;
+      var fr = filmRun = { dead:false }, end = endIdx == null ? line.length - 1 : Math.min(endIdx, line.length - 1), i = curIdx(line);
+      filmOn = true; playBtn();
+      var p;
+      if (fromStart || i >= end){ i = 0; p = selectShow(line, 0, false).then(function(ok){ return ok && !fr.dead && tween(1000, noop, fr); }); }
+      else p = Promise.resolve(true);
+      function step(ok){
+        if (!ok || fr.dead) return;
+        if (i >= end){ filmOn = false; playBtn(); return; }
+        i++;
+        if (line[i + 1]) getParsed(line[i + 1]);
+        return selectShow(line, i, true).then(function(ok){ return ok && !fr.dead && tween(1000, noop, fr); }).then(step);
+      }
+      p.then(step);
+    }
+    function curIdx(line){ for (var i = 0; i < line.length; i++) if (line[i].frame_id === selId) return i; return line.length - 1; }
 
     function frameMap(){ var m = {}; arr(data && data.frames).forEach(function(f){ if (f && f.frame_id) m[f.frame_id] = f; }); return m; }
     function branches(){
@@ -316,28 +766,32 @@
       if (f.source === 'operator') return f.by || 'the AgentMesh team';
       return f.by || 'an agent';
     }
-    function captionOf(f, i){
-      var n = num(f, i);
-      if (f.source === 'seed' || !f.parent) return 'Frame ' + n + ': the original pelican riding a bicycle.';
-      return 'Frame ' + n + ': “' + String(f.instruction || '').trim() + '”, by ' + who(f) + (f.model ? ', drawn by ' + f.model : '') + '.';
-    }
 
     function setHash(){
       var b = branchById(branchId), h = '';
-      if (b && b.branch_id !== data.main) h += 'branch=' + encodeURIComponent(b.branch_id);
-      if (!follow && selId) h += (h ? '&' : '') + 'frame=' + encodeURIComponent(selId);
+      if (b && b.branch_id !== data.main) h += 'b=' + encodeURIComponent(b.branch_id);
+      if (!follow && selId) h += (h ? '&' : '') + 'f=' + encodeURIComponent(selId);
       try { history.replaceState(null, '', h ? '#' + h : location.pathname + location.search); } catch(e){}
     }
     function readHash(){
-      var q = {}; location.hash.replace(/^#/, '').split('&').forEach(function(p){ var kv = p.split('='); if (kv[0]) q[kv[0]] = decodeURIComponent(kv[1] || ''); });
-      if (q.branch) branchId = q.branch;
-      if (q.frame){ selId = q.frame; follow = false; }
+      var raw = location.hash.replace(/^#/, ''), q = {};
+      if (raw && raw.indexOf('=') < 0) q.f = decodeURIComponent(raw);
+      else raw.split('&').forEach(function(p){ var kv = p.split('='); if (kv[0]) q[kv[0]] = decodeURIComponent(kv[1] || ''); });
+      var b = q.b || q.branch, f = q.f || q.frame;
+      if (b) branchId = b;
+      if (f){ selId = f; follow = false; }
+      if (q.play === '1') wantPlay = true;
+    }
+    function shareUrl(){
+      var b = branchById(branchId);
+      return location.origin + location.pathname + '#b=' + encodeURIComponent(b ? b.branch_id : '') + '&f=' + encodeURIComponent(selId || '') + '&play=1';
     }
 
     function showSoon(title, text){
+      stopFilm(); stopRun(); stageFor = null;
       $('pic').innerHTML = '<div class="soon"><b>' + esc(title) + '</b><span>' + esc(text) + '</span></div>';
-      $('timeline').hidden = true; $('branch-box').hidden = true; $('queue').hidden = true;
-      $('cap').textContent = ''; $('cap-meta').textContent = ''; $('older').textContent = '';
+      $('timeline').hidden = true; $('branch-box').hidden = true; $('queue').hidden = true; $('filmcap').hidden = true;
+      $('cap-meta').textContent = ''; $('older').textContent = '';
       $('instr').disabled = true; $('add-go').disabled = true;
     }
 
@@ -359,37 +813,39 @@
       selId = line[idx].frame_id;
       var f = line[idx], last = line.length - 1;
 
-      /* the picture */
-      var src = safeSvg(f.svg_url), img = $('pic').querySelector('img');
-      if (!img){ $('pic').innerHTML = '<img id="big" decoding="async">'; img = $('pic').querySelector('img'); }
-      if (src && img.getAttribute('src') !== src) img.setAttribute('src', src);
-      if (!src) img.removeAttribute('src');
-      img.alt = captionOf(f, idx);
+      /* the picture: a new frame on the stage plays its addition when it follows the one shown */
+      if (wantPlay){
+        wantPlay = false;
+        if (!reduced){ var endAt = idx; setTimeout(function(){ playFilm(endAt, true); }, 0); }
+        else showFrame(line, idx, false);
+      } else if (stageFor !== f.frame_id && !filmOn){
+        var prevId = idx > 0 ? line[idx - 1].frame_id : null;
+        showFrame(line, idx, !reduced && idx > 0 && ((stageFor === null && follow) || stageFor === prevId));
+      }
 
-      /* caption */
-      $('cap').textContent = captionOf(f, idx);
       var meta = [];
       if (f.at) meta.push('Added ' + when(f.at) + '.');
       if (b.branch_id !== data.main) meta.push('On the branch ' + bname(b) + '.');
       $('cap-meta').textContent = meta.join(' ');
       if (idx < last){
         $('older').innerHTML = 'This is an earlier frame. The newest on this branch is frame ' + esc(num(line[last], last)) + '. <button type="button" class="linkbtn" id="newest">Show the newest</button>';
-        $('newest').onclick = function(){ follow = true; render(); setHash(); };
+        $('newest').onclick = function(){ stopFilm(); follow = true; render(); setHash(); };
       } else $('older').textContent = '';
 
       /* timeline */
       $('timeline').hidden = false;
       var sc = $('scrub');
       sc.max = String(last); sc.value = String(idx); sc.disabled = last === 0;
-      sc.setAttribute('aria-valuetext', captionOf(f, idx));
+      sc.setAttribute('aria-valuetext', capOf(f, idx).full);
       $('prev').disabled = idx === 0; $('next').disabled = idx === last;
       $('pos').textContent = 'Frame ' + num(f, idx) + ' of ' + num(line[last], last) + (idx === last ? ', the newest' : '');
+      $('play').disabled = last === 0;
       var key = b.branch_id + '|' + line.map(function(x){ return x.frame_id; }).join(',');
       if (key !== thumbKey){
         thumbKey = key;
         $('thumbs').innerHTML = line.map(function(x, i){
           var u = safeSvg(x.svg_url);
-          return '<li><button type="button" data-i="' + i + '" aria-label="' + esc(captionOf(x, i)) + '"><span class="tb">' + (u ? '<img loading="lazy" decoding="async" alt="" src="' + esc(u) + '">' : '') + '</span><span class="tn">' + esc(num(x, i)) + '</span></button></li>';
+          return '<li><button type="button" data-i="' + i + '" aria-label="' + esc(capOf(x, i).full) + '"><span class="tb">' + (u ? '<img loading="lazy" decoding="async" alt="" src="' + esc(u) + '">' : '') + '</span><span class="tn">' + esc(num(x, i)) + '</span></button></li>';
         }).join('');
       }
       var cur = null;
@@ -447,6 +903,7 @@
     }
 
     function go(i){
+      stopFilm();
       var line = lineage(branchById(branchId)); if (!line.length) return;
       i = Math.max(0, Math.min(line.length - 1, i));
       selId = line[i].frame_id; follow = i === line.length - 1;
@@ -457,8 +914,147 @@
     $('prev').addEventListener('click', function(){ go(curIndex() - 1); });
     $('next').addEventListener('click', function(){ go(curIndex() + 1); });
     $('thumbs').addEventListener('click', function(e){ var t = e.target.closest('button[data-i]'); if (t) go(Number(t.getAttribute('data-i'))); });
-    $('branch').addEventListener('change', function(){ branchId = this.value; follow = true; selId = null; render(); setHash(); });
+    $('branch').addEventListener('change', function(){ stopFilm(); branchId = this.value; follow = true; selId = null; render(); setHash(); });
     $('fork').addEventListener('click', function(){ if (!selId) return; forkFrom = selId; render(); $('instr').focus(); });
+    $('replay').addEventListener('click', function(){
+      stopFilm();
+      var line = lineage(branchById(branchId)), i = curIdx(line);
+      if (i > 0) showFrame(line, i, true);
+    });
+    $('play').addEventListener('click', function(){
+      if (filmOn){ clock.paused = !clock.paused; playBtn(); return; }
+      playFilm(null, false);
+    });
+    $('speed').addEventListener('click', function(e){
+      var t = e.target.closest('button[data-s]'); if (!t) return;
+      speed = t.getAttribute('data-s');
+      clock.rate = speed === 't' ? 3 : Number(speed);
+      [].forEach.call($('speed').querySelectorAll('button'), function(x){ x.setAttribute('aria-pressed', x === t ? 'true' : 'false'); });
+    });
+    function applyReduced(){
+      $('play').hidden = reduced; $('speed').hidden = reduced;
+      if (reduced){ stopFilm(); stopRun(); }
+    }
+    if (mq){ var onMq = function(){ reduced = mq.matches; applyReduced(); }; if (mq.addEventListener) mq.addEventListener('change', onMq); else if (mq.addListener) mq.addListener(onMq); }
+    applyReduced();
+
+    /* ---------- save and share ---------- */
+    $('copy').addEventListener('click', function(){
+      var u = shareUrl(), note = $('share-note'), line = lineage(branchById(branchId)), f = line[curIdx(line)];
+      var said = 'Link copied. It opens this branch and plays the film up to frame ' + num(f, curIdx(line)) + '.';
+      var done = function(){ note.textContent = said; }, fail = function(){ note.textContent = 'Copy this link: ' + u; };
+      if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(u).then(done, fail); else fail();
+    });
+
+    function fmtT(s){ return +s.toFixed(3) + 's'; }
+    function kt(x){ return +x.toFixed(5); }
+    function wrapText(s, max){
+      var words = s.split(/\s+/), lines = [], cur = '';
+      words.forEach(function(w){ if ((cur + ' ' + w).trim().length > max && cur){ lines.push(cur); cur = w; } else cur = (cur + ' ' + w).trim(); });
+      if (cur) lines.push(cur);
+      if (lines.length > 2){ lines = lines.slice(0, 2); lines[1] = lines[1].replace(/.{0,3}$/, '') + '...'; }
+      return lines;
+    }
+    /* one visibility animation that shows its element only inside [a, b) of a loop of length T */
+    function showIn(doc, el, a, b, T){
+      var an = doc.createElementNS(SVGNS, 'animate'), vals = [], keys = [];
+      if (a > 0){ vals.push('hidden'); keys.push(0); vals.push('visible'); keys.push(kt(a / T)); } else { vals.push('visible'); keys.push(0); }
+      if (b < T){ vals.push('hidden'); keys.push(kt(b / T)); }
+      if (vals.length === 1){ el.setAttribute('visibility', 'visible'); return; }
+      an.setAttribute('attributeName', 'visibility'); an.setAttribute('calcMode', 'discrete');
+      an.setAttribute('values', vals.join(';')); an.setAttribute('keyTimes', keys.join(';'));
+      an.setAttribute('dur', fmtT(T)); an.setAttribute('repeatCount', 'indefinite');
+      el.appendChild(an);
+    }
+    var SEED_SLOT = 2, ADD_SLOT = 4.1;
+    function buildFilm(){
+      var line = lineage(branchById(branchId)), note = $('share-note'), btn = $('dl');
+      if (!line.length) return;
+      btn.disabled = true; note.textContent = 'Building the film from ' + line.length + (line.length === 1 ? ' frame.' : ' frames.');
+      var out = [], k = 0;
+      function next(){
+        var batch = line.slice(k, k + 4); k += 4;
+        if (!batch.length) return Promise.resolve();
+        return Promise.all(batch.map(getParsed)).then(function(ps){ ps.forEach(function(p, j){ out.push({ f:batch[j], i:k - 4 + j, p:p }); }); return next(); });
+      }
+      next().then(function(){
+        var good = out.filter(function(o){ return o.p && o.p.ok; }), skipped = out.length - good.length;
+        if (!good.length){ note.textContent = 'None of these frames passed the check, so there is no film to save.'; return; }
+        /* measure each frame's new parts off screen, for the camera */
+        var host = document.createElement('div'); host.className = 'measure'; document.body.appendChild(host);
+        good.forEach(function(o){
+          var s = buildInline(o.p, ''); host.appendChild(s);
+          var tops = focusTops(s); o.box = tops.length ? boxOf(s, tops) : null;
+          host.removeChild(s);
+        });
+        host.remove();
+        var vb0 = good[0].p.vb, W = vb0.w, H = vb0.h, capH = Math.round(W * .16), fs = capH * .22;
+        var doc = document.implementation.createDocument(SVGNS, 'svg', null), root = doc.documentElement;
+        root.setAttribute('viewBox', [0, 0, W, H + capH].join(' '));
+        root.setAttribute('width', '800'); root.setAttribute('height', String(Math.round(800 * (H + capH) / W)));
+        var el = function(n, attrs, parent){ var e = doc.createElementNS(SVGNS, n); Object.keys(attrs).forEach(function(a){ e.setAttribute(a, attrs[a]); }); (parent || root).appendChild(e); return e; };
+        var b = branchById(branchId);
+        el('title', {}).textContent = 'The pelican, ' + (b && b.branch_id !== data.main ? 'the branch ' + bname(b) : 'the main line') + ', from agentmesh.ai';
+        el('rect', { width:W, height:H + capH, fill:'#FFFFFF' });
+        var cam = el('svg', { x:0, y:0, width:W, height:H, viewBox:[vb0.x, vb0.y, W, H].join(' '), preserveAspectRatio:'xMidYMid meet' });
+        el('rect', { y:H, width:W, height:capH, fill:'#15171C' });
+        var caps = el('g', { 'font-family':'Geist, system-ui, sans-serif', fill:'#F3EFE6', 'font-size':+fs.toFixed(2) });
+        var t = 0, slots = good.map(function(o, j){ var s = t; t += j === 0 ? SEED_SLOT : ADD_SLOT; return s; }), T = t;
+        var camKeys = [[0, vb0]];
+        good.forEach(function(o, j){
+          var s = slots[j], e = j + 1 < good.length ? slots[j + 1] : T, pre = 'k' + j;
+          var same = o.p.vb.x === vb0.x && o.p.vb.y === vb0.y && o.p.vb.w === vb0.w && o.p.vb.h === vb0.h;
+          var grp = el('g', { id:pre, visibility:'hidden' }, cam);
+          showIn(doc, grp, s, e, T);
+          var inner = grp;
+          if (!same) inner = el('svg', { x:vb0.x, y:vb0.y, width:W, height:H, viewBox:[o.p.vb.x, o.p.vb.y, o.p.vb.w, o.p.vb.h].join(' '), preserveAspectRatio:'xMidYMid meet' }, grp);
+          var fg = frameGroup(doc, o.p, pre + '-', '#' + pre); inner.appendChild(fg);
+          var addition = j > 0;
+          var box = addition && same && o.box ? fitBox(o.box, vb0, W / H) : null;
+          if (box) camKeys.push([s, vb0], [s + .8, box], [s + 2.3, box], [s + 3.1, vb0]);
+          if (addition){
+            var fa = (s + (box ? .8 : .35)) / T, fb = (s + (box ? 2.3 : 1.85)) / T;
+            newTops(fg).forEach(function(x){
+              if ([].some.call(x.children, function(c){ return SMIL[c.localName] && c.getAttribute('attributeName') === 'opacity'; })) return;
+              var op = numOr(x.getAttribute('opacity'), 1);
+              var an = doc.createElementNS(SVGNS, 'animate');
+              an.setAttribute('attributeName', 'opacity'); an.setAttribute('values', ['0', '0', op, op].join(';'));
+              an.setAttribute('keyTimes', ['0', kt(fa), kt(fb), '1'].join(';')); an.setAttribute('dur', fmtT(T)); an.setAttribute('repeatCount', 'indefinite');
+              x.appendChild(an);
+            });
+          }
+          var cp = capOf(o.f, o.i), words = (addition ? 'Frame ' + num(o.f, o.i) + '. ' : '') + cp.line;
+          var tx = el('text', { x:+(W * .04).toFixed(2), y:+(H + capH * .3).toFixed(2), visibility:'hidden' }, caps);
+          wrapText(words, Math.max(24, Math.floor(W * .92 / (fs * .52)))).concat(cp.model ? [cp.model] : []).forEach(function(ln, m){
+            var ts = doc.createElementNS(SVGNS, 'tspan'); ts.setAttribute('x', +(W * .04).toFixed(2)); ts.setAttribute('dy', m ? +(fs * 1.2).toFixed(2) : 0);
+            if (cp.model && ln === cp.model){ ts.setAttribute('font-size', +(fs * .75).toFixed(2)); ts.setAttribute('fill-opacity', '.8'); }
+            ts.textContent = ln; tx.appendChild(ts);
+          });
+          showIn(doc, tx, s, e, T);
+        });
+        if (camKeys.length > 1){
+          camKeys.push([T, vb0]);
+          var vals = [], keys = [], lastT = -1;
+          camKeys.forEach(function(c){ if (c[0] <= lastT) return; lastT = c[0]; keys.push(kt(c[0] / T)); vals.push([c[1].x, c[1].y, c[1].w, c[1].h].map(function(n){ return +n.toFixed(2); }).join(' ')); });
+          keys[keys.length - 1] = 1;
+          el('animate', { attributeName:'viewBox', values:vals.join(';'), keyTimes:keys.join(';'), dur:fmtT(T), repeatCount:'indefinite', calcMode:'spline',
+            keySplines:keys.slice(1).map(function(){ return '.65 0 .35 1'; }).join(';') }, cam);
+        }
+        var text = new XMLSerializer().serializeToString(doc);
+        var chk = parseSafe(text);
+        if (!chk.ok){ note.textContent = 'The film did not pass the safety check, so it was not saved.'; return; }
+        var blob = new Blob([text], { type:'image/svg+xml' }), url = URL.createObjectURL(blob), a = document.createElement('a');
+        a.href = url; a.download = 'pelican-' + String((b && b.branch_id) || 'main').replace(/[^\w-]/g, '') + '.svg';
+        document.body.appendChild(a); a.click(); a.remove();
+        setTimeout(function(){ URL.revokeObjectURL(url); }, 60000);
+        var mb = blob.size / 1048576;
+        note.textContent = 'Saved a ' + Math.round(T) + ' second film of ' + good.length + (good.length === 1 ? ' frame' : ' frames') + ' that loops. It plays in any web browser.' +
+          (skipped ? ' ' + skipped + (skipped === 1 ? ' frame was' : ' frames were') + ' left out because ' + (skipped === 1 ? 'it' : 'they') + ' did not pass the check.' : '') +
+          (mb > 8 ? ' The file is ' + mb.toFixed(1) + ' MB, so some apps may open it slowly.' : '');
+      }).catch(function(){ note.textContent = 'The film could not be built just now. Please try again.'; })
+        .then(function(){ btn.disabled = false; });
+    }
+    $('dl').addEventListener('click', buildFilm);
 
     var instr = $('instr');
     instr.addEventListener('input', function(){ $('count').textContent = instr.value.length + ' of 140 characters'; });
@@ -506,6 +1102,7 @@
       if (document.visibilityState === 'visible') timer = setInterval(load, EVERY);
     }
     document.addEventListener('visibilitychange', function(){ if (document.visibilityState === 'visible') load(); schedule(); });
+    window.addEventListener('hashchange', function(){ var was = branchId; readHash(); if (branchId !== was) thumbKey = ''; stopFilm(); render(); });
     readHash(); load(); schedule();
   })();
   </script>
