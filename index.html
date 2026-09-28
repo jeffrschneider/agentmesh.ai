@@ -146,6 +146,10 @@ p{margin:0}
 .tell-msg{font-family:var(--mono);font-stretch:87.5%;font-size:.88rem;line-height:1.5;color:var(--fg);overflow-wrap:anywhere}
 .tell-msg::after{content:"";display:inline-block;width:.5em;height:1.05em;margin-left:4px;vertical-align:-.17em;background:var(--amber);border-radius:1px;animation:blink 1.1s steps(1) infinite}
 @keyframes blink{50%{opacity:0}}
+.tell-title{font-family:var(--display);font-size:1rem;font-weight:600;letter-spacing:-.01em;line-height:1.3;color:var(--fg);margin-bottom:4px}
+.tell-help{font-size:.9rem;line-height:1.45;color:var(--muted);margin-bottom:10px}
+.tell-link{display:inline-block;margin-top:9px;font-size:.88rem;font-weight:600;color:var(--fg);text-decoration:none;background-image:linear-gradient(var(--amber-line),var(--amber-line));background-repeat:no-repeat;background-position:0 100%;background-size:100% 1.5px;padding-bottom:1px}
+.tell-link:hover{background-size:100% 3px}
 
 /* the screen */
 .screen{margin:0;position:relative;min-width:0;background:var(--stage);color:var(--stage-fg);border-radius:22px;overflow:hidden;box-shadow:0 0 0 1px var(--stage-line),0 40px 70px -40px var(--shadow-c)}
@@ -407,8 +411,11 @@ p{margin:0}
           <a class="btn btn-amber" href="waitlist.html?from=home">Join the beta waitlist<svg class="arr" viewBox="0 0 16 16" width="16" height="16" aria-hidden="true"><path d="M3 8h9M8.5 4.5 12 8l-3.5 3.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
         </div>
         <div class="tell">
-          <div class="tell-head"><span>Tell your assistant</span><button type="button" class="tell-copy" id="tell-copy">Copy</button></div>
+          <p class="tell-title">Already in the beta? Connect your assistant in one step.</p>
+          <p class="tell-help">Paste this into Claude, Muse, Grok Bot or your coding agent. It connects itself, and you approve with one tap.</p>
+          <div class="tell-head"><span>Paste into your assistant</span><button type="button" class="tell-copy" id="tell-copy">Copy</button></div>
           <p class="tell-msg" id="tell-msg">Connect yourself to AgentMesh at agentmesh.ai/join</p>
+          <a class="tell-link" href="connect/">See which assistants work →</a>
         </div>
       </div>
 
