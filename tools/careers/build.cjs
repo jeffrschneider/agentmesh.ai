@@ -1,10 +1,10 @@
-// Builds careers/index.html and careers/core-platform.html from the site's own header and footer (taken from kill-switch.html).
+// Builds careers/index.html and a page per role, using the site's shared top bar and footer (brand/site-chrome.html) and site.css.
 const fs = require("fs");
 const root = require("path").resolve(__dirname, "../..") + "/";
-const src = fs.readFileSync(root + "kill-switch.html", "utf8");
+const src = fs.readFileSync(root + "brand/site-chrome.html", "utf8");
 const up = (s) => s.replace(/(href|src)="(?!https?:|#|mailto:|\.\.\/)([^"]+)"/g, '$1="../$2"');
-const header = up(src.slice(src.indexOf('<header class="topbar">'), src.indexOf("</header>") + 9));
-const footer = up(src.slice(src.indexOf('<footer class="sitefoot">'), src.indexOf("</footer>") + 9));
+const header = up(src.slice(src.indexOf('<header class="topbar"'), src.indexOf("</header>") + 9));
+const footer = up(src.slice(src.indexOf('<footer class="foot">'), src.indexOf("</footer>") + 9));
 const roles = fs.readdirSync(__dirname).filter((n) => n.endsWith(".json")).map((n) => JSON.parse(fs.readFileSync(__dirname + "/" + n, "utf8"))).sort((a, b) => (a.order ?? 99) - (b.order ?? 99));
 
 const head = (title, desc, path) => `<!DOCTYPE html>
@@ -24,35 +24,39 @@ const head = (title, desc, path) => `<!DOCTYPE html>
   <link rel="icon" type="image/svg+xml" href="../favicon.svg">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Fraunces:ital,opsz,wght@0,9..144,400;1,9..144,400&family=Geist:wght@400;500;600&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="../cream.css">
+  <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wdth,wght@12..96,75..100,400..700&family=Instrument+Sans:wdth,wght@75..100,400..700&family=Martian+Mono:wdth,wght@75..112.5,400..600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../site.css">
   <style>
-    .cr-head{ padding:72px 0 28px; max-width:760px; }
-    .cr-head h1{ margin:0 0 18px; font-size:clamp(2.4rem,5vw,4rem); text-wrap:balance; }
-    .cr-head .def{ margin:0 0 16px; font-family:var(--disp); font-size:clamp(1.35rem,2.4vw,1.8rem); line-height:1.35; color:var(--paper); max-width:34ch; }
-    .cr-head p{ margin:0 0 14px; font-size:1.15rem; line-height:1.6; color:var(--dim); max-width:62ch; }
-    .facts{ list-style:none; margin:8px 0 0; padding:0; display:flex; flex-wrap:wrap; gap:10px; }
-    .facts li{ font-family:var(--wire); font-size:12px; letter-spacing:.1em; text-transform:uppercase; border:1.5px solid var(--line-2); border-radius:999px; padding:7px 12px; color:var(--dim); }
-    .cr-sec{ padding:48px 0; border-top:1px solid var(--line); max-width:760px; }
-    .cr-sec h2{ margin:0 0 16px; font-size:clamp(1.7rem,3vw,2.3rem); }
-    .cr-sec > p{ margin:0 0 14px; font-size:1.1rem; line-height:1.6; color:var(--dim); max-width:64ch; }
-    .own{ list-style:none; margin:18px 0 0; padding:0; display:grid; grid-template-columns:repeat(auto-fit,minmax(260px,1fr)); gap:14px; }
-    .own li{ border:1.5px solid var(--line-2); border-radius:14px; padding:18px 20px; font-size:1rem; line-height:1.55; color:var(--dim); }
-    .own b{ display:block; font-family:var(--wire); font-weight:400; font-size:12px; letter-spacing:.1em; text-transform:uppercase; color:var(--paper); margin-bottom:6px; }
-    .ticks{ margin:14px 0 0; padding:0 0 0 20px; display:flex; flex-direction:column; gap:10px; font-size:1.05rem; line-height:1.55; color:var(--dim); max-width:66ch; }
-    .ticks li::marker{ color:var(--paper); }
+    p.kicker{ margin:0 0 18px; }
+    .kicker a{ color:inherit; text-decoration-color:var(--amber-line); text-underline-offset:3px; }
+    .cr-head{ padding:72px 0 32px; max-width:760px; }
+    .cr-head h1{ margin:0 0 20px; font-size:clamp(2.4rem,1.4rem + 3vw,3.9rem); line-height:1; letter-spacing:-.04em; font-stretch:88%; }
+    .cr-head .def{ margin:0 0 16px; font-family:var(--display); font-weight:500; font-size:clamp(1.35rem,1.1rem + 1vw,1.75rem); line-height:1.32; letter-spacing:-.015em; color:var(--fg); max-width:34ch; }
+    .cr-head p{ margin:0 0 14px; font-size:1.12rem; line-height:1.6; color:var(--muted); max-width:62ch; }
+    .facts{ list-style:none; margin:10px 0 0; padding:0; display:flex; flex-wrap:wrap; gap:8px; }
+    .facts li{ font-family:var(--mono); font-stretch:87.5%; font-size:.66rem; font-weight:500; letter-spacing:.08em; text-transform:uppercase; border:1px solid var(--line-strong); border-radius:999px; padding:7px 12px; color:var(--fg); background:var(--surface); }
+    .cr-sec{ padding:56px 0; border-top:1px solid var(--line); max-width:760px; }
+    .cr-sec h2{ margin:0 0 18px; font-size:clamp(1.7rem,1.2rem + 1.6vw,2.4rem); line-height:1.08; letter-spacing:-.03em; font-stretch:90%; }
+    .cr-sec > p{ margin:0 0 14px; font-size:1.08rem; line-height:1.6; color:var(--muted); max-width:64ch; }
+    .own{ list-style:none; margin:20px 0 0; padding:0; display:grid; grid-template-columns:repeat(auto-fit,minmax(min(260px,100%),1fr)); gap:14px; }
+    .own li{ border:1px solid var(--line); border-radius:18px; padding:18px 20px; font-size:.98rem; line-height:1.55; color:var(--muted); background:var(--surface); }
+    .own b{ display:block; font-family:var(--mono); font-stretch:87.5%; font-weight:500; font-size:.66rem; letter-spacing:.1em; text-transform:uppercase; color:var(--amber-ink); margin-bottom:8px; }
+    .ticks{ margin:16px 0 0; padding:0 0 0 20px; display:flex; flex-direction:column; gap:10px; font-size:1.04rem; line-height:1.55; color:var(--muted); max-width:66ch; }
+    .ticks li::marker{ color:var(--amber-ink); }
     .roles{ list-style:none; margin:8px 0 0; padding:0; display:flex; flex-direction:column; gap:14px; }
-    .roles a{ display:grid; grid-template-columns:minmax(0,1fr) auto; gap:8px 20px; align-items:center; border:1.5px solid var(--line-2); border-radius:16px; padding:22px 24px; text-decoration:none; color:inherit; }
-    .roles a:hover, .roles a:focus-visible{ border-color:var(--paper); }
-    .roles h3{ margin:0; font-size:1.5rem; }
-    .roles p{ margin:0; grid-column:1; font-size:1rem; line-height:1.55; color:var(--dim); max-width:62ch; }
-    .roles .go{ grid-row:1 / span 2; grid-column:2; font-family:var(--wire); font-size:12px; letter-spacing:.1em; text-transform:uppercase; color:var(--paper); white-space:nowrap; }
-    .when{ font-family:var(--wire); font-size:12px !important; letter-spacing:.08em; color:var(--faint) !important; margin:12px 0 0 !important; }
-    .apply{ padding:56px 0 88px; border-top:1px solid var(--line); }
-    .apply h2{ margin:0 0 14px; font-size:clamp(1.8rem,3.2vw,2.5rem); }
-    .apply p{ margin:0 0 14px; font-size:1.1rem; line-height:1.6; color:var(--dim); max-width:62ch; }
-    .apply .addr{ font-family:var(--wire); font-size:1.05rem; color:var(--paper); user-select:all; }
-    @media (max-width:620px){ .cr-head{ padding:44px 0 16px; } .roles a{ grid-template-columns:1fr; } .roles .go{ grid-row:auto; grid-column:1; } }
+    .roles a{ display:grid; grid-template-columns:minmax(0,1fr) auto; gap:8px 20px; align-items:center; border:1px solid var(--line); border-radius:18px; padding:22px 24px; text-decoration:none; color:inherit; background:var(--surface);
+      transition:transform .35s cubic-bezier(.2,.7,.2,1),border-color .35s,box-shadow .35s; }
+    .roles a:hover, .roles a:focus-visible{ transform:translateY(-3px); border-color:var(--amber-line); box-shadow:var(--shadow); }
+    .roles h3{ margin:0; font-size:1.36rem; line-height:1.2; letter-spacing:-.018em; }
+    .roles p{ margin:0; grid-column:1; font-size:.98rem; line-height:1.55; color:var(--muted); max-width:62ch; }
+    .roles .go{ grid-row:1 / span 2; grid-column:2; font-family:var(--mono); font-stretch:87.5%; font-size:.66rem; font-weight:500; letter-spacing:.1em; text-transform:uppercase; color:var(--amber-ink); white-space:nowrap; }
+    .when{ font-family:var(--mono); font-stretch:87.5%; font-size:.7rem !important; letter-spacing:.04em; color:var(--faint) !important; margin:12px 0 0 !important; }
+    .apply{ padding:72px 0 104px; border-top:1px solid var(--line); background:var(--surface); }
+    .apply h2{ margin:0 0 14px; font-size:clamp(1.8rem,1.25rem + 1.8vw,2.6rem); line-height:1.06; letter-spacing:-.032em; font-stretch:90%; }
+    .apply p{ margin:0 0 14px; font-size:1.08rem; line-height:1.6; color:var(--muted); max-width:62ch; }
+    .apply a{ color:var(--fg); text-decoration-color:var(--amber-line); text-decoration-thickness:1.5px; text-underline-offset:3px; }
+    .apply .addr{ display:inline-block; font-family:var(--mono); font-stretch:87.5%; font-size:.95rem; font-weight:500; color:var(--fg); background:var(--surface-2); border:1px solid var(--line); border-radius:10px; padding:8px 12px; user-select:all; overflow-wrap:anywhere; }
+    @media (max-width:620px){ .cr-head{ padding:44px 0 16px; } .cr-sec{ padding:44px 0; } .apply{ padding:56px 0 72px; } .roles a{ grid-template-columns:minmax(0,1fr); } .roles .go{ grid-row:auto; grid-column:1; } }
   </style>
 </head>
 <body>
@@ -60,6 +64,7 @@ const head = (title, desc, path) => `<!DOCTYPE html>
 `;
 const tail = `
   ${footer}
+  <script>(function(){var b=document.getElementById('topbar');function s(){b.classList.toggle('stuck',window.scrollY>8)}window.addEventListener('scroll',s,{passive:true});s();})();</script>
 </body>
 </html>
 `;
