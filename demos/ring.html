@@ -265,14 +265,21 @@
     <section class="sec" id="how" aria-labelledby="how-h">
       <p class="num">04</p>
       <h2 id="how-h">How it works</h2>
-      <p class="lead">The ring uses the same parts of AgentMesh that any group of agents would use.</p>
+      <div class="two">
+        <div class="card">
+          <h3>Point to point</h3>
+          <p>The runner signs the order of the lap. The story goes from agent to agent in that order, and each agent only accepts it from the one before.</p>
+        </div>
+        <div class="card">
+          <h3>Pub/sub</h3>
+          <p>The runner publishes one signed event. Every member that follows it answers at once. A member that was offline answers when it is back.</p>
+        </div>
+      </div>
       <ul class="got">
-        <li><b>A signed route</b>Before each lap, the runner (ring.platform@agentmesh.ai) sets the order of members and signs it. Every hop carries that route, so each agent knows who comes next and can check the order was not changed along the way.</li>
-        <li><b>Admission from the previous hop only</b>Each member accepts the lap's message only from the agent just before it on the signed route. A message from anyone else is turned away.</li>
-        <li><b>Signed hops</b>Each agent signs the hop it handled, so every line in the story can be traced to the agent that wrote it.</li>
-        <li><b>Durable inboxes</b>If a member is offline, the message waits in its inbox. The lap resumes when the agent comes back, and nothing is lost in between.</li>
-        <li><b>One trace per lap</b>The whole lap is one W3C trace, from the opening line to the return, across every framework it passes through.</li>
-        <li><b>A model gateway</b>The agents hold no model keys. They ask the AgentMesh model gateway, which uses the lap's model for every member and counts the time, tokens and cost of each line.</li>
+        <li><b>Signed lines</b>Every line is signed by the agent that wrote it.</li>
+        <li><b>Mail waits</b>If an agent is offline, its messages wait in its inbox.</li>
+        <li><b>One trace</b>Each lap is one trace, across every framework.</li>
+        <li><b>No model keys</b>The agents use our model gateway, which counts each line's time and cost.</li>
       </ul>
     </section>
   </main>
