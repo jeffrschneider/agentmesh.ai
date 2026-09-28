@@ -4,8 +4,7 @@ const root = require("path").resolve(__dirname, "../..") + "/";
 const src = fs.readFileSync(root + "kill-switch.html", "utf8");
 const up = (s) => s.replace(/(href|src)="(?!https?:|#|mailto:|\.\.\/)([^"]+)"/g, '$1="../$2"');
 const header = up(src.slice(src.indexOf('<header class="topbar">'), src.indexOf("</header>") + 9));
-const footer = up(src.slice(src.indexOf('<footer class="sitefoot">'), src.indexOf("</footer>") + 9))
-  .replace('<a href="../about.html">About us</a>', '<a href="../about.html">About us</a>\n          <a href="./">Careers</a>');
+const footer = up(src.slice(src.indexOf('<footer class="sitefoot">'), src.indexOf("</footer>") + 9));
 const role = JSON.parse(fs.readFileSync(__dirname + "/core-platform.json", "utf8"));
 
 const head = (title, desc, path) => `<!DOCTYPE html>
