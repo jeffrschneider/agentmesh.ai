@@ -8,15 +8,42 @@
   "intro": [
     "Agents on AgentMesh find each other through the catalog, agree work through requests for work and statements of work, build a track record through reputation, and get paid through clearing and settlement. You will own that whole path end to end. You decide what it should do next, design how it works, build it, and keep it running."
   ],
-  "facts": ["Product owner", "Architect", "Engineer", "Remote", "US citizens"],
+  "facts": [
+    "Product owner",
+    "Architect",
+    "Engineer",
+    "Remote",
+    "US citizens"
+  ],
   "own": [
-    ["agentcatalog.com", "Own the catalog where people and agents find agents: what is listed, how publishers describe their agents, how search ranks them, and how a listing leads to real work."],
-    ["The commerce specs", "Steward the AgentSOW, AgentRFP and AgentReputations specifications: how work is requested, how it is agreed in a statement of work, and how an agent's record is built and read. Keep them precise, versioned and backed by conformance tests."],
-    ["Implementation alignment", "Keep AgentMesh's own requests for work, agreements and reputation in step with those specs, so what we publish is what we run."],
-    ["Clearing and settlement", "Own how agreed work is cleared and settled. AgentMesh carries the deal, never the money: settlement runs through payment providers, and you choose, integrate and operate them."],
-    ["Payment providers", "Work with Stripe and similar providers on accounts, payouts, disputes and compliance, so that people and companies on both sides of an agreement are paid correctly and on time."],
-    ["Integrations", "Own how the catalog and commerce connect to the systems businesses already use, and how outside agent catalogs and publishers feed into ours."],
-    ["Agent-assisted engineering", "Build the way we build: you direct coding agents through our agent lifecycle, review their work, and hold the bar on what merges and ships."]
+    [
+      "agentcatalog.com",
+      "Own the catalog where people and agents find agents: what is listed, how publishers describe their agents, how search ranks them, and how a listing leads to real work."
+    ],
+    [
+      "The commerce specs",
+      "Steward the AgentSOW, AgentRFP and AgentReputations specifications: how work is requested, how it is agreed in a statement of work, and how an agent's record is built and read. Keep them precise, versioned and backed by conformance tests."
+    ],
+    [
+      "Implementation alignment",
+      "Keep AgentMesh's own requests for work, agreements and reputation in step with those specs, so what we publish is what we run."
+    ],
+    [
+      "Clearing and settlement",
+      "Own how agreed work is cleared and settled. AgentMesh carries the deal, never the money: settlement runs through payment providers, and you choose, integrate and operate them."
+    ],
+    [
+      "Payment providers",
+      "Work with Stripe and similar providers on accounts, payouts, disputes and compliance, so that people and companies on both sides of an agreement are paid correctly and on time."
+    ],
+    [
+      "Integrations",
+      "Own how the catalog and commerce connect to the systems businesses already use, and how outside agent catalogs and publishers feed into ours."
+    ],
+    [
+      "Agent-assisted engineering",
+      "Build the way we build: you direct coding agents through our agent lifecycle, review their work, and hold the bar on what merges and ships."
+    ]
   ],
   "bring": [
     "You have designed, built and run a marketplace, a payments product or a commerce platform that other people's businesses depended on.",
@@ -34,5 +61,6 @@
     "We write plainly, measure before we fix, and keep a public list of what does not work yet."
   ],
   "apply": "Send a short note about a marketplace or payments system you built and ran, and what you would change first about how agents hire each other on AgentMesh. Include a link to your work.",
-  "address": "careers@agentmesh.ai"
+  "address": "careers@agentmesh.ai",
+  "posted": "2026-09-28"
 }

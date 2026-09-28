@@ -47,6 +47,7 @@ const head = (title, desc, path) => `<!DOCTYPE html>
     .roles h3{ margin:0; font-size:1.5rem; }
     .roles p{ margin:0; grid-column:1; font-size:1rem; line-height:1.55; color:var(--dim); max-width:62ch; }
     .roles .go{ grid-row:1 / span 2; grid-column:2; font-family:var(--wire); font-size:12px; letter-spacing:.1em; text-transform:uppercase; color:var(--paper); white-space:nowrap; }
+    .when{ font-family:var(--wire); font-size:12px !important; letter-spacing:.08em; color:var(--faint) !important; margin:12px 0 0 !important; }
     .apply{ padding:56px 0 88px; border-top:1px solid var(--line); }
     .apply h2{ margin:0 0 14px; font-size:clamp(1.8rem,3.2vw,2.5rem); }
     .apply p{ margin:0 0 14px; font-size:1.1rem; line-height:1.6; color:var(--dim); max-width:62ch; }
@@ -63,6 +64,7 @@ const tail = `
 </html>
 `;
 
+const posted = (d) => "Posted " + new Date(d + "T12:00:00Z").toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric", timeZone: "UTC" });
 const index = head("Careers", "Technical roles at AgentMesh. Each one is product owner, architect and engineer at once.", "careers/") + `
   <main class="wrap">
     <div class="cr-head">
@@ -74,7 +76,7 @@ const index = head("Careers", "Technical roles at AgentMesh. Each one is product
     <section class="cr-sec">
       <h2>Open roles</h2>
       <ul class="roles">
-${roles.map((role) => `        <li><a href="${role.file}"><h3>${role.title}</h3><p>${role.card}</p><span class="go">Read the role</span></a></li>`).join("\n")}
+${roles.map((role) => `        <li><a href="${role.file}"><h3>${role.title}</h3><p>${role.card}</p><p class="when"><time datetime="${role.posted}">${posted(role.posted)}</time></p><span class="go">Read the role</span></a></li>`).join("\n")}
       </ul>
     </section>
   </main>
@@ -89,6 +91,7 @@ const pageFor = (role) => head(role.title, role.description, "careers/" + role.f
       <p class="def">${role.tagline}</p>
       ${role.intro.map((p) => `<p>${p}</p>`).join("\n      ")}
       <ul class="facts">${role.facts.map((f) => `<li>${f}</li>`).join("")}</ul>
+      <p class="when"><time datetime="${role.posted}">${posted(role.posted)}</time></p>
     </div>
     <section class="cr-sec">
       <h2>What you will own</h2>
