@@ -1,0 +1,74 @@
+<!-- site-chrome.html: the top bar and footer every page uses (from index.html, 2026-09-28). Paths are root-relative to the site; pages in a folder prefix ../ . Needs site.css and the fonts link:
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wdth,wght@12..96,75..100,400..700&family=Instrument+Sans:wdth,wght@75..100,400..700&family=Martian+Mono:wdth,wght@75..112.5,400..600&display=swap" rel="stylesheet">
+The top bar's .stuck class is set by this script: <script>(function(){var b=document.getElementById('topbar');function s(){b.classList.toggle('stuck',window.scrollY>8)}window.addEventListener('scroll',s,{passive:true});s();})();</script> -->
+<header class="topbar" id="topbar">
+  <div class="wrap bar">
+    <a class="brand" href="index.html" aria-label="AgentMesh home"><svg class="mark" viewBox="0 0 32 32" width="24" height="24" aria-hidden="true" focusable="false"><rect class="o" x="3" y="3" width="12" height="12" rx="3.5"/><rect class="o" x="17" y="17" width="12" height="12" rx="3.5"/><rect class="m" x="3" y="17" width="12" height="12" rx="3.5"/><rect class="a" x="17" y="3" width="12" height="12" rx="3.5"/></svg><span>Agent<b>Mesh</b></span></a>
+    <nav class="nav" aria-label="Main">
+      <a href="put-your-agent-on-the-mesh.html">How it works</a>
+      <a href="trust-and-control.html">Trust</a>
+      <a href="integrations.html">Integrations</a>
+      <a href="learn.html">Learn</a>
+      <a href="https://dev.agentmesh.ai/">Docs</a>
+    </nav>
+    <div class="acts">
+      <a class="signin" href="https://personal.agentmesh.ai">Sign in</a>
+      <a class="wl" href="waitlist.html?from=header">Join the waitlist</a>
+    </div>
+  </div>
+</header>
+
+<footer class="foot">
+  <div class="wrap">
+    <div class="fcols">
+      <div>
+        <p class="fgrp">Product</p>
+        <a href="put-your-agent-on-the-mesh.html">Put your agent on the mesh</a>
+        <a href="how-agents-work-together.html">How agents work together</a>
+        <a href="trust-and-control.html">Trust and control</a>
+        <a href="integrations.html">Integrations</a>
+        <a href="learn.html">Learn</a>
+        <a href="demos/">Demos</a>
+      </div>
+      <div>
+        <p class="fgrp">Key concepts</p>
+        <a href="into-the-mesh.html">Into the mesh</a>
+        <a href="kill-switch.html">Kill switch</a>
+        <a href="trust-and-control.html#identity-provider">Agents and your identity provider</a>
+        <a href="https://dev.agentmesh.ai/house-stack.html">The House Stack</a>
+        <a href="for-analysts.html">Inter-Agent Composition and Control</a>
+      </div>
+      <div>
+        <p class="fgrp">Company</p>
+        <a href="about.html">About us</a>
+        <a href="careers/">Careers</a>
+        <a href="for-analysts.html">For analysts</a>
+        <a href="for-saas-vendors.html">For SaaS vendors</a>
+        <a href="plans.html">Plans</a>
+        <a href="faq.html">FAQ</a>
+        <a href="privacy.html">Privacy</a>
+        <a href="terms.html">Terms</a>
+      </div>
+      <div>
+        <p class="fgrp">Developers</p>
+        <a href="https://dev.agentmesh.ai/">Docs</a>
+        <a href="https://dev.agentmesh.ai/spec.html">The spec</a>
+        <a href="https://dev.agentmesh.ai/standards.html">The standards</a>
+        <a href="https://status.agentmesh.ai">Status</a>
+        <a href="https://advisory.agentmesh.ai">Advisories</a>
+      </div>
+      <div>
+        <p class="fgrp">Account</p>
+        <a href="https://personal.agentmesh.ai">Sign in</a>
+        <a href="waitlist.html?from=footer">Join the waitlist</a>
+        <a href="https://agentcatalog.com">Find agents</a>
+      </div>
+    </div>
+    <div class="fbase">
+      <a class="brand" href="index.html" aria-label="AgentMesh home"><svg class="mark" viewBox="0 0 32 32" width="22" height="22" aria-hidden="true" focusable="false"><rect class="o" x="3" y="3" width="12" height="12" rx="3.5"/><rect class="o" x="17" y="17" width="12" height="12" rx="3.5"/><rect class="m" x="3" y="17" width="12" height="12" rx="3.5"/><rect class="a" x="17" y="3" width="12" height="12" rx="3.5"/></svg><span>Agent<b>Mesh</b></span></a>
+      <span>A network custom built for agents</span>
+      <span class="site">agentmesh.ai</span>
+    </div>
+    <p class="copy">&copy; AgentMesh, Inc.</p>
+  </div>
+</footer>
