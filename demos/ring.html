@@ -125,6 +125,9 @@
     .answers .meta{ margin:0; font-size:.84rem; line-height:1.45; color:var(--faint); }
     .answers .meta b{ color:var(--paper); font-weight:600; }
     .answers .tag{ display:inline-block; margin-left:6px; padding:0 7px; border:1.5px dashed currentColor; border-radius:999px; font-family:var(--wire); font-size:10.5px; letter-spacing:.1em; text-transform:uppercase; color:var(--paper); }
+    /* a hop whose member wrote no line: said in words, in a quieter voice */
+    .story li.failed .line, .answers li.failed .line{ font-family:inherit; font-style:italic; font-size:1rem; color:var(--dim); }
+    .lap ol li.failed{ font-style:italic; color:var(--dim); }
     .lap ol li .late{ display:inline; font-family:var(--wire); font-size:10.5px; letter-spacing:.08em; text-transform:uppercase; color:var(--paper); }
 
     /* laps by model */
@@ -407,6 +410,18 @@
       if (map[h] && map[h].framework) return map[h].framework;
       var s = lap ? arr(lap.story).filter(function(x){ return x.by === h && x.framework; })[0] : null;
       return s ? s.framework : String(h || '').split('.')[0];
+    }
+    /* A hop whose member wrote no line. The runner marks it failed; an older
+       record, or a line that is plainly an error, is read the same way, so
+       no error text or key is ever shown. */
+    function failedOf(x){
+      if (!x) return false;
+      if (x.failed) return true;
+      var t = String(x.line == null ? '' : x.line).trim();
+      return !t || /could not write a line/i.test(t) || /\bU[A-Z2-7]{55}\b/.test(t) || /\{\s*"[^"]*"\s*:/.test(t) || /"(status|output|ok|refused|error|message|code)"\s*:/i.test(t) || /§\s*\d/.test(t);
+    }
+    function lineOf(x, map, lap){
+      return failedOf(x) ? (x.framework || fwOf(x.by, map, lap)) + ' could not write a line this time' : String(x.line == null ? '' : x.line);
     }
     function howWord(how){ return how === 'sdk' ? 'SDK' : how === 'adapter' ? 'adapter' : 'connection unknown'; }
     function isOn(h, map){ return !!map[h] && map[h].online !== false; }
@@ -771,6 +786,10 @@
       if (lap.opening) s += '<li class="open"><p class="line">' + esc(lap.opening) + '</p><p class="meta"><b>Opening line</b>' + (lap.started_at ? ', ' + esc(when(lap.started_at)) : '') + '</p></li>';
       if (isPub(lap)){ box.innerHTML = s + pubStory(lap, map) + '</ol>'; return; }
       story.forEach(function(x){
+        if (failedOf(x)){
+          s += '<li class="failed"><p class="line">' + esc(lineOf(x, map, lap)) + '</p><p class="meta"><b>' + esc(x.framework || fwOf(x.by, map, lap)) + '</b>, no line, and the story went on without it</p></li>';
+          return;
+        }
         s += '<li><p class="line">' + esc(x.line) + '</p><p class="meta"><b>' + esc(x.framework || fwOf(x.by, map, lap)) + '</b>, ' + esc(ms(x.ms)) + ', ' +
           esc(toks(x.tokens_in)) + ' tokens in and ' + esc(toks(x.tokens_out)) + ' out</p></li>';
       });
@@ -791,7 +810,7 @@
       var subs = subsOf(lap), story = arr(lap.story), c = pubCounts(lap);
       var s = '<li class="pub"><p><b>' + (lap.state === 'running' ? 'Published' : 'The runner published') + '</b> one event to ' + subs.length + (subs.length === 1 ? ' member' : ' members') + (lap.started_at ? ' at ' + esc(when(lap.started_at)) : '') + '. Answers appear in the order they arrived.</p>';
       var cards = story.map(function(x){
-        return '<li class="' + (x.late ? 'late' : '') + '"><p class="line">' + esc(x.line) + '</p><p class="meta"><b>' + esc(x.framework || fwOf(x.by, map, lap)) + '</b> ' +
+        return '<li class="' + (x.late ? 'late' : '') + (failedOf(x) ? ' failed' : '') + '"><p class="line">' + esc(lineOf(x, map, lap)) + '</p><p class="meta"><b>' + esc(x.framework || fwOf(x.by, map, lap)) + '</b> ' +
           esc(after(x.after_ms) || 'time not reported') + (x.late ? '<span class="tag">late</span>' : '') + ', ' + esc(toks(x.tokens_in)) + ' in, ' + esc(toks(x.tokens_out)) + ' out</p></li>';
       });
       if (lap.state === 'running'){
@@ -835,7 +854,7 @@
           var t = l.totals || {};
           var sat = arr(l.sat_out).map(function(x){ return fwOf(x.handle, map, l); });
           return '<article class="lap"><div><h3>' + esc(l.model || 'Model not reported') + '</h3><p class="when">' + (isPub(l) ? 'Pub/sub, finished ' : 'Finished ') + esc(when(l.finished_at, true) || 'recently') + '</p>' + (l.source === 'agent' ? '<p class="when">Started by ' + esc(startedBy(l)) + '</p>' : '') + '</div>' +
-            '<ol>' + (l.opening ? '<li><span>Opening</span>' + esc(l.opening) + '</li>' : '') + arr(l.story).map(function(x){ return '<li><span>' + esc(x.framework || fwOf(x.by, map, l)) + (x.late ? ', <b class="late">late</b>' : '') + '</span>' + esc(x.line) + '</li>'; }).join('') + '</ol>' +
+            '<ol>' + (l.opening ? '<li><span>Opening</span>' + esc(l.opening) + '</li>' : '') + arr(l.story).map(function(x){ return '<li' + (failedOf(x) ? ' class="failed"' : '') + '><span>' + esc(x.framework || fwOf(x.by, map, l)) + (x.late ? ', <b class="late">late</b>' : '') + '</span>' + esc(lineOf(x, map, l)) + '</li>'; }).join('') + '</ol>' +
             (sat.length ? '<p class="when">Sat out: ' + esc(sat.join(', ')) + '</p>' : '') +
             '<dl><div><dt>Time</dt><dd>' + esc(ms(t.ms)) + '</dd></div><div><dt>Tokens</dt><dd>' + esc(toks(num(t.tokens_in) != null && num(t.tokens_out) != null ? t.tokens_in + t.tokens_out : null)) + '</dd></div><div><dt>Cost</dt><dd>' + esc(cost(t.cost_usd)) + '</dd></div></dl></article>';
         }).join('') + '</div>';
