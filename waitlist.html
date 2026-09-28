@@ -18,58 +18,65 @@
   <link rel="icon" type="image/svg+xml" href="favicon.svg">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Fraunces:ital,opsz,wght@0,9..144,400;1,9..144,400&family=Geist:wght@400;500;600&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="cream.css">
+  <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wdth,wght@12..96,75..100,400..700&family=Instrument+Sans:wdth,wght@75..100,400..700&family=Martian+Mono:wdth,wght@75..112.5,400..600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="site.css">
   <style>
-    .wl-main{ padding:72px 0 88px; }
-    .grid{ display:grid; grid-template-columns:minmax(0,1fr) minmax(0,520px); gap:64px; align-items:start; }
-    h1{ margin:0 0 20px; font-size:clamp(2.4rem,4.4vw,3.8rem); text-wrap:balance; }
-    .lede{ font-size:1.15rem; line-height:1.55; color:var(--dim); max-width:46ch; margin:0 0 16px; }
-    .lede b{ color:var(--paper); font-weight:500; }
-    .card{ background:var(--panel); border:1px solid var(--line); border-radius:20px; padding:28px; }
+    p.kicker{ margin:0 0 18px; }
+    .wl-main{ position:relative; overflow:hidden; padding:72px 0 104px; }
+    .wl-main::before{ content:""; position:absolute; inset:0; pointer-events:none; background-image:radial-gradient(var(--dot) 1.2px,transparent 1.4px); background-size:24px 24px;
+      -webkit-mask-image:radial-gradient(55% 70% at 78% 40%,black,transparent 72%); mask-image:radial-gradient(55% 70% at 78% 40%,black,transparent 72%); }
+    .grid{ position:relative; display:grid; grid-template-columns:minmax(0,1fr) minmax(0,520px); gap:64px; align-items:start; }
+    .wl-main h1{ margin:0 0 22px; font-size:clamp(2.5rem,1.4rem + 3.2vw,4rem); line-height:1; letter-spacing:-.04em; font-stretch:88%; }
+    .lede{ font-size:1.12rem; line-height:1.6; color:var(--muted); max-width:46ch; margin:0 0 16px; }
+    .lede b{ color:var(--fg); font-weight:600; }
+    .card{ background:var(--surface); border:1px solid var(--line); border-radius:22px; padding:28px; box-shadow:var(--shadow); }
     .field{ display:flex; flex-direction:column; gap:7px; margin:0 0 18px; }
-    label{ font-size:.97rem; font-weight:500; color:var(--paper); }
-    label .opt{ font-weight:400; color:var(--dim); }
-    input, textarea{ font:inherit; font-size:1rem; color:var(--paper); background:#FFFDF8; border:1px solid var(--line-2);
-      border-radius:10px; padding:12px 14px; width:100%; }
-    textarea{ min-height:120px; resize:vertical; }
-    input:focus, textarea:focus{ outline:2px solid var(--rust); outline-offset:1px; border-color:var(--paper); }
-    .submit{ font-family:var(--body); font-size:1rem; font-weight:500; min-height:52px; padding:0 24px;
-      background:#15171C; color:#F3EFE6; border:0; border-radius:14px; cursor:pointer; }
-    .submit:hover{ background:#2A2D35; }
-    .submit:disabled{ opacity:.6; cursor:default; }
-    .note{ font-size:.9rem; color:var(--dim); margin:14px 0 0; }
+    .card label{ font-size:.97rem; font-weight:600; color:var(--fg); }
+    .card label .opt{ font-weight:400; color:var(--muted); }
+    .card input, .card textarea{ font:inherit; font-size:1rem; color:var(--fg); background:var(--bg); border:1px solid var(--line-strong);
+      border-radius:12px; padding:12px 14px; width:100%; transition:border-color .2s,box-shadow .2s; }
+    .card textarea{ min-height:120px; resize:vertical; }
+    .card input:focus, .card textarea:focus{ outline:none; border-color:var(--amber-line); box-shadow:0 0 0 3px var(--amber-soft); }
+    .submit{ font-family:var(--body); font-size:1rem; font-weight:600; min-height:52px; padding:0 24px; cursor:pointer;
+      background:var(--amber); color:var(--on-amber); border:1px solid transparent; border-radius:14px;
+      box-shadow:inset 0 1px 0 var(--amber-hi),0 12px 26px -14px var(--amber-glow); transition:transform .25s cubic-bezier(.2,.7,.2,1),box-shadow .25s; }
+    .submit:hover{ transform:translateY(-2px); box-shadow:inset 0 1px 0 var(--amber-hi),0 20px 36px -16px var(--amber-glow); }
+    .submit:disabled{ opacity:.6; cursor:default; transform:none; }
+    .note{ font-size:.9rem; color:var(--muted); margin:14px 0 0; }
     .err{ display:none; gap:10px; align-items:flex-start; margin:0 0 18px; padding:12px 14px;
-      border:2px solid var(--rust); border-radius:10px; background:#FBEFE8; color:var(--paper); }
+      border:2px solid var(--amber-line); border-radius:12px; background:var(--amber-soft); color:var(--fg); }
     .err.on{ display:flex; }
-    .err .g{ color:var(--rust); font-size:1.15rem; line-height:1.4; flex:none; }
+    .err .g{ color:var(--amber-ink); font-size:1.15rem; line-height:1.4; flex:none; }
     .thanks{ display:none; }
     .thanks.on{ display:block; }
     .thanks, .err{ scroll-margin-top:120px; }
-    .thanks h2{ font-size:1.9rem; margin:0 0 10px; display:flex; gap:12px; align-items:center; }
-    .thanks h2 .g{ font-family:var(--wire); color:var(--paper); }
-    .thanks p{ color:var(--dim); margin:0 0 12px; }
-    .thanks a{ color:var(--paper); }
-    @media (max-width:900px){ .grid{ grid-template-columns:1fr; gap:36px; } }
-    @media (max-width:620px){ .wl-main{ padding:44px 0 64px; } .card{ padding:20px; } }
+    .thanks h2{ font-size:1.9rem; letter-spacing:-.025em; margin:0 0 12px; display:flex; gap:12px; align-items:center; }
+    .thanks h2 .g{ flex:none; width:34px; height:34px; border-radius:50%; display:grid; place-items:center; font-family:var(--mono); font-size:1rem;
+      background:color-mix(in srgb,var(--mint) 18%,transparent); color:var(--mint-ink); }
+    .thanks p{ color:var(--muted); margin:0 0 12px; }
+    .thanks b{ color:var(--fg); }
+    .thanks a{ color:var(--fg); text-decoration-color:var(--amber-line); text-decoration-thickness:1.5px; text-underline-offset:3px; }
+    @media (max-width:900px){ .grid{ grid-template-columns:minmax(0,1fr); gap:36px; } }
+    @media (max-width:620px){ .wl-main{ padding:44px 0 72px; } .card{ padding:20px; } }
   </style>
 </head>
 <body>
-  <header class="topbar">
-    <div class="bar">
-      <a class="brand" href="index.html" aria-label="AgentMesh home"><svg class="mark" viewBox="0 0 32 32" width="22" height="22" aria-hidden="true" focusable="false"><rect x="3" y="3" width="12" height="12" rx="3.5" fill="none" stroke="currentColor" stroke-width="2" opacity=".35"/><rect x="17" y="17" width="12" height="12" rx="3.5" fill="none" stroke="currentColor" stroke-width="2" opacity=".35"/><rect x="3" y="17" width="12" height="12" rx="3.5" fill="#43D6A6"/><rect x="17" y="3" width="12" height="12" rx="3.5" fill="#F2A93B"/></svg><span class="wm">Agent<b>Mesh</b></span></a>
-      <span class="beta">Beta</span>
-      <nav class="topnav">
-        <a href="put-your-agent-on-the-mesh.html">How it works</a>
-        <a href="trust-and-control.html">Trust</a>
-        <a href="integrations.html">Integrations</a>
-        <a href="learn.html">Learn</a>
-        <a href="https://dev.agentmesh.ai/">Docs</a>
-      </nav>
-      <a class="signin" href="https://personal.agentmesh.ai">sign in</a>
+  <header class="topbar" id="topbar">
+  <div class="wrap bar">
+    <a class="brand" href="index.html" aria-label="AgentMesh home"><svg class="mark" viewBox="0 0 32 32" width="24" height="24" aria-hidden="true" focusable="false"><rect class="o" x="3" y="3" width="12" height="12" rx="3.5"/><rect class="o" x="17" y="17" width="12" height="12" rx="3.5"/><rect class="m" x="3" y="17" width="12" height="12" rx="3.5"/><rect class="a" x="17" y="3" width="12" height="12" rx="3.5"/></svg><span>Agent<b>Mesh</b></span></a>
+    <nav class="nav" aria-label="Main">
+      <a href="put-your-agent-on-the-mesh.html">How it works</a>
+      <a href="trust-and-control.html">Trust</a>
+      <a href="integrations.html">Integrations</a>
+      <a href="learn.html">Learn</a>
+      <a href="https://dev.agentmesh.ai/">Docs</a>
+    </nav>
+    <div class="acts">
+      <a class="signin" href="https://personal.agentmesh.ai">Sign in</a>
       <a class="wl" href="waitlist.html?from=header">Join the waitlist</a>
     </div>
-  </header>
+  </div>
+</header>
 
   <main class="wl-main">
     <div class="wrap grid">
@@ -165,59 +172,60 @@
 })();
 </script>
 
-  <footer class="sitefoot">
-    <div class="wrap">
-      <div class="cols">
-        <div>
-          <p class="grp">product</p>
-          <a href="put-your-agent-on-the-mesh.html">Put your agent on the mesh</a>
-          <a href="how-agents-work-together.html">How agents work together</a>
-          <a href="trust-and-control.html">Trust and control</a>
-          <a href="integrations.html">Integrations</a>
-          <a href="learn.html">Learn</a>
-          <a href="demos/">Demos</a>
-        </div>
-        <div>
-          <p class="grp">key concepts</p>
-          <a href="into-the-mesh.html">Into the mesh</a>
-          <a href="kill-switch.html">Kill switch</a>
-          <a href="trust-and-control.html#identity-provider">Agents and your identity provider</a>
-          <a href="https://dev.agentmesh.ai/house-stack.html">The House Stack</a>
-          <a href="for-analysts.html">Inter-Agent Composition and Control</a>
-        </div>
-        <div>
-          <p class="grp">company</p>
-          <a href="about.html">About us</a>
-          <a href="careers/">Careers</a>
-          <a href="for-analysts.html">For analysts</a>
-          <a href="for-saas-vendors.html">For SaaS vendors</a>
-          <a href="plans.html">Plans</a>
-          <a href="faq.html">FAQ</a>
-          <a href="privacy.html">Privacy</a>
-          <a href="terms.html">Terms</a>
-        </div>
-        <div>
-          <p class="grp">developers</p>
-          <a href="https://dev.agentmesh.ai/">Docs</a>
-          <a href="https://dev.agentmesh.ai/spec.html">The spec</a>
-          <a href="https://dev.agentmesh.ai/standards.html">The standards</a>
-          <a href="https://status.agentmesh.ai">Status</a>
-          <a href="https://advisory.agentmesh.ai">Advisories</a>
-        </div>
-        <div>
-          <p class="grp">account</p>
-          <a href="https://personal.agentmesh.ai">Sign in</a>
-          <a href="waitlist.html?from=footer">Join the waitlist</a>
-          <a href="https://agentcatalog.com">Find agents</a>
-        </div>
+  <footer class="foot">
+  <div class="wrap">
+    <div class="fcols">
+      <div>
+        <p class="fgrp">Product</p>
+        <a href="put-your-agent-on-the-mesh.html">Put your agent on the mesh</a>
+        <a href="how-agents-work-together.html">How agents work together</a>
+        <a href="trust-and-control.html">Trust and control</a>
+        <a href="integrations.html">Integrations</a>
+        <a href="learn.html">Learn</a>
+        <a href="demos/">Demos</a>
       </div>
-      <div class="base">
-        <a class="brand" href="index.html" aria-label="AgentMesh home"><svg class="mark" viewBox="0 0 32 32" width="22" height="22" aria-hidden="true" focusable="false"><rect x="3" y="3" width="12" height="12" rx="3.5" fill="none" stroke="currentColor" stroke-width="2" opacity=".35"/><rect x="17" y="17" width="12" height="12" rx="3.5" fill="none" stroke="currentColor" stroke-width="2" opacity=".35"/><rect x="3" y="17" width="12" height="12" rx="3.5" fill="#43D6A6"/><rect x="17" y="3" width="12" height="12" rx="3.5" fill="#F2A93B"/></svg><span class="wm">Agent<b>Mesh</b></span></a>
-        <span>a network custom built for agents</span>
-        <span class="sep">agentmesh.ai</span>
+      <div>
+        <p class="fgrp">Key concepts</p>
+        <a href="into-the-mesh.html">Into the mesh</a>
+        <a href="kill-switch.html">Kill switch</a>
+        <a href="trust-and-control.html#identity-provider">Agents and your identity provider</a>
+        <a href="https://dev.agentmesh.ai/house-stack.html">The House Stack</a>
+        <a href="for-analysts.html">Inter-Agent Composition and Control</a>
       </div>
-      <p class="copy">&copy; AgentMesh, Inc.</p>
+      <div>
+        <p class="fgrp">Company</p>
+        <a href="about.html">About us</a>
+        <a href="careers/">Careers</a>
+        <a href="for-analysts.html">For analysts</a>
+        <a href="for-saas-vendors.html">For SaaS vendors</a>
+        <a href="plans.html">Plans</a>
+        <a href="faq.html">FAQ</a>
+        <a href="privacy.html">Privacy</a>
+        <a href="terms.html">Terms</a>
+      </div>
+      <div>
+        <p class="fgrp">Developers</p>
+        <a href="https://dev.agentmesh.ai/">Docs</a>
+        <a href="https://dev.agentmesh.ai/spec.html">The spec</a>
+        <a href="https://dev.agentmesh.ai/standards.html">The standards</a>
+        <a href="https://status.agentmesh.ai">Status</a>
+        <a href="https://advisory.agentmesh.ai">Advisories</a>
+      </div>
+      <div>
+        <p class="fgrp">Account</p>
+        <a href="https://personal.agentmesh.ai">Sign in</a>
+        <a href="waitlist.html?from=footer">Join the waitlist</a>
+        <a href="https://agentcatalog.com">Find agents</a>
+      </div>
     </div>
-  </footer>
+    <div class="fbase">
+      <a class="brand" href="index.html" aria-label="AgentMesh home"><svg class="mark" viewBox="0 0 32 32" width="22" height="22" aria-hidden="true" focusable="false"><rect class="o" x="3" y="3" width="12" height="12" rx="3.5"/><rect class="o" x="17" y="17" width="12" height="12" rx="3.5"/><rect class="m" x="3" y="17" width="12" height="12" rx="3.5"/><rect class="a" x="17" y="3" width="12" height="12" rx="3.5"/></svg><span>Agent<b>Mesh</b></span></a>
+      <span>A network custom built for agents</span>
+      <span class="site">agentmesh.ai</span>
+    </div>
+    <p class="copy">&copy; AgentMesh, Inc.</p>
+  </div>
+</footer>
+<script>(function(){var b=document.getElementById('topbar');function s(){b.classList.toggle('stuck',window.scrollY>8)}window.addEventListener('scroll',s,{passive:true});s();})();</script>
 </body>
 </html>

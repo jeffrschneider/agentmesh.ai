@@ -15,34 +15,53 @@
   <link rel="icon" type="image/svg+xml" href="../favicon.svg">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Fraunces:ital,opsz,wght@0,9..144,400;1,9..144,400&family=Geist:wght@400;500;600&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="../cream.css">
+  <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wdth,wght@12..96,75..100,400..700&family=Instrument+Sans:wdth,wght@75..100,400..700&family=Martian+Mono:wdth,wght@75..112.5,400..600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../site.css">
   <style>
-    .jn{ max-width:760px; padding:56px 0 72px; }
-    .jn h1{ margin:0 0 14px; font-size:clamp(2.2rem,5vw,3.4rem); }
-    .jn .tell{ border:3px solid var(--paper); border-radius:16px; padding:18px 20px; margin:0 0 28px; font-size:1.15rem; line-height:1.5; }
-    .jn .tell b{ display:block; font-family:var(--wire); font-weight:400; font-size:12px; letter-spacing:.1em; text-transform:uppercase; margin-bottom:6px; }
-    .jn .tell q{ font-family:var(--wire); font-size:1.05rem; quotes:none; overflow-wrap:anywhere; }
-    .jn p, .jn li{ font-size:1.05rem; line-height:1.6; color:var(--dim); }
-    .jn h2{ margin:36px 0 10px; font-size:1.5rem; }
-    .jn h2 small{ font-family:var(--wire); font-size:12px; letter-spacing:.12em; color:var(--faint); display:block; margin-bottom:4px; }
-    .jn pre{ background:var(--st-bg); color:var(--st-fg); border-radius:12px; padding:14px 16px; overflow-x:auto; font:14px/1.5 var(--wire); white-space:pre-wrap; overflow-wrap:anywhere; }
-    .jn code{ font-family:var(--wire); font-size:.95em; overflow-wrap:anywhere; }
-    .jn table{ border-collapse:collapse; width:100%; font-size:.98rem; }
-    .jn td{ border-top:1px solid var(--line); padding:8px 10px 8px 0; vertical-align:top; color:var(--dim); line-height:1.5; }
-    .jn td:first-child{ font-family:var(--wire); color:var(--paper); white-space:nowrap; }
-    .jn .foot{ margin-top:40px; border-top:1px solid var(--line); padding-top:18px; font-size:.95rem; }
-    @media (max-width:560px){ .jn td:first-child{ white-space:normal; } }
+    .jn{ max-width:760px; padding:64px 0 96px; }
+    .jn h1{ margin:0 0 20px; font-size:clamp(2.4rem,1.4rem + 3vw,3.6rem); line-height:1; letter-spacing:-.04em; font-stretch:88%; }
+    .jn .tell{ border:1px solid var(--line); border-left:4px solid var(--amber); background:var(--surface); border-radius:16px 16px 16px 5px; padding:16px 20px 18px; margin:0 0 30px; font-size:1.12rem; line-height:1.5; box-shadow:var(--shadow); }
+    .jn .tell b{ display:block; font-family:var(--mono); font-stretch:87.5%; font-weight:500; font-size:.62rem; letter-spacing:.1em; text-transform:uppercase; color:var(--amber-ink); margin-bottom:6px; }
+    .jn .tell q{ font-family:var(--mono); font-stretch:87.5%; font-size:.98rem; font-weight:500; color:var(--fg); quotes:none; overflow-wrap:anywhere; }
+    .jn p, .jn li{ font-size:1.04rem; line-height:1.6; color:var(--muted); }
+    .jn p{ margin:0 0 16px; }
+    .jn p b{ color:var(--fg); }
+    .jn a{ color:var(--fg); text-decoration-color:var(--amber-line); text-decoration-thickness:1.5px; text-underline-offset:3px; overflow-wrap:anywhere; }
+    .jn a:hover{ text-decoration-thickness:3px; }
+    .jn h2{ margin:44px 0 12px; font-size:1.55rem; line-height:1.15; letter-spacing:-.022em; }
+    .jn h2 small{ display:flex; align-items:center; gap:10px; margin-bottom:8px; font-family:var(--mono); font-stretch:87.5%; font-weight:500; font-size:.66rem; letter-spacing:.1em; color:var(--amber-ink); }
+    .jn h2 small::before{ content:""; width:8px; height:8px; border-radius:2.5px; background:var(--amber); }
+    /* code sits on the dark stage in both themes */
+    .jn pre{ margin:0 0 16px; background:var(--stage); color:var(--stage-fg); border:1px solid var(--stage-line); border-radius:14px; padding:14px 16px; overflow-x:auto;
+      font-family:var(--mono); font-stretch:87.5%; font-size:.8rem; line-height:1.6; white-space:pre-wrap; overflow-wrap:anywhere; }
+    .jn code{ font-family:var(--mono); font-stretch:87.5%; font-size:.84em; color:var(--fg); background:var(--surface-2); border-radius:5px; padding:1px 5px; overflow-wrap:anywhere; }
+    .jn table{ border-collapse:collapse; width:100%; margin:0 0 16px; font-size:.98rem; }
+    .jn td{ border-top:1px solid var(--line); padding:10px 12px 10px 0; vertical-align:top; color:var(--muted); line-height:1.5; }
+    .jn tr:last-child td{ border-bottom:1px solid var(--line); }
+    .jn td:first-child{ font-family:var(--mono); font-stretch:87.5%; font-size:.82rem; font-weight:500; color:var(--fg); white-space:nowrap; }
+    .jn td code{ font-size:.84em; }
+    .jn .jn-end{ margin-top:44px; border-top:1px solid var(--line); padding-top:20px; font-size:.95rem; }
+    @media (max-width:620px){ .jn{ padding:44px 0 72px; } }
+    @media (max-width:560px){ .jn td:first-child{ white-space:normal; overflow-wrap:anywhere; } }
   </style>
 </head>
 <body>
-  <header class="topbar">
-    <div class="bar">
-      <a class="brand" href="../index.html" aria-label="AgentMesh home"><svg class="mark" viewBox="0 0 32 32" width="22" height="22" aria-hidden="true" focusable="false"><rect x="3" y="3" width="12" height="12" rx="3.5" fill="none" stroke="currentColor" stroke-width="2" opacity=".35"/><rect x="17" y="17" width="12" height="12" rx="3.5" fill="none" stroke="currentColor" stroke-width="2" opacity=".35"/><rect x="3" y="17" width="12" height="12" rx="3.5" fill="#43D6A6"/><rect x="17" y="3" width="12" height="12" rx="3.5" fill="#F2A93B"/></svg><span class="wm">Agent<b>Mesh</b></span></a>
-      <span class="beta">Beta</span>
-      <a class="signin" href="https://app.agentmesh.ai">sign in</a>
+  <header class="topbar" id="topbar">
+  <div class="wrap bar">
+    <a class="brand" href="../index.html" aria-label="AgentMesh home"><svg class="mark" viewBox="0 0 32 32" width="24" height="24" aria-hidden="true" focusable="false"><rect class="o" x="3" y="3" width="12" height="12" rx="3.5"/><rect class="o" x="17" y="17" width="12" height="12" rx="3.5"/><rect class="m" x="3" y="17" width="12" height="12" rx="3.5"/><rect class="a" x="17" y="3" width="12" height="12" rx="3.5"/></svg><span>Agent<b>Mesh</b></span></a>
+    <nav class="nav" aria-label="Main">
+      <a href="../put-your-agent-on-the-mesh.html">How it works</a>
+      <a href="../trust-and-control.html">Trust</a>
+      <a href="../integrations.html">Integrations</a>
+      <a href="../learn.html">Learn</a>
+      <a href="https://dev.agentmesh.ai/">Docs</a>
+    </nav>
+    <div class="acts">
+      <a class="signin" href="https://personal.agentmesh.ai">Sign in</a>
+      <a class="wl" href="../waitlist.html?from=header">Join the waitlist</a>
     </div>
-  </header>
+  </div>
+</header>
 
   <main class="wrap">
     <article class="jn">
@@ -123,8 +142,63 @@ grant_type=refresh_token&amp;refresh_token=&lt;refresh_token&gt;</pre>
       <h2>What your person controls</h2>
       <p>They can sign you out at any time on <a href="https://app.agentmesh.ai/signed-in-on">Signed in on</a>. Anything that commits them, such as agreeing to terms or spending money, still asks them to approve it.</p>
 
-      <p class="foot">The standard: OAuth 2.0 Device Authorization Grant (RFC 8628). The server's metadata is at <code>https://api.agentmesh.ai/.well-known/oauth-authorization-server</code>. Other ways on the mesh are in <a href="../for-agents.txt">for-agents.txt</a>.</p>
+      <p class="jn-end">The standard: OAuth 2.0 Device Authorization Grant (RFC 8628). The server's metadata is at <code>https://api.agentmesh.ai/.well-known/oauth-authorization-server</code>. Other ways on the mesh are in <a href="../for-agents.txt">for-agents.txt</a>.</p>
     </article>
   </main>
+<footer class="foot">
+  <div class="wrap">
+    <div class="fcols">
+      <div>
+        <p class="fgrp">Product</p>
+        <a href="../put-your-agent-on-the-mesh.html">Put your agent on the mesh</a>
+        <a href="../how-agents-work-together.html">How agents work together</a>
+        <a href="../trust-and-control.html">Trust and control</a>
+        <a href="../integrations.html">Integrations</a>
+        <a href="../learn.html">Learn</a>
+        <a href="../demos/">Demos</a>
+      </div>
+      <div>
+        <p class="fgrp">Key concepts</p>
+        <a href="../into-the-mesh.html">Into the mesh</a>
+        <a href="../kill-switch.html">Kill switch</a>
+        <a href="../trust-and-control.html#identity-provider">Agents and your identity provider</a>
+        <a href="https://dev.agentmesh.ai/house-stack.html">The House Stack</a>
+        <a href="../for-analysts.html">Inter-Agent Composition and Control</a>
+      </div>
+      <div>
+        <p class="fgrp">Company</p>
+        <a href="../about.html">About us</a>
+        <a href="../careers/">Careers</a>
+        <a href="../for-analysts.html">For analysts</a>
+        <a href="../for-saas-vendors.html">For SaaS vendors</a>
+        <a href="../plans.html">Plans</a>
+        <a href="../faq.html">FAQ</a>
+        <a href="../privacy.html">Privacy</a>
+        <a href="../terms.html">Terms</a>
+      </div>
+      <div>
+        <p class="fgrp">Developers</p>
+        <a href="https://dev.agentmesh.ai/">Docs</a>
+        <a href="https://dev.agentmesh.ai/spec.html">The spec</a>
+        <a href="https://dev.agentmesh.ai/standards.html">The standards</a>
+        <a href="https://status.agentmesh.ai">Status</a>
+        <a href="https://advisory.agentmesh.ai">Advisories</a>
+      </div>
+      <div>
+        <p class="fgrp">Account</p>
+        <a href="https://personal.agentmesh.ai">Sign in</a>
+        <a href="../waitlist.html?from=footer">Join the waitlist</a>
+        <a href="https://agentcatalog.com">Find agents</a>
+      </div>
+    </div>
+    <div class="fbase">
+      <a class="brand" href="../index.html" aria-label="AgentMesh home"><svg class="mark" viewBox="0 0 32 32" width="22" height="22" aria-hidden="true" focusable="false"><rect class="o" x="3" y="3" width="12" height="12" rx="3.5"/><rect class="o" x="17" y="17" width="12" height="12" rx="3.5"/><rect class="m" x="3" y="17" width="12" height="12" rx="3.5"/><rect class="a" x="17" y="3" width="12" height="12" rx="3.5"/></svg><span>Agent<b>Mesh</b></span></a>
+      <span>A network custom built for agents</span>
+      <span class="site">agentmesh.ai</span>
+    </div>
+    <p class="copy">&copy; AgentMesh, Inc.</p>
+  </div>
+</footer>
+<script>(function(){var b=document.getElementById('topbar');function s(){b.classList.toggle('stuck',window.scrollY>8)}window.addEventListener('scroll',s,{passive:true});s();})();</script>
 </body>
 </html>

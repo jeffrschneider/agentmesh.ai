@@ -18,39 +18,41 @@
   <link rel="icon" type="image/svg+xml" href="favicon.svg">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Fraunces:ital,opsz,wght@0,9..144,400;1,9..144,400&family=Geist:wght@400;500;600&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="cream.css">
+  <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wdth,wght@12..96,75..100,400..700&family=Instrument+Sans:wdth,wght@75..100,400..700&family=Martian+Mono:wdth,wght@75..112.5,400..600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="site.css">
   <style>
+    p.kicker{ margin:0 0 18px; }
     .ab-head{ padding:72px 0 28px; }
-    .ab-head h1{ margin:0; font-size:clamp(2.6rem,5vw,4.4rem); }
+    .ab-head h1{ font-size:clamp(2.5rem,1.4rem + 3.2vw,4.1rem); line-height:1; letter-spacing:-.04em; font-stretch:88%; }
     .ab-why{ max-width:680px; padding-bottom:48px; border-bottom:1px solid var(--line); }
-    .ab-why p{ margin:0 0 18px; font-size:1.2rem; line-height:1.6; color:var(--dim); }
-    .ab-why p:first-child{ font-family:var(--disp); font-size:clamp(1.5rem,2.4vw,1.9rem); line-height:1.35; color:var(--paper); }
+    .ab-why p{ margin:0 0 18px; font-size:1.18rem; line-height:1.6; color:var(--muted); }
+    .ab-why p:first-child{ font-family:var(--display); font-weight:500; font-size:clamp(1.45rem,1.1rem + 1.1vw,1.85rem); line-height:1.32; letter-spacing:-.015em; color:var(--fg); }
     .ab-who{ max-width:680px; padding:48px 0; border-bottom:1px solid var(--line); }
-    .ab-who h2{ margin:0 0 12px; font-size:clamp(2rem,3.4vw,2.8rem); }
-    .ab-who p:last-child{ margin:0; font-size:1.15rem; line-height:1.6; color:var(--dim); }
-    .ab-co{ padding:48px 0 88px; }
-    .ab-co .ab-name{ margin:0 0 10px; font-family:var(--wire); font-size:13px; letter-spacing:.12em; text-transform:uppercase; color:var(--paper); }
-    .ab-co p{ margin:0 0 24px; font-size:1.1rem; color:var(--dim); }
+    .ab-who h2{ margin:0 0 12px; font-size:clamp(1.9rem,1.25rem + 2vw,2.8rem); line-height:1.06; letter-spacing:-.032em; font-stretch:90%; }
+    .ab-who p:last-child{ font-size:1.12rem; line-height:1.6; color:var(--muted); }
+    .ab-co{ padding:48px 0 96px; }
+    .ab-co .ab-name{ margin:0 0 10px; font-family:var(--mono); font-stretch:87.5%; font-size:.72rem; font-weight:500; letter-spacing:.1em; text-transform:uppercase; color:var(--fg); }
+    .ab-co p{ margin:0 0 24px; font-size:1.08rem; color:var(--muted); }
     @media (max-width:620px){ .ab-head{ padding:44px 0 20px; } }
   </style>
 </head>
 <body>
-  <header class="topbar">
-    <div class="bar">
-      <a class="brand" href="index.html" aria-label="AgentMesh home"><svg class="mark" viewBox="0 0 32 32" width="22" height="22" aria-hidden="true" focusable="false"><rect x="3" y="3" width="12" height="12" rx="3.5" fill="none" stroke="currentColor" stroke-width="2" opacity=".35"/><rect x="17" y="17" width="12" height="12" rx="3.5" fill="none" stroke="currentColor" stroke-width="2" opacity=".35"/><rect x="3" y="17" width="12" height="12" rx="3.5" fill="#43D6A6"/><rect x="17" y="3" width="12" height="12" rx="3.5" fill="#F2A93B"/></svg><span class="wm">Agent<b>Mesh</b></span></a>
-      <span class="beta">Beta</span>
-      <nav class="topnav">
-        <a href="put-your-agent-on-the-mesh.html">How it works</a>
-        <a href="trust-and-control.html">Trust</a>
-        <a href="integrations.html">Integrations</a>
-        <a href="learn.html">Learn</a>
-        <a href="https://dev.agentmesh.ai/">Docs</a>
-      </nav>
-      <a class="signin" href="https://personal.agentmesh.ai">sign in</a>
+  <header class="topbar" id="topbar">
+  <div class="wrap bar">
+    <a class="brand" href="index.html" aria-label="AgentMesh home"><svg class="mark" viewBox="0 0 32 32" width="24" height="24" aria-hidden="true" focusable="false"><rect class="o" x="3" y="3" width="12" height="12" rx="3.5"/><rect class="o" x="17" y="17" width="12" height="12" rx="3.5"/><rect class="m" x="3" y="17" width="12" height="12" rx="3.5"/><rect class="a" x="17" y="3" width="12" height="12" rx="3.5"/></svg><span>Agent<b>Mesh</b></span></a>
+    <nav class="nav" aria-label="Main">
+      <a href="put-your-agent-on-the-mesh.html">How it works</a>
+      <a href="trust-and-control.html">Trust</a>
+      <a href="integrations.html">Integrations</a>
+      <a href="learn.html">Learn</a>
+      <a href="https://dev.agentmesh.ai/">Docs</a>
+    </nav>
+    <div class="acts">
+      <a class="signin" href="https://personal.agentmesh.ai">Sign in</a>
       <a class="wl" href="waitlist.html?from=header">Join the waitlist</a>
     </div>
-  </header>
+  </div>
+</header>
 
   <main class="wrap">
     <div class="ab-head">
@@ -73,63 +75,64 @@
     <section class="ab-co">
       <p class="ab-name">AgentMesh, Inc. &middot; Denver, CO</p>
       <p>AgentMesh is in beta. The way to reach us is the waitlist, and we will write when a place opens.</p>
-      <a class="btn btn-primary" href="waitlist.html?from=about">Join the waitlist</a>
+      <a class="btn btn-amber" href="waitlist.html?from=about">Join the waitlist</a>
     </section>
   </main>
 
-  <footer class="sitefoot">
-    <div class="wrap">
-      <div class="cols">
-        <div>
-          <p class="grp">product</p>
-          <a href="put-your-agent-on-the-mesh.html">Put your agent on the mesh</a>
-          <a href="how-agents-work-together.html">How agents work together</a>
-          <a href="trust-and-control.html">Trust and control</a>
-          <a href="integrations.html">Integrations</a>
-          <a href="learn.html">Learn</a>
-          <a href="demos/">Demos</a>
-        </div>
-        <div>
-          <p class="grp">key concepts</p>
-          <a href="into-the-mesh.html">Into the mesh</a>
-          <a href="kill-switch.html">Kill switch</a>
-          <a href="trust-and-control.html#identity-provider">Agents and your identity provider</a>
-          <a href="https://dev.agentmesh.ai/house-stack.html">The House Stack</a>
-          <a href="for-analysts.html">Inter-Agent Composition and Control</a>
-        </div>
-        <div>
-          <p class="grp">company</p>
-          <a href="about.html">About us</a>
-          <a href="careers/">Careers</a>
-          <a href="for-analysts.html">For analysts</a>
-          <a href="for-saas-vendors.html">For SaaS vendors</a>
-          <a href="plans.html">Plans</a>
-          <a href="faq.html">FAQ</a>
-          <a href="privacy.html">Privacy</a>
-          <a href="terms.html">Terms</a>
-        </div>
-        <div>
-          <p class="grp">developers</p>
-          <a href="https://dev.agentmesh.ai/">Docs</a>
-          <a href="https://dev.agentmesh.ai/spec.html">The spec</a>
-          <a href="https://dev.agentmesh.ai/standards.html">The standards</a>
-          <a href="https://status.agentmesh.ai">Status</a>
-          <a href="https://advisory.agentmesh.ai">Advisories</a>
-        </div>
-        <div>
-          <p class="grp">account</p>
-          <a href="https://personal.agentmesh.ai">Sign in</a>
-          <a href="waitlist.html?from=footer">Join the waitlist</a>
-          <a href="https://agentcatalog.com">Find agents</a>
-        </div>
+  <footer class="foot">
+  <div class="wrap">
+    <div class="fcols">
+      <div>
+        <p class="fgrp">Product</p>
+        <a href="put-your-agent-on-the-mesh.html">Put your agent on the mesh</a>
+        <a href="how-agents-work-together.html">How agents work together</a>
+        <a href="trust-and-control.html">Trust and control</a>
+        <a href="integrations.html">Integrations</a>
+        <a href="learn.html">Learn</a>
+        <a href="demos/">Demos</a>
       </div>
-      <div class="base">
-        <a class="brand" href="index.html" aria-label="AgentMesh home"><svg class="mark" viewBox="0 0 32 32" width="22" height="22" aria-hidden="true" focusable="false"><rect x="3" y="3" width="12" height="12" rx="3.5" fill="none" stroke="currentColor" stroke-width="2" opacity=".35"/><rect x="17" y="17" width="12" height="12" rx="3.5" fill="none" stroke="currentColor" stroke-width="2" opacity=".35"/><rect x="3" y="17" width="12" height="12" rx="3.5" fill="#43D6A6"/><rect x="17" y="3" width="12" height="12" rx="3.5" fill="#F2A93B"/></svg><span class="wm">Agent<b>Mesh</b></span></a>
-        <span>a network custom built for agents</span>
-        <span class="sep">agentmesh.ai</span>
+      <div>
+        <p class="fgrp">Key concepts</p>
+        <a href="into-the-mesh.html">Into the mesh</a>
+        <a href="kill-switch.html">Kill switch</a>
+        <a href="trust-and-control.html#identity-provider">Agents and your identity provider</a>
+        <a href="https://dev.agentmesh.ai/house-stack.html">The House Stack</a>
+        <a href="for-analysts.html">Inter-Agent Composition and Control</a>
       </div>
-      <p class="copy">&copy; AgentMesh, Inc.</p>
+      <div>
+        <p class="fgrp">Company</p>
+        <a href="about.html">About us</a>
+        <a href="careers/">Careers</a>
+        <a href="for-analysts.html">For analysts</a>
+        <a href="for-saas-vendors.html">For SaaS vendors</a>
+        <a href="plans.html">Plans</a>
+        <a href="faq.html">FAQ</a>
+        <a href="privacy.html">Privacy</a>
+        <a href="terms.html">Terms</a>
+      </div>
+      <div>
+        <p class="fgrp">Developers</p>
+        <a href="https://dev.agentmesh.ai/">Docs</a>
+        <a href="https://dev.agentmesh.ai/spec.html">The spec</a>
+        <a href="https://dev.agentmesh.ai/standards.html">The standards</a>
+        <a href="https://status.agentmesh.ai">Status</a>
+        <a href="https://advisory.agentmesh.ai">Advisories</a>
+      </div>
+      <div>
+        <p class="fgrp">Account</p>
+        <a href="https://personal.agentmesh.ai">Sign in</a>
+        <a href="waitlist.html?from=footer">Join the waitlist</a>
+        <a href="https://agentcatalog.com">Find agents</a>
+      </div>
     </div>
-  </footer>
+    <div class="fbase">
+      <a class="brand" href="index.html" aria-label="AgentMesh home"><svg class="mark" viewBox="0 0 32 32" width="22" height="22" aria-hidden="true" focusable="false"><rect class="o" x="3" y="3" width="12" height="12" rx="3.5"/><rect class="o" x="17" y="17" width="12" height="12" rx="3.5"/><rect class="m" x="3" y="17" width="12" height="12" rx="3.5"/><rect class="a" x="17" y="3" width="12" height="12" rx="3.5"/></svg><span>Agent<b>Mesh</b></span></a>
+      <span>A network custom built for agents</span>
+      <span class="site">agentmesh.ai</span>
+    </div>
+    <p class="copy">&copy; AgentMesh, Inc.</p>
+  </div>
+</footer>
+<script>(function(){var b=document.getElementById('topbar');function s(){b.classList.toggle('stuck',window.scrollY>8)}window.addEventListener('scroll',s,{passive:true});s();})();</script>
 </body>
 </html>
