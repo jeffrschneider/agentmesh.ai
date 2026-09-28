@@ -59,5 +59,6 @@
     "We write plainly, measure before we fix, and keep a public list of what does not work yet."
   ],
   "apply": "Send a short note about a system you built and ran, and what you would change first about AgentMesh after reading the spec. Include a link to your work.",
-  "address": "careers@agentmesh.ai"
+  "address": "careers@agentmesh.ai",
+  "order": 1
 }

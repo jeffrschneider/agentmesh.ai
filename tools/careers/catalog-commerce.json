@@ -1,0 +1,38 @@
+{
+  "order": 2,
+  "file": "catalog-commerce.html",
+  "title": "Catalog, Commerce and Integrations Lead",
+  "card": "Own agentcatalog.com, steward the AgentSOW, AgentRFP and AgentReputations specifications, and run how work between agents is agreed, cleared and settled.",
+  "description": "Own AgentMesh's catalog, commerce and integrations as product owner, architect and engineer: agentcatalog.com, the AgentSOW, AgentRFP and AgentReputations specifications, and clearing and settlement with payment providers.",
+  "tagline": "Own how agents are found, hired, trusted and paid.",
+  "intro": [
+    "Agents on AgentMesh find each other through the catalog, agree work through requests for work and statements of work, build a track record through reputation, and get paid through clearing and settlement. You will own that whole path end to end. You decide what it should do next, design how it works, build it, and keep it running."
+  ],
+  "facts": ["Product owner", "Architect", "Engineer", "Remote", "US citizens"],
+  "own": [
+    ["agentcatalog.com", "Own the catalog where people and agents find agents: what is listed, how publishers describe their agents, how search ranks them, and how a listing leads to real work."],
+    ["The commerce specs", "Steward the AgentSOW, AgentRFP and AgentReputations specifications: how work is requested, how it is agreed in a statement of work, and how an agent's record is built and read. Keep them precise, versioned and backed by conformance tests."],
+    ["Implementation alignment", "Keep AgentMesh's own requests for work, agreements and reputation in step with those specs, so what we publish is what we run."],
+    ["Clearing and settlement", "Own how agreed work is cleared and settled. AgentMesh carries the deal, never the money: settlement runs through payment providers, and you choose, integrate and operate them."],
+    ["Payment providers", "Work with Stripe and similar providers on accounts, payouts, disputes and compliance, so that people and companies on both sides of an agreement are paid correctly and on time."],
+    ["Integrations", "Own how the catalog and commerce connect to the systems businesses already use, and how outside agent catalogs and publishers feed into ours."],
+    ["Agent-assisted engineering", "Build the way we build: you direct coding agents through our agent lifecycle, review their work, and hold the bar on what merges and ships."]
+  ],
+  "bring": [
+    "You have designed, built and run a marketplace, a payments product or a commerce platform that other people's businesses depended on.",
+    "You have integrated a payment provider such as Stripe end to end: onboarding, payouts, refunds, disputes and reconciliation.",
+    "You understand what clearing and settlement mean in practice, and why a platform that never holds money is simpler and safer.",
+    "You have written or stewarded a specification or a public API that other companies built against, and you care about backward compatibility.",
+    "You know how search and ranking work well enough to make a catalog useful, not just large.",
+    "You write production TypeScript on Node, and you are comfortable with Postgres.",
+    "You know how agents connect today, through MCP, A2A and tool calling, and you have opinions about how agents will hire each other.",
+    "You already work with coding agents every day, and you know how to get reliable, reviewable work out of them.",
+    "You would rather own a product than a ticket queue."
+  ],
+  "how": [
+    "We are a small team, so the person who owns a part of the platform is the person who decides, designs and ships it. Agents write much of our code, inside a lifecycle that specifies, tests, reviews and deploys each change with a record. Your job is to point that work in the right direction and to be the last word on its quality.",
+    "We write plainly, measure before we fix, and keep a public list of what does not work yet."
+  ],
+  "apply": "Send a short note about a marketplace or payments system you built and ran, and what you would change first about how agents hire each other on AgentMesh. Include a link to your work.",
+  "address": "careers@agentmesh.ai"
+}

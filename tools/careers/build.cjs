@@ -5,7 +5,7 @@ const src = fs.readFileSync(root + "kill-switch.html", "utf8");
 const up = (s) => s.replace(/(href|src)="(?!https?:|#|mailto:|\.\.\/)([^"]+)"/g, '$1="../$2"');
 const header = up(src.slice(src.indexOf('<header class="topbar">'), src.indexOf("</header>") + 9));
 const footer = up(src.slice(src.indexOf('<footer class="sitefoot">'), src.indexOf("</footer>") + 9));
-const role = JSON.parse(fs.readFileSync(__dirname + "/core-platform.json", "utf8"));
+const roles = fs.readdirSync(__dirname).filter((n) => n.endsWith(".json")).map((n) => JSON.parse(fs.readFileSync(__dirname + "/" + n, "utf8"))).sort((a, b) => (a.order ?? 99) - (b.order ?? 99));
 
 const head = (title, desc, path) => `<!DOCTYPE html>
 <html lang="en">
@@ -74,14 +74,14 @@ const index = head("Careers", "Technical roles at AgentMesh. Each one is product
     <section class="cr-sec">
       <h2>Open roles</h2>
       <ul class="roles">
-        <li><a href="${role.file}"><h3>${role.title}</h3><p>${role.card}</p><span class="go">Read the role</span></a></li>
+${roles.map((role) => `        <li><a href="${role.file}"><h3>${role.title}</h3><p>${role.card}</p><span class="go">Read the role</span></a></li>`).join("\n")}
       </ul>
     </section>
   </main>
 ` + tail;
 
 const li = (items, cls) => `<ul class="${cls}">\n` + items.map((x) => Array.isArray(x) ? `        <li><b>${x[0]}</b>${x[1]}</li>` : `        <li>${x}</li>`).join("\n") + `\n      </ul>`;
-const page = head(role.title, role.description, "careers/" + role.file) + `
+const pageFor = (role) => head(role.title, role.description, "careers/" + role.file) + `
   <main class="wrap">
     <div class="cr-head">
       <p class="kicker"><a href="./">Careers</a></p>
@@ -113,5 +113,5 @@ const page = head(role.title, role.description, "careers/" + role.file) + `
 ` + tail;
 
 fs.writeFileSync(root + "careers/index.html", index);
-fs.writeFileSync(root + "careers/" + role.file, page);
-console.log("written", index.length, page.length);
+for (const role of roles) fs.writeFileSync(root + "careers/" + role.file, pageFor(role));
+console.log("written", roles.map((r) => r.file).join(", "));
