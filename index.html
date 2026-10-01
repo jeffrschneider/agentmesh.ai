@@ -168,8 +168,13 @@ p{margin:0}
 .legend i{width:11px;height:11px;border-radius:50%;border:2px solid var(--st-yours)}
 .legend .k-theirs{border-style:dashed;border-color:var(--st-theirs)}
 .legend .k-mesh{width:14px;height:9px;border-radius:3px;border-width:1.5px;border-color:var(--st-mesh)}
-.stage-box{position:relative;width:100%;max-width:100%;aspect-ratio:640/440;background-image:radial-gradient(var(--stage-dot) 1px,transparent 1.3px);background-size:22px 22px;background-position:11px 11px}
-.stage-box canvas{position:absolute;inset:0;width:100%;height:100%;display:block}
+.stage-box{position:relative;width:100%;max-width:100%;aspect-ratio:1120/800;background-image:radial-gradient(var(--stage-dot) 1px,transparent 1.3px);background-size:22px 22px;background-position:11px 11px}
+.stage-box svg{position:absolute;inset:0;width:100%;height:100%;display:block}
+#stage text{font-family:var(--display);font-weight:700;letter-spacing:-.01em}
+/* the card uses the page's own surface, so the scene follows light and dark */
+.screen{--stage:var(--surface);--stage-2:var(--surface-2);--stage-line:var(--line);--stage-fg:var(--fg);--stage-dim:var(--muted);--stage-dot:var(--dot);box-shadow:0 0 0 1px var(--line),var(--shadow)}
+/* room for the longest caption, so the card does not change height between chapters */
+.screen-top .chap{min-height:5.4rem}
 .screen-foot{display:flex;align-items:center;gap:14px;padding:10px 14px 12px 20px;border-top:1px solid var(--stage-line)}
 .chapters{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:6px;flex:1;min-width:0}
 .chapters button{appearance:none;background:none;border:0;padding:8px 0 3px;margin:0;cursor:pointer;display:flex;flex-direction:column;gap:7px;min-width:0;text-align:left;color:var(--stage-dim);font-family:var(--mono);font-stretch:87.5%;font-size:.6rem;font-weight:500;letter-spacing:.06em;text-transform:uppercase;transition:color .3s}
@@ -399,8 +404,8 @@ p{margin:0}
   <section class="hero">
     <div class="wrap hero-in">
       <div class="hero-copy">
-        <p class="eyebrow"><span class="beta">Beta</span><span>The agent messaging network</span></p>
-        <h1>Connect the agents you already use, <em id="hero-em">and add new ones.</em></h1>
+        <p class="eyebrow"><span class="beta">Beta</span><span>The Agent Connectivity Network</span></p>
+        <h1>Join the Largest <em id="hero-em">Agent Network.</em></h1>
         <ul class="verbs" aria-label="What AgentMesh does">
           <li class="v-yours"><i></i>Connect yours.</li>
           <li class="v-theirs"><i></i>Reach theirs.</li>
@@ -419,22 +424,22 @@ p{margin:0}
         </div>
       </div>
 
-      <figure class="screen" id="screen" aria-label="Animation in five chapters: your agent on its own, then connected to your other agents, then reaching other people's agents while a stranger waits at the door, then handing work to mesh agents, then joining the wider network.">
+      <figure class="screen" id="screen" aria-label="Animation in five chapters: your agent joins AgentMesh and sends a message, the mesh delivers it to a friend's agent, the Agent Cloud shows its ready-made helper agents, your agent sends a request and helper agents work on it in turn, and the result comes back to you.">
         <div class="screen-top">
           <div class="chap in" id="chap">
             <span class="chap-n" id="chap-n">01<small>/05</small></span>
-            <div><div class="chap-h" id="chap-h">Your agent, working alone</div><div class="chap-d" id="chap-d">Capped by the tools its owner gave it.</div></div>
+            <div><div class="chap-h" id="chap-h">Connect yours</div><div class="chap-d" id="chap-d">Your agent joins AgentMesh and sends a message.</div></div>
           </div>
           <div class="legend" aria-hidden="true"><span><i></i>yours</span><span><i class="k-theirs"></i>theirs</span><span><i class="k-mesh"></i>mesh agent</span></div>
         </div>
-        <div class="stage-box" id="stage-box"><canvas id="stage" aria-hidden="true"></canvas></div>
+        <div class="stage-box" id="stage-box"><svg id="stage" viewBox="0 0 1120 800" aria-hidden="true" focusable="false"><defs></defs><g id="dyn"></g></svg></div>
         <div class="screen-foot">
           <div class="chapters" id="chapters" role="group" aria-label="Chapters">
-            <button type="button" data-i="0" aria-label="Chapter 1: your agent, working alone"><span class="track"><span class="fill"></span></span><span class="lab">Alone</span></button>
-            <button type="button" data-i="1" aria-label="Chapter 2: connect yours"><span class="track"><span class="fill"></span></span><span class="lab">Yours</span></button>
-            <button type="button" data-i="2" aria-label="Chapter 3: reach theirs"><span class="track"><span class="fill"></span></span><span class="lab">Theirs</span></button>
-            <button type="button" data-i="3" aria-label="Chapter 4: add mesh agents"><span class="track"><span class="fill"></span></span><span class="lab">Mesh</span></button>
-            <button type="button" data-i="4" aria-label="Chapter 5: grow the network"><span class="track"><span class="fill"></span></span><span class="lab">Network</span></button>
+            <button type="button" data-i="0" aria-label="Chapter 1: connect yours"><span class="track"><span class="fill"></span></span><span class="lab">Yours</span></button>
+            <button type="button" data-i="1" aria-label="Chapter 2: reach theirs"><span class="track"><span class="fill"></span></span><span class="lab">Theirs</span></button>
+            <button type="button" data-i="2" aria-label="Chapter 3: add mesh agents"><span class="track"><span class="fill"></span></span><span class="lab">Helpers</span></button>
+            <button type="button" data-i="3" aria-label="Chapter 4: ask for something new"><span class="track"><span class="fill"></span></span><span class="lab">Ask</span></button>
+            <button type="button" data-i="4" aria-label="Chapter 5: get it back"><span class="track"><span class="fill"></span></span><span class="lab">Back</span></button>
           </div>
           <button type="button" class="play" id="play" aria-label="Pause the animation"><svg class="i-pause" viewBox="0 0 14 14" aria-hidden="true"><rect x="2.5" y="2" width="3.2" height="10" rx="1"/><rect x="8.3" y="2" width="3.2" height="10" rx="1"/></svg><svg class="i-play" viewBox="0 0 14 14" aria-hidden="true"><path d="M3.5 2.2v9.6c0 .6.6 1 1.1.7l7.3-4.8c.5-.3.5-1 0-1.3L4.6 1.5c-.5-.3-1.1.1-1.1.7z"/></svg></button>
         </div>
@@ -672,444 +677,309 @@ p{margin:0}
   });
 })();
 
-/* ══ the hero: one agent grows into a network ══
-   render(t) is a pure function of the clock, so chapters can be jumped
-   to, paused, and shown as a still frame for reduced motion. The stage is
-   drawn in a 640 by 440 space and scaled to its box. */
+/* ══ the hero: a message, then a request, through the mesh ══
+   render(t) is a pure function of the clock, so chapters can be jumped to,
+   paused, and shown as a still frame for reduced motion. The scene is drawn
+   as SVG in a 1120 by 800 space and scales to its box. Colours come from the
+   page's own tokens: amber is yours, blue is theirs, violet is mesh, mint is
+   delivered. Every pair also differs in shape, never in colour alone. */
 (function () {
-  var canvas = document.getElementById('stage');
-  if (!canvas || !canvas.getContext) return;
-  var ctx = canvas.getContext('2d');
+  var svg = document.getElementById('stage');
+  if (!svg) return;
+  var defsEl = svg.querySelector('defs'), dyn = svg.querySelector('#dyn');
   var box = document.getElementById('stage-box');
   var $ = function (id) { return document.getElementById(id); };
-  var W = 640, H = 440, LOOP = 26, Z0 = 18.9, TAU = Math.PI * 2;
+  var W = 1120, H = 800, LOOP = 23, TAU = Math.PI * 2;
   var ACTS = [
-    { s: 0,    rest: 3.1,  h: 'Your agent, working alone', d: 'Capped by the tools its owner gave it.' },
-    { s: 3.6,  rest: 8.2,  h: 'Connect yours', d: 'Your other agents join the same mesh.' },
-    { s: 8.6,  rest: 12.2, h: 'Reach theirs', d: "Message anyone's agent by name. Strangers wait at the door." },
-    { s: 13.6, rest: 16.4, h: 'Add mesh agents', d: "Hand off work your agent can't do alone." },
-    { s: 18.8, rest: 24.4, h: 'Grow the network', d: 'Every agent you reach brings its own connections.' }
+    { s: 0,   rest: 2.5,  h: 'Connect yours', d: 'Your agent joins AgentMesh and sends a message.' },
+    { s: 2.6, rest: 4.9,  h: 'Reach theirs', d: "The mesh delivers it to a friend's agent." },
+    { s: 5.6, rest: 7.9,  h: 'Add mesh agents', d: 'The Agent Cloud is a set of ready-made helper agents you can hand work to.' },
+    { s: 8.6, rest: 16.6, h: 'Ask for something new', d: 'Your agent sends a request, and helper agents in the Agent Cloud work on it in turn.' },
+    { s: 17.4, rest: 21.9, h: 'Get it back', d: 'The result comes back to you.' }
   ];
 
   function clamp(v, a, b) { a = a == null ? 0 : a; b = b == null ? 1 : b; return v < a ? a : v > b ? b : v; }
-  function lerp(a, b, u) { return a + (b - a) * u; }
-  function easeOut(u) { u = clamp(u); return 1 - Math.pow(1 - u, 3); }
-  function easeIn(u) { u = clamp(u); return u * u * u; }
-  function easeInOut(u) { u = clamp(u); return u < .5 ? 4 * u * u * u : 1 - Math.pow(-2 * u + 2, 3) / 2; }
-  function easeSine(u) { u = clamp(u); return 0.5 - 0.5 * Math.cos(Math.PI * u); }
+  function seg(t, a, b) { return clamp((t - a) / (b - a)); }
+  function easeInOut(u) { return u < 0.5 ? 2 * u * u : 1 - Math.pow(-2 * u + 2, 2) / 2; }
+  function easeOut(u) { u = clamp(u); return 1 - (1 - u) * (1 - u); }
   function easeBack(u) { u = clamp(u); var c1 = 1.70158, c3 = c1 + 1; return 1 + c3 * Math.pow(u - 1, 3) + c1 * Math.pow(u - 1, 2); }
-  function hash(i) { var x = Math.sin(i * 127.1 + 311.7) * 43758.5453; return x - Math.floor(x); }
-  function rng(seed) { return function () { seed = seed + 0x6D2B79F5 | 0; var t = Math.imul(seed ^ seed >>> 15, 1 | seed); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; }; }
+  function bump(t, a, b) { return Math.sin(Math.PI * seg(t, a, b)); }
+  function frac(x) { return x - Math.floor(x); }
+  function n1(v) { return v.toFixed(1); }
 
-  /* colours come from the page's tokens */
-  var C = {}, KEYS = ['stage', 'stage-2', 'stage-line', 'stage-fg', 'stage-dim', 'st-yours', 'st-theirs', 'st-mesh', 'st-ok'];
-  function toRGB(v) {
-    v = (v || '').trim();
-    var m = v.match(/^#([0-9a-f]{3}|[0-9a-f]{6})$/i);
-    if (m) { var h = m[1]; if (h.length === 3) h = h.replace(/./g, '$&$&'); var n = parseInt(h, 16); return [n >> 16 & 255, n >> 8 & 255, n & 255]; }
-    m = v.match(/rgba?\(([^)]+)\)/);
-    if (m) { var p = m[1].split(',').map(parseFloat); return [p[0], p[1], p[2]]; }
-    return [200, 200, 200];
+  /* ---- colours, read from the page tokens ---- */
+  function cssv(name, fb) { var v = getComputedStyle(document.documentElement).getPropertyValue(name).trim(); return v || fb; }
+  function rgb(h) { h = h.replace('#', ''); if (h.length === 3) h = h[0] + h[0] + h[1] + h[1] + h[2] + h[2]; return [parseInt(h.substr(0, 2), 16), parseInt(h.substr(2, 2), 16), parseInt(h.substr(4, 2), 16)]; }
+  function mix(a, b, p) { var x = rgb(a), y = rgb(b); return '#' + [0, 1, 2].map(function (i) { return Math.round(x[i] + (y[i] - x[i]) * p).toString(16).padStart(2, '0'); }).join(''); }
+  function lum(h) { var c = rgb(h); return (0.2126 * c[0] + 0.7152 * c[1] + 0.0722 * c[2]) / 255; }
+  var PAL = {};
+  function readColors() {
+    var bg = cssv('--bg', '#F3F4F0'), surface = cssv('--surface', '#FBFBF8'), surface2 = cssv('--surface-2', '#E9ECE6');
+    var fg = cssv('--fg', '#0D1B1E'), line = cssv('--line', '#D4DAD3'), strong = cssv('--line-strong', '#B7C1B9');
+    var amber = cssv('--st-yours', '#F2A93B'), blue = cssv('--st-theirs', '#8AA5FF'), violet = cssv('--st-mesh', '#B9A0FF'), mint = cssv('--st-ok', '#43D6A6');
+    var dark = lum(bg) < 0.35;
+    PAL = { bg: bg, surface: surface, surface2: surface2, fg: fg, line: line, strong: strong, amber: amber, blue: blue, violet: violet, mint: mint, dark: dark,
+      ink: '#0D1B1E', pill: dark ? mix(surface, '#fff', 0.05) : '#FFFFFF' };
+    var d = '';
+    [['amber', amber], ['blue', blue], ['violet', violet], ['mint', mint]].forEach(function (p) {
+      d += '<linearGradient id="c_' + p[0] + '" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="' + mix(p[1], '#ffffff', 0.42) + '"/><stop offset="1" stop-color="' + p[1] + '"/></linearGradient>';
+      PAL['d_' + p[0]] = mix(p[1], '#000000', 0.22);
+    });
+    d += '<linearGradient id="cloudG" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="' + (dark ? mix(surface, '#fff', 0.12) : '#FFFFFF') + '"/><stop offset="1" stop-color="' + (dark ? mix(surface, '#fff', 0.05) : surface2) + '"/></linearGradient>';
+    d += '<linearGradient id="bandG" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="' + mix(surface, violet, dark ? 0.26 : 0.30) + '"/><stop offset="1" stop-color="' + mix(surface, violet, dark ? 0.36 : 0.44) + '"/></linearGradient>';
+    d += '<radialGradient id="softShadow"><stop offset="0" stop-color="' + (dark ? '#000' : '#3a4a66') + '" stop-opacity="' + (dark ? 0.5 : 0.22) + '"/><stop offset="1" stop-color="#000" stop-opacity="0"/></radialGradient>';
+    defsEl.innerHTML = d;
+    PAL.edge = mix(violet, dark ? '#fff' : '#000', dark ? 0.0 : 0.12);
   }
-  function readColors() { var cs = getComputedStyle(document.documentElement); KEYS.forEach(function (k) { C[k] = toRGB(cs.getPropertyValue('--' + k)); }); }
-  function col(k, a) { var c = C[k]; return 'rgba(' + c[0] + ',' + c[1] + ',' + c[2] + ',' + (a == null ? 1 : a) + ')'; }
-  var KC = { yours: 'st-yours', theirs: 'st-theirs', mesh: 'st-mesh' };
-  var FB = '"Instrument Sans", system-ui, -apple-system, "Segoe UI", sans-serif';
-  var FM = '"Martian Mono", ui-monospace, Menlo, Consolas, monospace';
-  var LS = 1, BA = 1;
-  function alpha(a) { ctx.globalAlpha = clamp(BA * a); }
 
-  /* the cast */
-  var N = {
-    Y0: { x: 232, y: 224, r: 24, k: 'yours', name: 'Claude', a: 0.25, main: 1 },
-    Y1: { x: 100, y: 122, r: 16, k: 'yours', name: 'ChatGPT', a: 3.9 },
-    Y2: { x: 92, y: 300, r: 16, k: 'yours', name: 'Muse', a: 4.25 },
-    Y3: { x: 262, y: 78, r: 16, k: 'yours', name: 'Claude Code', a: 4.6 },
-    T1: { x: 458, y: 92, r: 16, k: 'theirs', name: "Maya's agent", a: 8.9 },
-    T2: { x: 548, y: 204, r: 16, k: 'theirs', name: 'Acme support', a: 9.3 },
-    T3: { x: 512, y: 318, r: 16, k: 'theirs', name: 'new sender', a: 10.3 },
-    M1: { x: 124, y: 396, k: 'mesh', name: 'explainer', a: 13.9 },
-    M2: { x: 290, y: 398, k: 'mesh', name: 'video', a: 14.15 },
-    M3: { x: 470, y: 398, k: 'mesh', name: 'competitor watch', a: 14.4 }
-  };
-  var Y0 = N.Y0, NODE_IDS = Object.keys(N);
-  function rad(n) { return n.r || 12; }
-
-  var EDEF = [
-    ['Y0', 'Y1'], ['Y0', 'Y2'], ['Y0', 'Y3'], ['Y1', 'Y3'], ['Y1', 'Y2'],
-    ['Y0', 'T1'], ['Y3', 'T1'], ['Y0', 'T2'], ['T1', 'T2'], ['Y0', 'T3', 12.85],
-    ['Y0', 'M1'], ['Y2', 'M1'], ['Y0', 'M2'], ['Y0', 'M3'], ['T2', 'M3']
+  /* ---- layout (1120 by 800) ---- */
+  var GROUND = 716, MY = -48, LS = 1;
+  var agents = [
+    { id: 'you', x: 185, color: 'amber', type: 'squircle', label: 'You' },
+    { id: 'a', x: 435, color: 'blue', type: 'round' },
+    { id: 'b', x: 685, color: 'blue', type: 'capsule', label: 'A friend' },
+    { id: 'c', x: 935, color: 'blue', type: 'hat' }
   ];
-  var EDGES = EDEF.map(function (d, i) {
-    var a = d[0], b = d[1];
-    if (N[a].a > N[b].a) { var tmp = a; a = b; b = tmp; }
-    var P0 = N[a], P2 = N[b], dx = P2.x - P0.x, dy = P2.y - P0.y, L = Math.hypot(dx, dy);
-    var bow = (i % 2 ? 1 : -1) * 0.11 * L;
-    var cx = (P0.x + P2.x) / 2 - dy / L * bow, cy = (P0.y + P2.y) / 2 + dx / L * bow;
-    var pts = [], cum = [0], S = 40;
-    for (var k = 0; k <= S; k++) {
-      var u = k / S, v = 1 - u;
-      pts.push({ x: v * v * P0.x + 2 * v * u * cx + u * u * P2.x, y: v * v * P0.y + 2 * v * u * cy + u * u * P2.y });
-      if (k) cum.push(cum[k - 1] + Math.hypot(pts[k].x - pts[k - 1].x, pts[k].y - pts[k - 1].y));
-    }
-    var kinds = [N[a].k, N[b].k];
-    var kind = kinds.indexOf('mesh') >= 0 ? 'mesh' : kinds.indexOf('theirs') >= 0 ? 'theirs' : 'yours';
-    return { a: a, b: b, pts: pts, cum: cum, len: cum[S], kind: kind, t0: d[2] != null ? d[2] : Math.max(N[a].a, N[b].a) + 0.3, hot: false };
-  });
-  function at(e, d) {
-    d = clamp(d, 0, e.len);
-    var c = e.cum, lo = 0, hi = c.length - 1;
-    while (hi - lo > 1) { var m = (lo + hi) >> 1; if (c[m] < d) lo = m; else hi = m; }
-    var seg = (c[hi] - c[lo]) || 1, f = (d - c[lo]) / seg, A = e.pts[lo], B = e.pts[hi];
-    return { x: A.x + (B.x - A.x) * f, y: A.y + (B.y - A.y) * f, tx: B.x - A.x, ty: B.y - A.y };
+  var helpers = [{ x: 360, color: 'violet', type: 'squircle' }, { x: 560, color: 'violet', type: 'capsule' }, { x: 760, color: 'violet', type: 'round' }];
+  var HELPER_GROUND = 258, HELPER_S = 0.92;
+  var UX = [120, 240, 360, 460, 560, 660, 760, 880, 1000], UY = [440, 428, 440, 426, 442, 428, 440, 430, 442];
+  var LX = [185, 300, 415, 535, 685, 805, 915, 1010], LY = [505, 496, 512, 500, 510, 498, 508, 500];
+  var U = UX.map(function (x, i) { return [x, UY[i] + MY]; }), Lw = LX.map(function (x, i) { return [x, LY[i] + MY]; });
+  var node = { L0: Lw[0], L1: Lw[1], L2: Lw[2], L3: Lw[3], L4: Lw[4], L5: Lw[5], U2: U[2], U3: U[3], U4: U[4], U5: U[5], U6: U[6] };
+  var allNodes = U.map(function (p, i) { return { p: p, key: 'U' + i }; }).concat(Lw.map(function (p, i) { return { p: p, key: 'L' + i }; }));
+  var edges = [], i;
+  for (i = 0; i < U.length; i++) {
+    if (i < U.length - 1) edges.push([U[i], U[i + 1]]);
+    if (i < Lw.length) edges.push([U[i], Lw[i]]);
+    if (i < Lw.length && i + 1 < U.length) edges.push([U[i + 1], Lw[i]]);
+    if (i < Lw.length - 1) edges.push([Lw[i], Lw[i + 1]]);
   }
-  function edge(p, q) { for (var i = 0; i < EDGES.length; i++) { var e = EDGES[i]; if ((e.a === p && e.b === q) || (e.a === q && e.b === p)) return e; } return null; }
+  var YOU_HEAD = [185, 520], B_HEAD = [685, 520];
+  var HELP_HEAD = helpers.map(function (h) { return [h.x, 108]; });
 
-  /* the script: messages, jobs, arrivals and tags, all fixed in time */
-  var EV = [], ARR = [], WORK = [], TAGS = [];
-  function msg(from, to, t0, speed) {
-    var e = edge(from, to), dur = e.len / (speed || 230);
-    EV.push({ e: e, fwd: e.a === from, t0: t0, dur: dur, c: KC[N[from].k], ra: rad(N[from]), rb: rad(N[to]) });
-    ARR.push({ n: to, t: t0 + dur });
-    return t0 + dur;
+  /* ---- the two journeys ---- */
+  function L(a, b, t0, t1, lift, to) { return { a: a, b: b, t0: t0, t1: t1, lift: lift, to: to }; }
+  var j1 = {
+    start: YOU_HEAD, popAt: 1.0, endAt: 4.75, kind: function () { return 'envelope'; },
+    legs: [
+      L(YOU_HEAD, node.L0, 1.45, 2.35, 55, 'L0'),
+      L(node.L0, node.L1, 2.35, 2.65, 16, 'L1'), L(node.L1, node.L2, 2.65, 2.95, 16, 'L2'),
+      L(node.L2, node.L3, 2.95, 3.25, 16, 'L3'), L(node.L3, node.L4, 3.25, 3.55, 16, 'L4'),
+      L(node.L4, B_HEAD, 3.55, 4.55, 55, null)
+    ]
+  };
+  var j2 = {
+    start: YOU_HEAD, popAt: 7.7, endAt: 20.45,
+    kind: function (t) { return t < 16.75 ? 'request' : 'gift'; },
+    legs: [
+      L(YOU_HEAD, node.L0, 8.15, 8.95, 55, 'L0'), L(node.L0, node.L0, 8.95, 9.5, 0, null),
+      L(node.L0, node.L1, 9.5, 9.8, 16, 'L1'), L(node.L1, node.U2, 9.8, 10.1, 16, 'U2'),
+      L(node.U2, HELP_HEAD[0], 10.1, 10.9, 30, null), L(HELP_HEAD[0], HELP_HEAD[0], 10.9, 11.6, 0, null),
+      L(HELP_HEAD[0], node.U2, 11.6, 12.3, 30, 'U2'),
+      L(node.U2, node.U3, 12.3, 12.6, 16, 'U3'), L(node.U3, node.U4, 12.6, 12.9, 16, 'U4'),
+      L(node.U4, HELP_HEAD[1], 12.9, 13.6, 30, null), L(HELP_HEAD[1], HELP_HEAD[1], 13.6, 14.3, 0, null),
+      L(HELP_HEAD[1], node.U4, 14.3, 15.0, 30, 'U4'),
+      L(node.U4, node.U5, 15.0, 15.3, 16, 'U5'), L(node.U5, node.U6, 15.3, 15.6, 16, 'U6'),
+      L(node.U6, HELP_HEAD[2], 15.6, 16.3, 30, null), L(HELP_HEAD[2], HELP_HEAD[2], 16.3, 17.0, 0, null),
+      L(HELP_HEAD[2], node.U6, 17.0, 17.7, 30, 'U6'),
+      L(node.U6, node.L5, 17.7, 17.95, 14, 'L5'), L(node.L5, node.L4, 17.95, 18.2, 14, 'L4'),
+      L(node.L4, node.L3, 18.2, 18.45, 14, 'L3'), L(node.L3, node.L2, 18.45, 18.7, 14, 'L2'),
+      L(node.L2, node.L1, 18.7, 18.95, 14, 'L1'), L(node.L1, node.L0, 18.95, 19.2, 14, 'L0'),
+      L(node.L0, YOU_HEAD, 19.2, 20.1, 55, null)
+    ]
+  };
+  function bez(a, b, lift, u) {
+    var cx = (a[0] + b[0]) / 2, cy = (a[1] + b[1]) / 2 - lift, v = 1 - u;
+    return [v * v * a[0] + 2 * v * u * cx + u * u * b[0], v * v * a[1] + 2 * v * u * cy + u * u * b[1]];
   }
-  var R = rng(11);
-  for (var tt = 5.2; tt < 19.2;) {
-    var live = EDGES.filter(function (e) { return e.kind !== 'mesh' && e.t0 + 0.75 <= tt; });
-    if (live.length) {
-      var le = live[Math.floor(R() * live.length)], fw = R() < 0.5;
-      msg(fw ? le.a : le.b, fw ? le.b : le.a, tt, 205 + R() * 60);
+  function payloadAt(j, t) {
+    if (t < j.popAt || t > j.endAt) return null;
+    var pos = j.start, moving = false, k, lg;
+    for (k = 0; k < j.legs.length; k++) {
+      lg = j.legs[k];
+      if (t >= lg.t0 && t < lg.t1) { pos = bez(lg.a, lg.b, lg.lift, easeInOut((t - lg.t0) / (lg.t1 - lg.t0))); moving = lg.a !== lg.b; break; }
+      if (t >= lg.t1) pos = lg.b;
     }
-    tt += 0.34 + R() * 0.3;
+    var first = j.legs[0].t0, last = j.legs[j.legs.length - 1].t1, scale = 1;
+    if (t < first) scale = easeBack(seg(t, j.popAt, j.popAt + 0.4));
+    else if (t > last) scale = 1 - easeOut(seg(t, last + 0.05, j.endAt));
+    return { pos: pos, moving: moving, scale: Math.max(0, scale), kind: j.kind(t) };
   }
-  function job(from, m, t0, tagged) {
-    var a1 = msg(from, m, t0, 200);
-    WORK.push({ n: m, t0: a1, t1: a1 + 1.1 });
-    var a2 = msg(m, from, a1 + 1.1, 200);
-    if (tagged) TAGS.push({ n: from, t0: a2, t1: a2 + 0.95, text: 'delivered ✓' });
-  }
-  job('Y0', 'M1', 15.0, true);
-  job('T2', 'M3', 15.5, false);
-  job('Y0', 'M2', 16.2, true);
-
-  /* the stranger at the door */
-  var eS = edge('Y0', 'T3'), DOOR = 62;
-  var ST = { t0: 10.9, t1: 11.6, t2: 12.7, t3: 13.0 };
-  ARR.push({ n: 'Y0', t: ST.t3 });
-  var NR = { x: 390, y: 170 };
-
-  /* the wider mesh: a sphere of agents that grows outward from yours */
-  var GN = 150, GR = 170, GCX = 320, GCY = 220, TILT = 0.36;
-  var GP = [{ x: 0, y: Math.sin(TILT), z: Math.cos(TILT), k: 'you' }];
-  for (var gi = 0; gi < GN; gi++) {
-    var yy = 1 - (gi + 0.5) / GN * 2, rr0 = Math.sqrt(1 - yy * yy), th = gi * 2.399963, hh = hash(gi + 40);
-    GP.push({ x: Math.cos(th) * rr0, y: yy, z: Math.sin(th) * rr0, k: hh < 0.24 ? 'theirs' : hh < 0.32 ? 'mesh' : 'n' });
-  }
-  GP.forEach(function (p, i) {
-    var v = GP[0], dot = clamp(p.x * v.x + p.y * v.y + p.z * v.z, -1, 1);
-    p.ap = i === 0 ? Z0 + 1.0 : Z0 + 1.25 + Math.acos(dot) / Math.PI * 4.2 + hash(i + 900) * 0.3;
-  });
-  var GE = (function () {
-    var seen = {}, out = [];
-    for (var i = 0; i < GP.length; i++) {
-      var d = [];
-      for (var j = 0; j < GP.length; j++) if (j !== i) d.push({ j: j, v: GP[i].x * GP[j].x + GP[i].y * GP[j].y + GP[i].z * GP[j].z });
-      d.sort(function (p, q) { return q.v - p.v; });
-      for (var m = 0; m < (i === 0 ? 6 : 3); m++) {
-        var jj = d[m].j, key = Math.min(i, jj) + '-' + Math.max(i, jj);
-        if (seen[key]) continue; seen[key] = 1;
-        var A = i, B = jj; if (GP[A].ap > GP[B].ap) { var s = A; A = B; B = s; }
-        out.push({ a: A, b: B, st: GP[A].ap + 0.05, dur: Math.max(0.35, GP[B].ap - GP[A].ap) });
-      }
-    }
+  function trailOf(j, t) {
+    var out = [], k, p;
+    for (k = 1; k <= 7; k++) { p = payloadAt(j, t - k * 0.05); if (p && p.moving) out.push({ pos: p.pos, k: k }); }
     return out;
-  })();
-  function gproj(p, ang) {
-    var ca = Math.cos(ang), sa = Math.sin(ang), x = p.x * ca + p.z * sa, z = -p.x * sa + p.z * ca, y = p.y;
-    var ct = Math.cos(TILT), st = Math.sin(TILT);
-    return { x: x, y: y * ct - z * st, z: y * st + z * ct };
   }
 
-  /* drawing helpers */
-  function rrect(x, y, w, h, r) { ctx.beginPath(); ctx.moveTo(x + r, y); ctx.arcTo(x + w, y, x + w, y + h, r); ctx.arcTo(x + w, y + h, x, y + h, r); ctx.arcTo(x, y + h, x, y, r); ctx.arcTo(x, y, x + w, y, r); ctx.closePath(); }
-  function text(str, x, y, font, fill, a, align) {
-    if (a <= 0.01) return;
-    alpha(a); ctx.font = font; ctx.textAlign = align || 'center'; ctx.textBaseline = 'middle';
-    ctx.lineJoin = 'round'; ctx.lineWidth = 4; ctx.strokeStyle = col('stage', 0.92); ctx.strokeText(str, x, y);
-    ctx.fillStyle = fill; ctx.fillText(str, x, y);
+  /* ---- particles ---- */
+  var events = [
+    { t: 4.6, x: 685, y: 500, kind: 'delivered' },
+    { t: 8.95, x: 185, y: 477 + MY + 28, kind: 'ring' },
+    { t: 16.5, x: 760, y: 112, kind: 'sparkle' },
+    { t: 20.15, x: 185, y: 510, kind: 'confetti' }
+  ];
+  function star(x, y, s, rot, col, o) { return '<path transform="translate(' + n1(x) + ',' + n1(y) + ') rotate(' + rot.toFixed(0) + ') scale(' + s.toFixed(2) + ')" d="M0,-9 L2.4,-2.4 L9,0 L2.4,2.4 L0,9 L-2.4,2.4 L-9,0 L-2.4,-2.4Z" fill="' + col + '" fill-opacity="' + o.toFixed(2) + '"/>'; }
+  function checkBadge(x, y, sc) {
+    return '<g transform="translate(' + n1(x) + ',' + n1(y) + ') scale(' + sc.toFixed(3) + ')"><circle r="22" fill="' + PAL.pill + '" stroke="' + PAL.strong + '" stroke-width="1.5"/><circle r="16" fill="' + PAL.mint + '"/><path d="M-7,0 L-2,6 L8,-6" fill="none" stroke="#fff" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round"/></g>';
   }
-  function tag(str, x, y, kind, a, anchor) {
-    if (a <= 0.01) return;
-    ctx.font = '500 ' + (9.5 * LS).toFixed(2) + 'px ' + FM;
-    var tw = ctx.measureText(str).width, px = 7 * LS, h = 19 * LS, w = tw + px * 2;
-    var bx = anchor === 'center' ? x - w / 2 : anchor === 'right' ? x - w : x;
-    var c = kind === 'ok' ? 'st-ok' : kind === 'wait' ? 'st-yours' : 'stage-dim';
-    alpha(a); rrect(bx, y - h / 2, w, h, h / 2); ctx.fillStyle = col('stage'); ctx.fill();
-    ctx.lineWidth = 1.2; ctx.strokeStyle = col(c, 0.9); ctx.stroke();
-    ctx.fillStyle = col(c); ctx.textAlign = 'left'; ctx.textBaseline = 'middle'; ctx.fillText(str, bx + px, y + 0.5);
-  }
-  function envelope(x, y, c, a) {
-    var s = 0.9 + 0.3 * (LS - 1);
-    alpha(a);
-    ctx.save(); ctx.translate(x, y); ctx.scale(s, s);
-    ctx.shadowColor = col(c, 0.9); ctx.shadowBlur = 12;
-    rrect(-6.5, -4.5, 13, 9, 2); ctx.fillStyle = col(c); ctx.fill();
-    ctx.shadowBlur = 0;
-    ctx.beginPath(); ctx.moveTo(-5.2, -3.1); ctx.lineTo(0, 0.9); ctx.lineTo(5.2, -3.1);
-    ctx.strokeStyle = col('stage', 0.8); ctx.lineWidth = 1.2; ctx.lineJoin = 'round'; ctx.stroke();
-    ctx.restore();
-  }
-  function trail(e, d, dir, c, a) {
-    for (var k = 1; k <= 5; k++) {
-      var p = at(e, d - dir * k * 6);
-      alpha(a * 0.42 * (1 - k / 6));
-      ctx.beginPath(); ctx.arc(p.x, p.y, 2.7 - k * 0.35, 0, TAU); ctx.fillStyle = col(c); ctx.fill();
-    }
-  }
-  function pop(n, t) { return t < n.a ? 0 : Math.max(0, easeBack((t - n.a) / 0.55)); }
-  function chipBox(n) {
-    var s = Math.min(LS, 1.35);
-    ctx.font = '500 ' + (10.5 * LS).toFixed(2) + 'px ' + FM;
-    var tw = ctx.measureText(n.name).width;
-    return { w: tw + 30 * s, h: 25 * s, s: s };
-  }
-
-  /* the local scene: your agents, theirs, mesh agents and the traffic between them */
-  function drawLocal(t) {
-    var i, e;
-    // alone: the lonely pulse, and a message with nowhere to go
-    if (t > 0.6 && t < 3.6) {
-      var ph = (t - 0.6) % 1.3;
-      alpha(0.45 * (1 - ph / 1.3) * clamp((3.6 - t) / 0.4));
-      ctx.beginPath(); ctx.arc(Y0.x, Y0.y, Y0.r + 5 + ph * 22, 0, TAU); ctx.strokeStyle = col('st-yours'); ctx.lineWidth = 1.4; ctx.stroke();
-    }
-    var ndx = NR.x - Y0.x, ndy = NR.y - Y0.y, nl = Math.hypot(ndx, ndy);
-    if (t > 1.1 && t < 3.4) {
-      var fa = clamp((t - 1.1) / 0.2) * clamp((3.4 - t) / 0.5);
-      alpha(0.35 * fa); ctx.setLineDash([2, 5]); ctx.lineCap = 'round'; ctx.strokeStyle = col('stage-dim'); ctx.lineWidth = 1.4;
-      var reach = easeOut((t - 1.2) / 0.85);
-      ctx.beginPath(); ctx.moveTo(Y0.x + ndx / nl * (Y0.r + 4), Y0.y + ndy / nl * (Y0.r + 4));
-      ctx.lineTo(Y0.x + ndx / nl * lerp(Y0.r + 4, nl, reach), Y0.y + ndy / nl * lerp(Y0.r + 4, nl, reach)); ctx.stroke(); ctx.setLineDash([]);
-    }
-    if (t > 1.2 && t < 2.15) {
-      var nu = easeSine((t - 1.2) / 0.85), nd = lerp(Y0.r + 4, nl - 6, nu);
-      envelope(Y0.x + ndx / nl * nd, Y0.y + ndy / nl * nd, 'st-yours', 1 - clamp((t - 1.85) / 0.3) * 0.7);
-    }
-    tag('× no route', NR.x, NR.y - 2, 'mute', clamp((t - 2.0) / 0.2) * clamp((3.35 - t) / 0.35), 'center');
-
-    // the stranger's path, before it is an edge
-    if (t > 10.4 && t < 13.7) {
-      alpha(0.28 * clamp((t - 10.4) / 0.4) * clamp((13.7 - t) / 0.5));
-      ctx.setLineDash([2, 5]); ctx.lineCap = 'round'; ctx.strokeStyle = col('stage-dim'); ctx.lineWidth = 1.3;
-      ctx.beginPath(); eS.pts.forEach(function (p, k) { if (k) ctx.lineTo(p.x, p.y); else ctx.moveTo(p.x, p.y); }); ctx.stroke(); ctx.setLineDash([]);
-    }
-
-    // which edges carry a message right now
-    EDGES.forEach(function (e) { e.hot = false; });
-    for (i = 0; i < EV.length; i++) { var ev = EV[i]; if (t >= ev.t0 && t <= ev.t0 + ev.dur) ev.e.hot = true; }
-
-    // edges, drawn on from the older node toward the newer one
-    for (i = 0; i < EDGES.length; i++) {
-      e = EDGES[i];
-      var p = easeOut((t - e.t0) / 0.7); if (p <= 0) continue;
-      var c = KC[e.kind], base = e.kind === 'yours' ? 0.5 : 0.58;
-      alpha(1);
-      ctx.strokeStyle = col(c, e.hot ? Math.min(1, base + 0.35) : base);
-      ctx.lineWidth = e.kind === 'yours' ? 1.8 : 1.6; ctx.lineCap = 'round';
-      ctx.setLineDash(e.kind === 'theirs' ? [5, 4] : e.kind === 'mesh' ? [0.5, 5] : []);
-      if (e.kind === 'mesh') ctx.lineWidth = 2.2;
-      var target = p * e.len;
-      ctx.beginPath(); ctx.moveTo(e.pts[0].x, e.pts[0].y);
-      for (var k = 1; k < e.pts.length; k++) {
-        if (e.cum[k] >= target) { var q = at(e, target); ctx.lineTo(q.x, q.y); break; }
-        ctx.lineTo(e.pts[k].x, e.pts[k].y);
-      }
-      ctx.stroke(); ctx.setLineDash([]);
-      if (p < 1) { var q2 = at(e, target); alpha(1 - p); ctx.beginPath(); ctx.arc(q2.x, q2.y, 2.6, 0, TAU); ctx.fillStyle = col(c); ctx.fill(); }
-    }
-
-    // messages in flight
-    for (i = 0; i < EV.length; i++) {
-      var m = EV[i];
-      if (t < m.t0 || t > m.t0 + m.dur) continue;
-      var u = easeSine((t - m.t0) / m.dur), dist = lerp(m.ra, m.e.len - m.rb, u);
-      var d = m.fwd ? dist : m.e.len - dist, dir = m.fwd ? 1 : -1, pt = at(m.e, d);
-      trail(m.e, d, dir, m.c, 1);
-      envelope(pt.x, pt.y, m.c, 1);
-    }
-
-    // the stranger's message: arrives, waits at the door, is let in
-    if (t >= ST.t0 && t <= ST.t3) {
-      var sd, moving = true;
-      if (t < ST.t1) sd = lerp(eS.len - rad(N.T3), DOOR + 10, easeOut((t - ST.t0) / (ST.t1 - ST.t0)));
-      else if (t < ST.t2) { sd = DOOR + 10 + Math.sin((t - ST.t1) * 8) * 1.6; moving = false; }
-      else sd = lerp(DOOR + 10, Y0.r, easeIn((t - ST.t2) / (ST.t3 - ST.t2)));
-      var sp = at(eS, sd);
-      if (moving) trail(eS, sd, -1, 'st-theirs', 1);
-      envelope(sp.x, sp.y, 'st-theirs', 1);
-    }
-    var da = clamp((t - 11.3) / 0.3) * (1 - clamp((t - 13.3) / 0.4));
-    if (da > 0) {
-      var dp = at(eS, DOOR), dl = Math.hypot(dp.tx, dp.ty) || 1, ux = dp.tx / dl, uy = dp.ty / dl, nx = -uy, ny = ux;
-      var open = easeOut((t - ST.t2 + 0.1) / 0.35), dc = t >= ST.t2 - 0.1 ? 'st-ok' : 'st-yours';
-      alpha(da); ctx.strokeStyle = col(dc); ctx.fillStyle = col(dc); ctx.lineWidth = 2.6; ctx.lineCap = 'round';
-      [-1, 1].forEach(function (s) {
-        var hx = dp.x + nx * 14 * s, hy = dp.y + ny * 14 * s, vx = -nx * s, vy = -ny * s;
-        var ang = -s * open * 1.35, cs = Math.cos(ang), sn = Math.sin(ang);
-        var rx = vx * cs - vy * sn, ry = vx * sn + vy * cs;
-        ctx.beginPath(); ctx.moveTo(hx, hy); ctx.lineTo(hx + rx * 12, hy + ry * 12); ctx.stroke();
-        ctx.beginPath(); ctx.arc(hx, hy, 2.2, 0, TAU); ctx.fill();
-      });
-      var tx0 = dp.x - 6, ty0 = dp.y + 26 * Math.max(1, LS * 0.9);
-      tag('waiting at the door', tx0, ty0, 'wait', clamp((t - ST.t1) / 0.25) * clamp((ST.t2 - t) / 0.12));
-      tag('allowed ✓', tx0, ty0, 'ok', clamp((t - ST.t2) / 0.15) * clamp((13.55 - t) / 0.3));
-    }
-
-    // arrivals: a ripple on the receiver
-    for (i = 0; i < ARR.length; i++) {
-      var ar = ARR[i], age = t - ar.t, an = N[ar.n];
-      if (age < 0 || age > 0.7 || an.k === 'mesh') continue;
-      alpha(0.6 * (1 - age / 0.7));
-      ctx.beginPath(); ctx.arc(an.x, an.y, rad(an) + 3 + age * 26, 0, TAU); ctx.strokeStyle = col(KC[an.k]); ctx.lineWidth = 1.4; ctx.stroke();
-    }
-
-    // agents
-    NODE_IDS.forEach(function (id) {
-      var n = N[id], p = pop(n, t); if (p <= 0.001) return;
-      var age = t - n.a, a = clamp(p * 1.3);
-      if (n.k === 'mesh') {
-        var cb = chipBox(n), y = n.y + (1 - Math.min(1, p)) * 18, x0 = n.x - cb.w / 2;
-        var working = WORK.some(function (w) { return w.n === id && t >= w.t0 && t <= w.t1; });
-        alpha(a);
-        if (age < 0.8) { ctx.shadowColor = col('st-mesh', 0.8); ctx.shadowBlur = 22 * (1 - age / 0.8); }
-        rrect(x0, y - cb.h / 2, cb.w, cb.h, 7 * cb.s); ctx.fillStyle = col('stage-2'); ctx.fill(); ctx.shadowBlur = 0;
-        ctx.lineWidth = 1.5; ctx.strokeStyle = col('st-mesh', working ? 1 : 0.85);
-        if (working) { ctx.setLineDash([4, 3]); ctx.lineDashOffset = -t * 26; ctx.shadowColor = col('st-mesh', 0.7); ctx.shadowBlur = 10; }
-        ctx.stroke(); ctx.setLineDash([]); ctx.lineDashOffset = 0; ctx.shadowBlur = 0;
-        ctx.save(); ctx.translate(x0 + 12 * cb.s, y); ctx.rotate(Math.PI / 4 + (working ? t * 4 : 0));
-        ctx.fillStyle = col('st-mesh'); ctx.fillRect(-3 * cb.s, -3 * cb.s, 6 * cb.s, 6 * cb.s); ctx.restore();
-        ctx.font = '500 ' + (10.5 * LS).toFixed(2) + 'px ' + FM; ctx.fillStyle = col('stage-fg', 0.95);
-        ctx.textAlign = 'left'; ctx.textBaseline = 'middle'; ctx.fillText(n.name, x0 + 21 * cb.s, y + 0.5);
-        return;
-      }
-      var c = KC[n.k];
-      if (age < 0.9) {
-        alpha(0.7 * (1 - age / 0.9));
-        ctx.beginPath(); ctx.arc(n.x, n.y, n.r + 6 + age * 34, 0, TAU); ctx.strokeStyle = col(c); ctx.lineWidth = 1.5; ctx.stroke();
-      }
-      alpha(a);
-      ctx.save(); ctx.translate(n.x, n.y); ctx.scale(p, p);
-      if (n.main) { ctx.beginPath(); ctx.arc(0, 0, n.r + 9, 0, TAU); ctx.fillStyle = col(c, 0.1); ctx.fill(); }
-      if (age < 0.5) { ctx.shadowColor = col(c, 0.8); ctx.shadowBlur = 24 * (1 - age / 0.5); }
-      ctx.beginPath(); ctx.arc(0, 0, n.r, 0, TAU); ctx.fillStyle = col('stage-2'); ctx.fill(); ctx.shadowBlur = 0;
-      ctx.lineWidth = n.main ? 2.6 : 2; ctx.strokeStyle = col(c);
-      if (n.k === 'theirs') ctx.setLineDash([4.2, 3.2]);
-      ctx.stroke(); ctx.setLineDash([]);
-      ctx.beginPath(); ctx.arc(0, 0, n.main ? 7 : 4.8, 0, TAU);
-      if (n.k === 'theirs') { ctx.lineWidth = 1.6; ctx.stroke(); } else { ctx.fillStyle = col(c); ctx.fill(); }
-      ctx.restore();
-    });
-
-    // names
-    NODE_IDS.forEach(function (id) {
-      var n = N[id]; if (n.k === 'mesh') return;
-      var la = clamp((t - n.a - 0.15) / 0.4);
-      text(n.name, n.x, n.y + n.r + 12 * LS, '500 ' + (11.5 * LS).toFixed(2) + 'px ' + FB, col('stage-fg', 0.94), la);
-      if (n.main) text('YOU', n.x, n.y - n.r - 13 * LS, '600 ' + (8.5 * LS).toFixed(2) + 'px ' + FM, col('st-yours'), la);
-    });
-
-    // delivery receipts
-    for (i = 0; i < ARR.length; i++) {
-      var rc = ARR[i], rg = t - rc.t, rn = N[rc.n];
-      if (rg < 0 || rg > 0.9 || rn.k === 'mesh') continue;
-      var ta = rg < 0.12 ? rg / 0.12 : clamp((0.9 - rg) / 0.4);
-      text('✓', rn.x + rad(rn) * 0.95, rn.y - rad(rn) - 3 - rg * 10, '700 ' + (10.5 * LS).toFixed(2) + 'px ' + FB, col('st-ok'), ta * 0.9);
-    }
-    for (i = 0; i < TAGS.length; i++) {
-      var tg = TAGS[i], tn = N[tg.n];
-      var tga = clamp((t - tg.t0) / 0.18) * clamp((tg.t1 - t) / 0.25);
-      tag(tg.text, tn.x - rad(tn) - 12, tn.y, 'ok', tga, 'right');
-    }
-  }
-
-  function drawSphere(t) {
-    var sa = clamp((t - Z0 - 0.6) / 0.6); if (sa <= 0) return;
-    var zs = 1 + 1.7 * (1 - easeOut((t - Z0 - 0.6) / 3.0)), ang = (t - Z0 - 1.0) * 0.13, Rr = GR * zs;
-    var PR = GP.map(function (p) { var q = gproj(p, ang); return { x: GCX + q.x * Rr, y: GCY + q.y * Rr, z: q.z }; });
-    var BA0 = BA; BA = BA0 * sa;
-    alpha(1);
-    var gr = ctx.createRadialGradient(GCX - Rr * 0.22, GCY - Rr * 0.26, 0, GCX, GCY, Rr * 1.05);
-    gr.addColorStop(0, col('stage-fg', 0.07)); gr.addColorStop(0.6, col('st-theirs', 0.035)); gr.addColorStop(1, col('stage', 0));
-    ctx.fillStyle = gr; ctx.beginPath(); ctx.arc(GCX, GCY, Rr * 1.05, 0, TAU); ctx.fill();
-    ctx.strokeStyle = col('stage-fg', 0.08); ctx.lineWidth = 1; ctx.beginPath(); ctx.arc(GCX, GCY, Rr, 0, TAU); ctx.stroke();
-    GE.forEach(function (e) {
-      var A = PR[e.a], B = PR[e.b], z = (A.z + B.z) / 2; if (z < -0.35) return;
-      var p = easeOut((t - e.st) / e.dur); if (p <= 0) return;
-      var dep = (z + 1) / 2, a = 0.05 + 0.32 * dep * dep;
-      var you = e.a === 0 || e.b === 0, th = GP[e.a].k === 'theirs' && GP[e.b].k === 'theirs';
-      alpha(you ? 0.85 : th ? Math.min(0.85, a * 1.7) : a);
-      ctx.strokeStyle = col(you ? 'st-yours' : th ? 'st-theirs' : 'stage-fg'); ctx.lineWidth = you ? 1.4 : 1;
-      ctx.beginPath(); ctx.moveTo(A.x, A.y); ctx.lineTo(A.x + (B.x - A.x) * p, A.y + (B.y - A.y) * p); ctx.stroke();
-    });
-    for (var i = 1; i < GP.length; i++) {
-      var P = PR[i], g = GP[i]; if (P.z < -0.45 || t < g.ap) continue;
-      var pp = easeBack((t - g.ap) / 0.4), dep2 = (P.z + 1) / 2, sz = (1.5 + 3.4 * dep2) * pp;
-      alpha(0.2 + 0.78 * dep2);
-      ctx.fillStyle = col(g.k === 'theirs' ? 'st-theirs' : g.k === 'mesh' ? 'st-mesh' : 'stage-fg');
-      if (g.k === 'mesh') { ctx.save(); ctx.translate(P.x, P.y); ctx.rotate(Math.PI / 4); ctx.fillRect(-sz / 2, -sz / 2, sz, sz); ctx.restore(); }
-      else { ctx.beginPath(); ctx.arc(P.x, P.y, sz / 2, 0, TAU); ctx.fill(); }
-    }
-    if (t > Z0 + 2.4) {
-      for (var pi = 0; pi < 42; pi++) {
-        var PER = 1.5, uu = (t + hash(pi + 500) * PER) / PER, cyc = Math.floor(uu), fr = uu - cyc;
-        var e = GE[(pi * 131 + cyc * 977) % GE.length];
-        if (t < e.st + e.dur + 0.1) continue;
-        var A = PR[e.a], B = PR[e.b];
-        if (hash(cyc * 7 + pi) < 0.5) { var sw = A; A = B; B = sw; }
-        if ((A.z + B.z) / 2 < -0.1) continue;
-        var you = e.a === 0 || e.b === 0, th2 = GP[e.a].k === 'theirs' || GP[e.b].k === 'theirs';
-        var pc = you ? 'st-yours' : th2 ? 'st-theirs' : 'stage-fg';
-        alpha(Math.sin(fr * Math.PI)); ctx.shadowColor = col(pc); ctx.shadowBlur = 8; ctx.fillStyle = col(pc);
-        ctx.beginPath(); ctx.arc(A.x + (B.x - A.x) * fr, A.y + (B.y - A.y) * fr, 2.1, 0, TAU); ctx.fill(); ctx.shadowBlur = 0;
+  function burst(ev, t) {
+    var dt = t - ev.t, s = '', u, i, a, r, pal = [PAL.amber, PAL.mint, PAL.blue, PAL.violet, PAL.amber, PAL.mint];
+    if (dt < 0 || dt > 1.6) return '';
+    if (ev.kind === 'delivered') {
+      u = seg(dt, 0, 0.35); var o = 1 - seg(dt, 1.0, 1.4);
+      if (o > 0) s += '<g opacity="' + o.toFixed(2) + '">' + checkBadge(ev.x, ev.y - 40 * easeOut(u), easeBack(u)) + '</g>';
+      for (i = 0; i < 6; i++) { u = seg(dt, i * 0.04, i * 0.04 + 0.9); if (u <= 0 || u >= 1) continue; a = (i / 6) * TAU; r = 30 + 60 * easeOut(u); s += star(ev.x + Math.cos(a) * r, ev.y - 40 + Math.sin(a) * r * 0.8, 0.8 + 0.3 * (i % 2), i * 30 + u * 90, pal[i], 1 - u); }
+    } else if (ev.kind === 'ring') {
+      u = seg(dt, 0, 0.8);
+      if (u < 1) s += '<circle cx="' + ev.x + '" cy="' + ev.y + '" r="' + n1(12 + 70 * easeOut(u)) + '" fill="none" stroke="' + PAL.amber + '" stroke-width="' + n1(6 * (1 - u) + 1) + '" stroke-opacity="' + (1 - u).toFixed(2) + '"/>';
+    } else if (ev.kind === 'sparkle') {
+      u = seg(dt, 0, 0.9);
+      if (u < 1) for (i = 0; i < 12; i++) { a = (i / 12) * TAU; r = 14 + 70 * easeOut(u); s += star(ev.x + Math.cos(a) * r, ev.y + Math.sin(a) * r, 0.8 + 0.25 * (i % 3), i * 30 + u * 120, pal[i % 6], 1 - u); }
+    } else if (ev.kind === 'confetti') {
+      for (i = 0; i < 34; i++) {
+        a = -Math.PI / 2 + ((i * 97 % 100) / 100 - 0.5) * 2.4; var v = 200 + (i * 53 % 160), x, y, oo, rot;
+        x = ev.x + Math.cos(a) * v * dt * 0.75; y = ev.y + Math.sin(a) * v * dt * 0.75 + 380 * dt * dt;
+        oo = 1 - seg(dt, 0.9, 1.6); rot = i * 37 + dt * 400;
+        if (i % 3 === 0) s += '<circle cx="' + n1(x) + '" cy="' + n1(y) + '" r="5" fill="' + pal[i % 6] + '" fill-opacity="' + oo.toFixed(2) + '"/>';
+        else s += '<rect transform="translate(' + n1(x) + ',' + n1(y) + ') rotate(' + rot.toFixed(0) + ')" x="-5" y="-3" width="10" height="6" rx="2" fill="' + pal[i % 6] + '" fill-opacity="' + oo.toFixed(2) + '"/>';
       }
     }
-    var Yp = PR[0], yp = easeBack((t - GP[0].ap) / 0.45);
-    if (t > GP[0].ap && Yp.z > -0.2) {
-      var ph = ((t - GP[0].ap) % 1.6 + 1.6) % 1.6;
-      alpha(0.7 * (1 - ph / 1.6)); ctx.strokeStyle = col('st-yours'); ctx.lineWidth = 1.5;
-      ctx.beginPath(); ctx.arc(Yp.x, Yp.y, 7 + ph * 20, 0, TAU); ctx.stroke();
-      alpha(1); ctx.shadowColor = col('st-yours'); ctx.shadowBlur = 16; ctx.fillStyle = col('st-yours');
-      ctx.beginPath(); ctx.arc(Yp.x, Yp.y, Math.max(0, 6 * yp), 0, TAU); ctx.fill(); ctx.shadowBlur = 0;
-      text('you', Yp.x, Yp.y - 18 * LS, '600 ' + (9.5 * LS).toFixed(2) + 'px ' + FM, col('st-yours'), clamp((t - GP[0].ap - 0.3) / 0.5));
-    }
-    BA = BA0;
+    return s;
   }
 
-  var scale = 1;
+  /* ---- characters ---- */
+  function agentSVG(a, x, ground, s, st) {
+    var col = a.color, body = 'url(#c_' + col + ')', dark = PAL['d_' + col], INK = PAL.ink;
+    var squash = st.squash || 0, jump = st.jump || 0;
+    var bd = { squircle: { cy: -62, w: 104, h: 92, eyeY: -66 }, round: { cy: -58, w: 104, h: 104, eyeY: -62 }, capsule: { cy: -70, w: 84, h: 122, eyeY: -84 }, hat: { cy: -60, w: 100, h: 96, eyeY: -64 } }[a.type];
+    var cy = bd.cy, w = bd.w, h = bd.h, ey = bd.eyeY, g = '';
+    var armY = cy + 8, aw = w / 2 + 2, armR = st.armR == null ? 12 : st.armR, armL = st.armL == null ? -12 : st.armL;
+    g += '<g transform="translate(' + aw + ',' + armY + ') rotate(' + armR.toFixed(0) + ')"><ellipse cx="0" cy="16" rx="11" ry="21" fill="' + dark + '"/></g>';
+    g += '<g transform="translate(' + (-aw) + ',' + armY + ') rotate(' + armL.toFixed(0) + ')"><ellipse cx="0" cy="16" rx="11" ry="21" fill="' + dark + '"/></g>';
+    g += '<ellipse cx="-22" cy="-6" rx="16" ry="9" fill="' + dark + '"/><ellipse cx="22" cy="-6" rx="16" ry="9" fill="' + dark + '"/>';
+    if (a.type === 'round') g += '<path d="M-42,-86 L-38,-124 L-12,-102 Z" fill="' + body + '"/><path d="M42,-86 L38,-124 L12,-102 Z" fill="' + body + '"/><path d="M-37,-95 L-35,-114 L-22,-103 Z" fill="#fff" fill-opacity="0.55"/><path d="M37,-95 L35,-114 L22,-103 Z" fill="#fff" fill-opacity="0.55"/>';
+    if (a.type === 'round') g += '<circle cx="0" cy="' + cy + '" r="' + (w / 2) + '" fill="' + body + '"/>';
+    else g += '<rect x="' + (-w / 2) + '" y="' + (cy - h / 2) + '" width="' + w + '" height="' + h + '" rx="' + (a.type === 'capsule' ? w / 2 : 36) + '" fill="' + body + '"/>';
+    g += '<ellipse cx="' + (-w * 0.18) + '" cy="' + (cy - h * 0.30) + '" rx="' + (w * 0.22) + '" ry="' + (h * 0.10) + '" fill="#fff" fill-opacity="0.38"/>';
+    if (a.type === 'squircle') g += '<path d="M0,' + (cy - h / 2) + ' L0,' + (cy - h / 2 - 20) + '" stroke="' + dark + '" stroke-width="5" stroke-linecap="round"/><circle cx="0" cy="' + (cy - h / 2 - 25) + '" r="8" fill="#fff"/>';
+    if (a.type === 'capsule') g += '<path d="M0,' + (cy - h / 2) + ' Q8,' + (cy - h / 2 - 22) + ' 24,' + (cy - h / 2 - 20) + '" stroke="' + dark + '" stroke-width="5" fill="none" stroke-linecap="round"/><circle cx="26" cy="' + (cy - h / 2 - 21) + '" r="6.5" fill="#fff"/>';
+    if (a.type === 'hat') g += '<path d="M-22,' + (cy - h / 2 + 4) + ' L0,' + (cy - h / 2 - 40) + ' L22,' + (cy - h / 2 + 4) + ' Z" fill="' + INK + '" fill-opacity="0.85"/><circle cx="0" cy="' + (cy - h / 2 - 42) + '" r="7" fill="#fff"/>';
+    var ex = a.type === 'capsule' ? 17 : 21, lx = (st.lookX || 0) * 4, ly = (st.lookY || 0) * 3.5, blink = st.blink ? 0.12 : 1, sx;
+    for (sx = -1; sx <= 1; sx += 2) {
+      g += '<g transform="translate(' + (sx * ex) + ',' + ey + ') scale(1,' + blink + ')"><circle r="12" fill="#fff"/><circle cx="' + lx.toFixed(1) + '" cy="' + ly.toFixed(1) + '" r="6.6" fill="' + INK + '"/><circle cx="' + (lx + 2.2).toFixed(1) + '" cy="' + (ly - 2.4).toFixed(1) + '" r="2.2" fill="#fff"/></g>';
+      g += '<ellipse cx="' + (sx * (ex + 14)) + '" cy="' + (ey + 14) + '" rx="8" ry="5" fill="#fff" fill-opacity="0.4"/>';
+    }
+    var happy = st.happy || 0, think = st.think || 0;
+    if (think > 0.4) g += '<circle cx="0" cy="' + (ey + 18) + '" r="4.5" fill="' + INK + '"/>';
+    else if (happy > 0.45) g += '<path d="M-11,' + (ey + 12) + ' Q0,' + (ey + 34) + ' 11,' + (ey + 12) + ' Z" fill="' + INK + '"/><path d="M-6,' + (ey + 21) + ' Q0,' + (ey + 28) + ' 6,' + (ey + 21) + ' Q0,' + (ey + 18) + ' -6,' + (ey + 21) + 'Z" fill="' + PAL.amber + '"/>';
+    else g += '<path d="M-9,' + (ey + 14) + ' Q0,' + (ey + 22) + ' 9,' + (ey + 14) + '" stroke="' + INK + '" stroke-width="3.4" fill="none" stroke-linecap="round"/>';
+    var sy = s * (1 - squash), sxs = s * (1 + squash), jf = 1 - jump / 260;
+    return '<ellipse cx="' + x + '" cy="' + (ground + 4) + '" rx="' + n1(62 * s * jf) + '" ry="' + n1(11 * s * jf) + '" fill="url(#softShadow)"/>' +
+      '<g transform="translate(' + n1(x) + ',' + n1(ground - jump) + ') scale(' + sxs.toFixed(3) + ',' + sy.toFixed(3) + ')">' + g + '</g>';
+  }
+  function payloadSVG(p, t) {
+    var x = p.pos[0], y = p.pos[1], s = p.scale * (1 + (p.moving ? 0 : 0.04 * Math.sin(t * 8))), wob = p.moving ? Math.sin(t * 12) * 5 : Math.sin(t * 6) * 3, g;
+    var am = PAL.amber, amD = PAL.d_amber;
+    if (p.kind === 'envelope') g = '<rect x="-29" y="-21" width="58" height="42" rx="9" fill="#fff" stroke="' + am + '" stroke-width="4"/><path d="M-26,-16 L0,4 L26,-16" fill="none" stroke="' + am + '" stroke-width="4" stroke-linejoin="round" stroke-linecap="round"/><circle cx="0" cy="9" r="6" fill="' + am + '"/>';
+    else if (p.kind === 'request') g = '<rect x="-32" y="-25" width="64" height="46" rx="15" fill="' + am + '" stroke="' + amD + '" stroke-width="3"/><path d="M-16,19 L-27,34 L-2,20 Z" fill="' + am + '" stroke="' + amD + '" stroke-width="3" stroke-linejoin="round"/><path d="M-14,17 L-2,17" stroke="' + am + '" stroke-width="6"/><text y="10" text-anchor="middle" font-size="32" font-weight="700" fill="' + PAL.ink + '">?</text>';
+    else g = '<rect x="-26" y="-6" width="52" height="32" rx="7" fill="' + PAL.mint + '"/><rect x="-30" y="-18" width="60" height="16" rx="7" fill="' + mix(PAL.mint, '#fff', 0.35) + '"/><rect x="-5" y="-18" width="10" height="44" fill="#fff"/><ellipse cx="-11" cy="-26" rx="11" ry="7" fill="#fff" transform="rotate(-20 -11 -26)"/><ellipse cx="11" cy="-26" rx="11" ry="7" fill="#fff" transform="rotate(20 11 -26)"/>';
+    return '<g transform="translate(' + n1(x) + ',' + n1(y) + ') rotate(' + wob.toFixed(1) + ') scale(' + s.toFixed(3) + ')">' + g + '</g>';
+  }
+  function pill(cx, cy, text, fs, o, align) {
+    var w = text.length * fs * 0.58 + fs * 1.3, h = fs * 1.55;
+    if (align === "l") cx = cx + w / 2; else if (align === "r") cx = cx - w / 2;
+    return '<g' + (o != null ? ' opacity="' + o.toFixed(2) + '"' : '') + '><rect x="' + n1(cx - w / 2) + '" y="' + n1(cy - h / 2 + 2) + '" width="' + n1(w) + '" height="' + n1(h) + '" rx="' + n1(h / 2) + '" fill="' + PAL.fg + '" fill-opacity="0.07"/>' +
+      '<rect x="' + n1(cx - w / 2) + '" y="' + n1(cy - h / 2) + '" width="' + n1(w) + '" height="' + n1(h) + '" rx="' + n1(h / 2) + '" fill="' + PAL.pill + '" stroke="' + PAL.strong + '"/>' +
+      '<text x="' + n1(cx) + '" y="' + n1(cy + fs * 0.35) + '" text-anchor="middle" font-size="' + fs + '" fill="' + PAL.fg + '">' + text + '</text></g>';
+  }
+
+  /* ---- one frame ---- */
   function render(t) {
-    ctx.setTransform(scale, 0, 0, scale, 0, 0);
-    ctx.globalAlpha = 1; ctx.clearRect(0, 0, W, H);
-    BA = t < 0.3 ? t / 0.3 : (t > LOOP - 0.8 ? clamp((LOOP - t) / 0.8) : 1);
-    drawSphere(t);
-    var z = easeInOut((t - Z0) / 1.5), la = 1 - clamp((t - (Z0 + 1.0)) / 0.5);
-    if (la > 0) {
-      var s = 1 - 0.9 * z, tx = lerp(Y0.x, GCX, z), ty = lerp(Y0.y, GCY, z), BA1 = BA;
-      BA = BA1 * la;
-      ctx.save(); ctx.translate(tx, ty); ctx.scale(s, s); ctx.translate(-Y0.x, -Y0.y);
-      drawLocal(t);
-      ctx.restore();
-      BA = BA1;
+    var out = [], pay = [payloadAt(j1, t), payloadAt(j2, t)], nodeE = {}, k, lg, j, e;
+    var FS = 26 * LS, IDLE = 2.3;
+
+    for (k = 0; k < 7; k++) {
+      var bx = 90 + k * 160 + 30 * Math.sin(TAU * (t / LOOP + k / 7)), by = 120 + ((k * 131) % 520) + 22 * Math.cos(TAU * (t / LOOP * 2 + k / 5)), br = 34 + (k % 4) * 20;
+      out.push('<circle cx="' + n1(bx) + '" cy="' + n1(by) + '" r="' + br + '" fill="' + PAL.surface2 + '" fill-opacity="0.55"/>');
     }
-    ctx.globalAlpha = 1;
+    [j1, j2].forEach(function (jj) { jj.legs.forEach(function (l) { if (l.to && t >= l.t1) { var en = Math.exp(-(t - l.t1) / 0.5); nodeE[l.to] = Math.max(nodeE[l.to] || 0, en); } }); });
+
+    /* cloud */
+    var cin = seg(t, 5.6, 7.0), cout = 1 - seg(t, 22.0, 22.9), ca = Math.min(seg(t, 5.6, 6.4), cout);
+    if (ca > 0.01) {
+      var sc = 0.9 + 0.1 * Math.min(1, easeBack(cin)), ty = (1 - easeOut(cin)) * 70;
+      var shapes = '<circle cx="325" cy="205" r="78"/><circle cx="400" cy="150" r="92"/><circle cx="500" cy="116" r="106"/><circle cx="620" cy="116" r="106"/><circle cx="720" cy="150" r="92"/><circle cx="795" cy="205" r="78"/><rect x="325" y="150" width="470" height="135" rx="66"/>';
+      var g = '<ellipse cx="560" cy="292" rx="340" ry="16" fill="url(#softShadow)"/>' +
+        '<g fill="' + PAL.strong + '" stroke="' + PAL.strong + '" stroke-width="7" stroke-opacity="0.75">' + shapes + '</g><g fill="url(#cloudG)">' + shapes + '</g>';
+      helpers.forEach(function (h, hi) {
+        var pop = easeBack(seg(t, 6.3 + hi * 0.3, 6.8 + hi * 0.3));
+        if (pop <= 0) return;
+        var think = (hi === 0 && t >= 10.9 && t < 11.6) || (hi === 1 && t >= 13.6 && t < 14.3) ? 1 : 0;
+        var cheer = hi === 2 ? bump(t, 16.3, 17.0) : (hi === 0 ? bump(t, 11.6, 12.1) * 0.6 : bump(t, 14.3, 14.8) * 0.6);
+        var arrive = hi === 0 ? seg(t, 10.0, 10.9) : hi === 1 ? seg(t, 12.8, 13.6) : seg(t, 15.5, 16.3);
+        var st = { jump: 3 * Math.abs(Math.sin(TAU * (t / IDLE + hi * 0.3))) + (cheer > 0.3 ? 14 * cheer : 0), happy: cheer, think: think, lookY: arrive > 0 && arrive < 1 ? 1 : 0, lookX: 0,
+          blink: frac(t / (LOOP / 7) + hi * 0.27) < 0.04, armR: cheer > 0.3 ? -140 : 12, armL: cheer > 0.3 ? 140 : -12, squash: 0.02 * Math.sin(TAU * (t / IDLE + hi * 0.3)) };
+        g += agentSVG(h, h.x, HELPER_GROUND, HELPER_S * Math.min(1.05, pop), st);
+        if (think) g += '<g transform="translate(' + (h.x + 30) + ',' + (HELPER_GROUND - 140) + ')"><rect x="-26" y="-16" width="52" height="30" rx="15" fill="' + PAL.pill + '" stroke="' + PAL.strong + '"/>' +
+          [0, 1, 2].map(function (q) { return '<circle cx="' + (-12 + q * 12) + '" cy="0" r="' + (3.6 + 1.8 * Math.max(0, Math.sin(t * 9 - q * 1.2))).toFixed(1) + '" fill="' + PAL.fg + '"/>'; }).join('') + '</g>';
+      });
+      out.push('<g opacity="' + ca.toFixed(2) + '" transform="translate(' + n1(560 * (1 - sc)) + ',' + n1(ty + 200 * (1 - sc)) + ') scale(' + sc.toFixed(3) + ')">' + g + '</g>');
+      var ta = Math.min(seg(t, 7.0, 7.6), cout);
+      if (ta > 0.01) out.push(pill(880, 312, 'Agent Cloud', FS, ta, 'r'));
+    }
+
+    /* mesh */
+    out.push('<ellipse cx="560" cy="' + (556 + MY) + '" rx="520" ry="22" fill="url(#softShadow)"/>');
+    out.push('<path transform="translate(0,' + MY + ')" d="M60,470 C60,410 140,392 240,398 C360,408 440,388 560,392 C680,396 780,408 900,396 C990,388 1060,420 1060,470 C1060,520 990,552 900,546 C780,540 680,556 560,550 C440,544 360,556 240,548 C140,552 60,530 60,470 Z" fill="url(#bandG)" stroke="' + PAL.surface + '" stroke-opacity="0.9" stroke-width="3"/>');
+    var eg = '', dash = (-frac(t / LOOP * 40) * 16).toFixed(1);
+    edges.forEach(function (ed) { eg += '<line x1="' + ed[0][0] + '" y1="' + ed[0][1] + '" x2="' + ed[1][0] + '" y2="' + ed[1][1] + '" stroke="' + PAL.edge + '" stroke-opacity="0.5" stroke-width="3.5"/><line x1="' + ed[0][0] + '" y1="' + ed[0][1] + '" x2="' + ed[1][0] + '" y2="' + ed[1][1] + '" stroke="#fff" stroke-opacity="0.9" stroke-width="3" stroke-dasharray="0.1 16" stroke-dashoffset="' + dash + '"/>'; });
+    out.push('<g stroke-linecap="round">' + eg + '</g>');
+    var ns = '';
+    allNodes.forEach(function (nd) {
+      var en = nodeE[nd.key] || 0, big = nd.key === 'U2' || nd.key === 'U4' || nd.key === 'U6' || nd.key === 'L0';
+      if (en > 0.02) ns += '<circle cx="' + nd.p[0] + '" cy="' + nd.p[1] + '" r="' + n1(14 + 26 * (1 - en)) + '" fill="' + PAL.amber + '" fill-opacity="' + (0.4 * en).toFixed(2) + '"/>';
+      ns += '<circle cx="' + nd.p[0] + '" cy="' + nd.p[1] + '" r="' + (big ? 11 : 8.5) + '" fill="' + PAL.pill + '" stroke="' + PAL.edge + '" stroke-width="3.5"/>';
+    });
+    out.push(ns);
+    out.push(pill(70, 322, 'AgentMesh', FS, null, 'l'));
+    var acc = seg(t, 8.95, 9.35), accOut = 1 - seg(t, 10.3, 10.7);
+    if (acc > 0 && accOut > 0) out.push(checkBadge(185, 396 - 14 * acc, easeBack(acc) * accOut));
+
+    /* personal agents */
+    var pp = pay.filter(Boolean).map(function (p) { return p.pos; });
+    agents.forEach(function (a, ai) {
+      var happy = 0, jump = 0, armR = 12, armL = -12;
+      function hop(a0, a1, nn, hh) { var u = seg(t, a0, a1); return u > 0 && u < 1 ? hh * Math.abs(Math.sin(u * Math.PI * nn)) : 0; }
+      if (a.id === 'you') {
+        var w1 = bump(t, 0.5, 1.5), w2 = bump(t, 7.3, 8.2), cel = seg(t, 20.1, 21.8);
+        if (w1 > 0.3 || w2 > 0.3) armR = -150 + 20 * Math.sin(t * 14);
+        jump = hop(20.1, 21.8, 3, 26);
+        if (cel > 0 && cel < 1) { armR = -150; armL = 150; }
+        happy = Math.max(w1, w2, cel > 0 && cel < 1 ? 1 : 0);
+      } else if (a.id === 'b') {
+        jump = hop(4.5, 5.5, 2, 22); happy = bump(t, 4.5, 5.6) > 0.2 ? 1 : 0;
+        if (jump > 0) { armR = -140; armL = 140; }
+      }
+      var lookX = 0, lookY = 0.3 * Math.sin(t * 0.8 + ai);
+      if (pp.length) { var best = null, bd = 1e9; pp.forEach(function (p) { var d = Math.hypot(p[0] - a.x, p[1] - (GROUND - 70)); if (d < bd) { bd = d; best = p; } }); if (best && bd < 420) { lookX = clamp((best[0] - a.x) / 160, -1, 1); lookY = clamp((best[1] - (GROUND - 70)) / 200, -1, 1); } }
+      out.push(agentSVG(a, a.x, GROUND, 1.12, { jump: jump, happy: happy, armR: armR, armL: armL, lookX: lookX, lookY: lookY, blink: frac(t / (LOOP / 7) + ai * 0.31) < 0.04, squash: 0.025 * Math.sin(TAU * (t / IDLE + ai * 0.25)) }));
+      if (a.label) out.push(pill(a.x, GROUND + 46, a.label, FS));
+    });
+
+    /* trails, payloads, particles */
+    [j1, j2].forEach(function (jj) { trailOf(jj, t).forEach(function (tr) { out.push('<circle cx="' + n1(tr.pos[0]) + '" cy="' + n1(tr.pos[1]) + '" r="' + n1(7 - tr.k * 0.8) + '" fill="' + PAL.amber + '" fill-opacity="' + (0.55 - tr.k * 0.07).toFixed(2) + '"/>'); }); });
+    pay.forEach(function (p) { if (p) out.push(payloadSVG(p, t)); });
+    events.forEach(function (ev) { out.push(burst(ev, t)); });
+    dyn.innerHTML = out.join('');
   }
 
-  /* chapter caption, verbs, scrubber */
+  /* ---- chapter caption, verbs, scrubber (unchanged behaviour) ---- */
   var chap = $('chap'), chapN = $('chap-n'), chapH = $('chap-h'), chapD = $('chap-d');
   var segs = [].slice.call(document.querySelectorAll('#chapters button'));
   var fills = segs.map(function (b) { return b.querySelector('.fill'); });
   var verbs = [].slice.call(document.querySelectorAll('.verbs li'));
   var em = $('hero-em'), lastAct = -1;
-  function actAt(t) { var ai = 0; for (var i = 0; i < ACTS.length; i++) if (t >= ACTS[i].s) ai = i; return ai; }
+  function actAt(t) { var ai = 0, q; for (q = 0; q < ACTS.length; q++) if (t >= ACTS[q].s) ai = q; return ai; }
   function updateUI(t) {
     var ai = actAt(t);
     if (ai !== lastAct) {
@@ -1117,44 +987,33 @@ p{margin:0}
       chap.classList.remove('in'); void chap.offsetWidth;
       chapN.innerHTML = '0' + (ai + 1) + '<small>/05</small>'; chapH.textContent = ACTS[ai].h; chapD.textContent = ACTS[ai].d;
       chap.classList.add('in');
-      verbs.forEach(function (v, i) { v.classList.toggle('on', ai >= i + 1); v.classList.toggle('now', ai === i + 1); });
-      em.classList.toggle('on', ai >= 3);
-      segs.forEach(function (b, i) { b.classList.toggle('cur', i === ai); if (i === ai) b.setAttribute('aria-current', 'step'); else b.removeAttribute('aria-current'); });
+      verbs.forEach(function (v, q) { v.classList.toggle('on', ai >= q); v.classList.toggle('now', ai === q); });
+      em.classList.toggle('on', ai >= 2);
+      segs.forEach(function (b, q) { b.classList.toggle('cur', q === ai); if (q === ai) b.setAttribute('aria-current', 'step'); else b.removeAttribute('aria-current'); });
     }
-    fills.forEach(function (f, i) {
-      var s = ACTS[i].s, e = i < ACTS.length - 1 ? ACTS[i + 1].s : LOOP;
-      f.style.transform = 'scaleX(' + (t >= e ? 1 : t <= s ? 0 : (t - s) / (e - s)).toFixed(4) + ')';
+    fills.forEach(function (f, q) {
+      var s = ACTS[q].s, e2 = q < ACTS.length - 1 ? ACTS[q + 1].s : LOOP;
+      f.style.transform = 'scaleX(' + (t >= e2 ? 1 : t <= s ? 0 : (t - s) / (e2 - s)).toFixed(4) + ')';
     });
   }
-
-  function fit() {
-    var w = box.clientWidth || 640, dpr = Math.min(window.devicePixelRatio || 1, 2);
-    canvas.width = Math.round(w * dpr); canvas.height = Math.round(w * H / W * dpr);
-    scale = canvas.width / W;
-    LS = clamp(560 / w, 1, 1.5);
-  }
+  function fit() { var w = box.clientWidth || 560; LS = clamp(560 / w, 1, 1.6); }
 
   var reduced = false;
-  try { reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches; } catch (e) {}
+  try { reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches; } catch (err) {}
   var T = 0.8, playing = !reduced, onScreen = true, last = performance.now();
   var playBtn = $('play');
-  function setPlaying(p) {
-    playing = p; playBtn.classList.toggle('paused', !p);
-    playBtn.setAttribute('aria-label', p ? 'Pause the animation' : 'Play the animation');
-  }
+  function setPlaying(p) { playing = p; playBtn.classList.toggle('paused', !p); playBtn.setAttribute('aria-label', p ? 'Pause the animation' : 'Play the animation'); }
   function draw() { render(T); updateUI(T); }
-  if (reduced) { T = ACTS[3].rest; setPlaying(false); }
+  if (reduced) { T = 21.9; setPlaying(false); }
   playBtn.addEventListener('click', function () { setPlaying(!playing); last = performance.now(); });
-  segs.forEach(function (b, i) {
-    b.addEventListener('click', function () { T = playing ? ACTS[i].s + 0.001 : ACTS[i].rest; last = performance.now(); draw(); });
-  });
+  segs.forEach(function (b, q) { b.addEventListener('click', function () { T = playing ? ACTS[q].s + 0.001 : ACTS[q].rest; last = performance.now(); draw(); }); });
 
   readColors(); fit(); draw();
   if (window.ResizeObserver) new ResizeObserver(function () { fit(); draw(); }).observe(box);
   else window.addEventListener('resize', function () { fit(); draw(); });
   if (window.IntersectionObserver) new IntersectionObserver(function (es) { onScreen = es[0].isIntersecting; last = performance.now(); }).observe(box);
   function retheme() { readColors(); draw(); }
-  try { window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', retheme); } catch (e) {}
+  try { window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', retheme); } catch (err) {}
   if (window.MutationObserver) new MutationObserver(retheme).observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme', 'class'] });
   if (document.fonts && document.fonts.ready) document.fonts.ready.then(draw);
 
