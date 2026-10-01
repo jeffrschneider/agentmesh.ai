@@ -359,8 +359,8 @@
           <li><b>owner</b>The person who owns the agent can pause or terminate it.</li>
           <li><b>org admin</b>An organization admin can stop any agent the organization owns.</li>
           <li><b>operator</b>The AgentMesh operator can stop any agent, or the whole mesh.</li>
-          <li><b>passkey</b>Every press asks for your passkey if you have one, so a stolen session cannot press it. Without a passkey, you confirm from a recent sign-in by typing what you are about to do.</li>
-          <li><b>preview</b>Above one agent, the switch shows how many agents it will stop and asks you to type a confirmation.</li>
+          <li><b>one press</b>Pausing takes one press and nothing else, because stopping should never wait.</li>
+          <li><b>confirm</b>Resuming and terminating ask you to confirm: with your passkey if you have one, otherwise by typing a word after a recent sign-in.</li>
           <li><b>record</b>Every press is recorded with who pressed it, what it stopped, when, and why.</li>
           <li><b>lifting</b>Only the same or a higher authority can lift a stop.</li>
         </ul>
@@ -555,28 +555,20 @@
       <div>
         <p class="lc-num">08</p>
         <h2>How it looks.</h2>
-        <p>The switch appears wherever the person who answers for the agents already works. Each version asks for your passkey, or a typed confirmation if you have none, and the larger ones show a count and ask you to type a confirmation before anything stops.</p>
+        <p>The Kill switch has its own page, first in the menu, with one box for each scope and a count of what it covers. Pausing is one press. Resuming asks you to confirm, and lets you deliver or discard the mail that waited.</p>
         <ul class="places">
+          <li><b>The Kill switch page</b>First in the menu. One press pauses one agent, everything you own, or your organization.</li>
           <li><b>On an agent's page</b>Pause and Terminate buttons sit on every agent's page, next to its status.</li>
-          <li><b>A person's panic button</b>One button in your account pauses every agent you own.</li>
           <li><b>The organization stop</b>An organization admin can pause every agent the organization owns.</li>
           <li><b>The mesh-wide pause</b>The operator can pause the entire mesh. The operator's own tools keep running, so the mesh can be inspected and brought back.</li>
         </ul>
       </div>
       <div class="fig">
-        <div class="dlg" role="img" aria-label="A confirmation screen for pausing every agent a person owns. It shows that 14 agents will be paused and 3 running jobs will be held, asks the person to type pause all to confirm, and offers a Pause with passkey button and a Cancel button.">
-          <span class="t">Panic button</span>
-          <p class="h">Pause everything you own?</p>
-          <div class="cnt"><b>14 agents</b> will be paused. <b>3 running jobs</b> will be held, and new mail will wait in each inbox. You can resume them at any time.</div>
-          <div>
-            <div class="lab">Reason</div>
-            <div class="in">Unexpected spending on the research agent</div>
-          </div>
-          <div>
-            <div class="lab">Type "pause all" to confirm</div>
-            <div class="in">pause all</div>
-          </div>
-          <div class="row"><span class="b go">Pause with passkey</span><span class="b no">Cancel</span></div>
+        <div class="dlg" role="img" aria-label="The Everything you own box on the Kill switch page. It shows 14 agents and 3 running jobs, says new mail will wait in each inbox, and offers one Pause button.">
+          <span class="t">Kill switch</span>
+          <p class="h">Everything you own</p>
+          <div class="cnt"><b>14 agents</b> and <b>3 running jobs</b>. Pausing stops them all at once, and new mail waits in each inbox. You can resume at any time.</div>
+          <div class="row"><span class="b go">Pause</span></div>
         </div>
       </div>
     </section>
