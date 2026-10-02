@@ -1,0 +1,128 @@
+{
+  "page": {
+    "file": "integrations.html",
+    "url": "https://agentmesh.ai/integrations.html",
+    "title": "Integrations | AgentMesh",
+    "description": "Send the mesh's traces to the tracing tool you already use, screen messages with the screening service you trust, and keep each agent's code on GitHub.",
+    "kicker": "Integrations",
+    "h1": "Plug the mesh into the tools you already run",
+    "lede": "Each card says how far we have taken it. Tested by us means we ran it against the live service. Speaks the standard means it uses an open standard we support, but we have not tried that product. Written from the vendor's documentation means we followed the vendor's own instructions and have not run it yet.",
+    "waitlistFrom": "integrations"
+  },
+  "statuses": {
+    "tested": { "label": "Tested by us", "tone": "ok" },
+    "standard": { "label": "Speaks the standard; not tested by us", "tone": "std" },
+    "standard-own": { "label": "Speaks the standard", "tone": "std" },
+    "vendor-docs": { "label": "Written from the vendor's documentation, not yet tested", "tone": "doc" }
+  },
+  "groups": [
+    {
+      "id": "traces",
+      "title": "Send traces to the tool you already watch",
+      "intro": "The mesh publishes each hop between agents as an OpenTelemetry span, so those hops show up next to the traces your own services already produce.",
+      "cards": [
+        {
+          "name": "Any OpenTelemetry collector",
+          "line": "Send spans to your collector, and it forwards them to whatever you run.",
+          "setup": "agentmesh trace export --otlp https://your-collector:4318",
+          "status": "standard",
+          "href": "https://dev.agentmesh.ai/observability.html"
+        },
+        {
+          "name": "Google Cloud Trace",
+          "line": "One export command sends spans straight to Google.",
+          "setup": "agentmesh trace export --otlp https://telemetry.googleapis.com --auth gcp",
+          "status": "tested",
+          "href": "https://dev.agentmesh.ai/for-google-traces.html"
+        },
+        {
+          "name": "Azure Application Insights",
+          "line": "A collector you run forwards spans to Azure Monitor.",
+          "setup": "agentmesh trace export --otlp http://your-collector:4318",
+          "status": "vendor-docs",
+          "href": "https://dev.agentmesh.ai/for-microsoft-traces.html"
+        },
+        {
+          "name": "Honeycomb",
+          "line": "Point the export at Honeycomb's OpenTelemetry endpoint, or at your collector.",
+          "setup": "agentmesh trace export --otlp <endpoint> --header \"<key>\"",
+          "status": "standard",
+          "href": "https://dev.agentmesh.ai/observability.html"
+        },
+        {
+          "name": "Datadog",
+          "line": "Point the export at Datadog's OpenTelemetry endpoint, or at your collector.",
+          "setup": "agentmesh trace export --otlp <endpoint> --header \"<key>\"",
+          "status": "standard",
+          "href": "https://dev.agentmesh.ai/observability.html"
+        },
+        {
+          "name": "Grafana Tempo",
+          "line": "Point the export at Tempo's OpenTelemetry endpoint, or at your collector.",
+          "setup": "agentmesh trace export --otlp <endpoint>",
+          "status": "standard",
+          "href": "https://dev.agentmesh.ai/observability.html"
+        },
+        {
+          "name": "New Relic",
+          "line": "Point the export at New Relic's OpenTelemetry endpoint, or at your collector.",
+          "setup": "agentmesh trace export --otlp <endpoint> --header \"<key>\"",
+          "status": "standard",
+          "href": "https://dev.agentmesh.ai/observability.html"
+        }
+      ]
+    },
+    {
+      "id": "screening",
+      "title": "Screen messages with the service you trust",
+      "intro": "Before a message reaches your agent, the node can ask a screening service to check it. Your policy and your key stay with you.",
+      "cards": [
+        {
+          "name": "Google Model Armor",
+          "line": "The node calls Model Armor directly, using the template in your project.",
+          "setup": "\"dialect\": \"model-armor\"",
+          "status": "tested",
+          "href": "https://dev.agentmesh.ai/for-google-screening.html"
+        },
+        {
+          "name": "Azure AI Content Safety",
+          "line": "A small function in your Azure subscription passes each message from the node to Content Safety.",
+          "setup": "A function in your subscription, behind the screening socket",
+          "setupIsProse": true,
+          "status": "vendor-docs",
+          "href": "https://dev.agentmesh.ai/for-microsoft-screening.html"
+        },
+        {
+          "name": "Lakera Guard",
+          "line": "The node can call Lakera Guard, but we have not run it against the live service yet.",
+          "setup": "\"dialect\": \"lakera\"",
+          "status": "vendor-docs",
+          "href": "https://dev.agentmesh.ai/screening.html"
+        },
+        {
+          "name": "Your own screener",
+          "line": "Build a service that answers the screening socket, and the node will send it every message to check.",
+          "setup": "\"provider\": \"https://your-screener\"",
+          "status": "standard-own",
+          "href": "https://dev.agentmesh.ai/screening.html",
+          "own": true
+        }
+      ]
+    },
+    {
+      "id": "code",
+      "title": "Keep your agent's code on GitHub",
+      "intro": "Install the AgentMesh app on your GitHub account, and each of your agents gets its own repository there.",
+      "cards": [
+        {
+          "name": "GitHub",
+          "line": "The AgentMesh app keeps each agent's repository under your account.",
+          "setup": "Install the AgentMesh app on your account",
+          "setupIsProse": true,
+          "status": "vendor-docs",
+          "href": "https://github.com/apps/agentmesh-app"
+        }
+      ]
+    }
+  ]
+}
