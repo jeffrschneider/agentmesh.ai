@@ -105,7 +105,7 @@ const html = `<!DOCTYPE html>
     .ig-card:hover{transform:translateY(-3px);border-color:var(--line-strong);box-shadow:var(--shadow)}
     .ig-card .nm{font-family:var(--display);font-size:1.28rem;font-weight:600;line-height:1.2;letter-spacing:-.015em}
     .ig-card .ln{flex:1;font-size:.95rem;line-height:1.5;color:var(--muted)}
-    .ig-card .su{display:block;padding:8px 10px;border-radius:10px;background:var(--surface-2);font-family:var(--mono);font-stretch:87.5%;font-size:.7rem;line-height:1.5;color:var(--fg);overflow-wrap:anywhere}
+    .ig-card .su{display:block;padding:8px 10px;border-radius:10px;background:var(--surface-2);font-family:var(--mono);font-stretch:87.5%;font-size:.7rem;line-height:1.5;color:var(--fg);overflow-wrap:break-word;hyphens:none}
     .ig-card .su.prose{font-family:inherit;font-stretch:normal;font-size:.85rem;color:var(--muted)}
     .ig-card .st{font-family:var(--mono);font-stretch:87.5%;font-size:.7rem;font-weight:500;letter-spacing:.02em;line-height:1.45;color:var(--faint)}
     .ig-card .st.ok{color:var(--mint-ink)}

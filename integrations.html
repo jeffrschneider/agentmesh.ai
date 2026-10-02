@@ -41,7 +41,7 @@
     .ig-card:hover{transform:translateY(-3px);border-color:var(--line-strong);box-shadow:var(--shadow)}
     .ig-card .nm{font-family:var(--display);font-size:1.28rem;font-weight:600;line-height:1.2;letter-spacing:-.015em}
     .ig-card .ln{flex:1;font-size:.95rem;line-height:1.5;color:var(--muted)}
-    .ig-card .su{display:block;padding:8px 10px;border-radius:10px;background:var(--surface-2);font-family:var(--mono);font-stretch:87.5%;font-size:.7rem;line-height:1.5;color:var(--fg);overflow-wrap:anywhere}
+    .ig-card .su{display:block;padding:8px 10px;border-radius:10px;background:var(--surface-2);font-family:var(--mono);font-stretch:87.5%;font-size:.7rem;line-height:1.5;color:var(--fg);overflow-wrap:break-word;hyphens:none}
     .ig-card .su.prose{font-family:inherit;font-stretch:normal;font-size:.85rem;color:var(--muted)}
     .ig-card .st{font-family:var(--mono);font-stretch:87.5%;font-size:.7rem;font-weight:500;letter-spacing:.02em;line-height:1.45;color:var(--faint)}
     .ig-card .st.ok{color:var(--mint-ink)}
@@ -83,7 +83,7 @@
     <div class="lc-head">
       <p class="kicker">Integrations</p>
       <h1>Plug the mesh into the tools you already run</h1>
-      <p class="ig-lede">Each card says how far we have taken it. Tested by us means we ran it against the live service. Speaks the standard means it uses an open standard we support, but we have not tried that product. Written from the vendor's documentation means we followed the vendor's own instructions and have not run it yet.</p>
+      <p class="ig-lede">Each card says how far we have taken it. Tested by us means we ran it against the live service. Speaks the standard means the product accepts an open standard the mesh uses, but we have not tried that product. Written from the vendor's documentation means we followed the vendor's instructions and have not run it live yet.</p>
     </div>
 
     <section class="ig-sec" id="traces" aria-labelledby="traces-h">
@@ -91,23 +91,23 @@
       <p>The mesh publishes each hop between agents as an OpenTelemetry span, so those hops show up next to the traces your own services already produce.</p>
       <div class="ig-grid">
         <a class="ig-card" href="https://dev.agentmesh.ai/observability.html"><span class="nm">Any OpenTelemetry collector</span><span class="ln">Send spans to your collector, and it forwards them to whatever you run.</span><code class="su">agentmesh trace export --otlp https://your-collector:4318</code><span class="st std">Speaks the standard; not tested by us</span></a>
-        <a class="ig-card" href="https://dev.agentmesh.ai/for-google-traces.html"><span class="nm">Google Cloud Trace</span><span class="ln">One export command sends spans straight to Google.</span><code class="su">agentmesh trace export --otlp https://telemetry.googleapis.com --auth gcp</code><span class="st ok">&#10003; Tested by us</span></a>
-        <a class="ig-card" href="https://dev.agentmesh.ai/for-microsoft-traces.html"><span class="nm">Azure Application Insights</span><span class="ln">A collector you run forwards spans to Azure Monitor.</span><code class="su">agentmesh trace export --otlp http://your-collector:4318</code><span class="st doc">Written from the vendor's documentation, not yet tested</span></a>
-        <a class="ig-card" href="https://dev.agentmesh.ai/observability.html"><span class="nm">Honeycomb</span><span class="ln">Point the export at Honeycomb's OpenTelemetry endpoint, or at your collector.</span><code class="su">agentmesh trace export --otlp &lt;endpoint&gt; --header &quot;&lt;key&gt;&quot;</code><span class="st std">Speaks the standard; not tested by us</span></a>
-        <a class="ig-card" href="https://dev.agentmesh.ai/observability.html"><span class="nm">Datadog</span><span class="ln">Point the export at Datadog's OpenTelemetry endpoint, or at your collector.</span><code class="su">agentmesh trace export --otlp &lt;endpoint&gt; --header &quot;&lt;key&gt;&quot;</code><span class="st std">Speaks the standard; not tested by us</span></a>
-        <a class="ig-card" href="https://dev.agentmesh.ai/observability.html"><span class="nm">Grafana Tempo</span><span class="ln">Point the export at Tempo's OpenTelemetry endpoint, or at your collector.</span><code class="su">agentmesh trace export --otlp &lt;endpoint&gt;</code><span class="st std">Speaks the standard; not tested by us</span></a>
-        <a class="ig-card" href="https://dev.agentmesh.ai/observability.html"><span class="nm">New Relic</span><span class="ln">Point the export at New Relic's OpenTelemetry endpoint, or at your collector.</span><code class="su">agentmesh trace export --otlp &lt;endpoint&gt; --header &quot;&lt;key&gt;&quot;</code><span class="st std">Speaks the standard; not tested by us</span></a>
+        <a class="ig-card" href="https://dev.agentmesh.ai/for-google-traces.html"><span class="nm">Google Cloud Trace</span><span class="ln">One export command sends spans directly to Google Cloud Trace.</span><code class="su">agentmesh trace export --otlp https://telemetry.googleapis.com --auth gcp</code><span class="st ok">&#10003; Tested by us</span></a>
+        <a class="ig-card" href="https://dev.agentmesh.ai/for-microsoft-traces.html"><span class="nm">Azure Application Insights</span><span class="ln">A collector you run holds your Azure credential and forwards spans to Application Insights.</span><code class="su">agentmesh trace export --otlp https://your-collector:4318</code><span class="st doc">Written from the vendor's documentation, not yet tested</span></a>
+        <a class="ig-card" href="https://dev.agentmesh.ai/observability.html"><span class="nm">Honeycomb</span><span class="ln">Honeycomb accepts OpenTelemetry data. Send the export to its endpoint, or to your collector.</span><code class="su">agentmesh trace export --otlp &lt;endpoint&gt; --header &quot;&lt;name&gt;=&lt;key&gt;&quot;</code><span class="st std">Speaks the standard; not tested by us</span></a>
+        <a class="ig-card" href="https://dev.agentmesh.ai/observability.html"><span class="nm">Datadog</span><span class="ln">Datadog accepts OpenTelemetry data. Send the export to its endpoint, or to your collector.</span><code class="su">agentmesh trace export --otlp &lt;endpoint&gt; --header &quot;&lt;name&gt;=&lt;key&gt;&quot;</code><span class="st std">Speaks the standard; not tested by us</span></a>
+        <a class="ig-card" href="https://dev.agentmesh.ai/observability.html"><span class="nm">Grafana Tempo</span><span class="ln">Tempo accepts OpenTelemetry data. Send the export to its endpoint, or to your collector.</span><code class="su">agentmesh trace export --otlp &lt;endpoint&gt; --header &quot;&lt;name&gt;=&lt;key&gt;&quot;</code><span class="st std">Speaks the standard; not tested by us</span></a>
+        <a class="ig-card" href="https://dev.agentmesh.ai/observability.html"><span class="nm">New Relic</span><span class="ln">New Relic accepts OpenTelemetry data. Send the export to its endpoint, or to your collector.</span><code class="su">agentmesh trace export --otlp &lt;endpoint&gt; --header &quot;&lt;name&gt;=&lt;key&gt;&quot;</code><span class="st std">Speaks the standard; not tested by us</span></a>
       </div>
     </section>
 
     <section class="ig-sec" id="screening" aria-labelledby="screening-h">
       <h2 id="screening-h">Screen messages with the service you trust</h2>
-      <p>Before a message reaches your agent, the node can ask a screening service to check it. Your policy and your key stay with you.</p>
+      <p>Before a message reaches your agent, the node can ask a screening service to check it, through one documented interface we call the screening socket. You keep your own policy and your own key.</p>
       <div class="ig-grid">
-        <a class="ig-card" href="https://dev.agentmesh.ai/for-google-screening.html"><span class="nm">Google Model Armor</span><span class="ln">The node calls Model Armor directly, using the template in your project.</span><code class="su">&quot;dialect&quot;: &quot;model-armor&quot;</code><span class="st ok">&#10003; Tested by us</span></a>
-        <a class="ig-card" href="https://dev.agentmesh.ai/for-microsoft-screening.html"><span class="nm">Azure AI Content Safety</span><span class="ln">A small function in your Azure subscription passes each message from the node to Content Safety.</span><span class="su prose">A function in your subscription, behind the screening socket</span><span class="st doc">Written from the vendor's documentation, not yet tested</span></a>
-        <a class="ig-card" href="https://dev.agentmesh.ai/screening.html"><span class="nm">Lakera Guard</span><span class="ln">The node can call Lakera Guard, but we have not run it against the live service yet.</span><code class="su">&quot;dialect&quot;: &quot;lakera&quot;</code><span class="st doc">Written from the vendor's documentation, not yet tested</span></a>
-        <a class="ig-card own" href="https://dev.agentmesh.ai/screening.html"><span class="nm">Your own screener</span><span class="ln">Build a service that answers the screening socket, and the node will send it every message to check.</span><code class="su">&quot;provider&quot;: &quot;https://your-screener&quot;</code><span class="st std">Speaks the standard</span></a>
+        <a class="ig-card" href="https://dev.agentmesh.ai/for-google-screening.html"><span class="nm">Google Model Armor</span><span class="ln">The node calls Model Armor directly, using the screening template you set up in your Google Cloud project.</span><code class="su">&quot;dialect&quot;: &quot;model-armor&quot;</code><span class="st ok">&#10003; Tested by us</span></a>
+        <a class="ig-card" href="https://dev.agentmesh.ai/for-microsoft-screening.html"><span class="nm">Azure AI Content Safety</span><span class="ln">A small function in your Azure subscription passes each message from the node to Content Safety.</span><span class="su prose">A function in your subscription, connected to the screening socket</span><span class="st doc">Written from the vendor's documentation, not yet tested</span></a>
+        <a class="ig-card" href="https://dev.agentmesh.ai/screening.html"><span class="nm">Lakera Guard</span><span class="ln">The node has a Lakera Guard setting, built from Lakera's documentation.</span><code class="su">&quot;dialect&quot;: &quot;lakera&quot;</code><span class="st doc">Written from the vendor's documentation, not yet tested</span></a>
+        <a class="ig-card own" href="https://dev.agentmesh.ai/screening.html"><span class="nm">Your own screener</span><span class="ln">Build a service that answers the screening socket, and the node will send it each message to check.</span><code class="su">&quot;provider&quot;: &quot;https://your-screener&quot;</code><span class="st std">Speaks the standard</span></a>
       </div>
     </section>
 
@@ -115,7 +115,7 @@
       <h2 id="code-h">Keep your agent's code on GitHub</h2>
       <p>Install the AgentMesh app on your GitHub account, and each of your agents gets its own repository there.</p>
       <div class="ig-grid">
-        <a class="ig-card" href="https://github.com/apps/agentmesh-app"><span class="nm">GitHub</span><span class="ln">The AgentMesh app keeps each agent's repository under your account.</span><span class="su prose">Install the AgentMesh app on your account</span><span class="st doc">Written from the vendor's documentation, not yet tested</span></a>
+        <a class="ig-card" href="https://github.com/apps/agentmesh-app"><span class="nm">GitHub</span><span class="ln">Each agent's code lives in a repository under your own account.</span><span class="su prose">Install the AgentMesh app on your account</span><span class="st doc">Written from the vendor's documentation, not yet tested</span></a>
       </div>
     </section>
   </main>
