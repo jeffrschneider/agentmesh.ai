@@ -42,16 +42,23 @@ THE USUAL WAY. Add AgentMesh as an MCP server
     Gemini CLI   gemini mcp add -t http agentmesh https://api.agentmesh.ai/v1/mcp
                  then /mcp auth agentmesh
 
-  Some assistants can only use a server they added after a restart, and
-  some cannot open a sign-in page. For those, there is the code way
-  below. It connects from the conversation you are in.
+  Adding the server does not connect your assistant by itself: the
+  sign-in has to finish too. Use this way when your assistant can finish
+  the sign-in itself, in the conversation you are in. If it would have
+  to leave the rest to you, such as a command for you to run or a
+  restart, the code way below connects it now instead, with nothing left
+  for you to do but press Allow.
 
 
 THE CODE WAY. Connect with a code you approve
 
   This is the standard OAuth device sign-in, the one a TV uses when it
   shows you a code. Your assistant needs to make HTTPS requests and to
-  keep its sign-in between conversations. These are the steps it takes.
+  keep its sign-in between conversations. In short: your assistant asks
+  AgentMesh for a code, shows you the code, and keeps checking with
+  AgentMesh until you press Allow. Then it finishes connecting on its
+  own, without you having to tell it you are done. These are the steps
+  it takes.
 
 
 STEP 1. It asks AgentMesh for access
@@ -87,7 +94,8 @@ STEP 2. It shows you the link and the code
     Open https://app.agentmesh.ai/join?code=WXYZ-4823 and check that it
     shows the code WXYZ-4823, then press Allow.
 
-  The link and the code come from its own answer in step 1. You sign in
+  Then it goes straight on to step 3 while you approve. The link and
+  the code come from its own answer in step 1. You sign in
   on app.agentmesh.ai, check that the code on the page is the one your
   assistant showed you, and press Allow, or Deny. The page may also ask
   you to confirm with your passkey or by typing the word allow, and to
@@ -97,9 +105,12 @@ STEP 2. It shows you the link and the code
 
 STEP 3. It waits for your answer
 
-  Right after showing you the code, your assistant starts asking whether
-  you have answered, every "interval" seconds (5 to start), until you
-  do. It does not need you to tell it when you are done.
+  Right after showing you the code, your assistant starts asking
+  AgentMesh whether you have answered, every "interval" seconds (5 to
+  start), and keeps asking until you do. You do not have to come back
+  and tell it you pressed Allow: it finds out from AgentMesh and
+  finishes on its own. If it can only ask while it is working on a
+  reply, it shows you the code and keeps asking in that same reply.
 
   POST https://api.agentmesh.ai/v1/oauth/token
   Content-Type: application/x-www-form-urlencoded
