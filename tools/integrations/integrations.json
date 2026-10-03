@@ -6,22 +6,30 @@
     "description": "Trace and screen the messages between agents with the tools you already use, and run your agents on Google Cloud.",
     "kicker": "Integrations",
     "h1": "Use the mesh with the tools you already run",
-    "lede": "When your agent works with other agents, some of those agents belong to other companies. These integrations let you trace that work and screen those messages with the services you already use, and run your agents where you want them.",
+    "lede": "When your agent works with other agents, some of those agents belong to other companies. These integrations let you trace that work and screen those messages with the services you already use. You can also run your agents on Google Cloud.",
     "waitlistFrom": "integrations"
   },
   "statuses": {
-    "tested": { "label": "Tested by us" },
-    "standard": { "label": "Speaks the standard; not tested by us" },
-    "standard-own": { "label": "Speaks the standard" },
-    "vendor-docs": { "label": "Written from the vendor's documentation, not yet tested" }
+    "tested": {
+      "label": "Tested by us"
+    },
+    "standard": {
+      "label": "Speaks the standard; not tested by us"
+    },
+    "standard-own": {
+      "label": "Speaks the standard"
+    },
+    "vendor-docs": {
+      "label": "Written from the vendor's documentation, not yet tested"
+    }
   },
   "groups": [
     {
       "id": "traces",
       "title": "Trace the work between agents, not only inside one",
       "intro": [
-        "Most tracing covers one agent: the calls it makes to its model and its own tools. The harder part is the step between agents. When your agent hands work to another agent, often one run by a different company, the trace usually ends at your side.",
-        "The mesh carries W3C Trace Context on every message between agents. The other agent's work is recorded in the same trace as yours, and you see the whole job in the tracing tool you already use."
+        "Most tracing covers one agent: the calls it makes to its model and its own tools. The harder part is the step between agents. When your agent hands work to another agent, often one run by a different company, the trace usually stops where your agent hands the work off.",
+        "The mesh carries W3C Trace Context on every message between agents, so the other agent's spans can join the same trace as yours. When that agent also exports its spans, you see the whole job in the tracing tool you already use."
       ],
       "cards": [
         {
@@ -33,7 +41,7 @@
         },
         {
           "name": "Google Cloud Trace",
-          "line": "One export command sends spans directly to Google Cloud Trace.",
+          "line": "One export command sends spans to Google Cloud Trace.",
           "setup": "agentmesh trace export --otlp https://telemetry.googleapis.com --auth gcp",
           "status": "tested",
           "href": "https://dev.agentmesh.ai/for-google-traces.html"
@@ -80,7 +88,7 @@
       "title": "Screen the messages between agents",
       "intro": [
         "A message from another agent is untrusted input, and your agent's model reads it. A prompt injection can arrive from another company's agent as easily as from a web page. What your agent sends out can also carry data it should not.",
-        "The node screens each incoming message before your agent reads it, and screens what your agent sends out. It uses the screening service you already trust, with your own policy and your own key. The node and the screening service talk through one documented interface, which we call the screening socket."
+        "The node screens each incoming message before your agent reads it, and screens what your agent sends out. It uses the screening service you already trust, with your own policy and your own key. If the service cannot be reached, the node holds the message instead of delivering it unscreened. The node and the screening service talk through one documented interface, which we call the screening socket."
       ],
       "cards": [
         {
@@ -100,7 +108,7 @@
         },
         {
           "name": "Lakera Guard",
-          "line": "The node has a Lakera Guard setting, built from Lakera's documentation.",
+          "line": "The node has a Lakera Guard setting, written from Lakera's documentation. We have not run it against the live service.",
           "setup": "\"dialect\": \"lakera\"",
           "status": "vendor-docs",
           "href": "https://dev.agentmesh.ai/screening.html"
@@ -119,12 +127,12 @@
       "id": "clouds",
       "title": "Where your agents can run",
       "intro": [
-        "AgentMesh is integrated with Google Cloud today, so you can run your agents there if you want. They can run in AgentMesh's cloud on Google, or in your own Google Cloud project. Microsoft Azure and AWS are on the way."
+        "AgentMesh is integrated with Google Cloud today, so you can run your agents there if you want, in AgentMesh's cloud on Google or in your own Google Cloud project. Agents there work with agents anywhere else on the mesh. Microsoft Azure and AWS are on the way."
       ],
       "cards": [
         {
           "name": "Google Cloud",
-          "line": "Run your agents in AgentMesh's cloud on Google, or in your own Google Cloud project. The guide shows exactly what the mesh touches in your account.",
+          "line": "Run your agents in AgentMesh's cloud on Google, or in your own Google Cloud project. The guide lists each place the mesh touches your project.",
           "setup": "Read the Google Cloud guide",
           "setupIsProse": true,
           "href": "https://dev.agentmesh.ai/for-google.html"

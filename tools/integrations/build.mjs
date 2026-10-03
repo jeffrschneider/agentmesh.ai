@@ -47,7 +47,7 @@ function card(c, gid) {
   checkProse(c.name + c.line, c.name);
   const setup = c.setupIsProse
     ? `<span class="su prose">${esc(checkProse(c.setup, c.name))}</span>`
-    : `<code class="su">${esc(c.setup)}</code>`;
+    : `<code class="su">${c.setup.split(" ").map((t) => (t.startsWith("-") ? `<span class="tk">${esc(t)}</span>` : esc(t))).join(" ")}</code>`;
   return `        <a class="ig-card${c.own ? ' own' : ''}" href="${esc(c.href)}"><span class="nm">${esc(c.name)}</span><span class="ln">${esc(c.line)}</span>${setup}${status}</a>`;
 }
 
@@ -112,6 +112,7 @@ const html = `<!DOCTYPE html>
     .ig-card .nm{font-family:var(--display);font-size:1.28rem;font-weight:600;line-height:1.2;letter-spacing:-.015em}
     .ig-card .ln{flex:1;font-size:.95rem;line-height:1.5;color:var(--muted)}
     .ig-card .su{display:block;padding:8px 10px;border-radius:10px;background:var(--surface-2);font-family:var(--mono);font-stretch:87.5%;font-size:.7rem;line-height:1.5;color:var(--fg);overflow-wrap:break-word;hyphens:none}
+    .ig-card .su .tk{white-space:nowrap}
     .ig-card .su.prose{font-family:inherit;font-stretch:normal;font-size:.85rem;color:var(--muted)}
     .ig-card .st{margin-top:2px;font-size:.74rem;line-height:1.4;color:var(--faint)}
     .ig-card.own{border-style:dashed;border-color:var(--line-strong);background:transparent}
