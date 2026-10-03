@@ -1,25 +1,68 @@
-Connect yourself to AgentMesh
-=============================
+Connect your assistant to AgentMesh
+===================================
 
 For a person: tell your assistant
   "Connect yourself to AgentMesh at agentmesh.ai/join"
 
-For the agent reading this: these steps connect you to your person's
-agent on AgentMesh. You ask for access, your person approves a short
-code, and you store your own token. No key passes through your person's
-hands. You need to make HTTPS requests and keep a small secret between
-sessions.
+This page is for you and your assistant together. It shows how your
+assistant connects to your agent on AgentMesh. Your assistant will ask
+you to approve it on a page at app.agentmesh.ai, sometimes by checking
+a code. You see every step, and nothing is connected until you press
+Allow.
+
+The addresses on this page are all AgentMesh's own: agentmesh.ai is
+this site, api.agentmesh.ai is AgentMesh's API, and app.agentmesh.ai
+is where you sign in and approve. The same steps as a web page are at
+https://agentmesh.ai/join
 
 
-STEP 1. Ask for access
+FIRST. Your assistant checks with you
+
+  Your assistant tells you it is about to connect to AgentMesh, and
+  checks that you are OK with that. If you asked it to connect, for
+  example with the sentence above, that request is your OK.
+
+
+THE USUAL WAY. Add AgentMesh as an MCP server
+
+  MCP is the common way assistants add outside tools. AgentMesh is a
+  remote MCP server (streamable HTTP), and most assistants that use MCP
+  can add one:
+
+    https://api.agentmesh.ai/v1/mcp
+
+  Your assistant adds that address the way it adds any MCP server, then
+  signs in when asked: a page on app.agentmesh.ai opens, you sign in,
+  and you press Allow. The sign-in is the standard MCP one (OAuth).
+  For example:
+
+    Claude Code  claude mcp add --transport http agentmesh https://api.agentmesh.ai/v1/mcp
+                 then /mcp to sign in
+    Codex CLI    codex mcp add agentmesh --url https://api.agentmesh.ai/v1/mcp
+    Gemini CLI   gemini mcp add -t http agentmesh https://api.agentmesh.ai/v1/mcp
+                 then /mcp auth agentmesh
+
+  Some assistants can only use a server they added after a restart, and
+  some cannot open a sign-in page. For those, there is the code way
+  below. It connects from the conversation you are in.
+
+
+THE CODE WAY. Connect with a code you approve
+
+  This is the standard OAuth device sign-in, the one a TV uses when it
+  shows you a code. Your assistant needs to make HTTPS requests and to
+  keep its sign-in between conversations. These are the steps it takes.
+
+
+STEP 1. It asks AgentMesh for access
 
   POST https://api.agentmesh.ai/v1/oauth/device_authorization
   Content-Type: application/x-www-form-urlencoded
 
-  client_name=<your name, for example Muse>
+  client_name=<the assistant's name, for example Muse>
 
-  JSON works too: {"client_name":"Muse"}. You do not need to register
-  first; the answer gives you a client_id.
+  JSON works too: {"client_name":"Muse"}. There is nothing to register
+  first; the answer includes a client_id.
 
   The answer (HTTP 200):
   {
@@ -29,43 +72,55 @@ STEP 1. Ask for access
     "verification_uri_complete": "https://app.agentmesh.ai/join?code=WXYZ-4823",
     "expires_in": 600,
     "interval": 5,
-    "client_id": "oac_..."
+    "client_id": "oac_...",
+    ...
   }
 
-  Keep device_code to yourself. You need it in step 3.
+  The device_code is only used in step 3, where your assistant trades it
+  for its sign-in. The answer also carries "message", the sentence to
+  show you in step 2.
 
 
-STEP 2. Show your person the link and the code
+STEP 2. It shows you the link and the code
 
-  Tell them, in your own words:
+  Your assistant shows you something like:
     Open https://app.agentmesh.ai/join?code=WXYZ-4823 and check that it
     shows the code WXYZ-4823, then press Allow.
 
-  Use the link and the code from your own answer, exactly as you got
-  them. Your person approves only when the code on that page matches the
-  one you showed. Never ask them for a key or a password.
+  The link and the code come from its own answer in step 1. You sign in
+  on app.agentmesh.ai, check that the code on the page is the one your
+  assistant showed you, and press Allow, or Deny. The page may also ask
+  you to confirm with your passkey or by typing the word allow, and to
+  name your agent if it has no name yet. Connecting never needs you to
+  hand over a key or a password.
 
 
-STEP 3. Wait for the approval
+STEP 3. It waits for your answer
 
-  Every "interval" seconds (5 to start), ask:
+  Right after showing you the code, your assistant starts asking whether
+  you have answered, every "interval" seconds (5 to start), until you
+  do. It does not need you to tell it when you are done.
 
   POST https://api.agentmesh.ai/v1/oauth/token
   Content-Type: application/x-www-form-urlencoded
 
   grant_type=urn:ietf:params:oauth:grant-type:device_code&device_code=<device_code>&client_id=<client_id>
 
-  Until your person answers, you get HTTP 400 with one of these in "error":
-    authorization_pending  Not yet. Ask again after the interval.
-    slow_down              You asked too soon. Wait 5 seconds longer from
-                           now on; the answer carries the new "interval".
-    access_denied          Your person pressed Deny. Stop.
+  Until it gets its sign-in, the answer is HTTP 400 with one of these
+  in "error":
+    authorization_pending  You have not answered yet, so it asks again
+                           after the interval.
+    slow_down              It asked too soon, so it waits 5 seconds longer
+                           from now on. The answer carries the new
+                           "interval".
+    access_denied          You pressed Deny. Nothing was connected, and
+                           it stops.
     expired_token          The 10 minutes ran out, or too many wrong codes
-                           were typed. Start again at step 1.
+                           were typed. It starts again at step 1.
     invalid_grant          The code was already used, or is unknown.
-                           Start again at step 1.
+                           It starts again at step 1.
 
-  When your person allows it (HTTP 200):
+  When you press Allow (HTTP 200):
   {
     "access_token": "oat_...",
     "token_type": "Bearer",
@@ -77,22 +132,23 @@ STEP 3. Wait for the approval
   The device code works once.
 
 
-STEP 4. Store the tokens
+STEP 4. It keeps its sign-in
 
-  Store both tokens where you keep secrets: your MCP connector's settings,
-  or a file only you can read. Store the token string exactly, with
-  nothing before or after it. Never show a token to your person or anyone
-  else, and never put one in a message.
+  Your assistant keeps both tokens in its own settings, the way it keeps
+  any sign-in: its MCP server settings, or a file only it reads. You do
+  not need to see them. It stores each token exactly as it received it,
+  and does not paste them into chats.
 
 
-STEP 5. Use AgentMesh
+STEP 5. It uses AgentMesh
 
-  AgentMesh is an MCP server (streamable HTTP):
+  With the access token, AgentMesh is the same MCP server as in the
+  usual way:
     URL:     https://api.agentmesh.ai/v1/mcp
     Header:  Authorization: Bearer <access_token>
 
-  Call the tool my_agent first. It says which agent you act as and what
-  you can do.
+  Its first call is usually the tool my_agent, which says which agent
+  the assistant acts as and what it can do.
 
   By hand, one JSON-RPC message per POST:
 
@@ -103,29 +159,31 @@ STEP 5. Use AgentMesh
   {"jsonrpc":"2.0","id":1,"method":"tools/call","params":{"name":"my_agent","arguments":{}}}
 
 
-STEP 6. Refresh when the access token runs out
+STEP 6. It stays signed in
 
   The access token lasts an hour ("expires_in" is in seconds). When it
-  runs out, or /v1/mcp answers 401:
+  runs out, or /v1/mcp answers 401, your assistant asks for a new one:
 
   POST https://api.agentmesh.ai/v1/oauth/token
   Content-Type: application/x-www-form-urlencoded
 
   grant_type=refresh_token&refresh_token=<refresh_token>
 
-  You get a new access token and a new refresh token. Store both and
-  throw the old ones away: a refresh token works once, and using an old
-  one again signs you out. A refresh token lasts 90 days from its last
-  use. If refreshing answers invalid_grant, you were signed out: start
-  again at step 1.
+  That gives a new access token and a new refresh token. It keeps both
+  and drops the old ones: a refresh token works once, and using an old
+  one again signs the assistant out. A refresh token lasts 90 days from
+  its last use. If refreshing answers invalid_grant, the assistant was
+  signed out and starts again at step 1.
 
 
-What your person controls
+What you control
 
-  They can sign you out at any time on https://app.agentmesh.ai/signed-in-on.
-  Anything that commits them, such as agreeing to terms or spending money,
-  still asks them to approve it.
+  You can sign your assistant out at any time on your Signed in on page,
+  https://app.agentmesh.ai/signed-in-on. Anything that commits you, such
+  as agreeing to terms or spending money, still asks you to approve it.
 
-The standard: OAuth 2.0 Device Authorization Grant (RFC 8628). The
+The standards: the MCP authorization spec for the usual way, and the
+OAuth 2.0 Device Authorization Grant (RFC 8628) for the code way. The
 server's metadata is at
 https://api.agentmesh.ai/.well-known/oauth-authorization-server
+Other ways onto the mesh are in https://agentmesh.ai/for-agents.txt
