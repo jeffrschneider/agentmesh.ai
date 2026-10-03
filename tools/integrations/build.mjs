@@ -37,22 +37,27 @@ function checkProse(s, where) {
 }
 
 function card(c, gid) {
-  const st = data.statuses[c.status];
-  if (!st) throw new Error(`${c.name}: unknown status "${c.status}"`);
   for (const k of ['name', 'line', 'setup', 'href']) if (!c[k]) throw new Error(`${c.name || gid}: missing ${k}`);
+  let status = '';
+  if (c.status) {
+    const st = data.statuses[c.status];
+    if (!st) throw new Error(`${c.name}: unknown status "${c.status}"`);
+    status = `<span class="st">${esc(st.label)}</span>`;
+  }
   checkProse(c.name + c.line, c.name);
   const setup = c.setupIsProse
     ? `<span class="su prose">${esc(checkProse(c.setup, c.name))}</span>`
     : `<code class="su">${esc(c.setup)}</code>`;
-  const tick = st.tone === 'ok' ? '&#10003; ' : '';
-  return `        <a class="ig-card${c.own ? ' own' : ''}" href="${esc(c.href)}"><span class="nm">${esc(c.name)}</span><span class="ln">${esc(c.line)}</span>${setup}<span class="st ${st.tone}">${tick}${esc(st.label)}</span></a>`;
+  return `        <a class="ig-card${c.own ? ' own' : ''}" href="${esc(c.href)}"><span class="nm">${esc(c.name)}</span><span class="ln">${esc(c.line)}</span>${setup}${status}</a>`;
 }
 
 function group(g) {
-  checkProse(g.title + g.intro, g.id);
+  const intro = Array.isArray(g.intro) ? g.intro : [g.intro];
+  intro.forEach((t) => checkProse(t, g.id));
+  checkProse(g.title, g.id);
   return `    <section class="ig-sec" id="${esc(g.id)}" aria-labelledby="${esc(g.id)}-h">
       <h2 id="${esc(g.id)}-h">${esc(g.title)}</h2>
-      <p>${esc(g.intro)}</p>
+${intro.map((t) => `      <p>${esc(t)}</p>`).join('\n')}
       <div class="ig-grid">
 ${g.cards.map((c) => card(c, g.id)).join('\n')}
       </div>
@@ -99,7 +104,8 @@ const html = `<!DOCTYPE html>
     .ig-sec{padding-block:72px 16px;border-top:1px solid var(--line);display:flex;flex-direction:column;gap:14px}
     .ig-sec:first-of-type{border-top:0;padding-top:24px}
     .ig-sec h2{font-size:clamp(1.9rem,1.2rem + 2.1vw,2.85rem);line-height:1.05;letter-spacing:-.032em;font-stretch:90%}
-    .ig-sec > p{color:var(--muted);font-size:1.08rem;max-width:60ch;margin-bottom:18px}
+    .ig-sec > p{color:var(--muted);font-size:1.08rem;line-height:1.6;max-width:64ch}
+    .ig-sec > p:last-of-type{margin-bottom:18px}
     .ig-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:16px;padding-bottom:56px}
     .ig-card{display:flex;flex-direction:column;gap:10px;min-width:0;padding:20px;border:1px solid var(--line);border-radius:18px;background:var(--surface);color:var(--fg);text-decoration:none;transition:transform .35s cubic-bezier(.2,.7,.2,1),border-color .35s,box-shadow .35s}
     .ig-card:hover{transform:translateY(-3px);border-color:var(--line-strong);box-shadow:var(--shadow)}
@@ -107,8 +113,7 @@ const html = `<!DOCTYPE html>
     .ig-card .ln{flex:1;font-size:.95rem;line-height:1.5;color:var(--muted)}
     .ig-card .su{display:block;padding:8px 10px;border-radius:10px;background:var(--surface-2);font-family:var(--mono);font-stretch:87.5%;font-size:.7rem;line-height:1.5;color:var(--fg);overflow-wrap:break-word;hyphens:none}
     .ig-card .su.prose{font-family:inherit;font-stretch:normal;font-size:.85rem;color:var(--muted)}
-    .ig-card .st{font-family:var(--mono);font-stretch:87.5%;font-size:.7rem;font-weight:500;letter-spacing:.02em;line-height:1.45;color:var(--faint)}
-    .ig-card .st.ok{color:var(--mint-ink)}
+    .ig-card .st{margin-top:2px;font-size:.74rem;line-height:1.4;color:var(--faint)}
     .ig-card.own{border-style:dashed;border-color:var(--line-strong);background:transparent}
 
     .lc-end{position:relative;overflow:hidden;border-top:1px solid var(--line);padding-block:104px}
