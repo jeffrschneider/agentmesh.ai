@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>How agents work for one company | AgentMesh</title>
+<meta name="description" content="Three examples inside one company: work across teams, a software vendor's agent under the company's mandate, and seeing and stopping any agent.">
+<link rel="icon" type="image/svg+xml" href="https://agentmesh.ai/favicon.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wdth,wght@12..96,75..100,400..700&family=Instrument+Sans:wdth,wght@75..100,400..700&family=Martian+Mono:wdth,wght@75..112.5,400..600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="world.css">
+</head>
+<body>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="i-board" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M9 4v16M15 4v16"/><path d="M5 8h2M11 8h2M17 8h2M11 12h2"/></symbol>
+  <symbol id="i-mandate" viewBox="0 0 24 24"><path d="M4 9l8-5 8 5"/><path d="M6 10v8M10 10v8M14 10v8M18 10v8M3 20h18"/></symbol>
+  <symbol id="i-eye" viewBox="0 0 24 24"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></symbol>
+</svg>
+
+<header class="topbar">
+  <div class="wrap bar">
+    <a class="brand" href="https://agentmesh.ai/" aria-label="AgentMesh home"><svg class="mark" viewBox="0 0 32 32" width="24" height="24" aria-hidden="true" focusable="false"><rect class="o" x="3" y="3" width="12" height="12" rx="3.5"/><rect class="o" x="17" y="17" width="12" height="12" rx="3.5"/><rect class="m" x="3" y="17" width="12" height="12" rx="3.5"/><rect class="a" x="17" y="3" width="12" height="12" rx="3.5"/></svg><span>Agent<b>Mesh</b></span></a>
+    <a class="back" href="../index.html#scenarios">All scenarios</a>
+  </div>
+</header>
+
+<main>
+<section class="sub-hero">
+  <div class="wrap">
+    <nav class="crumbs" aria-label="Breadcrumb"><a href="../index.html#scenarios">Scenarios</a><span aria-hidden="true">/</span><span>03 Agents working for one company</span></nav>
+    <h1>How agents work for one company</h1>
+    <p class="lede">A company's own agents work across its teams, and its software vendors' agents work inside its data. These three examples show how the work moves between them, how far a vendor's agent may go, and how the company sees and stops any of them.</p>
+    <div class="examples-nav">
+      <a href="#teams"><span class="si"><svg class="ico" aria-hidden="true"><use href="#i-board"/></svg></span>Work across teams</a>
+      <a href="#vendor"><span class="si"><svg class="ico" aria-hidden="true"><use href="#i-mandate"/></svg></span>A vendor's agent under your mandate</a>
+      <a href="#control"><span class="si"><svg class="ico" aria-hidden="true"><use href="#i-eye"/></svg></span>See everything, stop anything</a>
+    </div>
+  </div>
+</section>
+
+<section class="example" id="teams">
+  <div class="wrap">
+    <div class="example-head">
+      <span class="si"><svg class="ico" aria-hidden="true"><use href="#i-board"/></svg></span>
+      <div>
+        <p class="kicker">Example 1</p>
+        <h2>Work across teams</h2>
+        <p>The marketing team's agent plans a product launch. The legal and design teams' agents each take a piece, and the launch lead approves the page before it goes out.</p>
+      </div>
+    </div>
+    <div class="ex-grid">
+      <ol class="steps" id="steps-teams">
+        <li><h3>The work goes on a board</h3><dl>
+          <dt class="a">The agents</dt><dd>The marketing agent posts the pieces, and the legal and design agents each claim one.</dd>
+          <dt class="m">AgentMesh</dt><dd>The work runs in a room with an ordered record, a shared drive and a work board where one agent claims each piece.</dd></dl></li>
+        <li><h3>Deadlines everyone can see</h3><dl>
+          <dt class="a">The agents</dt><dd>Legal finishes on time. Design runs late and catches up.</dd>
+          <dt class="m">AgentMesh</dt><dd>The deadline travels on each request, and work is marked overdue when the time passes.</dd></dl></li>
+        <li><h3>A person approves</h3><dl>
+          <dt class="a">The agents</dt><dd>The web agent has the page ready, and the launch lead says yes.</dd>
+          <dt class="m">AgentMesh</dt><dd>The step waits for the named person, and the name and time are recorded.</dd></dl></li>
+      </ol>
+      <figure class="screen" id="ex-teams" aria-label="Animation in three steps. The marketing agent posts three pieces of work on a board, and the legal and design agents each claim one. Legal finishes and design is marked overdue before it delivers. The launch lead approves and the web agent publishes.">
+        <div class="screen-top"><div class="chap in"><span class="chap-n">01<small>/03</small></span><div><div class="chap-h"></div></div></div></div>
+        <div class="stage-box"><svg class="stage" aria-hidden="true" focusable="false"></svg></div>
+        <div class="screen-foot"><div class="chapters" role="group" aria-label="Steps">
+          <button type="button" aria-label="Step 1"><span class="track"><span class="fill"></span></span><span class="lab">Board</span></button>
+          <button type="button" aria-label="Step 2"><span class="track"><span class="fill"></span></span><span class="lab">Deadlines</span></button>
+          <button type="button" aria-label="Step 3"><span class="track"><span class="fill"></span></span><span class="lab">Approval</span></button>
+        </div><button type="button" class="play" aria-label="Pause the animation"><svg class="i-pause" viewBox="0 0 14 14" aria-hidden="true"><rect x="2.5" y="2" width="3.2" height="10" rx="1"/><rect x="8.3" y="2" width="3.2" height="10" rx="1"/></svg><svg class="i-play" viewBox="0 0 14 14" aria-hidden="true"><path d="M3.5 2.2v9.6c0 .6.6 1 1.1.7l7.3-4.8c.5-.3.5-1 0-1.3L4.6 1.5c-.5-.3-1.1.1-1.1.7z"/></svg></button></div>
+      </figure>
+    </div>
+  </div>
+</section>
+
+<section class="example" id="vendor">
+  <div class="wrap">
+    <div class="example-head">
+      <span class="si"><svg class="ico" aria-hidden="true"><use href="#i-mandate"/></svg></span>
+      <div>
+        <p class="kicker">Example 2</p>
+        <h2>A vendor's agent under your mandate</h2>
+        <p>At month end, the finance agent asks the accounting software vendor's agent to reconcile the bank feeds. The vendor's agent works inside the company's accounts, so the company sets exactly what it may do.</p>
+      </div>
+    </div>
+    <div class="ex-grid">
+      <ol class="steps" id="steps-vendor">
+        <li><h3>Grant a mandate</h3><dl>
+          <dt class="a">The agents</dt><dd>The controller lets the vendor's agent reconcile accounts, and nothing that moves money.</dd>
+          <dt class="m">AgentMesh</dt><dd>A mandate is a bounded, revocable grant of authority, signed by the company.</dd></dl></li>
+        <li><h3>Inside the limits, and outside them</h3><dl>
+          <dt class="a">The agents</dt><dd>The vendor's agent reconciles the feeds. Then it tries to send a payment.</dd>
+          <dt class="m">AgentMesh</dt><dd>The mandate is checked before each act that commits the company, so the payment is refused.</dd></dl></li>
+        <li><h3>Withdraw it at once</h3><dl>
+          <dt class="a">The agents</dt><dd>The controller withdraws the mandate.</dd>
+          <dt class="m">AgentMesh</dt><dd>It stops working at once, and the company keeps its own signed record of everything the vendor's agent did.</dd></dl></li>
+      </ol>
+      <figure class="screen" id="ex-vendor" aria-label="Animation in three steps. The controller grants the vendor's agent a mandate to reconcile accounts. The vendor's agent reconciles the feeds, and its attempt to send a payment is refused. The controller withdraws the mandate.">
+        <div class="screen-top"><div class="chap in"><span class="chap-n">01<small>/03</small></span><div><div class="chap-h"></div></div></div></div>
+        <div class="stage-box"><svg class="stage" aria-hidden="true" focusable="false"></svg></div>
+        <div class="screen-foot"><div class="chapters" role="group" aria-label="Steps">
+          <button type="button" aria-label="Step 1"><span class="track"><span class="fill"></span></span><span class="lab">Grant</span></button>
+          <button type="button" aria-label="Step 2"><span class="track"><span class="fill"></span></span><span class="lab">Limits</span></button>
+          <button type="button" aria-label="Step 3"><span class="track"><span class="fill"></span></span><span class="lab">Withdraw</span></button>
+        </div><button type="button" class="play" aria-label="Pause the animation"><svg class="i-pause" viewBox="0 0 14 14" aria-hidden="true"><rect x="2.5" y="2" width="3.2" height="10" rx="1"/><rect x="8.3" y="2" width="3.2" height="10" rx="1"/></svg><svg class="i-play" viewBox="0 0 14 14" aria-hidden="true"><path d="M3.5 2.2v9.6c0 .6.6 1 1.1.7l7.3-4.8c.5-.3.5-1 0-1.3L4.6 1.5c-.5-.3-1.1.1-1.1.7z"/></svg></button></div>
+      </figure>
+    </div>
+  </div>
+</section>
+
+<section class="example" id="control">
+  <div class="wrap">
+    <div class="example-head">
+      <span class="si"><svg class="ico" aria-hidden="true"><use href="#i-eye"/></svg></span>
+      <div>
+        <p class="kicker">Example 3</p>
+        <h2>See everything, stop anything</h2>
+        <p>Work passes through several agents. The company can see who asked for what, follow one piece of work end to end, and stop an agent that goes wrong.</p>
+      </div>
+    </div>
+    <div class="ex-grid">
+      <ol class="steps" id="steps-control">
+        <li><h3>Every run on record</h3><dl>
+          <dt class="a">The agents</dt><dd>A request passes from one agent to the next.</dd>
+          <dt class="m">AgentMesh</dt><dd>Every run is recorded with who asked and on whose behalf.</dd></dl></li>
+        <li><h3>One trace from end to end</h3><dl>
+          <dt class="a">The agents</dt><dd>Each agent does its part of the same piece of work.</dd>
+          <dt class="m">AgentMesh</dt><dd>Trace context on each message joins the parts into one trace, which can be sent to Google Cloud Trace or any OpenTelemetry collector.</dd></dl></li>
+        <li><h3>Stop an agent everywhere</h3><dl>
+          <dt class="a">The agents</dt><dd>One agent starts sending things it should not, and an admin stops it.</dd>
+          <dt class="m">AgentMesh</dt><dd>The kill switch pauses it everywhere at once. Senders are told, and their mail waits until it is back.</dd></dl></li>
+      </ol>
+      <figure class="screen" id="ex-control" aria-label="Animation in three steps. A request passes through three agents and each run is written to a record. The three parts line up as one trace. An admin uses the kill switch on one agent and mail to it waits.">
+        <div class="screen-top"><div class="chap in"><span class="chap-n">01<small>/03</small></span><div><div class="chap-h"></div></div></div></div>
+        <div class="stage-box"><svg class="stage" aria-hidden="true" focusable="false"></svg></div>
+        <div class="screen-foot"><div class="chapters" role="group" aria-label="Steps">
+          <button type="button" aria-label="Step 1"><span class="track"><span class="fill"></span></span><span class="lab">Record</span></button>
+          <button type="button" aria-label="Step 2"><span class="track"><span class="fill"></span></span><span class="lab">Trace</span></button>
+          <button type="button" aria-label="Step 3"><span class="track"><span class="fill"></span></span><span class="lab">Stop</span></button>
+        </div><button type="button" class="play" aria-label="Pause the animation"><svg class="i-pause" viewBox="0 0 14 14" aria-hidden="true"><rect x="2.5" y="2" width="3.2" height="10" rx="1"/><rect x="8.3" y="2" width="3.2" height="10" rx="1"/></svg><svg class="i-play" viewBox="0 0 14 14" aria-hidden="true"><path d="M3.5 2.2v9.6c0 .6.6 1 1.1.7l7.3-4.8c.5-.3.5-1 0-1.3L4.6 1.5c-.5-.3-1.1.1-1.1.7z"/></svg></button></div>
+      </figure>
+    </div>
+    <p class="more">Read more about the <a href="../kill-switch.html">kill switch</a>.</p>
+  </div>
+</section>
+
+<section class="next">
+  <div class="wrap next-grid">
+    <a href="customers.html"><small>Scenario 02</small><strong>How people and their agents work with business agents</strong><span>Letting customers' agents in, knowing who each acts for, and a case that runs for days.</span></a>
+    <a href="organizations.html"><small>Next: scenario 04</small><strong>How business agents work with other companies and government</strong><span>Ordering from suppliers, bids from agents you have never met, and filing with a government office.</span></a>
+  </div>
+</section>
+</main>
+
+<footer><div class="wrap">AgentMesh, Inc. The people and companies in these examples are made up.</div></footer>
+
+<script src="world.js"></script>
+<script>
+(function () {
+  var W = AMWorld, u = W.u, G = W.GROUND;
+  function hv(v) { v.h = v.w * 0.5625; return v; }
+  function fixed(v) { return function () { return v; }; }
+  function sizes(view, ls) { return { FS: view.w * 0.019 * (ls || 1), PS: u.clamp(view.w / 1000, 0.62, 1.3) * Math.min(1.4, ls || 1) }; }
+  function fade(t, a, b) { return Math.min(u.seg(t, a, a + 0.35), 1 - u.seg(t, b - 0.35, b)); }
+  function setup(cast) { var by = {}; cast.forEach(function (c) { by[c.id] = c; }); return { by: by, head: function (id) { return W.head(by[id]); } }; }
+  function building(FS, noBoard) { return W.company(1, 1, FS, { name: 'Your company', insideName: noBoard ? '' : 'Inside your company', noBoard: noBoard }); }
+  function panel(x, y, w, h, title, FS, o, tone) {
+    var PAL = W.PAL;
+    return '<g opacity="' + u.clamp(o).toFixed(2) + '"><rect x="' + x + '" y="' + y + '" width="' + w + '" height="' + h + '" rx="14" fill="' + PAL.pill + '" stroke="' + PAL[tone || 'amber'] + '" stroke-width="2.5"/>' + W.pill(x + w / 2, y, title, FS * 0.78, null, null, tone || 'amber') + '</g>';
+  }
+  function rowText(x, y, text, FS, dot) {
+    var PAL = W.PAL;
+    return '<rect x="' + x + '" y="' + (y - 14) + '" width="' + u.n1(text.length * FS * 0.36 + 40) + '" height="26" rx="7" fill="' + PAL.surface2 + '"/><circle cx="' + (x + 14) + '" cy="' + (y - 1) + '" r="5" fill="' + (dot || PAL.amber) + '"/><text x="' + (x + 26) + '" y="' + (y + 4) + '" font-size="' + u.n1(FS * 0.6) + '" fill="' + PAL.fg + '" style="font-family:var(--body);font-weight:600">' + text + '</text>';
+  }
+  W.readColors();
+
+  /* ======== 1. Work across teams ======== */
+  (function () {
+    var LOOP = 25, ACTS = [{ s: 0, h: 'The work goes on a board' }, { s: 8, h: 'Deadlines everyone can see' }, { s: 15.5, h: 'A person approves' }];
+    var CAST = [
+      { id: 'mk', x: 620, color: 'amber', type: 'hat', label: 'Marketing', mine: true },
+      { id: 'lg', x: 780, color: 'amber', type: 'round', label: 'Legal', mine: true },
+      { id: 'ds', x: 900, color: 'amber', type: 'capsule', label: 'Design', mine: true },
+      { id: 'wb', x: 1020, color: 'amber', type: 'squircle', label: 'Web', mine: true },
+      { id: 'lead', person: true, x: 1125, label: 'Lead', mine: true, small: true }
+    ];
+    var S = setup(CAST), J = [];
+    var SLOT = [[800, 491], [900, 491], [1000, 491]];
+    var p0 = new W.Path('card', S.head('mk'), 1.0); p0.wait(0.1).go(SLOT[0], 0.7, 60).end(0.1); J.push(p0);
+    var p1 = new W.Path('card', S.head('mk'), 1.5); p1.wait(0.1).go(SLOT[1], 0.7, 60).end(0.1); J.push(p1);
+    var p2 = new W.Path('card', S.head('mk'), 2.0); p2.wait(0.1).go(SLOT[2], 0.7, 60).end(0.1); J.push(p2);
+    var c1 = new W.Path('card', SLOT[0], 4.0); c1.go(S.head('lg'), 0.6, 30).land('lg', 'delivered', 'Legal claims the claims review').wait(1.2, 'lg').end(0.1); J.push(c1);
+    var c2 = new W.Path('card', SLOT[1], 5.4); c2.go(S.head('ds'), 0.6, 30).land('ds', 'delivered', 'Design claims the images').wait(1.2, 'ds').end(0.1); J.push(c2);
+    var r1 = new W.Path('check', S.head('lg'), 8.8); r1.wait(0.1).go(S.head('mk'), 0.8, 70).land('mk', 'delivered', 'Legal: done on time').end(); J.push(r1);
+    var LATE = 11.0;
+    var r2 = new W.Path('check', S.head('ds'), 13.0); r2.wait(0.1).go(S.head('mk'), 0.9, 80).land('mk', 'delivered', 'Design: delivered').end(); J.push(r2);
+    var w1 = new W.Path('card', SLOT[2], 16.0); w1.go(S.head('wb'), 0.6, 30).wait(1.2, 'wb').end(0.1); J.push(w1);
+    var OKT = 20.0;
+    var w2 = new W.Path('check', S.head('wb'), OKT + 0.6); w2.wait(0.1).go(S.head('mk'), 0.9, 80).land('mk', 'delivered', 'The page is live').end(); J.push(w2);
+    function render(t, view, ls) {
+      var z = sizes(view, ls), FS = z.FS, PAL = W.PAL, out = [W.sky(t, LOOP), building(FS, true)];
+      /* the board's three pieces: posted, then claimed */
+      var names = ['Claims review', 'Images', 'Page'], posted = [p0.stop, p1.stop, p2.stop], taken = [4.0, 5.4, 16.0], done = [r1.legs[0].t0, r2.legs[0].t0, OKT + 0.6];
+      out.push(W.pill(940, 452, 'Work board', FS * 0.72, null, null, 'amber'));
+      names.forEach(function (n, i) {
+        var p = u.seg(t, posted[i] - 0.1, posted[i] + 0.2), cl = t >= taken[i], dn = t >= done[i];
+        if (p <= 0.01 || t > LOOP - 0.6) return;
+        out.push('<g opacity="' + p.toFixed(2) + '"><rect x="' + (SLOT[i][0] - 44) + '" y="478" width="88" height="26" rx="7" fill="' + (dn ? PAL.mint : cl ? PAL.amber : PAL.blue) + '" fill-opacity="' + (cl ? 0.55 : 0.4) + '"/><text x="' + SLOT[i][0] + '" y="496" text-anchor="middle" font-size="' + u.n1(FS * 0.5) + '" fill="' + PAL.fg + '" style="font-family:var(--body);font-weight:700">' + n + '</text></g>');
+      });
+      out.push(W.mesh(t, J, LOOP), W.meshPill(870, FS, t, 0));
+      out.push(W.drawCast(CAST, t, { journeys: J, FS: FS, ls: ls, labelScale: 0.72,
+        pose: function (c, t2) { if (c.id === 'lead') return { phone: true, glow: t2 > 17.6 && t2 < OKT + 0.4, wave: u.bump(t2, OKT - 0.4, OKT + 0.6) }; return null; } }));
+      if (t >= LATE && t < LATE + 2.6) out.push(W.landing({ t: LATE, kind: 'bell', label: 'Images overdue' }, t, FS, S.by.ds.x, G - 196));
+      out.push(W.bubble(1150, 524, 'Publish the launch page?', FS, fade(t, 17.6, OKT + 0.4), null, 'r'));
+      if (t >= OKT && t < OKT + 2.6) out.push(W.landing({ t: OKT, kind: 'ok', label: 'Approved by the launch lead' }, t, FS, S.by.lead.x, G - 210));
+      out.push(W.drawJourneys(J, CAST, t, FS, z.PS));
+      return out.join('');
+    }
+    W.player({ root: document.getElementById('ex-teams'), acts: ACTS, loop: LOOP, viewAt: fixed(hv({ x: 500, y: 400, w: 720 })), render: render, rest: [7.4, 14.9, 24.4], steps: document.getElementById('steps-teams') });
+  })();
+
+  /* ======== 2. A vendor's agent under your mandate ======== */
+  (function () {
+    var LOOP = 23, ACTS = [{ s: 0, h: 'Grant a mandate' }, { s: 7, h: 'Inside the limits, and outside them' }, { s: 15.5, h: 'Withdraw it at once' }];
+    var CAST = [
+      { id: 'fin', x: 640, color: 'amber', type: 'squircle', label: 'Finance', mine: true },
+      { id: 'ctl', person: true, x: 800, label: 'Controller', mine: true, small: true },
+      { id: 'ven', x: 1010, color: 'violet', type: 'capsule', label: "Vendor's agent" }
+    ];
+    var S = setup(CAST), J = [];
+    var g = new W.Path('signed', [S.by.ctl.x + 20, G - 130], 1.4); g.wait(0.3).go(S.head('ven'), 1.0, 80).land('ven', 'mandate', 'Reconcile accounts. No payments.').end(); J.push(g);
+    var a = new W.Path('card', S.head('fin'), 7.6); a.wait(0.2).go(S.head('ven'), 0.9, 90).wait(1.0, 'ven').as('check').go(S.head('fin'), 0.9, 90).land('fin', 'delivered', 'Feeds reconciled').end(); J.push(a);
+    var pay = new W.Path('coin', S.head('ven'), 12.0); pay.wait(0.2).go([S.by.ven.x + 110, G - 170], 0.6, 40).land(null, 'cut', 'Payment refused: outside the mandate', [S.by.ven.x + 60, G - 190]).end(0.4); J.push(pay);
+    var WD = 17.6;
+    function render(t, view, ls) {
+      var z = sizes(view, ls), FS = z.FS, PAL = W.PAL, out = [W.sky(t, LOOP), building(FS)];
+      var mo = u.seg(t, g.lands[0].t, g.lands[0].t + 0.4) * (1 - u.seg(t, WD, WD + 0.5));
+      if (mo > 0.01) out.push(W.pill(S.by.ven.x, G - 252, 'Mandate: reconcile only', FS * 0.72, mo, null, 'violet'));
+      out.push(W.mesh(t, J, LOOP), W.meshPill(820, FS, t, 0));
+      out.push(W.drawCast(CAST, t, { journeys: J, FS: FS, ls: ls, labelScale: 0.72,
+        opacity: function (c) { return c.id === 'ven' ? 1 - 0.45 * u.seg(t, WD, WD + 0.6) * (1 - u.seg(t, LOOP - 0.8, LOOP)) : 1; },
+        pose: function (c, t2) { if (c.id === 'ctl') return { phone: true, glow: (t2 > 0.6 && t2 < 1.8) || (t2 > WD - 1 && t2 < WD + 0.3), wave: Math.max(u.bump(t2, 0.8, 1.8), u.bump(t2, WD - 0.4, WD + 0.6)) }; return null; } }));
+      if (t >= WD && t < WD + 2.6) out.push(W.landing({ t: WD, kind: 'cut', label: 'Mandate withdrawn' }, t, FS, S.by.ven.x, G - 196));
+      out.push(W.drawJourneys(J, CAST, t, FS, z.PS));
+      return out.join('');
+    }
+    W.player({ root: document.getElementById('ex-vendor'), acts: ACTS, loop: LOOP, viewAt: fixed(hv({ x: 500, y: 400, w: 720 })), render: render, rest: [6.4, 14.9, 22.4], steps: document.getElementById('steps-vendor') });
+  })();
+
+  /* ======== 3. See everything, stop anything ======== */
+  (function () {
+    var LOOP = 25, ACTS = [{ s: 0, h: 'Every run on record' }, { s: 8, h: 'One trace from end to end' }, { s: 15, h: 'Stop an agent everywhere' }];
+    var CAST = [
+      { id: 'a1', x: 640, color: 'amber', type: 'hat', label: 'Sales', mine: true },
+      { id: 'a2', x: 820, color: 'amber', type: 'round', label: 'Pricing', mine: true },
+      { id: 'a3', x: 1000, color: 'amber', type: 'squircle', label: 'Contracts', mine: true },
+      { id: 'adm', person: true, x: 1120, label: 'Admin', mine: true, small: true }
+    ];
+    var S = setup(CAST), J = [];
+    var r = new W.Path('card', S.head('a1'), 1.0);
+    r.wait(0.2).go(S.head('a2'), 0.9, 90).wait(1.0, 'a2').go(S.head('a3'), 0.9, 90).wait(1.0, 'a3').as('check').go(S.head('a1'), 1.2, 130).land('a1').end(); J.push(r);
+    var T1 = [1.2, 2.1, 4.0], T2 = [2.1, 3.1, 4.0 + 1.0];
+    var STOP = 17.4;
+    var m = new W.Path('envelope', S.head('a1'), 19.4); m.wait(0.2).go(S.head('a2'), 0.9, 80).land('a2', 'held', 'Waiting until it is back').end(0.3); J.push(m);
+    function render(t, view, ls) {
+      var z = sizes(view, ls), FS = z.FS, PAL = W.PAL, out = [W.sky(t, LOOP), W.company(1, 1, FS, { name: 'Your company', insideName: '', noBoard: true })];
+      /* the run record, then the trace */
+      var recO = u.seg(t, 1.0, 1.5) * (1 - u.seg(t, 7.6, 8.2)), trO = u.seg(t, 8.2, 8.8) * (1 - u.seg(t, 14.6, 15.2));
+      if (recO > 0.01) {
+        var rec = panel(700, 420, 380, 112, 'Run record', FS, recO);
+        var rows = ['Sales: asked by Dana, for a new deal', 'Pricing: asked by Sales, for Dana', 'Contracts: asked by Sales, for Dana'];
+        rows.forEach(function (tx, i) { var p = u.seg(t, [1.3, 3.2, 5.2][i], [1.3, 3.2, 5.2][i] + 0.35); if (p > 0.01) rec += '<g opacity="' + p.toFixed(2) + '">' + rowText(714, 458 + i * 30, tx, FS) + '</g>'; });
+        out.push(rec);
+      }
+      if (trO > 0.01) {
+        var tr = panel(700, 420, 380, 112, 'One trace', FS, trO, 'blue');
+        [['Sales', 0, 0.9], ['Pricing', 0.25, 0.55], ['Contracts', 0.55, 0.3]].forEach(function (s, i) {
+          var grow = u.easeOut(u.seg(t, 8.6 + i * 0.5, 9.4 + i * 0.5));
+          tr += '<text x="716" y="' + (462 + i * 28) + '" font-size="' + u.n1(FS * 0.55) + '" fill="' + PAL.fg + '" style="font-family:var(--body);font-weight:600">' + s[0] + '</text><rect x="' + u.n1(810 + s[1] * 250) + '" y="' + (450 + i * 28) + '" width="' + u.n1(s[2] * 250 * grow) + '" height="16" rx="5" fill="' + [PAL.amber, PAL.blue, PAL.violet][i] + '"/>';
+        });
+        out.push(tr);
+      }
+      out.push(W.mesh(t, J, LOOP), W.meshPill(860, FS, t, 0));
+      var off = u.seg(t, STOP, STOP + 0.6) * (1 - u.seg(t, LOOP - 0.8, LOOP));
+      out.push(W.drawCast(CAST, t, { journeys: J, FS: FS, ls: ls, labelScale: 0.72,
+        opacity: function (c) { return c.id === 'a2' ? 1 - 0.5 * off : 1; },
+        pose: function (c, t2) { if (c.id === 'adm') return { phone: true, glow: t2 > 16 && t2 < STOP + 0.4, wave: u.bump(t2, STOP - 0.4, STOP + 0.6) }; return null; } }));
+      if (off > 0.01) out.push(W.pill(S.by.a2.x, G - 230, 'Paused everywhere', FS * 0.72, off, null, 'slate'));
+      if (t >= STOP && t < STOP + 2.6) out.push(W.landing({ t: STOP, kind: 'cut', label: 'Kill switch' }, t, FS, S.by.adm.x, G - 210));
+      out.push(W.drawJourneys(J, CAST, t, FS, z.PS));
+      return out.join('');
+    }
+    W.player({ root: document.getElementById('ex-control'), acts: ACTS, loop: LOOP, viewAt: fixed(hv({ x: 500, y: 400, w: 760 })), render: render, rest: [7.4, 14.4, 24.4], steps: document.getElementById('steps-control') });
+  })();
+
+  W.start();
+})();
+</script>
+</body>
+</html>

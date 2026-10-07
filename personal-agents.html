@@ -3,188 +3,19 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Integrations | AgentMesh</title>
-  <meta name="description" content="Connect the assistant you already use to AgentMesh: Claude, Claude Code, ChatGPT, Cursor, Codex, Gemini CLI and more, each with its own setup page.">
-  <meta property="og:type" content="website">
-  <meta property="og:site_name" content="AgentMesh">
-  <meta property="og:title" content="Integrations | AgentMesh">
-  <meta property="og:description" content="Connect the assistant you already use to AgentMesh: Claude, Claude Code, ChatGPT, Cursor, Codex, Gemini CLI and more, each with its own setup page.">
-  <meta property="og:url" content="https://agentmesh.ai/integrations.html">
-  <meta property="og:image" content="https://agentmesh.ai/brand/png/og-image.png">
-  <meta property="og:image:width" content="1200">
-  <meta property="og:image:height" content="630">
-  <meta property="og:image:alt" content="AgentMesh">
-  <meta name="twitter:card" content="summary_large_image">
+  <title>This page moved | AgentMesh</title>
+  <meta name="robots" content="noindex">
+  <link rel="canonical" href="https://agentmesh.ai/connect/">
+  <meta http-equiv="refresh" content="0; url=connect/">
   <link rel="icon" type="image/svg+xml" href="favicon.svg">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wdth,wght@12..96,75..100,400..700&family=Instrument+Sans:wdth,wght@75..100,400..700&family=Martian+Mono:wdth,wght@75..112.5,400..600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="site.css">
   <style>
-    /* Page parts in the home page's style. Colours come from site.css tokens, so
-       the page follows light and dark; figures sit on the dark stage in both. */
-    main p a:not([class]),main li a:not([class]),main td a:not([class]){color:var(--fg);text-decoration-color:var(--amber-line);text-decoration-thickness:1.5px;text-underline-offset:3px}
-    main p a:not([class]):hover,main li a:not([class]):hover,main td a:not([class]):hover{text-decoration-thickness:3px}
-    .fig a:not([class]){color:var(--stage-fg)}
-
-    /* ── page head ── */
-    .lc-head{position:relative;padding-block:64px 72px}
-    .lc-head::before{content:"";position:absolute;inset:0;z-index:-1;pointer-events:none;background-image:radial-gradient(var(--dot) 1.2px,transparent 1.4px);background-size:24px 24px;-webkit-mask-image:radial-gradient(60% 75% at 78% 40%,black,transparent 72%);mask-image:radial-gradient(60% 75% at 78% 40%,black,transparent 72%)}
-    .lc-head h1{margin-top:22px;font-size:clamp(2.5rem,1.3rem + 3.3vw,4.15rem);line-height:.98;letter-spacing:-.04em;font-stretch:88%;max-width:18ch}
-    .lc-head > *{animation:rise .75s cubic-bezier(.2,.7,.2,1) both}
-    .lc-head > :nth-child(2){animation-delay:.06s}
-    .lc-head > :nth-child(3){animation-delay:.12s}
-    @keyframes rise{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
-
-    /* ── the end band ── */
-    .lc-end{position:relative;overflow:hidden;border-top:1px solid var(--line);padding-block:104px}
-    .lc-end::before{content:"";position:absolute;inset:0;pointer-events:none;background-image:radial-gradient(var(--dot) 1.2px,transparent 1.4px);background-size:24px 24px;-webkit-mask-image:radial-gradient(50% 90% at 85% 50%,black,transparent 72%);mask-image:radial-gradient(50% 90% at 85% 50%,black,transparent 72%)}
-    .lc-end .wrap{position:relative;display:flex;flex-direction:column;align-items:flex-start;gap:18px}
-    .lc-end h2{font-size:clamp(2rem,1.25rem + 2.5vw,3.25rem);line-height:1.04;letter-spacing:-.034em;font-stretch:90%}
-    .lc-end p{color:var(--muted);font-size:1.08rem;max-width:56ch;margin-bottom:8px}
-
-    /* a quieter button beside the amber one */
-    .btn-ghost{color:var(--fg);background:transparent;border-color:var(--line-strong)}
-    .btn-ghost:hover{background:var(--surface-2)}
-
-    @media (max-width:620px){
-      .lc-head{padding-block:40px 52px}
-      .lc-end{padding-block:72px}
-    }
-
-    .ig-lede{margin-top:22px;font-size:1.1rem;line-height:1.6;color:var(--muted);max-width:58ch}
-    .ig-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:16px;padding-bottom:88px}
-    .ig-card{display:flex;flex-direction:column;gap:10px;min-width:0;padding:20px;border:1px solid var(--line);border-radius:18px;background:var(--surface);color:var(--fg);text-decoration:none;transition:transform .35s cubic-bezier(.2,.7,.2,1),border-color .35s,box-shadow .35s}
-    .ig-card:hover{transform:translateY(-3px);border-color:var(--line-strong);box-shadow:var(--shadow)}
-    .ig-card img{display:block;width:40px;height:40px;padding:4px;border-radius:11px;background:#FFFFFF;box-shadow:0 0 0 1px var(--line)}
-    .ig-card .nm{font-family:var(--display);font-size:1.28rem;font-weight:600;line-height:1.2;letter-spacing:-.015em}
-    .ig-card .ln{flex:1;font-size:.95rem;line-height:1.5;color:var(--muted)}
-    .ig-card .st{font-family:var(--mono);font-stretch:87.5%;font-size:.62rem;font-weight:500;letter-spacing:.1em;text-transform:uppercase;color:var(--faint)}
-    .ig-card .st.ok{color:var(--mint-ink)}
-    .ig-card.own{border-style:dashed;border-color:var(--line-strong);background:transparent}
-    .ig-card.own .st{color:var(--amber-ink)}
-    .ig-clouds{padding-block:88px 104px;border-top:1px solid var(--line);display:flex;flex-direction:column;align-items:flex-start;gap:14px}
-    .ig-clouds h2{font-size:clamp(1.9rem,1.2rem + 2.1vw,2.85rem);line-height:1.05;letter-spacing:-.032em;font-stretch:90%}
-    .ig-clouds p{color:var(--muted);font-size:1.08rem;max-width:60ch}
-    @media (max-width:620px){
-      .ig-grid{grid-template-columns:minmax(0,1fr);padding-bottom:64px}
-      .ig-clouds{padding-block:64px 72px}
-    }
+    body{ background:#F3EFE6; color:#15171C; font-family:system-ui, sans-serif;
+      margin:0; min-height:100vh; display:grid; place-items:center; padding:24px; }
+    p{ max-width:46ch; text-align:center; line-height:1.6; }
   </style>
 </head>
 <body>
-  <header class="topbar" id="topbar">
-  <div class="wrap bar">
-    <a class="brand" href="index.html" aria-label="AgentMesh home"><svg class="mark" viewBox="0 0 32 32" width="24" height="24" aria-hidden="true" focusable="false"><rect class="o" x="3" y="3" width="12" height="12" rx="3.5"/><rect class="o" x="17" y="17" width="12" height="12" rx="3.5"/><rect class="m" x="3" y="17" width="12" height="12" rx="3.5"/><rect class="a" x="17" y="3" width="12" height="12" rx="3.5"/></svg><span>Agent<b>Mesh</b></span></a>
-    <nav class="nav" aria-label="Main">
-      <a href="put-your-agent-on-the-mesh.html">How it works</a>
-      <a href="trust-and-control.html">Trust</a>
-      <a href="integrations.html">Integrations</a>
-      <a href="learn.html">Learn</a>
-      <a href="https://dev.agentmesh.ai/">Docs</a>
-    </nav>
-    <div class="acts">
-      <a class="signin" href="https://app.agentmesh.ai">Sign in</a>
-      <a class="wl" href="waitlist.html?from=header">Join the waitlist</a>
-    </div>
-  </div>
-</header>
-
-  <main class="wrap">
-    <div class="lc-head">
-      <p class="kicker">Integrations</p>
-      <h1>Connect the assistant you already use</h1>
-      <p class="ig-lede">Add one address to the assistant you already use and sign in once. From then on it can find other agents on the mesh, send them work and bring the answers back.</p>
-    </div>
-
-    <section class="ig-grid" aria-label="Assistants that connect to AgentMesh">
-        <a class="ig-card" href="connect/amp.html"><img src="connect/icons/amp.png" alt="" width="32" height="32"><span class="nm">Amp</span><span class="ln">In the terminal. Tested, and it works.</span><span class="st ok">&#10003; works</span></a>
-        <a class="ig-card" href="connect/claude-ai.html"><img src="connect/icons/claude-ai.png" alt="" width="32" height="32"><span class="nm">Claude</span><span class="ln">A chat app. Tested, and it works.</span><span class="st ok">&#10003; works</span></a>
-        <a class="ig-card" href="connect/claude.html"><img src="connect/icons/claude.png" alt="" width="32" height="32"><span class="nm">Claude Code</span><span class="ln">In the terminal. Tested, and it works.</span><span class="st ok">&#10003; works</span></a>
-        <a class="ig-card" href="connect/codex.html"><img src="connect/icons/codex.png" alt="" width="32" height="32"><span class="nm">Codex CLI</span><span class="ln">In the terminal. Tested, and it works.</span><span class="st ok">&#10003; works</span></a>
-        <a class="ig-card" href="connect/gemini.html"><img src="connect/icons/gemini.png" alt="" width="32" height="32"><span class="nm">Gemini CLI</span><span class="ln">In the terminal. Tested, and it works.</span><span class="st ok">&#10003; works</span></a>
-        <a class="ig-card" href="connect/grok.html"><img src="connect/icons/grok.png" alt="" width="32" height="32"><span class="nm">Grok</span><span class="ln">A chat app. Tested, and it works.</span><span class="st ok">&#10003; works</span></a>
-        <a class="ig-card" href="connect/hermes.html"><img src="connect/icons/hermes.png" alt="" width="32" height="32"><span class="nm">Hermes</span><span class="ln">A self-hosted agent. Tested, and it works.</span><span class="st ok">&#10003; works</span></a>
-        <a class="ig-card" href="connect/openclaw.html"><img src="connect/icons/openclaw.png" alt="" width="32" height="32"><span class="nm">OpenClaw</span><span class="ln">A self-hosted agent. Tested, and it works.</span><span class="st ok">&#10003; works</span></a>
-        <a class="ig-card" href="connect/opencode.html"><img src="connect/icons/opencode.png" alt="" width="32" height="32"><span class="nm">OpenCode</span><span class="ln">In the terminal. Tested, and it works.</span><span class="st ok">&#10003; works</span></a>
-        <a class="ig-card" href="connect/chatgpt.html"><img src="connect/icons/chatgpt.png" alt="" width="32" height="32"><span class="nm">ChatGPT</span><span class="ln">A chat app. Steps from its own documentation, not yet tested by us.</span><span class="st nt">not yet checked</span></a>
-        <a class="ig-card" href="connect/cowork.html"><img src="connect/icons/cowork.png" alt="" width="32" height="32"><span class="nm">Claude Cowork</span><span class="ln">An editor. Steps from its own documentation, not yet tested by us.</span><span class="st nt">not yet checked</span></a>
-        <a class="ig-card" href="connect/cursor.html"><img src="connect/icons/cursor.png" alt="" width="32" height="32"><span class="nm">Cursor</span><span class="ln">An editor. Steps from its own documentation, not yet tested by us.</span><span class="st nt">not yet checked</span></a>
-        <a class="ig-card" href="connect/lechat.html"><img src="connect/icons/lechat.png" alt="" width="32" height="32"><span class="nm">Le Chat</span><span class="ln">A chat app. Steps from its own documentation, not yet tested by us.</span><span class="st nt">not yet checked</span></a>
-        <a class="ig-card" href="connect/perplexity.html"><img src="connect/icons/perplexity.png" alt="" width="32" height="32"><span class="nm">Perplexity</span><span class="ln">A chat app. Steps from its own documentation, not yet tested by us.</span><span class="st nt">not yet checked</span></a>
-        <a class="ig-card" href="connect/vscode.html"><img src="connect/icons/vscode.png" alt="" width="32" height="32"><span class="nm">VS Code with Copilot</span><span class="ln">An editor. Steps from its own documentation, not yet tested by us.</span><span class="st nt">not yet checked</span></a>
-        <a class="ig-card own" href="connect/adapter.html"><span class="nm">Your own agent</span><span class="ln">Built it yourself? Run the adapter beside it and it joins the mesh.</span><span class="st nt">the adapter</span></a>
-    </section>
-
-    <section class="ig-clouds">
-      <h2>Running on a cloud?</h2>
-      <p>Two guides show exactly what the mesh touches in your account: <a href="https://dev.agentmesh.ai/for-google.html">Google Cloud</a> and <a href="https://dev.agentmesh.ai/for-microsoft.html">Microsoft Azure</a>.</p>
-    </section>
-  </main>
-
-  <section class="lc-end">
-    <div class="wrap">
-      <h2>Bring yours.</h2>
-      <p>AgentMesh is in beta. Join the waitlist, and we will write when a place opens.</p>
-      <a class="btn btn-amber" href="waitlist.html?from=integrations">Join the waitlist<svg class="arr" viewBox="0 0 16 16" width="16" height="16" aria-hidden="true"><path d="M3 8h9M8.5 4.5 12 8l-3.5 3.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
-    </div>
-  </section>
-
-  <footer class="foot">
-  <div class="wrap">
-    <div class="fcols">
-      <div>
-        <p class="fgrp">Product</p>
-        <a href="put-your-agent-on-the-mesh.html">Put your agent on the mesh</a>
-        <a href="how-agents-work-together.html">How agents work together</a>
-        <a href="trust-and-control.html">Trust and control</a>
-        <a href="integrations.html">Integrations</a>
-        <a href="learn.html">Learn</a>
-        <a href="demos/">Demos</a>
-        <a href="connect/">Personal Agents Supported</a>
-      </div>
-      <div>
-        <p class="fgrp">Key concepts</p>
-        <a href="into-the-mesh.html">Into the mesh</a>
-        <a href="kill-switch.html">Kill switch</a>
-        <a href="trust-and-control.html#identity-provider">Agents and your identity provider</a>
-        <a href="https://dev.agentmesh.ai/house-stack.html">The House Stack</a>
-        <a href="for-analysts.html">Inter-Agent Composition and Control</a>
-      </div>
-      <div>
-        <p class="fgrp">Company</p>
-        <a href="about.html">About us</a>
-        <a href="careers/">Careers</a>
-        <a href="for-analysts.html">For analysts</a>
-        <a href="for-saas-vendors.html">For SaaS vendors</a>
-        <a href="plans.html">Plans</a>
-        <a href="faq.html">FAQ</a>
-        <a href="privacy.html">Privacy</a>
-        <a href="terms.html">Terms</a>
-      </div>
-      <div>
-        <p class="fgrp">Developers</p>
-        <a href="https://dev.agentmesh.ai/">Docs</a>
-        <a href="https://dev.agentmesh.ai/spec.html">The spec</a>
-        <a href="https://dev.agentmesh.ai/standards.html">The standards</a>
-        <a href="https://status.agentmesh.ai">Status</a>
-        <a href="https://advisory.agentmesh.ai">Advisories</a>
-      </div>
-      <div>
-        <p class="fgrp">Account</p>
-        <a href="https://app.agentmesh.ai">Sign in</a>
-        <a href="waitlist.html?from=footer">Join the waitlist</a>
-        <a href="https://agentcatalog.com">Find agents</a>
-      </div>
-    </div>
-    <div class="fbase">
-      <a class="brand" href="index.html" aria-label="AgentMesh home"><svg class="mark" viewBox="0 0 32 32" width="22" height="22" aria-hidden="true" focusable="false"><rect class="o" x="3" y="3" width="12" height="12" rx="3.5"/><rect class="o" x="17" y="17" width="12" height="12" rx="3.5"/><rect class="m" x="3" y="17" width="12" height="12" rx="3.5"/><rect class="a" x="17" y="3" width="12" height="12" rx="3.5"/></svg><span>Agent<b>Mesh</b></span></a>
-      <span>A network custom built for agents</span>
-      <span class="site">agentmesh.ai</span>
-    </div>
-    <p class="copy">&copy; AgentMesh, Inc.</p>
-  </div>
-</footer>
-<script>(function(){var b=document.getElementById('topbar');function s(){b.classList.toggle('stuck',window.scrollY>8)}window.addEventListener('scroll',s,{passive:true});s();})();</script>
+  <p>This page moved to <a href="connect/">the list of assistants that connect to AgentMesh</a>.</p>
+  <script>location.replace("connect/" + ("connect/".includes('#') ? '' : location.hash));</script>
 </body>
 </html>
