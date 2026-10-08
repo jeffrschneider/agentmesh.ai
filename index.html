@@ -722,7 +722,7 @@ p{margin:0}
     var reset = 1 - u.seg(t, 37, 37.8);
     var oB = 0.4 + 0.6 * u.seg(t, 8.5, 9.6) * reset, oC = u.seg(t, 17, 18.2) * reset, oD = u.seg(t, 25.5, 26.8) * reset;
     var out = [W.sky(t, LOOP)];
-    out.push(W.company(oB, oC, FS, { hideInside: oD, tag: 'B2C', tagO: u.seg(t, 8.5, 9.6) * (1 - u.seg(t, 17, 17.8)) }));
+    out.push(W.company(oB, oC, FS, { name: 'Your company', insideName: 'Inside your company', hideInside: oD, tag: 'B2C', tagO: u.seg(t, 8.5, 9.6) * (1 - u.seg(t, 17, 17.8)) }));
     out.push(W.otherCompany(oD, FS));
     out.push(W.government(oD, FS));
     if (oD > 0.01) {
