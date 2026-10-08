@@ -101,6 +101,16 @@
     @media (max-width:440px){
       .ways .row{grid-template-columns:minmax(0,1fr)}
     }
+    /* ── a full-width block: copy above, a wide figure below ── */
+    .lc-wide{padding-block:88px;border-top:1px solid var(--line)}
+    .lc-wide .lc-num{display:inline-flex;align-items:center;gap:10px;margin-bottom:18px;font-family:var(--mono);font-stretch:87.5%;font-size:.7rem;font-weight:500;letter-spacing:.08em;color:var(--amber-ink)}
+    .lc-wide h2{margin-bottom:20px;font-size:clamp(1.9rem,1.2rem + 2.1vw,2.85rem);line-height:1.05;letter-spacing:-.032em;font-stretch:90%;max-width:22ch}
+    .lc-wide .gv-copy p:not(.lc-num){margin-bottom:14px;color:var(--muted);font-size:1.06rem;line-height:1.6;max-width:68ch}
+    .lc-wide .fig{margin-top:36px}
+    @media (max-width:980px){ .lc-wide{padding-block:72px} }
+    @media (max-width:620px){ .lc-wide{padding-block:56px} }
+    .lc-wide .gv-tall{display:none}
+    @media (max-width:720px){ .lc-wide .gv-wide{display:none} .lc-wide .gv-tall{display:block} }
   </style>
 </head>
 <body>
@@ -171,6 +181,7 @@
           <li><b>a name</b>Anchored to a domain you already own, so nobody has to be told who is behind it.</li>
           <li><b>an inbox</b>It holds messages while you redeploy, so they wait instead of failing.</li>
           <li><b>a card</b>Signed by the agent: what it does, what it needs, and what it will not touch.</li>
+          <li><b>a principal</b>Every message and run names who asked and on whose behalf the agent acts, signed, so either side can check it later.</li>
         </ul>
       </div>
     </section>
@@ -192,9 +203,101 @@
       </div>
     </section>
 
+    <section class="lc-wide" id="governance">
+      <div class="gv-copy">
+        <p class="lc-num">04</p>
+        <h2>Your agent's guardrails stop at its edge.</h2>
+        <p>Most governance today lives inside one agent: which models it may call, its token and cost budgets, the filters on its prompts and answers, the tools and data it may use, and the log of every model call. Whoever built the agent sets them, and they work well for that agent.</p>
+        <p>They end where your agent hands work to another one. When it works with a vendor's agent or a supplier's, the questions move to the space between them: who each one is, who it acts for, what the messages between them may carry, what it may commit, and what record both sides keep. The mesh answers those questions, alongside the guardrails you already have.</p>
+      </div>
+      <div class="fig">
+        <svg style="position:absolute;width:0;height:0;overflow:hidden" aria-hidden="true" focusable="false">
+          <defs>
+            <marker id="gv-arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 Z" fill="#E8F0EC"/></marker>
+            <symbol id="gv-intra" viewBox="0 0 480 360">
+              <rect x="1" y="1" width="478" height="358" rx="18" fill="none" stroke="rgba(232,240,236,.35)" stroke-width="1.5" stroke-dasharray="5 4"/>
+              <text x="24" y="38" fill="#E8F0EC" font-family="'Martian Mono', monospace" font-size="12" letter-spacing="1.3">INTRA-AGENT GOVERNANCE</text>
+              <rect x="90" y="56" width="300" height="230" rx="16" fill="#14272B" stroke="#F2A93B" stroke-width="2.5"/>
+              <circle cx="116" cy="82" r="9" fill="#14272B" stroke="#F2A93B" stroke-width="2.5"/>
+              <text x="134" y="86" fill="#F2A93B" font-family="'Martian Mono', monospace" font-size="11" letter-spacing="1">YOUR AGENT CHECKS</text>
+              <g fill="#E8F0EC" font-family="'Instrument Sans', sans-serif" font-size="14">
+                <text x="116" y="122"><tspan fill="#7FD6A8">&#10003;</tspan>  Which models it may call</text>
+                <text x="116" y="148"><tspan fill="#7FD6A8">&#10003;</tspan>  Token and cost budgets</text>
+                <text x="116" y="174"><tspan fill="#7FD6A8">&#10003;</tspan>  Prompt and response filters</text>
+                <text x="116" y="200"><tspan fill="#7FD6A8">&#10003;</tspan>  Tool and data permissions</text>
+                <text x="116" y="226"><tspan fill="#7FD6A8">&#10003;</tspan>  A log of every model call</text>
+                <text x="116" y="252"><tspan fill="#7FD6A8">&#10003;</tspan>  Rate limits and fallback</text>
+              </g>
+              <g fill="#9BADA8" font-family="'Instrument Sans', sans-serif" font-size="15" text-anchor="middle">
+                <text x="240" y="314">Inside one agent, set by whoever built it.</text>
+                <text x="240" y="338">It ends where the agent hands off work.</text>
+              </g>
+            </symbol>
+            <symbol id="gv-inter" viewBox="0 0 480 360">
+              <rect x="1" y="1" width="478" height="358" rx="18" fill="none" stroke="rgba(232,240,236,.35)" stroke-width="1.5" stroke-dasharray="5 4"/>
+              <text x="24" y="38" fill="#E8F0EC" font-family="'Martian Mono', monospace" font-size="12" letter-spacing="1.3">INTER-AGENT GOVERNANCE</text>
+              <circle cx="58" cy="170" r="24" fill="#14272B" stroke="#F2A93B" stroke-width="2.5"/>
+              <rect x="398" y="146" width="48" height="48" rx="6" fill="#14272B" stroke="#8AA5FF" stroke-width="2.5"/>
+              <g fill="#E8F0EC" font-family="'Martian Mono', monospace" font-size="10" letter-spacing=".8" text-anchor="middle">
+                <text x="58" y="214">YOUR</text><text x="58" y="228">AGENT</text>
+                <text x="422" y="214">THEIR</text><text x="422" y="228">AGENT</text>
+              </g>
+              <g stroke="#E8F0EC" stroke-width="1.8" stroke-dasharray="5 4" fill="none">
+                <line x1="84" y1="170" x2="124" y2="170" marker-start="url(#gv-arr)" marker-end="url(#gv-arr)"/>
+                <line x1="356" y1="170" x2="394" y2="170" marker-start="url(#gv-arr)" marker-end="url(#gv-arr)"/>
+              </g>
+              <rect x="128" y="56" width="224" height="230" rx="14" fill="#10221F" stroke="rgba(232,240,236,.55)" stroke-width="1.5"/>
+              <text x="240" y="80" fill="#9BADA8" font-family="'Martian Mono', monospace" font-size="10" letter-spacing="1.2" text-anchor="middle">THE MESH CHECKS</text>
+              <g fill="#E8F0EC" font-family="'Instrument Sans', sans-serif" font-size="14">
+                <text x="146" y="108"><tspan fill="#7FD6A8">&#10003;</tspan>  Who each one is</text>
+                <text x="146" y="133"><tspan fill="#7FD6A8">&#10003;</tspan>  Who it acts for</text>
+                <text x="146" y="158"><tspan fill="#7FD6A8">&#10003;</tspan>  Who may reach it</text>
+                <text x="146" y="183"><tspan fill="#7FD6A8">&#10003;</tspan>  Message guards both ways</text>
+                <text x="146" y="208"><tspan fill="#7FD6A8">&#10003;</tspan>  What it may commit</text>
+                <text x="146" y="233"><tspan fill="#7FD6A8">&#10003;</tspan>  The signed record</text>
+                <text x="146" y="258"><tspan fill="#7FD6A8">&#10003;</tspan>  The stop switch</text>
+              </g>
+              <g fill="#9BADA8" font-family="'Instrument Sans', sans-serif" font-size="15" text-anchor="middle">
+                <text x="240" y="314">Between agents, across teams and companies.</text>
+                <text x="240" y="338">Each owner sets the rules for their side.</text>
+              </g>
+            </symbol>
+          </defs>
+        </svg>
+        <svg class="gv-wide" viewBox="0 0 1000 380" role="img" aria-label="Two panels. Intra-agent governance: your agent checks which models it may call, token and cost budgets, prompt and response filters, tool and data permissions, a log of every model call, and rate limits and fallback, set by whoever built it and ending where the agent hands off work. Inter-agent governance: between your agent and their agent, the mesh checks who each one is, who it acts for, who may reach it, message guards both ways, what it may commit, the signed record and the stop switch, with each owner setting the rules for their side.">
+          <use href="#gv-intra" x="10" y="10" width="480" height="360"/>
+          <use href="#gv-inter" x="510" y="10" width="480" height="360"/>
+        </svg>
+        <svg class="gv-tall" viewBox="0 0 500 750" role="img" aria-label="Intra-agent governance inside your agent, set by whoever built it; inter-agent governance between your agent and theirs, checked by the mesh.">
+          <use href="#gv-intra" x="10" y="10" width="480" height="360"/>
+          <use href="#gv-inter" x="10" y="380" width="480" height="360"/>
+        </svg>
+        <div class="cap"><span>intra-agent: inside one agent</span><span>inter-agent: between agents, carried by the mesh</span></div>
+      </div>
+    </section>
+
+    <section class="lc-block" id="commit">
+      <div>
+        <p class="lc-num">05</p>
+        <h2>You decide what it may commit.</h2>
+        <p>Give your agent a mandate that says what it may agree to in your name, and a spending limit it cannot pass. Where a decision matters, the agent asks a person for an OK before it commits.</p>
+        <p>If something goes wrong, the kill switch stops the agent everywhere at once, and its mail waits until you resume it. Every message is signed, every run records who asked and on whose behalf, and a daily audit export is timestamped publicly, so neither side can change the record later. <a href="trust-and-control.html">Trust and control</a> has the detail.</p>
+        <p><a class="btn btn-ghost" href="kill-switch.html">How the kill switch works &rarr;</a></p>
+      </div>
+      <div class="fig">
+        <ul class="got" aria-label="What you set for your agent">
+          <li><b>a mandate</b>What it may agree to in your name, and nothing beyond it.</li>
+          <li><b>a limit</b>What it may spend before it has to stop and ask.</li>
+          <li><b>your OK</b>A person approves where it matters, before the agent commits.</li>
+          <li><b>a stop</b>The kill switch, from one agent up to your whole organization.</li>
+          <li><b>a record</b>Signed messages and runs, with a daily export timestamped publicly.</li>
+        </ul>
+      </div>
+    </section>
+
     <section class="lc-block">
       <div>
-        <p class="lc-num">04</p>
+        <p class="lc-num">06</p>
         <h2>It shows up in your observability stack.</h2>
         <p>Every message between agents carries W3C Trace Context, so the hop from your agent to theirs joins the same trace. Point your OpenTelemetry collector at the mesh, and those spans land in the tools you already use, beside everything else.</p>
       </div>
@@ -215,7 +318,7 @@
 
     <section class="lc-block" id="ways">
       <div>
-        <p class="lc-num">05</p>
+        <p class="lc-num">07</p>
         <h2>Bring it however it's built.</h2>
         <p>There are four ways in, and they differ in one thing: who holds the key your agent signs with. Give us the address of an agent that already speaks A2A, add our TypeScript or Rust library to your agent's code (Mastra and LangChain.js agents included), hand us the repo or container to run, or have us run it in your own Google Cloud project.</p>
         <p>Start with the address and move when you outgrow it. <a href="https://dev.agentmesh.ai/bring-your-own-agent.html">The full comparison</a> is in the developer docs.</p>
